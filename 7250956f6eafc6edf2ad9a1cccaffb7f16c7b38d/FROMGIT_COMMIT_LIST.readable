@@ -1,0 +1,1194 @@
+aaaa9a487d854f1aca5b6d488320d0dfc42ca4bc FROMGIT: clk: qcom: Add qspi (Quad SPI) clock defines for sdm845 to header
+a0027569d48c18e57ec410200fe51951e6b8cc63 FROMGIT: clk: qcom: Add qspi (Quad SPI) clocks for sdm845
+e73240945b27eb632877d05ed77c8c3163db995d FROMGIT: clk: qcom: Add support for RCG to register for DFS
+e392f41c9d60050be8614f7548bc0f5f5fa34635 FROMGIT: clk: qcom: gcc: Register QUPv3 RCGs for DFS on SDM845
+2506c0ef606b6577a7ec90aa99bd1184cef231e3 FROMGIT: clk: qcom: Allocate space for NULL terimation in DFS table
+fc847365b4a25119ebd4f3205467490ee964d80c FROMGIT: irqchip/pdc: Setup all edge interrupts as rising edge at GIC
+5e19c1b9d22e9030faf1c1416954d3462cc12ea7 FROMGIT: remoteproc: qcom: Rename Hexagon v5 PAS driver
+781ba8bb996c991ffb5c4c02fae4e172b8711b52 FROMGIT: remoteproc: qcom: Rename Hexagon v5 modem driver
+0862307cedb9d1677153b3b32109a101147a50a7 FROMGIT: remoteproc: qcom: q6v5-pil: Explicitly get mss_restart line
+0458145fe1c09a5b9145ec7f5651b28c033706dd FROMGIT: remoteproc: qcom: q6v5-pil: Assign the relocated address
+1c49de37c86e0eef59af3b98af536ee5896d9b19 FROMGIT: remoteproc: qcom: q6v5-mss: add SCM probe dependency
+1bf3d422a57baf709fd1d43e184676604f5652d6 FROMGIT: remoteproc: qcom: q6v5: Propagate EPROBE_DEFER
+075f8d32a531c81348c16ac4f21ba5fd1382bc64 FROMGIT: phy: qcom-ufs: Remove stale methods that handle ref clk
+9c587082bed26de7739a59c23231586693056b83 FROMGIT: scsi/ufs: qcom: Remove ufs_qcom_phy_*() calls from host
+f72fb13033c2fcd63867203899ab03c29f9f11dc FROMGIT: phy: qcom-ufs: Declare 20nm qcom ufs qmp phy as Broken
+3ff5fe8ff411b6baae2584d34dfae1c009f1d1d4 FROMGIT: dt-bindings: remoteproc: qcom: Remove additional definition tag
+94c0786f7d0c02a4381609d02a486079532322a4 FROMGIT: dt-bindings: remoteproc: Add PDC reset binding for Q6V5 PIL
+c439c5bd6e307351010ba9908a66c3b633b94f2a FROMGIT: remoteproc: qcom: q6v5: shore up resource probe handling
+2d5c55ebeafbdfed5bfabc4f1ad626ce3bf05ea9 FROMGIT: soc: mediatek: pwrap: order SoCs and PMICs ascending
+d41bdc7bb8c79be7b020592d1e6174c2ddc16d03 FROMGIT: soc: mediatek: pwrap: use group of bits for pwrap capability
+c9cb8075ea53ded950d3b9855b99b268bf769f72 FROMGIT: soc: mediatek: add mt8183 pwrap support
+b90ce1ee1bfba4b2883cc075772a11ff2e80ed05 FROMGIT: soc: mediatek: pwrap: use true and false for boolean values
+03ea379beeb967119ab72d0b8254b52d9779f70e FROMGIT: spi: mediatek: Don't modify spi_transfer when transfer.
+e84b02dbda20712b4c18f240305f83462584ae7a FROMGIT: clk: qcom: Remove unused arrays in SDM845 GCC
+f4aebeac8dd618be40094103d67e194ecb03d1fa FROMGIT: dt-bindings: mediatek: add compatible for mt8183 pwrap
+2d3d86b00f82efe197dbd9cac96076da9041a3df FROMGIT: Bluetooth: hci_qca: Remove serdev_device_open/close function calls
+d30a8fa8750c845870bcff71d8109744facf51fe FROMGIT: Bluetooth: hci_qca: Remove hdev dereference in qca_close().
+36016fca0273e52d5ea193b3f793a657b8751c46 FROMGIT: Bluetooth: hci_serdev: clear HCI_UART_PROTO_READY to avoid closing proto races
+0c448190dfc8e8581eacaba7751c8fb3f8ddbdaa FROMGIT: Bluetooth: hci_serdev: Add protocol check in hci_uart_dequeue().
+ca63fe22d6679a65e3ab8b6a06acea44ee28b285 FROMGIT: Bluetooth: hci_qca: Add poweroff support during hci down for wcn3990
+c92e788e82ec7186007eaad6db9861bbaa45ff08 FROMGIT: drm/msm: dsi: Initialize msm_dsi->id to -1
+23ea0396141756e0d2b05b0c298a154249c10109 FROMGIT: drm/msm: dsi: Return errors whan dt parsing fails
+0906ef8a49664dbdf355b846bdc7d89e7c5d4943 FROMGIT: drm/msm: Don't fail bind if nothing connected to dsi
+3c1319c930406992389fdf183c0fa292131ad72b FROMGIT: drm/msm/disp/dpu: Use proper define for drm_encoder_init() 'encoder_type'
+feed88390c9ab0ea43c0adeb8cd3814b5730401a FROMGIT: drm/msm/dpu: enable cursor plane on dpu
+1bce99e49817f74899962778e4d05efafb960665 FROMGIT: drm/msm/dpu: fix for cursor blend issue
+193f6bb0243c86d3c033b5a6e595c0c77276c010 FROMGIT: drm/msm/dpu: remove stale display port programming
+82eb61b0919b87b9fb3d0dd2402e4cee7a9179b4 FROMGIT: drm/msm/dpu: remove unwanted encoder type mapping
+22c9db85fcb69bdbc27155648b145c0972cd1300 FROMGIT: drm/msm/dpu: use encoder type to identify display type
+19a58520851eb28616542fb149b75d753cc7cdab FROMGIT: drm/msm: dpu: Allow planes to extend past active display
+c04cd8d84864502827f93fce0e166c3a0eca3a08 FROMGIT: drm: Add support for device_id based detection.
+f293be4c3487c73644bcb815cda52d4ef4b3b22b FROMGIT: drm/msm/dpu: Remove dpu_mdss_isr when dpu_mdss_destroy is called
+cc7710e458b5c29628986654c85de1c147d98109 FROMGIT: drm/msm/dpu: remove debugfs support for misr
+abd107d04dab16ba761c0d6e4facead2dfc24053 FROMGIT: drm/msm/dpu: squash power handle event types
+dfa9533535ba92ef8bb956f5591404cf8a354290 FROMGIT: drm/msm/dpu: remove scalar config definitions
+1ed14ec0307aae287d97402f04617686a6c45794 FROMGIT: drm/msm/dpu: remove resource pool manager
+fd63a09e1e094a30f09efde9186a15e435886130 FROMGIT: drm/msm/dpu: remove ping pong split topology variables
+d74ba3b48a30fc0b5ab0ac9833b6390a54f6fb88 FROMGIT: drm/msm/dpu: enable master-slave encoders explicitly
+fcab4b10728f29b9e50bb6681493ac998082b55a FROMGIT: drm/msm/dpu: use kms stored hw mdp block
+eb5be227fd0a3b9e7c5ff6c022f09990a3aa5f71 FROMGIT: drm/msm/dpu: iterate for assigned hw ctl in virtual encoder
+f9f6303506ce5c5c128a18b358338c4c97665fa5 FROMGIT: drm/msm/dpu: avoid querying for hw intf before assignment
+46c6077246525abed3a04e776054d96aed42e217 FROMGIT: drm/msm/dpu: make crtc get_mixer_width helper static
+6de298594b0f7832d360c07acc36d0236bef4bcc FROMGIT: drm/msm/dpu: move hw resource tracking to crtc state
+0b79fbc1f5938a4f82af67b3ee9a8867ffd46f23 FROMGIT: drm/msm/dpu: rename hw_ctl to lm_ctl
+bb47db33d33e20a0e79f6ffb5f5d5932c5ce0bff FROMGIT: drm/msm/dpu: clean up destination scaler residue
+184b50387b1132082c119d1d230269b976be8b04 FROMGIT: drm/msm/dpu: remove cdm block support from resource manager
+d515995116b10be09fe42c8998ec8bf172ad0676 FROMGIT: drm/msm/dpu: remove LOCK/CLEAR support in RM
+4d865ec8d1d38b8fab4b4b7a61c3aaf7c90bc59f FROMGIT: drm/msm/dpu: remove display H_TILE from encoder
+36df86588f4bdb849af7ff568459758f79735722 FROMGIT: drm/msm/dpu: remove RM dependency on connector state
+04b0ddc6c0c3d76ee2982f37fd77c3d2054b6c8e FROMGIT: drm/msm/dpu: relax parameter validation in encoders
+f5415ee402a467c78b2244541fc60af9923bd75a FROMGIT: drm/msm/dpu: remove RM topology definition
+54616100eeb9f52eb15b51486bcded09e75cf1af FROMGIT: drm/msm/dpu: Remove an unused enum
+104b23dbfa6393b12d338a3bebf43544a5e865c6 FROMGIT: drm/msm: dpu: Remove impossible checks
+b744b9d76e756593d24d5cdb8b2675dd9ecbedf8 FROMGIT: drm/msm: dpu: Move atomic_check_plane_state() call to atomic_check
+03d4204845f362ef6ba6b45272c1ce8371c42549 FROMGIT: drm/msm: dpu: Consolidate atomic_check functions()
+7e619f5d16a1329ca539aea463087ee31986d945 FROMGIT: drm/msm: dpu: Remove dpu_plane_sspp_enabled()
+9708a59a17781289ba5cafb169525de7df5af07a FROMGIT: drm/msm: dpu: Remove dpu_plane_enabled()
+675d812294a79d705694f9ff0be61f47dda5ee8f FROMGIT: drm/msm: dpu: Make dpu_plane_sspp_atomic_update() void
+e86e495d5829f87bac84096c6b18af2f0f229450 FROMGIT: drm/msm: dpu: Don't continue after error in atomic_check
+4cf05d4680d2d9f8ff378bb5f967497be5edc531 FROMGIT: drm/msm: dpu: Clear frame_busy_mask bit after trace
+51c962fda01de55572ed504e60fdcda7d2590521 FROMGIT: drm/msm: dpu: Add extra_flush_bits to trigger_flush trace
+585e7b8ed9bbb38b65c4ca7002483ebbc6e1262e FROMGIT: drm/msm: dpu: Don't store/deref pointers in trace ringbuffer
+3b0d81a601b47919772fe8892ea756b241e2b919 FROMGIT: drm/msm/dpu: Remove unneeded checks in dpu_plane.c
+9ae5fd010fedcf2971e4e60ec11549657f93f417 FROMGIT: drm/msm/dpu: Clean up plane atomic disable/update
+c27fba3b5dbb1ed8ee0bca9315060ac834dd1052 FROMGIT: drm/msm/dpu: Remove unneeded checks in dpu_crtc.c
+9e20907b8ff9dde688f266508bbd52d30a882bfe FROMGIT: drm/msm/dpu: Remove _dpu_crtc_power_enable
+8fff3e015a26f66724901b96042663d46af08534 FROMGIT: drm/msm/dpu: Change _dpu_crtc_vblank_enable_no_lock to void
+b3682083a1b64e3c8dcfc0c4e3a0a807dc04cb8b FROMGIT: drm/msm/dpu: Make dpu_plane_danger_signal_ctrl void
+cf0ba003ab39775c07ef66603483b69974842cf3 FROMGIT: drm/msm/dpu: Revise _dpu_plane_get_aspace
+8f98e6bbb0642b024aa2c0c1af9d00cf8842e87f FROMGIT: drm/msm: dpu: Don't reset dpu_enc->cur_master on .disable()
+02c165f1ae973c9bcca71f9b7bfe10543af0758f FROMGIT: drm/msm: dpu: Fix memory leak caused by dropped reference
+5d0d79881ed6f6786c76e5a03693272de117f7a1 FROMGIT: drm/i915: Ensure intel_engine_init_execlist() builds with Clang
+db2403486018fe369cb36d37932288114ca69c8d FROMGIT: HID: magicmouse: add support for Apple Magic Trackpad 2
+c6d74ca189bf7c7cadcc27c2aa2a4ad9c53632bb FROMGIT: dt-bindings: thermal: qcom-spmi-temp-alarm: Fix documentation of 'reg'
+960674ad54ba3e4b95eaa0af08110cfc18ca3879 FROMGIT: dt-bindings: thermal: qcom-spmi-temp-alarm: Improve thermal zone in example
+48eab673b61b2a67466d2068d903401ceb3b8200 FROMGIT: thermal: qcom-spmi: Use PMIC thermal stage 2 for critical trip points
+4e1f97ca3502990bf77e29df51500a7c61df08f0 FROMGIT: dt-bindings: iio: adc: Add DT binding document for PMIC5 ADC
+d898d58d38e9c63acbdbd16021288a1a80d98f50 FROMGIT: iio: adc: Update QCOM ADC license to SPDX format
+9c5b47f4b743cbcf2d052078debd568def18e108 Reland "FROMGIT: iio: adc: Add QCOM SPMI PMIC5 ADC driver"
+fe9770ef885ee31ab771e508d3d778707fd7463a FROMGIT: iio: adc: qcom-spmi-adc5: Add ADC5_AMUX_THM[24]_100K_PU to rev2 channel list
+c8557c62aa3e2a6d21b4bee619a290ae282ce93b FROMGIT: iio: adc: qcom-spmi-adc5: Verify channel numbers from DT
+1c1932522b1f87b893cfe94bc4d007f4ac90f37a FROMGIT: media: vivid: Support 480p for webcam capture
+2a89197287240b20b5d9c3fa8a73fa1e2fa9b3d1 FROMGIT: mmc: sdhci-pci-o2micro: Add quirk for O2 Micro dev 0x8620 rev 0x01
+f7e88db1adeb10f56c542af6e183df88c0710377 FROMGIT: mmc: mediatek: fill the actual clock for mmc debugfs
+92c65eff003eceaac3d69c843b4f1f1c17e541f0 FROMGIT: mmc: mediatek: fix cannot receive new request when msdc_cmd_is_ready fail
+40d57a667f84227061daf00b95e9fc1bd2ce17c1 FROMGIT: mmc: mediatek: tune CMD/DATA together
+b5198f85b321cc8e8221f6a97fe7b961a050febc FROMGIT: mmc: mediatek: add MT8183 MMC driver support
+ba9f577126ba9b8c7a89aeb65b097b84d5eca79d FROMGIT: mmc: mediatek: drop too much code of tuning method
+e6461815611bdeaf505dbab6113402131a10adbb FROMGIT: mmc: dt-bindings: add support for MT8183 SoC
+9f2024e3e33a8cdd7b5ee65b17a8d64339f88599 FROMGIT: i2c: mediatek: Use DMA safe buffers for i2c transactions
+ac02d02d0d75441b341e2a2a69636a2737579008 FROMGIT: virtio_net: ethtool tx napi configuration
+7bbcf7c546dee8a6ee0ce0f64dc3bb51250c33e1 FROMGIT: pinctrl: msm: Mux out gpio function with gpio_request()
+70577ec26137b629ba2866de3d1d61c05e93ffb2 FROMGIT: pinctrl: msm: Configure interrupts as input and gpio mode
+e243dc5b1235adc1031816f5f7ef611316fd9c31 FROMGIT: regulator: qcom-rpmh: Add stylistic breaks in the default cases
+61885ed8fe5486986f8b59f4ed13b849e7c6a96f FROMGIT: ASoC: AMD: Fix simultaneous playback and capture on different channel
+0cbc4b150692d449162f5379d6cebd6c4eef4cc9 FROMGIT: ASoC: rt5663: Remove the boost volume in the beginning of playback
+5e663981719e72c9b3e327c01f4374213b9e3e56 FROMGIT: ath10k: skip resetting rx filter for WCN3990
+b920521079959af54dc6059c05f6693432c57496 FROMGIT: ath10k: retrieve MAC address from system firmware if provided
+b179540ca4b7dca254169999f4fdb41d454641e1 FROMGIT: ath10k: optimize pci diag mem read & write operations
+4154ab349bc80e1630d1be44c99e9d3efd2685f3 FROMGIT: ath10k: support to access target space below 1M for qca6174 and qca9377
+17daccfdc5ac55c8887289f3e773a964ed03b2f2 FROMGIT: ath10k: download firmware via diag Copy Engine for QCA6174 and QCA9377.
+c00940f09bbb2137fe6ac90d2fcfc1f16e834827 FROMGIT: ath10k: add missing sanity check on diag download
+7df2240519ab5774c0445124daf9b0f4738dcee7 FROMGIT: ath10k: allocate small size dma memory in ath10k_pci_diag_write_mem
+dbd641a67eeae90c169db56729802751ce0fc9ad FROMGIT: virtio_net: ethtool tx napi configuration
+69258ffbeff229cde477d27842a9622dc468ed5b FROMGIT: remoteproc: Introduce custom dump function for each remoteproc segment
+145382e59e64b73cd2c64000015afaf5690ec1e0 FROMGIT: remoteproc: Add mechanism for custom dump function assignment
+57b2ba142d71e42bd0024f8abda4b2ab012ce4f8 FROMGIT: remoteproc: qcom: q6v5-mss: Refactor mba load/unload sequence
+55387429434f64611f34b9f80ed76b0c4c862d35 FROMGIT: remoteproc: qcom: q6v5-mss: Add custom dump function for modem
+51f32652b9350918e17c1bcdc045cf4123abf9f6 FROMGIT: remoteproc: qcom: q6v5-mss: Register segments/dumpfn for coredump
+6795c9e15e3ca442ee942bfee0d7007a1cbf9841 FROMGIT: Bluetooth: hci_qca: Add support for controller debug logs.
+1f2ddb68ecdf0c535dccecce36b2dcd2f3204bd2 FROMGIT: dt-bindings: drm/panel: simple: Add no-hpd property
+779033c6ef5e15b4cdd67149e5b859542bbcc1b2 FROMGIT: drm/panel: simple: Support panels with HPD where HPD isn't connected
+493c1fc5c3b04082b607337ecbbb2a587d2a3e78 FROMGIT: drm/panel: simple: Add "no-hpd" delay for Innolux TV123WAM
+5aeea2bee0d2783c93e0d8e6e7610d014a2bef2f FROMGIT: drm/bridge: ti-sn65dsi86: Remove the mystery delay
+856bea88a208608ea7a697ed5613058aecd5f5c1 FROMGIT: dt-bindings: drm/panel: simple: Innolux TV123WAM is actually P120ZDG-BF1
+baf3d9c5e1c8745c5caeff41145c01f36df03d1a FROMGIT: drm/panel: simple: Innolux TV123WAM is actually P120ZDG-BF1
+aefcb5def44482e804d0b9b874a7bad8b3e6e1d8 FROMGIT: dt-bindings: reset: Add PDC Global binding for SDM845 SoCs
+29c5af39eb56f20a07ce5e5fd47e07c1b67e4c26 FROMGIT: reset: qcom: PDC Global (Power Domain Controller) reset controller
+ef979b8d0cf8def366c8f51974bf1d2e23841e74 FROMGIT: drm/msm/dsi: configure VCO rate for 10nm PLL driver
+32f81281ee172f1ba046da1e3e58fb5864e1110f FROMGIT: dt-bindings: firmware: scm: Refactor compatibles and clocks
+0f1090942c06ed1e0bbc34d8ca91dad57eaecd58 FROMGIT: firmware: qcom: scm: Refactor clock handling
+631aae578ed41073d9a735686f6836d47b6e24b1 FROMGIT: dt-bindings: firmware: scm: Add MSM8998 and SDM845
+e3ae26e4b09a40195854b6bdd8a642b088b93dc4 FROMGIT: remoteproc: qcom: q6v5-pil: Add PDC reset for modem on SDM845 SoCs
+854de5e86773a085a3cc39c054619f9212b65678 FROMGIT: remoteproc: qcom: q6v5: Fix a race condition on fatal crash
+75376edeeca740a7a494dbddbb396af9843fc44e FROMGIT: remoteproc: Check for NULL firmwares in sysfs interface
+a0069d4ff25ca6bb7c93c4e3ffabb1aee7188605 FROMGIT: kdb: use correct pointer when 'btc' calls 'btt'
+84d58e0c2625dfc93fb2cd8c75fbd8f46309d03b FROMGIT: kdb: print real address of pointers instead of hashed addresses
+c57b65e23a909fc86248619fb23c81a9471bdcef FROMGIT: drm/msm/dpu: Remove dpu_kms_pm_suspend/resume
+71d572ed6925692655f6a1cb336bf91a700e80ac FROMGIT: drm/msm: Cut dpu_kms hooks from msm_pm_suspend/resume
+cf871c48663f74a54958ec1eddbd4435dc2e1b29 FROMGIT: drm/msm/dpu: Remove suspend state tracking from crtc
+52b7b072ddf4efaf011cd506845d0b3673b4ddf8 FROMGIT: drm/msm/dpu: Replace dpu_crtc_reset by atomic helper
+cab80fe26740baabfc82fc6d273f3ec7e224aa4a FROMGIT: spi: mediatek: use correct mata->xfer_len when in fifo transfer
+d787a08dd1d30603b67519c92742caa1c417748e FROMGIT: pinctrl: mediatek: add pinctrl-mtk-common-v2 for all MediaTek pinctrls
+b47fd6643596818f9ca58e2e2faffb719b0200ae FROMGIT: pinctrl: mediatek: add pinctrl-moore that implements the generic pinctrl dt-bindings
+166049758528f250a6883402c77791cb70a4933e FROMGIT: pinctrl: mediatek: extend struct mtk_pin_field_calc to pinctrl-mtk-common-v2.c
+b969bef323b87cf08a88701cfe207fc91cccbae7 FROMGIT: pinctrl: mediatek: extend struct mtk_pin_desc to pinctrl-mtk-common-v2.c
+2a63a391eff703bfc77d969caa6daf56655cb8af FROMGIT: pinctrl: mediatek: extend struct mtk_pin_soc to pinctrl-mtk-common-v2.c
+f5344624573c19c51ee5393e3fc78b7f8588e954 FROMGIT: pinctrl: mediatek: add driving strength related support to pinctrl-mtk-common-v2.c
+0bc1e20a65eabf00d86b81884e51ded9003084cc FROMGIT: pinctrl: mediatek: add drv register support to pinctrl-mtk-common-v2.c
+78a8f26c8acc25addec8dfafa65ab3833a36a9a6 FROMGIT: pinctrl: mediatek: add pull related support to pinctrl-mtk-common-v2.c
+1fa745667c40bab300e994ef450b4bb69acf960c FROMGIT: pinctrl: mediatek: add advanced pull related support to pinctrl-mtk-common-v2.c
+22dab2668775ebc8b1f020656e1c4d6c59b7de90 FROMGIT: pinctrl: mediatek: add ies register support to pinctrl-mtk-common-v2.c
+3d5ff5670b8ec79668f5dff788e5c781a5004bbd FROMGIT: pinctrl: mediatek: add pullen, pullsel register support to pinctrl-mtk-common-v2.c
+72c134f24d1e1a0a2f59c7e09c1e18cdef1b73ed FROMGIT: pinctrl: mediatek: add MT7623 pinctrl driver based on generic pinctrl binding
+69aa71b320d8f3c17dc86a3ad7a7419c28ca4a82 FROMGIT: pinctrl: mediatek: use pin descriptor all in pinctrl-mtk-common-v2.c
+2dba3edf11d68b299a400ecd844945885068231c FROMGIT: pinctrl: mediatek: add multiple register bases support to pinctrl-mtk-common-v2.c
+2b642a20d40ddceac4e723d984d34af37e81e38c FROMGIT: pinctrl: mediatek: adjust error code and message when some register not supported is found
+be7adadac07fb1a32f5408bee0b59c6bc1b9219a FROMGIT: pinctrl: mediatek: extend struct mtk_pin_desc which per-pin driver depends on
+aae6e04342c1a48fdb6fcbce6006281e74539ddd FROMGIT: pinctrl: mediatek: add pinctrl-paris that implements the vendor dt-bindings
+f32494fb5b274f233f1cfd08b58ce8312fc6b5bb FROMGIT: pinctrl: mediatek: add MT8183 pinctrl driver
+c2fee9ae1343ad493991ea7d50d0c6bbfacf26fa FROMGIT: pinctrl: mediatek: extend advanced pull support in pinctrl-mtk-common-v2.c
+ca620dc60858ebcb231dac92d528406d0c366174 FROMGIT: pintcrl: mediatek: add pull tweaks for I2C related pins on MT8183
+f9d842dc7e92610301f4249b3b571f739e17a64c FROMGIT: pinctrl: mediatek: extend eint build to pinctrl-mtk-common-v2.c
+a670839d7595664329ad8b1c77b4a3d2931882ca FROMGIT: pinctrl: mediatek: add eint support to MT8183 pinctrl driver
+05ec9c3d12b810cd846d0cdb480479d3e1cde3a1 FROMGIT: spi: spi-geni-qcom: fix nitpicks
+918c0dee213725e096996a1e311ed6e43fe922aa FROMGIT: spi: spi-geni-qcom: Simplify probe function
+e7711922e27bae0703665619091b35638a50cd3a FROMGIT: spi: mediatek: Add bindings for mediatek MT8183 soc platform
+087e97a0abd1a757b7a387d1bc6ae9d03d3fddc8 FROMGIT: spi: mediatek: add spi support for mt8183 IC
+c61beb6aa01e12c75823fc6baf8b53969e58715a FROMGIT: drm/msm: dpu: Don't set legacy plane->crtc pointer
+9e4885d4cb57e5d0970cf3b050c26e31863ab2e3 FROMGIT: drm/msm: Grab a vblank reference when waiting for commit_done
+c2d3bee4a255735d47ea48a9d967c44fe6403e63 FROMGIT: drm/i915: Break long iterations for get/put shmemfs pages
+470a3b5adecdefaa34e905faf338bcd408949ea2 FROMGIT: mm, drm/i915: mark pinned shmemfs pages as unevictable
+3d845db97bb0e0ad472010c1ab45095f5b800ee0 FROMGIT: serial: core: Allow processing sysrq at port unlock time
+358cd71faf4bdce007875dfc37d190507e9f3768 FROMGIT: serial: qcom_geni_serial: Process sysrq at port unlock time
+59984192b303cd28613be71b6c16d2d310679f7c FROMGIT: serial: core: Include console.h from serial_core.h
+bf68223fbbe7113f6ccf58162faca61c20ca2c16 FROMGIT: serial: 8250: Process sysrq at port unlock time
+ab033ab033025eb77af0fb53e7e527ad960356c3 FROMGIT: drm/msm/dsi: fix dsi clock names in DSI 10nm PLL driver
+c6e63a6cb71854ff22c94798182abd20dc08f772 FROMGIT: mfd: mt6397: Do not call irq_domain_remove if PMIC unsupported
+19679dd1391367a0f05888f9f9277c8ed4f34074 FROMGIT: ASoC: qdsp6: q6afe-dai: constify snd_soc_dai_ops structures
+918784d3258f5d1c02b72e6019df072b72813ff9 FROMGIT: ASoC: qdsp6: q6afe: Fix wrong MI2S SD line mask
+38ea42418290092b33bf26a2497fdc6f35b029e7 FROMGIT: ASoC: qdsp6: q6asm-dai: Only add routing once.
+72cf54eee7d785a770f0e05f87b2e088ebabeac4 FROMGIT: ASoC: qdsp6: q6afe-dai: Fix the dai widgets
+cebd49b6d30e5c0f5e858de81e9ad4b59a4576e4 FROMGIT: ASoC: smd845: constify snd_soc_ops structure
+3a5e967b85e13045028692892e57f54c555c49c5 FROMGIT: ASoC: qcom: Set dai_link id to each dai_link
+9df59dbc0ec7f31f74057e9b5b0ca6a690dc5d55 FROMGIT: ASoC: rt5663: Add documentation for power supply support
+60e202745f64f9cc1b6065b0d667c3ebbcfb5502 FROMGIT: ASoC: rt5663: Add regulator support
+c53bfd11628423d3049bbe2f2289d7a94ab6e623 FROMGIT: ASoC: rt5663: Fix error handling of regulator_set_load
+ac2ae23ce609cab0ae7392f280428a5ee17eaf6c FROMGIT: regulator: Fix return value of _set_load() stub
+a94ab60791f7a94cbc9e7eaf5c9164f63d40f326 FROMGIT: dt-bindings: mmc: sdhci-msm: Add SoC-specific compatible strings
+fb98d451bc99248bf9b0e562c18a68d8f8b68169 FROMGIT: mmc: sdhci-msm: Re-initialize DLL if MCLK is gated dynamically
+869138e6e829172917d026cc7b807a61c3206450 FROMGIT: regulator: core: Properly expose requested_microamps in sysfs
+3cb61220295954d4b3b9591e3d00ba1b574dd6e0 FROMGIT: drm/msm: Check if target supports crash dump capture
+752aa8287a3e2797f23a6de5daa6c33a6c002568 FROMGIT: drm/msm: Fix task dump in gpu recovery
+e7f610aecbe30b0198d737eded3681f7d04be34f FROMGIT: drm/msm/gpu: Fix a couple memory leaks in debugfs
+1c968b53b5aac0311f86ddad75b27d943337d90c FROMGIT: drm/msm: fix handling of cmdstream offset
+eb0f6a00d167d057f6c6040ecbff3903cdbd16be FROMGIT: drm/msm: dpu: Add tracing around CTL_FLUSH
+55983d7e69a49c1ceaf74dd5c337caf93e9e7505 FROMGIT: drm/msm: Remove dpu_encoder_phys_ops->hw_reset()
+86285846604c5989c107106c1256e8bea61b6df0 FROMGIT: drm/msm: dpu: Remove unused functions from msm_media_info.h
+31f20cb411327f998d2966a8dffb70fe30b4571b FROMGIT: drm/msm: dpu: Remove _dpu_encoder_power_enable()
+e6f27b093fde998fa380f0f39b2d1d4cd91ac95b FROMGIT: drm/msm: dpu: Remove 'inline' from several functions
+f8c5e403e780df05ce840f31b84d52700550b624 FROMGIT: drm/msm: dpu: Remove empty/useless labels
+2085ea2727c19bb0b5ad7565c7a5fd814573a2f2 FROMGIT: drm/msm: dpu: Clean up _dpu_core_video_mode_intf_connected()
+1769b1cfd5022974598e1d1768b1dd80060edaef FROMGIT: drm/msm: dpu: Remove checks from dpu_plane_destroy_state()
+4aab9f9a5a57616a735a3cb03d1d7452ad1ab75c FROMGIT: drm/msm: validate display and event threads
+54b05ab018581178978268c316bd3ed662fca3c5 FROMGIT: drm: msm: Use DRM_DEV_* instead of dev_*
+9d304995796752dd1a2808d984551b803f521a5c FROMGIT: drm/msm/hdmi: Enable HPD after HDMI IRQ is set up
+27063751aafcd4dd84273e28e65f9240c0708ed9 FROMGIT: drm/msm/gpu: Don't map command buffers with nr_relocs equal to 0
+94487671c545cd6e1d4384c3fa63e34b044dd71a FROMGIT: media: use strscpy() instead of strlcpy()
+41e1aaac898b4f3b5a303ad70fc745d62d010ea2 FROMGIT: media: venus: helpers: use true and false for boolean values
+f4c7c1f0c786b646a481d338202ee325b94cb9aa FROMGIT: media: venus: vdec: fix decoded data size
+be942d0cdc04afad25a4dea0b748afb8a613a8fc FROMGIT: media: venus: change the default value of GOP size
+77c544c436f705529345e506ee9df7918c155f21 FROMGIT: media: venus: firmware: add routine to reset ARM9
+753b34203ffcfeb8d07620a9d634e160a3a47a97 FROMGIT: media: venus: firmware: move load firmware in a separate function
+1b7741e303fe88ebdc740064129d6c9dbf9fe40c FROMGIT: media: venus: firmware: register separate platform_device for firmware loader
+e0a21b8f6e157c1657d29dc3dba05312f16bb44e FROMGIT: media: venus: firmware: add no TZ boot and shutdown routine
+a68d52c583fe8a89cff02038ed24d611bd42c08e FROMGIT: drm/msm: dpu: Only check flush register against pending flushes
+b5821e309066897e062cab149a65198927148745 FROMGIT: drm/msm: dpu: Make legacy cursor updates asynchronous
+a6144631dc999b22df77de6d1505f73c1f7e2ff3 FROMGIT: regulator: core: Add voltage balancing mechanism
+cd6325a708002fd59649f0b240d833a792c9de0f FROMGIT: regulator: core: Change voltage setting path
+9cf84c7fde39de1ad4a3bcb1686d34fa95c7057b FROMGIT: regulator: core: Mutually resolve regulators coupling
+dbaaf25e8cc3bd8041fdbbb58cbff429be7defbb FROMGIT: regulator: core: Don't allow to get regulator until all couples resolved
+e877f3f1b58815a8ceb4dca8be6c75fc6eeef21a FROMGIT: regulator: Change regulator-coupled-max-spread property
+26153bc95c0cad36d151b41691c2e90dcc432b26 FROMGIT: regulator: core: Limit regulators coupling to a single couple
+3f92f9a722a02d4261c237a0d2c1013b2b0ae466 FROMGIT: regulator: Document new regulator-max-step-microvolt property
+453dd6dafa69a2f3b48605956f2c99aebd6e812f FROMGIT: regulator: core: Add new max_uV_step constraint
+82f9b0eeecdb56fc0565081b505d01c099ce09c5 FROMGIT: regulator: core: Decouple regulators on regulator_unregister()
+75e7b7fe7aefa6c0149668ae5e7839a3e874cde3 BACKPORT: FROMGIT: regulator/of_get_regulator: add child path to find the regulator supplier
+1ae8f532a070ecbe7cf31fb5cf08599c9d1c60ed FROMGIT: regulator: core: Use ww_mutex for regulators locking
+6d16487bb82dc2933614c7fbfedb5bd7ae7ccf24 FROMGIT: regulator: core: Properly handle case where supply is the couple
+1ccdc3d4f570423fbc94a60bc63f737d85da0da6 FROMGIT: regulator: core: Keep regulators-list locked while traversing the list
+4390fc7b70a8d19dd9f37c2597d8d9297a40ff61 FROMGIT: regulator: core: Export regulator_lock and regulator_unlock
+922a76327a94b23497f91b91a6df3870eda723fa FROMGIT: regulator: core: Don't double-disable supplies in regulator_disable_deferred()
+8a6bb5618f33c9c7ba2abe913d316d931e61158b FROMGIT: regulator: core: Only count load for enabled consumers
+0d0f9313dbff7d782644865223cd8d4df7f7a449 FROMGIT: regulator: core: Avoid propagating to supplies when possible
+368518908c68eec8d1e1bc80f4b1b9f54a0f4f84 FROMGIT: regulator: core: Apply system load even if no consumer loads
+78710b0c6ed925bb3e360305ce123b5a74512682 FROMGIT: regulator: core: enable power when setting up constraints
+b00a486e5c125dff95596d738b26052a2d0221e5 FROMGIT: dt-bindings: clk: Introduce 'protected-clocks' property
+43e58bfd2b71d906d17ad216a86f0850fadb0ea7 FROMGIT: clk: qcom: Support 'protected-clocks' property
+bf7d861712aa05780b3e7e54d7915ce9a26670b0 FROMGIT: dt-bindings: clock: Introduce QCOM Graphics clock bindings
+44caa3cd0e5ca1ff494c15c8649c2173e6799d39 FROMGIT: dt-bindings: clock: qcom: Fix the xo parent in gpucc example
+4e06e76b2b7d02a9d3dc1c13f3567c2c0a063c07 FROMGIT: clk: qcom: Add graphics clock controller driver for SDM845
+521ccc34d200dc4038187f9063db1b9487c06bef FROMGIT: clk: qcom: gpu_cc_gmu_clk_src has 5 parents, not 6
+d8be00e1986ee5a166a01d4f1237a7c0f5f5018e FROMGIT: clk: qcom: gdsc: Don't override existing gdsc pd functions
+eff574bf23c53f879ffdfcfbfa885691cf33f755 FROMGIT: clk: qcom: Add a dummy enable function for GX gdsc
+ef7981910d5e635e61260fab629f87c6b5461864 FROMGIT: drm/mediatek: Only try to attach bridge if there is one
+59da277d77757cc905cbbe752babd93df0de5d67 FROMGIT: HID: input: Ignore battery reported by Symbol DS4308
+cf73b244a80ac44650b508dc05a585951bdaec60 FROMGIT: tty: serial: qcom_geni_serial: Fix softlock
+002bdfe286f697fbce5a5044152a93606c167ea0 FROMGIT: dt-bindings: clock: Require #reset-cells in sdm845-videocc
+5470ddbee1a8b71b30a09b1574f7668601d20286 FROMGIT: usb/mtu3: power down device ip at setup
+f0c4e830bac97e89a08ab36e27c38c75ec7865c7 FROMGIT: ASoC: rsnd: tidyup registering method for rsnd_kctrl_new()
+6e1ae32a41c698f1db6a837cdf6400f80c5a1f53 FROMGIT: ASoC: sdm845: Update slot_width for Quaternary TDM port
+35bced89cee9b065634ab2fc0632b42d8a23f72e FROMGIT: ASoC: sdm845: Add support for Secondary MI2S interface
+1bdbfad56dae2623e26da748ec605c6e70e0cbb9 FROMGIT: ASoC: qcom: sdm845: Add board specific dapm widgets
+77bfc7d1f99e6edce1f78d2fabf8175279f56594 FROMGIT: ASoC: qcom: sdm845: Create and setup jack in init callback
+5c7311c643d0b0fa3c4fc58496dca1a3235b8466 FROMGIT: drm/i915: Pass intel_encoder to infoframe functions
+69aa931da6c1c6f3fc3c493778eaa7a9d612d137 FROMGIT: drm/i915/psr: Enable PSR1 on gen-9+ HW
+b707df38bff20d4bd2cfbc1d375576b8c63444f3 FROMGIT: drm/i915/psr: Share PSR and PSR2 exit mask
+f9ecc73976ddb57b74d3d48070294d5cc5b124d1 FROMGIT: drm/i915/psr: Make MASK_DISP_REG_WRITE reserved in PSR_MASK for ICL
+1491e20be7af6762e448fce0e22b20c96a3db6ff FROMGIT: drm/i915/psr: Remove PSR2 TODO error handling
+74d62f145a34290d0f33d2375f2fe77a2fbba325 FROMGIT: drm/i915/psr: Use WA to force HW tracking to exit PSR2
+39bb01366aeb8c9cafe2783d1856ed121a394c70 FROMGIT: drm/i915/psr: Use intel_psr_exit() in intel_psr_disable_source()
+0342998c2f3c4b08ef4993542d7057433a171d93 FROMGIT: drm/i915/psr: Always wait for idle state when disabling PSR
+6dadceaf740c95686c64aef9f81aeaf3ac5e1cf3 FROMGIT: drm/i915/psr: Move intel_psr_disable_source() code to intel_psr_disable_locked()
+9536fcf61a9fa114988c36342245c4e4192cc9f8 FROMGIT: drm/i915: Make EDP PSR flags not depend on enum values
+1dfd2a59ef5e06a2219ef7e5aee01ab6e6aabc58 FROMGIT: drm/i915: Make CHICKEN_TRANS reg not depend on enum value
+8c831514add44c0b86f2a28b000cb8a26b1871a6 FROMGIT: drm/i915: Check PSR errors instead of retrain while PSR is enabled
+d6edf59abaa1247ed52c952d345721ef0e93cbba FROMGIT: drm/i915: Do not enable PSR in the next modeset after a error
+59d783977f6a6868e90ea5b2d2fa2f13a3e01358 FROMGIT: drm/i915: Disable PSR when a PSR aux error happen
+64744ba0ce9eeb8c621409995c0acec34b57cd92 FROMGIT: drm/i915: Keep PSR disabled after a driver reload after a PSR error
+055edfec27842cfeb23e15ef0a3fffb2531f3b82 FROMGIT: dt-bindings: mmc: sdhci-msm: Clarify register requirements
+a8b9b0eb4266d17b9d62a4c0bdb00e0acb14ead2 FROMGIT: dt-bindings: clock: Introduce QCOM LPASS clock bindings
+eea7e2b35e911d99c6189e5d62d6d9addb809094 BACKPORT: FROMGIT: clk: qcom: Add lpass clock controller driver for SDM845
+e16801b1b793a4945a7e6405d1d2e74238f70749 FROMGIT: arm64: dts: qcom: sdm845-mtp: Mark protected gcc clocks
+d740624dcf10f3812753ca2a5be4948e3618fd3c FROMGIT: ath10k: fill the channel survey results for WCN3990 correctly
+dfc1539ad5aaa76a5f3b6e6c93d6132625e9206b FROMGIT: media: venus: add support for USERPTR to queue
+b8bd11b2c1bee07e6040d27bfcccf98d339ed7d2 FROMGIT: media: venus: handle peak bitrate set property
+a80e5e3e190e15f3f8958f556ae88ef69428cfbe FROMGIT: media: venus: dynamic handling of bitrate
+83517dfc85ced96576d97bac355d0a07ed28e93a FROMGIT: media: venus: fix reported size of 0-length buffers
+157ef071fb2345a3d26a536999f9a4ca18711101 FROMGIT: soc: qcom: qmi_interface: Limit txn ids to U16_MAX
+33e5702425d5e08130a8951f32e39a7670efc82b FROMGIT: soc: qcom: Drop help text for QCOM_QMI_HELPERS
+374a8ec77b6a5117871022383d981a9cec5569fc FROMGIT: soc: qcom: llcc-slice: Remove duplicated include from llcc-slice.c
+8dcfb8a4a6cfcb37434c94f6154a63119decbafb FROMGIT: arm64: dts: sdm845: add prng-ee node
+c6eeadbed74ec75efbd2fbcb5ded1be6b22f651c FROMGIT: MAINTAINERS: Add entry for Qualcomm TSENS thermal drivers
+cd67a380f1ffe5e8d4601c4516188318bb41479a FROMGIT: arm64: defconfig: Enable some qcom remoteproc configs
+dcc13cd0fdd53700df3a11e0462030e587914422 FROMGIT: arm64: defconfig: Enable QCS404 configs
+38dba9f00542aaec8aa227a700f10817d3ad0f15 FROMGIT: arm64: defconfig: Enable core Qualcomm SDM845 options
+886087872ec88c6fbc71024a97c5c13f9a95dce7 FROMGIT: soc: qcom: cmd-db: Remove memcpy()ing from cmd_db_get_header()
+3cd64b512c1da06c8d6d1fe13f9f9a3554c12ec4 FROMGIT: PM / Domains: Rename genpd virtual devices as virt_dev
+0354aab5f445eece04fc726d0b7052c6e75aeac2 FROMGIT: OPP: Identify and mark genpd OPP tables
+b7682f58a628ea80239362abe97182a399853927 FROMGIT: OPP: Separate out custom OPP handler specific code
+cb26ae3958765746d613a210f7c0c2f57cc1ec70 FROMGIT: OPP: Populate required opp tables from "required-opps" property
+c329b3fc766557019d18a43dd92f0c592a5d14e2 FROMGIT: OPP: Populate OPPs from "required-opps" property
+3a832dbb2e5ef3974e40ad99b8dc7ed1aae17d32 FROMGIT: PM / Domains: Add genpd_opp_to_performance_state()
+602595b8c2ffa15c464a7d51dd23282ed325ad28 FROMGIT: OPP: Add dev_pm_opp_{set|put}_genpd_virt_dev() helper
+4c9d74cd67e4a95de311849781aaa8a644574568 FROMGIT: OPP: Configure all required OPPs
+9e8d2c6fb1105b57814c90774c23fd8a11217ed4 BACKPORT: FROMGIT: OPP: Rename and relocate of_genpd_opp_to_performance_state()
+2b4d567ae6978a994769bce10af09d12ffd82914 FROMGIT: OPP: Remove of_dev_pm_opp_find_required_opp()
+a64bd0e5a1763fbebb98ddbd5d6a01b3582bc58a FROMGIT: tty: serial: 8250_mtk: always resume the device in probe.
+fceb7e8a8aea991baa47c64d917cd9b26311c577 FROMGIT: media: venus: core: Set dma maximum segment size
+8ea3a51ceb25de844a24e368b478b6e1542194de FROMGIT: regulator: core: Clean enabling always-on regulators + their supplies
+91eb6443b7ab8adb08c0d3ffb88d2a9cc14c824f FROMGIT: soc: qcom: cmd-db: Stop memcpy()ing in cmd_db_read_aux_data()
+85a6c1bfade1201e818b507050dcb4921631a2e8 FROMGIT: drm: msm: Check cmd_db_read_aux_data() for failure
+04ed2bc673c60d7764e7a41a4874cc27400e2dce FROMGIT: iommu/arm-smmu: Add pm_runtime/sleep ops
+4251f1d293c3409f6eab9e04dda2158cdf26811a FROMGIT: iommu/arm-smmu: Invoke pm_runtime across the driver
+fbe86f8d5bf3b247e84bfa5e21553035e82ffdb3 FROMGIT: iommu/arm-smmu: Add the device_link between masters and smmu
+93b267aeee9618ea9ff3860e7ab034c8fe9bbf6c FROMGIT: dt-bindings: arm-smmu: Add bindings for qcom,smmu-v2
+b251db67b2116b34fd7beed8bc543ca00b82ee1a FROMGIT: iommu/arm-smmu: Add support for qcom,smmu-v2 variant
+9acb1d05e32df9ef0a58147b76cdf42124f9bfb5 FROMGIT: firmware: qcom: scm: fix compilation error when disabled
+5c901b10e8d178abfc532ff13abbe24615a16514 FROMGIT: dt-bindings: cpufreq: Introduce QCOM cpufreq firmware bindings
+996fc61b832fd19084bf162594352e00ec8bf426 FROMGIT: cpufreq: qcom-hw: Add support for QCOM cpufreq HW driver
+ca7b20e83ca2f3e8a4af92fa47d8f1e72d61831d FROMGIT: ASoC: sdm845: Add TDM configuration for speaker
+7ce7f596d0cc61efb62b232a210e00e00e10bb2d FROMGIT: ASoC: sdm845: Add configuration for headset codec
+94c1a05d8026c4d138aa99b4a2ceb126dbb96116 FROMGIT: ASoC: sdm845: add rt5663 codec select
+f9df630d37dec64ea655cc5d2431245402317e9a FROMGIT: OPP: Use opp_table->regulators to verify no regulator case
+da6a4029b66d7f2b43daa6ceb4decbcd58759e2b FROMGIT: OPP: Fix missing debugfs supply directory for OPPs
+0dfc258bcab48dd6b1c172e5c03ac8b9aa33390c FROMGIT: PM / Domains: Make genpd performance states orthogonal to the idlestates
+12866f44d115d0aad5e05fb60d50559d97f8eddd FROMGIT: OPP: Improve _find_table_of_opp_np()
+edb391ca38f8fa085679144796eab363a538514d FROMGIT: OPP: Add dev_pm_opp_xlate_performance_state() helper
+3d9228c979069298c2077c6136de64c75c3ef4be BACKPORT: FROMGIT: OPP: Don't return 0 on error from of_get_required_opp_performance_state()
+ba46d4bd68a674defa1c6ff50249ae85df143dca FROMGIT: PM / Domains: Save OPP table pointer in genpd
+2b014b1076b192867c4f7f6a98c3f5550c43949d FROMGIT: PM / Domains: Factorize dev_pm_genpd_set_performance_state()
+c5fdb521d68237e84f93f5e700f91ec3d1876944 FROMGIT: PM / Domains: Propagate performance state updates
+915512fd8344087c78e798247b67ac5ad640ab72 FROMGIT: soc: mediatek: Add Mediatek CMDQ helper
+b115e23d59fcf571f88319bd3742092c9b854742 FROMGIT: mmc: mediatek: Add MMC_CAP_SDIO_IRQ support
+2134dc1dc8fd12e1698aa1cb16bf9e5d48febb09 BACKPORT: FROMGIT: pinctrl: mediatek: improve Kconfig dependencies
+05b6ca9eb6d1a403644c99b49ff845dd0b44c7b0 FROMGIT: drm/msm: Unblock writer if reader closes file
+f73aa842cf87e067b6e954ca0b0b3369dde4617b FROMGIT: Bluetooth: hci_serdev: Remove setting of HCI_QUIRK_RESET_ON_CLOSE.
+1f10a13a9df56965347a77f34a33673be5104082 FROMGIT: drm/msm/gpu: Remove hardcoded interrupt name
+d1a1238658988473c94bb9ce90d0c9698fb3a280 FROMGIT: drm/msm: drop interrupt-names
+c8ca44178623e3d49a30b3d30d54690135a4c58d FROMGIT: dt-bindings: drm/msm/a6xx: Document GMU and update GPU bindings
+423dff22071d0d16562ffee423f211c640a0c16c FROMGIT: dt-bindings: soc: qcom: Add remote-pid binding for GLINK SMEM
+36c5f70de4cf0e57bd22941c14b813eac7aa0431 FROMGIT: dt-bindings: remoteproc: qcom: Add missing clocks for SDM845
+ae2299146e028285d5d7d7f1ac4e6646d14ec73f FROMGIT: dt-bindings: remoteproc: qcom: Add missing clocks for MSM8996
+2bc746f11bcb488aa5f8ea9743f84f1d0ba8fec1 FROMGIT: remoteproc: qcom: q6v5-mss: Add missing clocks for MSM8996
+e28eba358d64dc4ff93335ae8ec910d7b00563e1 FROMGIT: dt-bindings: remoteproc: qcom: Fixup regulator dependencies
+98087c9f474c785d8a0c59797d28f078335733f9 FROMGIT: remoteproc: qcom: q6v5-mss: Add missing regulator for MSM8996
+b958d3763cdc4823930dc4234f5f45c8615a4ea9 FROMGIT: dt-bindings: remoteproc: qcom: Add power-domain bindings for Q6V5
+f7d1d8fa0775c092e72b09ae8d944b877f5bb313 FROMGIT: dt-bindings: remoteproc: qcom: Add firmware bindings for Q6V5
+2b061d5d269017afac738df4413fecfaf8a860f9 FROMGIT: ASoC: sdm845: set jack only for a specific backend
+e86eea880bdda000db9e5397c793c2a927fb6f35 FROMGIT: drm/msm: Fix A6XX support for opp-level
+031b268f155841bd436d5ac2ca9062ca689dde4c FROMGIT: ASoC: soc-core: fix init platform memory handling
+b919a502d94c026a824643cd46885824ab2d5900 FROMGIT: dt-bindings: drm/msm/a6xx: Document GMU bindings
+9c5202b6244e14e8ec82804a846ed4b25134bf36 FROMGIT: cpufreq: qcom-hw: Move to device_initcall
+41511d3a9ec1bf0d118e281276ee85bb2ac393a9 FIXUP: FROMGIT: arm64: dts: qcom: sdm845: Add UFS nodes for sdm845-mtp (iommu)
+76ba21160c342e0759e888d2418483371df81d0e FROMGIT: Bluetooth: hci_qca: Add helper to set device address
+79b50fa2147a255dd5385ad4b0e0c39783f0da66 FROMGIT: media: v4l2-mem2mem: add v4l2_m2m_buf_copy_data helper function
+42d02cfd9d7794e8b926d008c2b2fc2e46b9bdcc FROMGIT: media: vim2m: use v4l2_m2m_buf_copy_data
+4e74336b235b193520fb10d3c83e250dadd63afc FROMGIT: media: buffer.rst: clean up timecode documentation
+7529d6af6804caf5c18d3ee3c7f3076f497e0f78 FROMGIT: media: videodev2.h: add v4l2_timeval_to_ns inline function
+2eee00e948c1d9c459f121d1808248e78948092e FROMGIT: media: vb2: add vb2_find_timestamp()
+ae097d57077eeccd511c1a41a90dfd9af100e5b9 FROMGIT: media: vim2m: the v4l2_m2m_buf_copy_data args were swapped
+47d4a10060848550906c481ba542ef7be8616c92 FROMGIT: ASoC: qcom: Kconfig: select max98927 for sdm845
+584537509b236e4febb84be8554d6ca1028c8349 FROMGIT: ASoC: sdm845: Set DAI format for dmic codec
+9aa95e2960f455e6ecfd6047216e7ade0521dd5f FROMGIT: rpmsg: core: Make remove handler for rpmsg driver optional.
+6095a55b7b942751ad8342178cb428323813d9fb FROMGIT: pinctrl: mediatek: add EINT support to virtual GPIOs
+53e439b388fa6d2abb12f903803d625fc54eb6d3 FROMGIT: tty: serial: qcom_geni_serial: Allow mctrl when flow control is disabled
+fdd3c7e8c0b3fc5a84e76ccc17e79b675d1d13db FROMGIT: drm/panel: panel-innolux: set display off in innolux_panel_unprepare
+006ffdaf0aaac8c25964284c4eb1ce72f276d402 FROMGIT: remoteproc/qcom_sysmon.c: Remove duplicate header
+2b6f391c4c7e2bb15250bb0a84435bd0c39daf11 FROMGIT: dt-bindings: remoteproc: qcom: Introduce shutdown-ack irq for Q6V5
+32831819814f7922f005efc83b58b1b68a86247a FROMGIT: remoteproc: qcom: Add shutdown-ack irq
+78219bac941d08ce4034c2a007d102b95f589315 FROMGIT: remoteproc: qcom: Wait for shutdown-ack/ind on sysmon shutdown
+e097b30f9aa51662b1ca145a480b76520daf39e3 FROMGIT: drm/msm: honor GPU_READONLY flag
+29c9cba8b588839f0db2c725a92fce5f92879974 FROMGIT: usb: split code locating ACPI companion into port and device
+1f878625787257106e45e9a8e16bee9d476ce6fd FROMGIT: usb: assign ACPI companions for embedded USB devices
+5ea6c169a1b9dac91b52079dfa85a22a9807bd86 FROMGIT: Bluetooth: Allow driver specific cmd timeout handling
+5f6af36f3c5d32058526e7346b8a240587b37918 FROMGIT: Bluetooth: btusb: Use the cmd_timeout method to reset the Intel BT chip
+112b018bb672d18dc9a748ed979880b6d1758f75 FROMGIT: scsi: ufs: Remove select of phy-qcom-ufs from ufs-qcom
+ba03e54302016344140f7fad0ff50f3916b6655a FROMGIT: drm/gem: Mark pinned pages as unevictable
+e16f6f8a0334d52f92f5a043df02cf9b01ffa993 FROMGIT: drm/msm/dpu: Ignore alpha for XBGR8888 format
+8316ed2efab6d4a3542a4e9c71ea0395a4d7fe63 FROMGIT: drm/msm: dpu: Remove unused trace_dpu_perf_update_bus()
+1a46e2791c52c7212f1d89e13955b65167eaaf54 FROMGIT: drm/msm: dpu: Don't use power_event for vbif_init_memtypes
+7a8455341c2c73cd1dea3f2803377b82063303e2 FROMGIT: drm/msm: dpu: Handle crtc pm_runtime_resume() directly
+5949664dbb6107afeccc36a4f9ef3a588b3e46ae FROMGIT: drm/msm: dpu: Remove power_handle from core_perf
+965160e42cdafa7978340ab5eb40cdce557abf7c FROMGIT: drm/msm: dpu: Include dpu_io_util.h directly in dpu_kms.h
+809c1a74a778c9238c43cbebc68f93f3985c0d8d FROMGIT: drm/msm: dpu: Fix typo in dpu_encoder
+36af0e02a6b6997386eb18aadfcdd95b59851d54 FROMGIT: drm/msm: dpu: Add ->enabled to dpu_encoder_virt
+6371d7391d0640fa869daa39a1acaeba4e70676a FROMGIT: drm/msm: dpu: Move crtc runtime resume to encoder
+b56127e52372fbc7b33d0b2c4babe7bf491b96a4 FROMGIT: drm/msm: dpu: Don't drop locks in crtc_vblank_enable
+024ad019422b8962a32ab64c442316af652b9d38 FROMGIT: drm: Clear state->acquire_ctx before leaving drm_atomic_helper_commit_duplicated_state()
+853e37394285fbf04c441099f80d2fbdd3696a34 FROMGIT: drm: Move drm_mode_setcrtc() local re-init to failure path
+681f9b7539c909efa3098999e5b7d7e5fd2c29b7 FROMGIT: drm: Move atomic_state_put after locks are dropped
+1552942d364e880ebdd4648addb8bc2af48aeb44 FROMGIT: drm: Add DRM_MODESET_LOCK_BEGIN/END helpers
+07eeac5b0fff61a855fbb9cb4a87fac9dc34eed9 FROMGIT: drm: Fix compiler warning in drm_atomic_helper.c
+7cf1cb5b420dd57df656bf6bbadd48c2563c6f09 FROMGIT: drm/msm: dpu: Grab the modeset locks in frame_event
+2a7feef4dc7ec1de8285c3fa618bee5b99cbc360 FROMGIT: drm/msm: dpu: Stop using encoder->crtc pointer
+7bf21ed44f035b5b1a2d7e7c5e5bb93b6772a1f8 FROMGIT: drm/msm: dpu: Add modeset lock checks where applicable
+36941bc2f9dab0d2707dfb927bd38ccc084470f5 FROMGIT: drm/msm: dpu: Move pm_runtime_(get|put) from vblank_enable
+4a195dc7b3f4609b20c0db89fe6c7cc1533b9f6d FROMGIT: drm/msm: dpu: Remove crtc_lock from setup_mixers
+c925628a26ed8f090b952e4398a56329ff081007 FROMGIT: drm/msm: dpu: Remove vblank_callback from encoder
+f0b8b205eadfca8d64ef1551a726d10fea299348 FROMGIT: drm/msm: dpu: Use atomic_disable for dpu_crtc_disable
+c2d3c74e49aa5d21e0fea23dbb90a956d3d8c970 FROMGIT: drm/msm: dpu: Don't bother checking ->enabled in dpu_crtc_vblank
+cb45f0d82472b476a5738e2a81a4554a10bd1269 FROMGIT: drm/msm: dpu: Separate crtc assignment from vblank enable
+d6fb75b221ad560e94a8e31e432e355f82471792 FROMGIT: drm/msm: dpu: Remove vblank_requested flag from dpu_crtc
+c4825e62541d3fe3529ea905a5cf822139311a2a FROMGIT: drm/msm: dpu: Remove crtc_lock
+1403c6c5d99a10e9b481a8386aee75530dd0ed77 FROMGIT: drm/msm/dpu: Remove dpu_crtc_get_mixer_height
+50341776eefa8ba778a175e78c70601699409e22 FROMGIT: drm/msm/dpu: Remove unused functions
+c1d367a7f8059d14d7f5733cff41d28a1fa1110c FROMGIT: drm/msm/dpu: Cleanup callers of dpu_hw_blk_init
+d6c9c6536933f96e552ea6ea6a3817624056c6dc FROMGIT: drm/msm: Make irq_postinstall optional
+b21e0e5787cd8fa3ab04217623b5f2ffb846cc80 FROMGIT: drm/msm/dpu: Cleanup the debugfs functions
+3dfd6f8520f5fa7878a448e27e0504637f9801f0 FROMGIT: drm/msm/dpu: Further cleanups for static inline functions
+03f7de6b6f367acadc8c5f2328df72a58aadd46d FROMGIT: drm/msm/dpu: Clean up dpu_media_info.h static inline functions
+a4778ca30061b9938a56376be2a190cfa1b35e32 FROMGIT: drm/msm/dpu: Fix clock issue after bind failure
+2f42e090d4e63ccf68aff6bdae5e478c7b9f4ce4 FROMGIT: drm/msm: fix build warning for 64-bit seqno
+384b18d912390e6213964479899e4a8c4db5f2da FROMGIT: drm: msm: Cleanup drm_display_mode print str
+9ab27c58d6a3af3cd18a0ee839e7549ce653c4ab FROMGIT: Bluetooth: btusb: btusb_intel_cmd_timeout: use sleeping functions
+5925248c7d4d0f77a9d3f0d928bd7037f3c6a5a6 FROMGIT: media: venus: firmware: check fw size against DT memory region size
+63e2ad82242830ef390216eb6c290b8dd7bd115a FROMGIT: media: venus: core: correct maximum hardware load for sdm845
+e627b7a4e320314d5c8ccf2337a6af20ece875e6 FROMGIT: media: venus: core: correct frequency table for sdm845
+7f8f31a64ba2cebfa3fb4fbbf585aaeaec81c9bc FROMGIT: media: venus: helpers: drop setting of timestamp invalid flag
+4a802342abcb3b3f7e0ef4bc55e7d6dd7938b84c FROMGIT: remoteproc: qcom: Add support for parsing fw dt bindings
+a40509ace2be5b8e9cf9a86e7c36a76d6ece05ae FROMGIT: PM / EM: Expose the Energy Model in debugfs
+62da15f9923d7abce66671fd4c3f6df68303016f FROMGIT: cpufreq: Replace open-coded << with BIT()
+18eaf64be44bf9fcf8c09ad588b502097bf4a248 FROMGIT: thermal: cpu_cooling: Require thermal core to be compiled in
+a796284e54501f8eb6a77f72fd5fecb136e19e8f FROMGIT: remoteproc: q6v5-mss: Vote for rpmh power domains
+7dd6bf8f83263e29d8017a184c984a450824f9e2 FROMGIT: remoteproc: q6v5-mss: Active powerdomain for SDM845
+fdda7063fbf99e8b3c3ad7c2bdff61b719eb66c5 FROMGIT: cpufreq: qcom: Read voltage LUT and populate OPP
+51ee9e3074098d2a54538350559dbdfc2346957c FROMGIT: ASoC: soc-core: defer card probe until all component is added to list
+9f8351ec2a257cc0ef6e492656dae48c8192eb71 FROMGIT: ASoC: core: Make snd_soc_find_component() more robust
+338d14f2eb586b0f8b1fb0215ec3f448374f5c36 BACKPORT: FROMGIT: ASoC: Documentation: Add google, cros-ec-codec
+c34d9ed5d6a6b254a83433edaef036fb7e6713a5 FROMGIT: ASoC: cros_ec_codec: Add codec driver for Cros EC
+b6f347b0037812e7230eab61d1db96eb1d635da5 FROMGIT: cpufreq: Auto-register the driver as a thermal cooling device if asked
+60ee251f9fc07bf48ab762a68205b775dd73e0b6 FROMGIT: cpufreq: qcom-hw: Register as a cpufreq cooling device
+7bef1e32c8c18d92eafba65aa64c709de8498e7c FROMGIT: cpufreq: mediatek: Use auto-registration of thermal cooling device
+929ba260fcf7530e3ba46b0636671bb3de0ce041 FROMGIT: dt-bindings: arm: Add bindings for Mediatek MT8183 SoC Platform
+d58489b461f4589a183dc82344f83a0f939c0d33 FROMGIT: dt-bindings: i2c: Add Mediatek MT7629 i2c binding
+eed2df6a4e62ef52f23dd25c653aa7972559dd1f FROMGIT: i2c: mediatek: speeds is replaced by macros definitions
+56c9e04ea2d9863876242c8b021497e85d7fe3a0 FROMGIT: i2c: mediatek: remove completion_done()
+6e443237e4db5839f4849089393388c7aae644e3 FROMGIT: PM / OPP: Introduce a power estimation helper
+ce8fa721a396138c7459490ac2f6e7ec2b58bb82 FROMGIT: cpufreq: dt: Register an Energy Model
+a606e92ce56f82413a373ff51272e4141cee8159 FROMGIT: cpufreq: scpi: Register an Energy Model
+85fa0cc7cfc804399229eb55f9dab27287da268c FROMGIT: cpufreq: arm_big_little: Register an Energy Model
+97ca06a36cf7afd848b1d428c64f58f94a38472e FROMGIT: cpufreq: scmi: Register an Energy Model
+7dcbd36c3c80ad00d1a501fa42e001149051abc7 FROMGIT: cpufreq: qcom-hw: Register an Energy Model
+63b90bbf8a809565b7ce681ba46b9e02096c654c FROMGIT: cpufreq: mediatek: Register an Energy Model
+1f555b48484954169d9f776d961447ba4b639c6f FROMGIT: kthread: Add __kthread_should_park()
+24fc61dbd1f8af4faa32a4120019cd6857fe4e2f FROMGIT: softirq: Don't skip softirq execution when softirq thread is parking
+ba1fedcf1f81f269892e89f2f78d74af444ba368 FROMGIT: thermal: mtk: Allocate enough space for mtk_thermal.
+953c391d09d4f88612c4bfe1bf18150506f37c76 FROMGIT: driver core: Remove the link if there is no driver with AUTO flag
+f10d88da21eb352f52f41b787ae7754a164eeb3f FROMGIT: ASoC: mediatek: mt8183: add platform driver
+73295bc26f277a1e15c85f81c64251ab8fc0092f FROMGIT: ASoC: mediatek: mt8183: add audio afe document
+82cccbc61ce260e2c8f6cf263dc1d2759ed09c16 FROMGIT: ASoC: mediatek: mt6358: add codec driver
+f0f00db6adf4f50e333e031a305995f2cd2b3df8 FROMGIT: ASoC: Fixup build error for mt6358
+26608274411b5e2a8736c7ef6eb8276be78deb19 FROMGIT: ASoC: mediatek: mt6358: add codec document
+1c66215d7012d7daf8ea5904076ec08df1f9b9d5 FROMGIT: drm/i915/cnp+: update to the new RAWCLK_FREQ recommendations
+857b017cdb057f6fd3229315b6f37b85f1f42d28 FROMGIT: drm/i915: rename CNP_RAWCLK_FRAC to CNP_RAWCLK_DEN
+694e8ebf06f547f3a58723b87749859e847430da FROMGIT: drm/i915: add ICP support to cnp_rawclk() and kill icp_rawclk()
+2adb713b93b8b9e77fe74b21470910f40cb8d049 FROMGIT: media: vb2: vb2_find_timestamp: drop restriction on buffer state
+2b5ae526f9564f2fc98524b2423a12925f6aa136 FROMGIT: Bluetooth: hci_qca: use wait_until_sent() for power pulses
+b5edfdcf16b9626c4ac4f633e0e8e8bad964a115 FROMGIT: Bluetooth: hci_qca: Deassert RTS while baudrate change command
+90e01bd653a79140fb82d8b1bdeb6cd72c7d1402 FROMGIT: Bluetooth: hci_qca: Disable IBS state machine and flush Tx buffer
+50bc974f3e396a7669613efa0e6ad0d1e390d7f9 FROMGIT: dt-bindings: soc: fix typo of MT8173 power dt-bindings
+ae118cb89ef0b1c2acabc27f716d9f216480fc0f FROMGIT: dt-bindings: mtk-sysirq: Add compatible for Mediatek MT8183
+5a0f18ce6ad9a9a3a4a71bd0442c00d16af5d47a FROMGIT: platform/x86: intel_pmc_core: Handle CFL regmap properly
+66deac2872f7f310d9ff0b3ea30684e0d8cd19d6 FROMGIT: platform/x86: intel_pmc_core: Fix PCH IP sts reading
+542aa3818797554029e66caf19f63e4166ca6331 FROMGIT: platform/x86: intel_pmc_core: Fix PCH IP name
+4266096ccfe41028a473d7c25b53ba44dff282b1 FROMGIT: platform/x86: intel_pmc_core: Fix file permissions for ltr_show
+30c09c384c1dfc64a4922d0d2e5cfbeca427f828 FROMGIT: platform/x86: intel_pmc_core: Include Reserved IP for LTR
+17d46ae9f526897e9c260cb6c9cfe283f738caf8 FROMGIT: platform/x86: intel_pmc_core: Avoid a u32 overflow
+189379d713787ddf018a147a8fa6c0de151b26f3 FROMGIT: x86/CPU: Add Icelake model number
+98d44c2c1df642beafffb3dcd940c3d698d0dbd3 FROMGIT: platform/x86: intel_pmc_core: Convert to INTEL_CPU_FAM6 macro
+63007489014a0228eb2ae97ad0712faedc3f4bbc FROMGIT: platform/x86: intel_pmc_core: Add ICL platform support
+2a0e0dfa2259be67dafb22b37131d4d3145b90f3 FROMGIT: platform/x86: intel_pmc_core: Add Package cstates residency info
+bd3d664061164c545cb11832f995b27df02354c9 BACKPORT: FROMGIT: LSM: generalize flag passing to security_capable
+cb75c2aed662f88961886a278dd1487c9500aedf FROMGIT: LSM: add SafeSetID module that gates setid calls
+7b86fa8f4d5fa6d194e094f7e82e02fe7653609b BACKPORT: FROMGIT: LSM: add SafeSetID module that gates setid calls
+29d1c7035a4b352e7525f504c7f10176b9b29266 FROMGIT: LSM: SafeSetID: 'depend' on CONFIG_SECURITY
+477b21d223a154fe5b853de916c4a26bf2e4ff48 FROMGIT: LSM: SafeSetID: remove unused include
+0f2a2852788cec400341e9bcf9c39223189c2740 FROMGIT: LSM: fix return value check in safesetid_init_securityfs()
+d1491457036306b2a98e0211509132010c52da50 FROMGIT: media: dt-bindings: media: add 'assigned-clocks' to vcodec examples
+8d95fbdf6c035f96699b1b2f9a2bf64d296d180c FROMGIT: arm64: dts: Using standard CCF interface to set vcodec clk
+e00bb16b8735683b08b5829373cc36ab214e938f FROMGIT: media: mtk-vcodec: Using common interface to manage vdec/venc clock
+2a8215ece2bd99fb14b563e829145ac296b7f8c3 FROMGIT: media: mtk-vcodec: Correct return type for mem2mem buffer helpers
+a023e53d1e90d4eb2b5a8cfafacf0bcdd05038ba FROMGIT: Bluetooth: hci_qca: Pass boolean 'on/off' to qca_send_power_pulse()
+fe1490fe79bf1048dd6701b601f96d8740b3cef6 FROMGIT: Bluetooth: hci_qca: Move boot delay to qca_send_power_pulse()
+6b05ba83ca18b1bc9dfb2037d402983a3e3aaae3 FROMGIT: Bluetooth: hci_qca: Add delay after power-off pulse
+6a0eb5057ff01d0cd46ae8ae857f1a902083c562 FROMGIT: Bluetooth: hci_qca: Use msleep() instead of open coding it
+d9eaf9e138397f681821643ae5278fab791de4e8 FROMGIT: Bluetooth: Add quirk for reading BD_ADDR from fwnode property
+a3795d748625d9af695b310e27621e2970fb358c FROMGIT: Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY
+c2cef00148f5e4c430e2cf92f8eac66f0d83dd6a FROMGIT: Bluetooth: hci_qca: Set HCI_QUIRK_USE_BDADDR_PROPERTY for wcn3990
+1172bafea5dba8ba0d0dc8229f4a65a8f57c2bf7 FROMGIT: arm64: dts: qcom: sdm845: Define IOMMU for sdhc 2
+0d9789594de06e83426792d99fb7a8e9d6f0faa2 FROMGIT: arm64: dts: qcom: sdm845: Define iommus for USB controllers
+b571d34789cb108dfca552affd70ea034d9cb946 BACKPORT: FROMGIT: arm64: dts: sdm845: Add clocks and iommus to WCN3990 WLAN node
+68285d2d480b22d4d395abbab5fd3331034f902a FROMGIT: ath10k: pci: use mutex for diagnostic window CE polling
+602da5c2f495cac1a2176bc05b58ca73c4ac0e91 BACKPORT: FROMGIT: arm64: dts: qcom: sdm845: Remove the duplicate header inclusion
+0509fb70c737f43714979958804b0a0d9a17c034 FROMGIT: ath10k: change swap mail box check after htc ready
+8b17dad310ab6e33dee41440310310173435f17f FROMGIT: iommu/io-pgtable-arm-v7s: Only kmemleak_ignore L2 tables
+9c19f2ce388f1d09e7547a8888d9a44a2d2caba0 FROMGIT: PM / Domains: Mark "name" const in genpd_dev_pm_attach_by_name()
+c69129489004cf31c641b8fd76bc292f20017506 FROMGIT: PM / Domains: Mark "name" const in dev_pm_domain_attach_by_name()
+2b3d1057bf044e442e9166536247be9185713d4b FROMGIT: ath10k: reduce transmit msdu count
+0280d311b32411c6a9387011cddc777706924d6a FROMGIT: thermal: mediatek: fix register index error
+873bd047962fc42a9d4a915551166ff44fc4485c FROMGIT: thermal: mediatek: add common index of vts settings.
+3fbea0368ad7b1796cec1071412bafaaee172987 FROMGIT: thermal: mediatek: add calibration item
+56fbb90961513354f3135de1c5c9bfc3d20d2059 FROMGIT: thermal: mediatek: add thermal controller offset
+0fbff835a7482b90be19e4f4e44268d4530eacea FROMGIT: thermal: mediatek: add flag for bank selection
+08b5425a74fa3dbf924cb71595bc3e9b6fa37b43 FROMGIT: dt-bindings: thermal: add binding document for mt8183 thermal controller
+690561bd8a53c8c4ad0a2017688c6df093c6a655 FROMGIT: thermal: mediatek: add support for MT8183
+eb15ca3f8aa3ef8d72cb62a06b2077ebfc5c3c91 BACKPORT: FROMGIT: media: vb2: Keep dma-buf buffers mapped until they are freed
+5e6561a230ed35a4e30843a363214440e043f402 FROMGIT: i2c: mediatek: modify threshold passed to i2c_get_dma_safe_msg_buf()
+d77350195d9b88c9815fc6492355c455ee55ad20 FROMGIT: drm/i915/hsw: Drop the stereo 3D enabled check in psr_compute_config()
+3885d3b8d6cc9ac00e5c7e5d233b42a2f007e1a0 FROMGIT: drm/i915/psr: Get pipe id following atomic guidelines
+362c1b55039abe02740029a7b728c9456958db3c FROMGIT: drm/i915: Disable PSR in Apple panels
+922732ac0280931a13adab3ac73533c7c26fbfd2 FROMGIT: drm/i915/psr: Don't tell sink that main link will be active while is active PSR2
+db19ddeb0f295e4f10861c5e2d956150e2fe501e FROMGIT: drm/i915/psr: Set PSR CRC verification bit in sink inside PSR1 block
+7ae113979b02c2c0940ce1fa26df81e9ba97a6a3 FROMGIT: drm/i915/psr: Enable sink to trigger a interruption on PSR2 CRC mismatch
+d2c53b6e2952a9d2b9c41c82b7fd9c3ce20f32b0 FROMGIT: drm/i915/icl: Do not change reserved registers related to PSR2
+065928a05f5cc788ad9a245d8535f4352b0f9cc4 FROMGIT: drm/i915: Remove old PSR2 FIXME about frontbuffer tracking
+9e6c48ccd28e4b7673fcf70ea02f036181640762 FROMGIT: drm: Add the PSR SU granularity registers offsets
+dd1a42dbdbf4d6394e9013ad0db5388d3eb15327 FROMGIT: drm: Fix documentation generation for DP_DPCD_QUIRK_NO_PSR
+cdfce760aabf461761a875b6ea9c1c9a42a5b423 FROMGIT: drm/i915/psr: Allow PSR2 to be enabled when debugfs asks
+92d3c4fa9038e7d0e197b0f3fdd8f25a7ab1ee97 FROMGIT: drm/i915: Refactor PSR status debugfs
+b79123d599a0e557f421aab954168908a8a992cc FROMGIT: drm/i915: Add PSR2 selective update status registers and bits definitions
+f0851a2ae3b98c6186a8745461c1e7fc8a18f9f5 FROMGIT: drm/i915/debugfs: Print PSR selective update status register values
+21f0b4b8abac1329588b72f4d80b0cbbd2456270 FROMGIT: drm/i915/psr: Check if resolution is supported by default SU granularity
+55479c87f38b38a3c3e74152d82f3073c41de684 FROMGIT: drm/i915/psr: Check if source supports sink specific SU granularity
+cc2518a1832b842e342b0f7c1dcc52d119e54777 FROMGIT: drm/i915: Add an update_pipe callback to intel_encoder and call this on fastsets (v2)
+925b57de64fefd566f399ef36a3afdbeb3028895 FROMGIT: drm/i915: DDI: call intel_psr_ and _edp_drrs_enable() on pipe updates
+00ce7e69c025e35c7d942fd86d776160138fd4cf FROMGIT: drm/i915/psr: Execute the default PSR code path when setting i915_edp_psr_debug
+e68a5032a48d527b65eca8d512b6c75edac7e983 FROMGIT: drm/i915/psr: Remove PSR2 FIXME
+91a3d7df18035709772496bcc61918b7b1a885ff FROMGIT: drm/i915/psr: Only lookup for enabled CRTCs when forcing a fastset
+ec1dbd6996d87368578fb31d952577c039c32c4a FROMGIT: drm/i915: Compute and commit color features in fastsets
+eb7c8b1609e348bb922c843e091e766bbd7afb2a FROMGIT: drm/i915/psr: Drop test for EDP in CRTC when forcing commit
+af5a5f71fd179297bbd773f5368bcde397b2b5aa FROMGIT: drm/i915: Push clear_intel_crtc_state() onto the heap
+8b5a25be72c6717dddcd63ad0cc610c06e678197 FROMGIT: drm/i915: Remove the "pf" crc source
+c661f7f6c8f9f979399570e05a99d9e0e820d396 FROMGIT: drm/i915: Use named initializers for the crc source name array
+798c636328220ab4bc909d115c0c85d970c6e320 FROMGIT: drm/i915: Remove the broken DP CRC support for g4x
+0a1d871f9c003a831f15222d97decc729c93d452 FROMGIT: drm/i915: Extend skl+ crc sources with more planes
+d930c0399a17f69a1ebb6f0acbf1598c8e52218f FROMGIT: drm/i915/crc: Make IPS workaround generic
+52be6b41fc632eb4e838972b580e586f3110ee43 FROMGIT: drm/i915: Disable PSR2 while getting pipe CRC
+bc725e35acb9259b2d08eda024da84b7f82e2a38 FROMGIT: drm/i915: Drop redundant checks to update PSR state
+0a587b81b375188087703a9391ad9ba6d2665697 FROMGIT: drm/i915: Force PSR1 exit when getting pipe CRC
+6ad5a407ce989f8ca19b23c5fa8e7e20af7af919 FROMGIT: drm/i915: Enable PSR2 by default
+af482a7d0fa3562bc1ce0b918360d1b26510bd7c FROMGIT: ath10k: sdio: set hi_acs_flags
+d0a4ae8d5ec80384294019d9864b8bf33dd17d4a FROMGIT: ath10k: sdio: disable fwlog prints
+5468e784c0600551ca03263f5255a375c05f88e7 FROMGIT: ath10k: sdio: reset chip on power_down()
+e4a0ecfe9726f50ac43d3f49b6fff222e13dcbce FROMGIT: ath10k: don't report unset rssi values to mac80211
+e9991f7b21a5627965cb9f0d7982357d671bf782 FROMGIT: ath10k: remove the calibration data fetch for sdio
+ba7e13c91d5055998b4290a59f66e8d8f76eebf7 FROMGIT: ASoC: qcom: add i2c dependency for SND_SOC_SDM845
+bb53e658dfabac279a6108e181c104a100d5105a FROMGIT: platform/x86: intel_pmc_core: Quirk to ignore XTAL shutdown
+56f016bd97ee9c0290f6bde0bdf7ab2130eec132 FROMGIT: HID: intel-ish-hid: Add match callback to ishtp bus type
+9ea185875075a59c82173d6744d4f10ab20d19bc FROMGIT: HID: intel-ish-hid: Hide members of struct ishtp_cl_device
+fc6292bdcb592c7671267b1356fe80a19e6ca872 FROMGIT: HID: intel-ish-hid: Simplify ishtp_cl_link()
+d8a281a01a02e677a05d352aea1cfb1ab8de055c FROMGIT: HID: intel-ish-hid: Move driver registry functions
+88c3b9891eaea973c73aa9fda6fa8bab6b646695 FROMGIT: HID: intel-ish-hid: Store ishtp_cl_device instance in device
+304c14acbb59ff76647c2235e4aa0c15c9b7d83b FROMGIT: HID: intel-ish-hid: Move the common functions from client.h
+52e86493162b95d94e3c351f39320b90d4f87e86 FROMGIT: HID: intel-ish-hid: Add interface functions for struct ishtp_cl
+a6ed4f2e33212bfd3363bef3a3e5048044d46162 FROMGIT: HID: intel-ish-hid: Move functions related to bus and device
+eca84bac156ce58e41e6832500f316e5a5630eea FROMGIT: HID: intel-ish-hid: Use the new interface functions in HID ish client
+aa7f58e56349bd4f84182a7e62f42603aec789dd FROMGIT: HID: intel-ish-hid: Add interface function for PCI device pointer
+8c26da2491968cc03ccdfa13fff395d2b77d58ee FROMGIT: ASoC: mediatek: mt8183: skip for i2s5 in mck_disable
+b193ed56a616b2ff5ea63b01a41787d82afff43d FROMGIT: ASoC: dapm: Remove clock framework ifdefs
+dfe88f64834eb0068666e1fc0880012c8b50d722 FROMGIT: ASoC: dapm: Don't fail creating new DAPM control on NULL pinctrl
+b6a94ef225261dc869f9d450b271d6adeb29fc2a FROMGIT: ASoC: dpcm: Properly initialise hw->rate_max
+30476b17e23d3c209f138097a3eeff3e86ff6a6c FROMGIT: ASoC: rt5682: Update calibration function
+2e87e0543c2f6e2615c485ed7e2dfc9a1d75ac28 FROMGIT: ASoC: rt5670: Add quirk for Thinkpad 8 tablet
+b61bc757192e40427e73536c73abc51f5810fee4 FROMGIT: ASoC: Intel: common: Add quirk for Thinkpad 8 tablet
+42a84209392e07e3b66c2c5fec7f67d4ab059971 FROMGIT: ASoC: Intel: cht-bsw-rt5672: Add key-mappings for the headset buttons
+b3ae2aab3d194ccd24ee4edfb16b4c6f19c7ea8c FROMGIT: ASoC: dmic: add DT module alias
+4b51c62e78a26adaf7e280e2ee0ee80b01b96afa FROMGIT: ASoC: core: Don't schedule DAPM work if already in target state
+457202ebb7b4e3428d03a2446abb9abbfd30af76 FROMGIT: ASoC: dapm: Move error handling to snd_soc_dapm_new_control_unlocked
+b777e56546d637eb1be027fe4c0c1d6de8aded1f FROMGIT: ASoC: dapm: Cosmetic tidy up of snd_soc_dapm_new_control
+3cbda8b19cfd721fa926f1f26274bbb6f2387888 FROMGIT: ASoC: dapm: Move connection of CODEC to CODEC DAIs
+9903271702c0e5d474aff012e4e5306a436e171f FROMGIT: ASoC: dapm: Add support for multi-CODEC CODEC to CODEC links
+a4b1632727e788c7b4ae0f9b84d6d623f749f22a FROMGIT: ASoC: dapm: Move CODEC to CODEC params from the widget to the runtime
+c28cec748b8ba515bf624d810ac17edf73033d5f FROMGIT: ASoC: hdac_hdmi: remove redundant check for !port condition
+436c2234ff55397eb75b58df7df6a81c9b4a522b FROMGIT: ASoC: dapm: Avoid uninitialised variable warning
+2fa5ea511494ac03b9ea87f8050a82d19e669be8 FROMGIT: ASoC: max98373: usleep_range() needs include/delay.h
+ab13fc9b8f67d8cb1c2174aacdc9c5f5c55a5779 FROMGIT: ASoC: dapm: Fix a couple uninitialized ret variables
+1ab18e534163845a64255b8c19455f6a47b6c49b FROMGIT: ASoC: hdac_hda: use devm_snd_soc_register_component()
+518aa9871b8cc1671b381520c438be79381bfcc4 FROMGIT: ASoC: rt5668: use devm_snd_soc_register_component()
+fb74129483a29173991548cadd019649ec38cdee FROMGIT: ASoC: skl-topology: Use kmemdup to replace kzalloc + memcpy
+777615137335af3ed520fe24a11fd9deaaeea539 FROMGIT: ASoC: dapm: Add missing return value check for snd_soc_dapm_new_dai
+0935ec3e3608d0c0fd4e2e4f4e7a61716457d4cf FROMGIT: ASoC: Fix UBSAN warning at snd_soc_get/put_volsw_sx()
+aa298f6936fd3cd778c737a4eb48301376be8cb8 FROMGIT: ASoC: rt5668: remove empty rt5668_i2c_remove()
+5a0621c00ad338bc78ae9673c5ca84b5bc4a9144 FROMGIT: ASoC: rt5514-spi: Get the period_bytes in the copy work to make sure the value correctly
+96b0e5cbbcf6dff2a366bd9187ff74d548f539e3 FROMGIT: ASoC: remove redundant include
+975d1dcf3b693679118174cbe9f0a5c46fa609c9 FROMGIT: ASoC: rt5682: Improve HP performance
+064d30a0e6722677b16eadd8f7233bbccbe8745c FROMGIT: ASoC: rt5682: Remove HP volume control
+b30306877825ab93d4a1dd74764c6eb45330fe72 FROMGIT: ASoC: rt5682: Update calibration function
+5084aa64f7b2c5d08d4b4432ca59956117c3fbb6 FROMGIT: ASoC: rt5682: Fix the boost volume at the begining of playback
+1fad30b1444500a1cbac1a58891b1632c77b5d24 FROMGIT: ASoC: rt5682: Minor code modification
+7d2bb5e89384275910d680eed4c369b6f2ad649c FROMGIT: ASoC: rt5677-spi: Drop unused GPIO include
+28575a7c5260f6364a69af349171ec658139aecf FROMGIT: ASoC: add for_each_dpcm_fe() macro
+310cfdd9cfe5388d566e5f25dcf908bf45eee45d FROMGIT: ASoC: add for_each_dpcm_be() macro
+c3ebb9e9cd16edd027fffcc64b768f1f067fea7e FROMGIT: ASoC: max98088: add OF support
+7754e7864f5700308ee01a029bffcee74076bb70 FROMGIT: ASoC: soc-utils: Rename dummy_dma_ops to snd_dummy_dma_ops
+08daa3471a9e026163065d2371e77b6c9b022131 FROMGIT: ASoC: rt274: Add fall-through annotations
+a4a336208fa6da42b9b908696700f81ba917b03c FROMGIT: ASoC: intel: skylake: Add fall-through annotation
+97b0f53b00958ef7e89ac68083e32a51fedde47d FROMGIT: ASoC: topology: Use the standard fall-through annotations
+5a8b1f496bab78a5ce5094b7a18cb011558f5034 FROMGIT: ASoC: max98088: Add master clock handling
+4286dbca885c07ba2cf77f3defa850418c67b9f2 FROMGIT: ASoC: max98373: Sort Digital Volume in reverse order
+401d8ca95dbb0e648c8328e5580f86cf56f420e6 FROMGIT: ASoC: max98373: Sort BDE Limiter Thresh Volume in reverse order
+3f410f738403c4cb5ceaa8d7b0ace314b6ab3fb1 FROMGIT: ASoC: max98373: Sort max98373_bde_gain_tlv in reverse order
+bae4b8a19a85dcf36ef93ba1eaba5050d0077ed9 FROMGIT: ASoC: max98373: Sort DHT Rot Pnt Volume in reverse order
+4dd6c094afeeac491ec1bfeafefdf822347f0af5 FROMGIT: Bluetooth: hci_qca: Add helper function to get the chip family
+ac327efa10b3cf05faf4e022af31678bb33af88e BACKPORT: FROMGIT: ASoC: Intel: Boards: Add KBL Dialog Maxim I2S machine driver
+5030b7516456cb48c2d506b201bec1ba512faf06 FROMGIT: ASoC: Intel: common: Add Kabylake Dialog+Maxim machine driver entry
+f315322ebc446c7e1b6ebd17efb0e7161e37499d FROMGIT: ASoC: intel: don't pass GFP_DMA32 to dma_alloc_coherent
+7951d70e106380472a2026b09ebf08a5f275d9f2 FROMGIT: ASoC: Intel: kbl_da7219_max98927: minor white space clean up
+3fa425b4778a8857db8c75bb8703b0147ccbffcf FROMGIT: ASoC: dapm: Add support for hw_free on CODEC to CODEC links
+09633c3ed746d87a2f6a221c2905618082413c2a FROMGIT: ALSA: pcm: Return 0 when size < start_threshold in capture
+f1eaa3d0073fee7015f9916eb2686a2556a024b6 FROMGIT: ALSA: memalloc: Don't align the size to power-of-two
+eb21c697037245761e3aad42a092f82e487a9f9f FROMGIT: ALSA: memalloc: Simplify snd_malloc_dev_pages() calls
+681ba3e4cdf63b8b876ffa160375c7196829aa90 FROMGIT: ALSA: memalloc: Add non-cached buffer type
+1be4b4dce570f008fb79ea24c0fe99c086ab81cd FROMGIT: regmap: split up regmap_config.use_single_rw
+56e771c218dad60828140b7d319e7978c9ba0299 FROMGIT: ALSA: pcm: Update hardware pointer before start capture
+57989351ae48abc8ff47d2633a11eb1d5b7291f4 FROMGIT: ALSA: hda: Fix mismatch for register mask and value in ext controller.
+1674a9f2749fe712f5e857192d08d09747a14907 FROMGIT: ALSA: rawmidi: A lightweight function to discard pending bytes
+d74eae221ca0558eb1c12bf55d5c3970acb198bf FROMGIT: ALSA: memalloc: Add fall-through annotation
+de5bda61b04c71fdeeb337196dbbe7ca90854742 FROMGIT: ASoC: nau8825: remove unnecessary unlikely()
+bbdbf1bd0d901cfbb153cc588ad04d4e4d34e54b FROMGIT: ASoC: codecs: constify snd_soc_dai_ops structures
+783eb7668e624582efa28056ffd4de61dc03af0e FROMGIT: ASoC: acpi: define common interface for machine driver configuration
+382822915edc030f2de2cd61dc3b35c24365364e FROMGIT: ASoC: Intel: use standard interface for Hdaudio machine driver
+86a8f5cbfc49b9e5526cbdeca51f86d04225a3cb FROMGIT: ASoC: Intel: use standard interface for Atom machine drivers
+e8eff4b58d9c9a5a9b5b12681752f0d8e03f211f FROMGIT: ASoC: Intel: boards: fix Skylake typo
+becc582efe1c6b7edefb745a860f078b93a4fd7e FROMGIT: ASoC: Intel: remove GFP_ATOMIC, use GFP_KERNEL
+b45135eaebbf39f7207d1b7319642137ce812ae9 FROMGIT: ASoC: Intel: common: add SOF information for APL RVP
+26e5cad4bbebf3960deaecd8f12f0e2112dde343 FROMGIT: ASoC: Intel: common: add quirk for APL RVP boards
+300cfd88775561b88e82726d415915cc73b7aae7 FROMGIT: ASoC: Intel: hdac_hdmi: add Icelake support
+6a76181a5a284b4ee638067053e2e21fadba2a76 FROMGIT: ASoC: Intel: fix interface for Chromebook machine drivers
+d08258a41d778e260c52b0f0a096e3731ffdf8bb FROMGIT: ASoC: Intel: use platform_data for machine drivers
+33f0e64ced66b717a8a4541e529e1fbe258a9149 FROMGIT: ASoC: soc-core: add snd_soc_of_parse_node_prefix()
+65bd3a7a2dacad260eaa9590a8d85ba986dc0128 FROMGIT: ASoC: soc.h: makes snd_soc_of_parse_audio_prefix() inline
+bdf4c1816fc38e872cf6b843221cdb9ae1852dfb FROMGIT: ASoC: Intel: Skylake: Make DSP replies more human readable
+80926cb144cf4304346f6ba0249184317d26e4f1 FROMGIT: ASoC: Intel: Skylake: Add FW reply for MCLK/SCLK IPC
+4493e67e2e92da3647b612ad0ff006fdbb528976 FROMGIT: ASoC: dmic: introduce mode switch delay
+6e1949d7f70a500c864a2c4d0a038918dfa927bd FROMGIT: ASoC: dmic: introduce module_param wakeup_delay
+790cfc3a1ac47abbcf9789504635bb55ed6af0fc FROMGIT: ASoC: au8540: use 64-bit arithmetic instead of 32-bit
+79057e7cd2ba73a08ae93754fb1dd4338eebc65c FROMGIT: ASoC: Intel: common: add ACPI matching tables for ICL
+deef9ab202cda95114dd8bda8e61c486dc89d364 FROMGIT: ASoC: max98373: Added max98373_reset for stable amp reset
+cb45e0a5474d51220d97b6b94b0f4f7a6b0ee8ad FROMGIT: ASoC: rt5660: Add a new ACPI match ID
+d97b996379d96796ad8d27269047f58ca2b163bd FROMGIT: ASoC: Intel: bytcr_rt5640: Add quirk for the Prowise PT301 tablet
+82177307dd1fb09b795a583e2a91f76956ae2873 FROMGIT: ASoC: Intel: bytcr_rt5640: Add quirk for the Point of View Mobii TAB-P1005W-232
+aa997a1e18d5ed7620b04ae4638c96e2e7e1dd00 FROMGIT: ASoC: Intel: kbl_da7219_max98927: fix the audio jack button remapping
+df80d3b9f33b6d97dfdcf7ea57a8c3ec660db209 FROMGIT: ASoC: Intel: kbl_rt5660: Add a new machine driver for kbl with rt5660
+6e7af39f867495db2777aaa919a99cbfcc5aed0e FROMGIT: ASoC: Intel: Skylake: Add CFL-S support
+0bdebcff88d607cb4ad371bf6fbdcff6ddba97c4 FROMGIT: ASoC: Intel: Skylake: Harden DSP detection with PCI class/subclass info
+a7d45494518b98b6ddf50de5719d6f248f39bb57 FROMGIT: ASoC: Intel: Skylake: stop probe if HDaudio capabilities don't exist
+43c71461eca31acb10a462abca3bb75592137ee2 FROMGIT: ASoC: Intel: Skylake: remove useless tests on HDaudio capabilities
+2171c1d56a0b4a74d29175b4c9ae6ba5d2ad3f0d FROMGIT: ASoC: Intel: Skylake: add error logs on probe, remove dependency on NHLT
+d685995077b102e255729e99e9421d47fe04013c FROMGIT: ASoC: pcm512x: Implement the digital_mute interface
+4e9d2a90d68ed8eafb7273957f67b0047b9fa9f3 BACKPORT: FROMGIT: ASoC: Intel: Skylake: Add more platform granularity
+011065d8e4ab9d5458bf0b3ac7739d992b7588aa FROMGIT: ALSA: soc-compress: add support to snd_compr_set_runtime_buffer()
+05c167bc8c15b1fb2c47704817aafd60e772d4b8 FROMGIT: ALSA: compress: make use of runtime buffer for copy
+aef9ffb7e20b7c40aacc25c4998427869c61a6a0 FROMGIT: ASoC: pcm512x: Fix a double unlock in pcm512x_digital_mute()
+86f7b76479ebd79a08e8c4965baf4f3f3e9c79ae FROMGIT: ASoC: Intel: atom: Make PCI dependency explicit
+3887cd94377fae0a536c556ba48690f06feda83c FROMGIT: ASoC: rt5682: Fix recording no sound issue
+341a4b83fe3fcc8c6ac36cc73a03bf58795cdbab FROMGIT: ALSA: x86: Fix runtime PM for hdmi-lpe-audio
+0cf74c0d4f2a036e9528a946a4e4e32b7ad90d96 FROMGIT: ALSA: x86: Rip out the lpe audio runtime suspend/resume hooks
+df50bc200fe511da07948d3311a0c782a7ef01b4 FROMGIT: ALSA: control: Consolidate helpers for adding and replacing ctl elements
+102406613fc4c4a37ad9d64ea00189df8f45e63a FROMGIT: ALSA: HDA: export process_unsol_events()
+392984bdeccb881acc906f2d4ddefac58b6643f9 FROMGIT: ASoC: Intel: Skylake: remove useless cast
+c9287dff90bf79dd524bcd71d6eacd4cf52b7599 FROMGIT: ASoC: Intel: Skylake: simplify boolean tests
+ea1e70e03831d8a4abf49eac0e6bd15971c7be64 FROMGIT: ASoC: Intel: Haswell: remove unneeded semicolon
+2e55cfc553f72b22ae4325fb292fef2297ecf6ca FROMGIT: ASoC: Intel: Haswell: assign booleans to true/false
+d34d3ec8eca751ef41f6f6313f88901e3c5c3d6e FROMGIT: ASoC: Intel: Baytrail: remove unneeded variable
+070b65a5e73fdc60134b9eac2f846b87637c0a3e FROMGIT: ASoC: Intel: Baytrail: simplify boolean test
+f731edbf8797b7db4e6fe4a6fcce6dc845ed86c9 FROMGIT: ASoC: Intel: Atom: simplify boolean tests
+4f56b3255e4ee2e2285c3b3ce79186494377a99d FROMGIT: ASoC: Intel: boards: use snd_mask_set_format in all machine drivers
+352f507972426089f4c25529fae8a34d7141f022 FROMGIT: ASoC: es8316: Add jack-detect support
+53109076fef23babd96328c354e3542c66c1579c FROMGIT: ASoC: es8316: Add DAC mono mix switch mixer control
+b1c816866f91ae840df3b5a5518c7c1eec958730 FROMGIT: ASoC: Intel: bytcht_es8316: Sort includes alphabetically
+a12ddd1db69e30a1c2576e867d5f6a6cf67ba8e7 FROMGIT: ASoC: Intel: bytcht_es8316: Minor refactoring
+65c0b43fc1e9f811ac04d98f89664e2b54dcd7a4 FROMGIT: ASoC: Intel: bytcht_es8316: Add support for SSP0 (BYTCR)
+8aa45176da50f26a42dc56f9aeb817bc1efc532c FROMGIT: ASoC: Intel: bytcht_es8316: Add jack-detect support
+5a9b96905fbd6e27636cd76d9c0a8e651cce1c87 FROMGIT: ASoC: Intel: bytcht_es8316: Add external speaker mux support
+8e76631ddd4276bd40871f49212e2fa4f8fbd94e FROMGIT: ASoC: Intel: bytcht_es8316: Add input-map support
+38625cd3565e85638b95c9d3612ec05260239e69 FROMGIT: ASoC: Intel: bytcht_es8316: Set card long_name based on quirks
+fca5c37bdb503fc377ce4122e1a5a2c60c0357a6 FROMGIT: ASoC: Intel: Add ACPI match table entry for ES8316 codec on BYTCR platform
+1dbc026e0c2989710b8e478f825220dd5f2c8d95 FROMGIT: ASoC: Intel: sst: Simplify is_byt_cr()
+77b074e241db2d2148d6ccf68fb73d09483d280f FROMGIT: ASoC: Intel: sst: Fallback to BYT-CR if IRQ 5 is missing
+66a4f870fbdf22b173ca1999e6eaa9b955d8a005 FROMGIT: ASoC: Intel: bytcr_rt5640: Add quirks for ASUS MeMO Pad 7 (ME176C)
+2ac6e6d29b5ecf5e6e30a8094dc9bfbaf586f247 FROMGIT: ASoC: dmic: declare trigger function as static
+27b08f5403d709fc67a9dfa1b925a89161ccf937 FROMGIT: ath10k: enable bus layer suspend/resume for WCN3990
+3c4d95a935ef0beef86f8eab7e148b6058697070 FROMGIT: ath10k: disable interface pause wow config for integrated chipset
+e41ce2aeaca18ddfdc8ff342d1ac117d6bcd966b FROMGIT: ath10k: request credit report if flow control enabled on ep
+bf135b596cafb90ec9173648fcce80def404406d FROMGIT: mfd: mt6397: Don't call irq_dispose_mapping.
+4966bff1f9ade28c9f6391e750fbb275589916c4 FROMGIT: drm/i915/cml: Add CML PCI IDS
+9da545d3d1f38635a16cc9c949e17cc52d2eaa9a FROMGIT: drm/i915/cml: Introduce Comet Lake PCH
+c097e29c0aab145aac6125f70b206791f93d4a30 FIXUP: FROMGIT: platform/x86: intel_pmc_core: Quirk to ignore XTAL shutdown
+af52899fe6344e8108739c670aeaff016b0462f6 FROMGIT: ARM: dts: rockchip: Fix gpu opp node names for rk3288
+0609e0fdabfc6d08d1eca852fe5dca7d223ab060 FROMGIT: ARM: dts: rockchip: Fix gic/efuse sort ordering for rk3288
+b6b4739f0b4e6dc60a94c9adac33adef78421caf FROMGIT: ARM: dts: rockchip: Add vdd_logic to rk3288-veyron
+45911a7248a067753feb0e8759c52d42160a7638 FROMGIT: ARM: dts: rockchip: Remove #address/#size-cells from rk3288-veyron gpio-keys
+7203c53fb3dac737c3ff4fc2d9fc020d73f8e74a FROMGIT: ARM: dts: rockchip: Remove #address/#size-cells from rk3288 mipi_dsi
+b03b855806c759159368a23e5b208654c42497c0 FROMGIT: ARM: dts: rockchip: fix rk3288 cpu opp node reference
+58af760666d01454c9e5647d75ed835d0261e0ac FROMGIT: ARM: dts: rockchip: Add rk3288-veyron-jerry rev 10-15
+731760db01706cd30ef1993f44d1fc22d8744682 FROMGIT: ARM: dts: rockchip: Add dvs-gpios to rk3288-veyron-jerry
+90a9becf1f5212310fc2785d48bb004008775af4 FROMGIT: ASoC: max98090: remove unused constant variables
+0ee49369b87feea2576ae99a8eadfbbcb5c6965c FROMGIT: ASoC: es8316: remove unused constant variables
+2270c1f3cd73b599b80befbd7b91af514daae8ea FROMGIT: ASoC: codecs: fix kernel doc descriptions
+7187ad006e28e3e450295fc5b2283d71ecb21c5b FROMGIT: ASoC: rt5645: remove unused mux define
+89028a93495b30f1b2b65fe652f6d0e74822f36d FROMGIT: ASoC: rt5670: remove unused mux/mixer define
+d890d165a8cd0e5f80b3629073461941cd62af96 FROMGIT: ASoC: max98383: fix boolean assignments to true/false
+d364995a73e2b12a34b8e7e865988e97577252b6 FROMGIT: ASoC: cs4271: fix boolean assignments
+f1ead3c1e8bd11e889ffffc056faf1a9ad78991f FROMGIT: ASoC: rt274: fix boolean tests
+35b54faf1f4e31b00ea028ca223bdaf4bc587d47 FROMGIT: ASoc: rt286: fix boolean tests
+7932349ef804272c2d38f9838a29e5dc93e6d1f9 FROMGIT: ASoC: rt5640: fix boolean assignments
+b564783194be63d153f355d6bab64e2d2ba5d23c FROMGIT: ASoC: max98927: fix boolean assignments
+665638a16fa75649d239370d5bd83d9c6c999741 FROMGIT: ASoC: rt5651: fix boolean assignments
+a897b1b57c9f33f12bba2b59e7dc5b9fc46e7875 FROMGIT: ASoC: nau8824: fix boolean assignment
+29ae55752b19d5a5bba586323e91c8b342be7258 FROMGIT: ASoC: tscs42xx.c: fix boolean test
+3ed496600e6cdbc51efac71c4835d7ea33346f7d FROMGIT: ASoC: mt6351: remove unneeded variable
+6fca071583e6d956a8fea4ca790a5b113a09095b FROMGIT: ASoC: da7219: fix endianness issues
+4476ee93c2a01481da526ad1c6a4c956f4e02b94 FROMGIT: ASoC: da7219: use logical AND
+0845ed11f41f89fb0590c002323d9537586622ce FROMGIT: ASoC: rt5645: store eq kcontrol byte in __be
+bfb1ae0aedf91c2eb97fd4fc130fa0ee1c3e5a60 FROMGIT: ASoC: rl6437a: use __be32 for a __be32 buf
+fc995eccb47dad8c0b5b368f5dc2646a7e8cbb17 FROMGIT: ASoC: rt298: fix boolean tests
+25b088d04a98fcc74c1028f20643e5a53facf0d9 FROMGIT: ASoC: Intel: common: Add quirk for PoV P1006W tablet
+305d4289b3635b28d75c2e4198b931ebcf1164ef FROMGIT: ASoC: rt5651: Add ACPI ID 10EC5640
+d727df70848b8766285ea4eafe4f0c102c4fdbc7 FROMGIT: ASoC: rt5651: Add support for jack detect using an external GPIO
+e42020f6d034fd0e35554179a9ac2ecadce133d1 FROMGIT: ASoC: Intel: bytcr_rt5651: Revert "Fix DMIC map headsetmic mapping"
+ef8e7c79abb132e5c5976c1cc1221f71538a22a2 FROMGIT: ASoC: Intel: bytcr_rt5651: Add quirks module parameter
+f7cb196341938ab9b59f79c5d88a63bc051bed69 FROMGIT: ASoC: Intel: bytcr_rt5651: Add support for jack-detect using an external GPIO
+94e9bfd80ae3cc6be1438d9b38b2f7b5850e5611 FROMGIT: ASoC: Intel: bytcr_rt5651: Add quirk for PoV TAB-P1006W-232 (v1.0) tablet
+0e9d29fdbb2dae025814295313f474a20f56a31e FROMGIT: ASoC: rt274: Variable "buf" in function rt274_jack_detect() could be uninitialized
+711cd4789fc5cb3382f00ec83a69d2c1df0e1d92 FROMGIT: ASoC: da7219: MCLK should be enabled before DAI clocks
+1f50e86a35d035618b24b0e207e97035a003cb6a FROMGIT: ASoC: da7219: Add recalc_rate function to return DAI clock rate
+64b409cdeb64343fa97b0c980bee69c7157ccaec FROMGIT: ASoC: Intel: Boards: move the codec PLL configuration to _init
+d04c2b756256438649bed2b0284ed43a6d7dcb6b FROMGIT: ASoC: Intel: bytcht_es8316: use correct drvdata in snd_byt_cht_es8316_mc_remove()
+dbad4dd46b5e2ea41e6b0262ccc99ff51b55c9ee FROMGIT: ASoC: intel: skl: Fix display power regression
+f1df69f5a7159d9871d40708ee8f29fe96e9fbaa FROMGIT: ASoC: rt5682: add default pdata for i2s mode
+214622b4d8b3a0c65ba0227e4ea49df53cc7acf7 FROMGIT: ASoC: soc-core: remove error due to probe deferral
+aba8b0f9b23f120469708fee50af4e4ba7e4de64 FIXUP: FROMGIT: ASoC: Intel: bytcht_es8316: Add support for SSP0 (BYTCR)
+3f306e02ae7cdf99eeb87ccf94a6458d839dd2d3 FROMGIT: ASoC: soc.h: add explanation of legacy/modern style of dai_link
+74b60636924370d07ee8b76a9f498449edc534ad FROMGIT: ASoC: audio-graph-card: remove endpoint bidirectional check
+196759dd2cb21a39aeb28c417e694c9ef359cb91 FROMGIT: ASoC: audio-graph-scu-card: remove endpoint bidirectional check
+8a5c41455882dbb2880ce8a1bd9ced68e3ab9ed0 FROMGIT: ASoC: audio-graph-scu-card: remove error check which never happen
+230e6cfd4b7a7220e1cc627079eb5cd924ec561b FROMGIT: ASoC: simple-card-utils: remove asoc_simple_card_clk_register()
+4dd9a81c81628029d30f169f2dc829f0c2b5d023 FROMGIT: ASoC: simple-card-utils: accept NULL parameter on asoc_simple_card_xxx()
+91cc2bdb1a1ca80ac35da0aaa5fd74e1988ad458 FROMGIT: ASoC: simple-card-utils: tidyup asoc_simple_card_parse_convert()
+c1349474cc04f1377fb49407313a1981231295ce FROMGIT: ASoC: simple_card_utils: remove "option" from asoc_simple_card_of_parse_routing()
+6d6bbf65ba149ab91c411c6465a24f959cf31a71 FROMGIT: ASoC: simple-scu-card: tidyup "prefix" parsing
+bf63b30e456f67cbde9023e8832f808c2d12742d FROMGIT: ASoC: audio-graph-scu-card: tidyup "prefix" parsing
+91305cfae6f81d9d02eac79b2ec0489128619ded FROMGIT: ASoC: audio-graph-scu-card: use simple_dai_props
+e4f48031f4150a3ef51ebd17d23e5d1067c10008 FROMGIT: ASoC: audio-graph-scu-card: support snd_soc_dai_link_component style for codec
+d799869b78c4a66d9b73573b7b3bdac7ecd8bc65 FROMGIT: ASoC: audio-graph-scu-card: support snd_soc_dai_link_component style for platform
+735b8b270afe535d93d0c8738a454392653a9c6f FROMGIT: ASoC: audio-graph-scu-card: tidyup "convert-rate/channels" parsing
+29287d935cb0ed413c873bfc0dbd7149a9c93389 FROMGIT: ASoC: audio-graph-scu-card: tidyup asoc_simple_card_parse_daifmt() timing
+dbc27a91b3d9cbb84acbe8b1c95ec57a5f244591 FROMGIT: ASoC: audio-graph-card: tidyup typo SND_AUDIO_GRAPH_CARD
+0406aa50ed5117d81fdddf426aa333c7af9ba553 FROMGIT: ASoC: audio-graph-card: tidyup define position
+36660357e546d9cda421937fc39733b7b01bbc5e FROMGIT: ASoC: simple-card-utils: fixup asoc_simple_card_get_dai_id() counting
+62fe3cf888b3e4ee4cfb1cf5aa7e529a48f63995 FROMGIT: ASoC: audio-graph-scu-card: care link / dai count
+6b56d6b704bc155394ad2edac425b5468c5440ef FROMGIT: ASoC: audio-graph-scu-card: use cpu/codec pointer on graph_dai_props
+8ae09c88867684f6f66ce8c03e751de6a24caea2 FROMGIT: ASoC: audio-graph-scu-card: care multi DPCM codec_conf
+13daf2d20d9d69c7cd00f62dc94709739d83d477 FROMGIT: ASoC: audio-graph-card: support snd_soc_dai_link_component style for codec
+b053e7c3fe8d1ed70e1398936a505d00b4b718c8 FROMGIT: ASoC: audio-graph-card: support snd_soc_dai_link_component style for platform
+e51d75b023ab43b28ae57dca1218aca9f509b397 FROMGIT: ASoC: audio-graph-card: use cpu/codec pointer on graph_dai_props
+b3d445ca708520f747c1021c9a671d7165278715 FROMGIT: ASoC: Use of_node_name_eq for node name comparisons
+beff365661f5fffc492d65158e8062a21db0e074 FROMGIT: ASoC: simple-card-utils: fix build warning without CONFIG_OF
+cacff15bd308cce0cfe762c811324a4c6808986d FROMGIT: ASoC: simple-card: support snd_soc_dai_link_component style for codec
+7739335f63697ee29dc84e519cc13a22264e590d FROMGIT: ASoC: simple-card: support snd_soc_dai_link_component style for platform
+8424d79dbe638e7ee50f8f44242775c32996c68e FROMGIT: ASoC: simple-card: use cpu/codec pointer on simple_dai_props
+5d9311c1e3e73a26173cf2bb28b02d695399d1ed FROMGIT: ASoC: simple-scu-card: tidyup asoc_simple_card_parse_daifmt() timing
+ec0d99092ddafe0446b4dfdf079f555e5482adda FROMGIT: ASoC: simple-scu-card: add dai-link support
+06b7fad8802f1d1b3086e11cfb18245fec755e3c FROMGIT: ASoC: simple-scu-card: use simple_dai_props
+791d7446aded9d5899287d3908d7a9f5b117e81f FROMGIT: ASoC: simple-scu-card: support snd_soc_dai_link_component style for codec
+3955456e21f9f3275c4d47a3cedc9b5868bdabe2 FROMGIT: ASoC: simple-scu-card: support snd_soc_dai_link_component style for platform
+03cde205dd406d7c3b8d70393b9afd4afc37ccd1 FROMGIT: ASoC: simple-scu-card: care link / dai count
+55ea462d2b3fd253d599037ab905e04d165de9ac FROMGIT: ASoC: simple-scu-card: tidyup "convert-rate/channels" parsing
+efa4333037013028cd4f26e5ad534d41f3d3d3a0 FROMGIT: ASoC: simple-scu-card: use cpu/codec pointer on graph_dai_props
+4ed2eb723ff1699482175dec16d157ea77f1a1b2 FROMGIT: ASoC: simple-scu-card: care multi DPCM codec_conf
+9d7dcefafd3bcf8147919fa95d7a95c35c9d099c FROMGIT: ASoC: simple-card: Dereference pointer for memcpy sizeof in asoc_simple_card_probe
+45d52e7303bc90ac691a88d3dd633eb302274feb FROMGIT: ASoC: simple-card-utils: fixup asoc_simple_card_get_dai_id() ID method
+f29b9ce1cf70a054b84483d8ca08436fdb4e1fd6 FROMGIT: ASoC: audio-graph-card: merge audio-graph-scu-card
+3b8e84ab841b03df95bd5a26eb1599ac13eeaacb FROMGIT: ASoC: audio-graph-card: enable mclk-fs on codec node
+a1c3df24ada575b0ae69afbc13c9ef47a2c98170 FROMGIT: ASoC: audio-graph-card: tidyup mclk-fs method
+4ae1c8abc8e02727e125dfef419be3c6525a6095 FROMGIT: ASoC: audio-graph-card: tidyup convert_rate/channel method
+8a2a65924e70962f08ec9386f10e46efcc85325d FROMGIT: ASoC: audio-graph-card: tidyup prefix for snd_soc_codec_conf
+8efc9d58f2cb63f57a272bbbd8d81ba361ab81b5 FROMGIT: ASoC: simple-card: merge simple-scu-card
+9a53431b966a85b592281298559a7c662f22eaa0 FROMGIT: ASoC: simple-card: tidyup mclk-fs method
+36f6f2c9910185fd26a97b4d558383dcb214a19b FROMGIT: ASoC: simple-card: tidyup convert_rate/channel method
+f802470b32cbf96dbcdaa82eae832e72c7e2e3d8 FROMGIT: ASoC: simple-card: tidyup prefix for snd_soc_codec_conf
+d552f0eb8a7f591e600bf1cba70b06fb1b09b4b0 FROMGIT: ASoC: simple-card-utils: check "reg" property on asoc_simple_card_get_dai_id()
+ca03a198228cd64aa9eb24266143422d10898a83 FROMGIT: ASoC: mediatek: Fix UBSAN warning.
+7e63e98f8604e8d4a6eaa56f60ca2bdf001e0db1 FROMGIT: ASoC: mediatek: Reduce repititive code on mtk_regmap_update_bits.
+1ffc57989f2ee48a4813760c44f266bd3d3e15ca FROMGIT: ASoC: audio-graph-card: add asoc_graph_card_get_conversion()
+b4e93dd2539784b6ab26c6a2f74774144792ae05 FROMGIT: ASoC: audio-graph-scu-card: remove audio-graph-scu-card
+3eb456222c63931c35cd6046dc6e05d4f78050be FROMGIT: ASoC: simple-scu-card: remove simple-scu-card
+0b0aff11d310b7b1e5e5e5e15e4d830af931fa99 FROMGIT: ASoC: audio-graph-card: add 1 CPU : 1 Codec support again
+a623ebb8b2f1718b483bf912429b1df03d8b17b7 FROMGIT: ASoC: audio-graph-card: add link_info
+10a7e1c53cf5a858b6cfdbd2caf40983c26233d0 FROMGIT: ASoC: audio-graph-card: cleanup DAI link loop method - step1
+52d47063640a96ea529fd9ddb844c05240e52881 FROMGIT: ASoC: audio-graph-card: cleanup DAI link loop method - step2
+c080f25d96c776bd2ea2683e364a70fa0950f582 FROMGIT: ASoC: audio-graph-card: reduce naming prefix
+68b986713043bf91ddf70d37acae2b8ca5d4d8c2 FROMGIT: ASoC: simple-card: add asoc_simple_card_get_conversion()
+57ec0ab14872cef2cf73b2ea620abebf229f4cf0 FROMGIT: ASoC: simple-card: add 1 CPU : 1 Codec support again
+a101fc38cc42f29786b14d2624df13455ea31d5d FROMGIT: ASoC: simple-card: add link_info
+e69148f18961cd79bff680665be8c43577ed9d98 FROMGIT: ASoC: simple-card: cleanup DAI link loop method - step1
+4c3e6928862e588a583d5ea5d1bc1afeb8a64b24 FROMGIT: ASoC: simple-card: cleanup DAI link loop method - step2
+87be7fd03a230e0750b2df9745deef3b33e0444a FROMGIT: ASoC: simple-card: reduce naming prefix
+2b57f260c0dbacef1fcf6296a462ca1851bf5b35 FROMGIT: ASoC: simple_card_utils: support snd_soc_dai_link_component style for codec
+fbf57f6a702ea8a63c6f9ab1273ecc821426e083 FROMGIT: ASoC: simple-card-util: support snd_soc_dai_link_component style for platform
+94998778441a8a2ebaae7d5f3dc01b9abc927a9d FROMGIT: ASoC: simple-card-util: remove dai_link compatible code for platform
+b2a36e0888fa000f66969889b7ec4927cb5a5038 FROMGIT: ASoC: soc-core: add .num_platform for dai_link
+48d3a44dbbb00b8c3ba7ae1428853b267eeeb268 FROMGIT: ASoC: soc-core: add new snd_soc_flush_all_delayed_work()
+0c7b884a560e0d98e726e4bf83c8e30cbf404604 FROMGIT: ASoC: soc-core: merge card resources cleanup method
+b4c8307884b72316fd55c600eb3e95603e5f4e50 FROMGIT: ASoC: soc-core: reduce if/else nest on soc_probe_link_dais
+b193f8d2ec8cbe76167e658d8310c30700884915 FROMGIT: ASoC: soc-core: add soc_cleanup_component()
+a356ef57378ce43687307790abf64badb570349b FROMGIT: ASoC: soc-core: use for_each_link_codecs() for dai_link codecs
+6c2a60d003e03046dbce2e3f9eb4afbc9a58971a FROMGIT: ARM: dts: rockchip: Add device tree for rk3288-veyron-mighty
+202141fa25bf03a68128d0d75fb75ff4be496cd4 FROMGIT: ASoC: core: Fix multi-CODEC setups
+3a1811dcf4db720933cf19198a62c1223d3f0000 FROMGIT: ASoC: Intel: make const arrays static, reduces object code size
+7cfd16ec2d71c30ad81ae2128514e409e86908e8 FROMGIT: ASoC: core: Allow soc_find_component lookups to match parent of_node
+df8a9b37d795bd5f460fbf36570b60f9901db973 FROMGIT: ASoC: soc-core: use for_each_link_codecs() for dai_link codecs V2
+718fcb157f37ef9bb64dd40f43068200885de0b7 FROMGIT: ASoC: pcm512x: Implement the set_bclk_ratio interface
+453db948575077e93d1e5fa11a58b702bd193ba8 FROMGIT: ASoC: pcm512x: Fix clocking calculations when not using the PLL
+be9c65584c8e329f1364181a317e2f1bdb9001bc FROMGIT: ASoC: soc-acpi: add static inline fallbacks when CONFIG_ACPI=n
+6c5e0596e0837265b24314d3821329ef29bc25f0 FROMGIT: ASoC: rt5651: Variable "ret" in function rt5651_i2c_probe() could be uninitialized
+e7a099b009486c38ea6a5fd9cdaef4f6aeab0682 FROMGIT: ASoC: add helper to change platform name for all dailinks
+b41820a659dd325d34a31d42d0b5bc15fbd39269 FROMGIT: ASoC: Intel: haswell: platform name fixup support
+bb2de676a5152a72eda7299282e5d33cca507842 FROMGIT: ASoC: Intel: broadwell: platform name fixup support
+c1f2364aea4d6193293b45dc8fdfe4c07238d6cd FROMGIT: ASoC: Intel: bdw-rt5677: platform name fixup support
+56d355ac1f23327b43bcec77f5080b74f9b9a3d8 FROMGIT: ASoC: Intel: bytcr_rt5640: platform name fixup support
+2cdf7214db7d0fdd75ec3d825ddb59a6b20421bc FROMGIT: ASoC: Intel: bytcr_rt5651: platform name fixup support
+7c6c0c5869d97fec31c9e592a0ae5aa59fb1061c FROMGIT: ASoC: Intel: bytcht_da7213: platform name fixup support
+5d234c7bb982a3a8e4ee4b0990dad9c44ce1506a FROMGIT: ASoC: Intel: bytcht_es8316: platform name fixup support
+0e2d73f3a277e9c013dd2bf99b15bbc2dcd6af75 FROMGIT: ASoC: Intel: cht_bsw_max98090_ti: platform name fixup support
+b5e7397334c7623e88811001ce28d17aa0b1e26c FROMGIT: ASoC: Intel: cht_bsw_nau8824: platform name fixup support
+401b28adbf7e4aa33e8ae9e7151d4aee92f6af2b FROMGIT: ASoC: Intel: cht_bsw_rt5645: platform name fixup support
+339f03d8f868e0d5dc7dc4f0c0bc3ef731020e08 FROMGIT: ASoC: Intel: cht_bsw_rt5672: platform name fixup support
+d23962a378962766c2ccfcfb35634984fb9be35c BACKPORT: FROMGIT: ASoC: Intel: bxt_da7219_max98357a: platform name fixup support
+6083f2ac2b6e29c3e88442b133b4d23743c312a1 FROMGIT: ASoC: Intel: bxt_rt298: platform name fixup support
+2aca354f3e302874625fe86713c4f91456b96abb FROMGIT: ASoC: Intel: glk_rt5682_max98357a: platform name fixup support
+282acbaa6557bc8c626012f79680718dce4fb7f7 FROMGIT: ASoC: Intel: cht_bsw_rt5672: remove useless test
+0bc8bfed6add653b0449794241b6695d24ad4c79 FROMGIT: ASoC: topology: Reduce number of dereferences when accessing dobj
+a0078f08c495254edda8cb0e71e8bb865a2cd165 FROMGIT: ASoC: topology: Remove widgets from dobj list
+60c09d5314d0affbe85a59e47135d0c07a7f385e FROMGIT: ASoC: topology: Fix memory leak from soc_tplg_denum_create_texts
+ac96dbcd08906de4dac0386a855a9bb581b93ba8 FROMGIT: ASoC: topology: fix memory leak in soc_tplg_dapm_widget_create
+7601100598e2e184a7cdb9f070a42b81bc757ee3 FROMGIT: ASoC: topology: add SND_SOC_DOBJ_GRAPH type for dapm routes
+765e6d2342fefd26d35840dea272e279ecb91010 FROMGIT: ASoC: topology: modify dapm route loading routine and add dapm route unloading
+cfe11d17cd03f8070ced1330f3f39ff3fd4181c4 FROMGIT: ASoC: dapm: fix use-after-free issue with dailink sname
+316a5a9f94644f1912f548605ee462d77762314a FROMGIT: ASoC: topology: fix oops/use-after-free case with dai driver
+4f926348e457338aa6e7ecebcd3ea964b4e06bd3 FROMGIT: ASoC: dapm: Only power up active channels from a DAI
+f62a8cc4bd18f8334cddfbe05ab4196a98902404 FROMGIT: ASoC: dapm: Add warnings for widget overwrite when adding route
+d0a128b12ae984b86392cd36791ced1195acbf4f FROMGIT: ASoC: soc-core: clear platform pointers on error
+8e8f9b2af04d33db0e432b5f199378266f1b5c8f FROMGIT: ASoC: soc-core: Fix probe deferral following prelink failure
+3fa4d4e364df1840b13729cf0f00d392e677dc41 FROMGIT: ASoC: topology: unload physical dai link in remove
+aa37e1cf12e19ef46713c3031175400c4cbdfeda FROMGIT: ASoC: dapm: Check for NULL widget in dapm_update_dai_unlocked
+0042f69a842bac9f2ec0f188c4f31d094ab8e7c3 FROMGIT: ASoC: compress: Clarify the intent of current compressed ops handling
+2b92810b654b33c4d101ec16a99dce684c44a15f FROMGIT: ASoC: compress: Add helper functions for component trigger/set_params
+de2b70a6dbd8fb7c600f3396524cf75c833ea700 FROMGIT: ASoC: dapm: harden use of lookup tables
+d165fdd3ff5b3bba5db853bfa1dfe7eaeec845cf FROMGIT: ASoC: regulator notifier registration should be managed
+593daede1003760a7f7ac3d8bd5fd56916613f00 FROMGIT: gpiolib: acpi: Introduce ACPI_GPIO_QUIRK_ONLY_GPIOIO
+2ec2c60c579b73ec3c23982f5f42a50d4d6a2295 FROMGIT: ASoC: core: don't increase component module refcount unconditionally
+a8cbb5a3be7922c518a21862d0fac775f59a7b87 FROMGIT: ASoC: hdac_hdmi: use devm_kzalloc for all structures
+287d479263f2fe3cc1b67a0cd0f6bdbf858891c2 FROMGIT: ASoC: Use __printf markup to silence compiler
+043d92e57817225f1b7f525e02d8327ba3258859 FROMGIT: ASoC: dmaengine: Improve of_node test in dmaengine_pcm_request_chan_of()
+46eb483cb1780e5a895f2da591e206ece3903f3d FROMGIT: ASoC: dmaengine: Extend use of chan_names provided in custom DMA config
+2ad1384ae218b89eae69ede65e62a499eae85a3c FROMGIT: ASoC: Intel: bxt-match: remove prefix for SOF files
+86383de7994249d3bece3d7a5bbee826a907ae49 FROMGIT: ASoC: Intel: byt-match.c: remove prefix for SOF files
+1aa597a1a7fad0bb7b83cd511f87970949f10522 FROMGIT: ASoC: Intel: cht-match: remove prefix for SOF files
+da777e4a03073209d0d75703d26cb287db933efc FROMGIT: ASoC: Intel: cnl-match: remove prefix for SOF files
+246909ad20866a9f14229629302ef8de38d37a72 FROMGIT: ASoC: Intel: glk-match: remove prefix for SOF files
+e4cb9489f1ef3a25b3ef701a8ac8651c1a903084 FROMGIT: ASoC: Intel: hda-match: remove prefix for SOF files
+c999a2aef228e435f254b67301d2a77cb5ab9d36 FROMGIT: ASoC: Intel: hsw-bdw-match: remove prefix for SOF files
+f02cf1623fb3fa4928c82c2df004c7ca38b1fbd7 FROMGIT: ASoC: Intel: icl-match: remove prefix for SOF files
+25bfc35e1b41f2470e5c381362b36b5cf3573223 FROMGIT: ASoC: Intel: soc-acpi: bxt-match: remove asoc_plat_name field
+de09889d1267c9710c16bc93ac620e4ce3a714f3 FROMGIT: ASoC: Intel: soc-acpi: byt-match: remove asoc_plat_name field
+11f58ebfeed3e1c4684f2b1ae7e90d422e727234 FROMGIT: ASoC: Intel: soc-acpi: cht-match: remove asoc_plat_name field
+4728ef08ef7b7c10d15757bcc1de45f915981be3 FROMGIT: ASoC: Intel: soc-acpi: glk-match: remove asoc_plat_name field
+c299bd456da3107f07ff52a0ed5f72c51345597b FROMGIT: ASoC: Intel: soc-acpi: hsw-bdw-match: remove asoc_plat_name field
+c77f99a29427d8d86b3d130c127d88c44cf9d271 FROMGIT: ASoC: Intel: soc-acpi: icl-match: remove asoc_plat_name field
+86fd1102aee7380308343630a72f462a7a7e2475 FROMGIT: ASoC: Intel: soc-acpi: cnl-match.c: remove asoc_plat_name field
+4ce085b6cbe08298229c61246ee4105477d56f82 FROMGIT: ASoC: soc-acpi: remove asoc_plat_name field
+8a08f1edcd050dbd473f3e52ae5ae45f12638596 FROMGIT: ASoC: soc-acpi: remove new_mach_data field
+9d4fd74aaf95accae8aabbde93c842c3718a45c8 FROMGIT: dt-bindings: ufs: Add #reset-cells for Qualcomm controllers
+6d98df7a15b786009d4b2d7a31c3b12928b893bb FROMGIT: dt-bindings: phy-qcom-qmp: Add UFS PHY reset
+91fee11185be4912de01ae6f82324b26df5e277f FROMGIT: dt-bindings: phy: qcom-ufs: Add resets property
+f63b0c40406c14fbcde42f56b61102d5f5f93966 FROMGIT: scsi: ufs: qcom: Expose the reset controller for PHY
+624b791f0b2b6267da2b8ff351bd971a6de5917a FROMGIT: phy: qcom: Utilize UFS reset controller
+52afbdf7a538dfd4f48273357c0c5d2aad99334c FROMGIT: phy: ufs-qcom: Refactor all init steps into phy_poweron
+0f96f056a3ce763e9c671273bf6fad0136f32ee9 FROMGIT: media: mtk-vcodec: fix access to vb2_v4l2_buffer struct
+5ea8187c5aa082a7e71d3cd5f36a98012344c7ed FROMGIT: media: mtk-vcodec: fix access to incorrect planes member
+7eadcaf857454f0540d469a78770f426a5ddb906 FROMGIT: media: mtk-vcodec: remove ready_to_display
+c3bd7d8300b6910f9926daabacf2aedf71d22c2b BACKPORT: FROMGIT: ASoC: Mediatek: MT8183: Add machine driver with TS3A227
+c8fe61d50a483706877498971ed15201b002e6e0 FROMGIT: ASoC: Mediatek: Add document for mt8183-mt6358-ts3a227-max98357
+27052d2f7397ff9883f04c66d93070300c63f2a8 BACKPORT: FROMGIT: ASoC: Mediatek: MT8183: Add machine driver with DA7219
+b84bb3870c2bff9fc804c3fb119acea34c449f2e FROMGIT: rtc: cros-ec: Fail suspend/resume if wake IRQ can't be configured
+6bd0ceaf7c16ec02c081b819a5e56e0d86d9dfa4 BACKPORT: media: platform: fix several typos
+2cccc5fb3c1b8548f3a174308998f14330bff444 BACKPORT: FROMGIT: PM / wakeup: Use pm_pr_dbg() instead of pr_debug()
+e1d4d60718c34f71eb9c3c5ca802c23303b40ac3 FROMGIT: ASoC: Mediatek: Add document for mt8183-da7219-max98357
+184b3a9f738b242e914b502a73743a363f20b227 BACKPORT: FROMGIT: ASoC: mediatek: use %pOFn instead of device_node.name
+bd3bd9c8aadeece636d2be169c6ec23486bc0bb2 FROMGIT: block/bfq: fix ifdef for CONFIG_BFQ_GROUP_IOSCHED=y
+17872142d42f31676361bd150ae1e7e0c8544d9b FROMGIT: ASoC: Mediatek: MT8183: TS3A227: fix build error
+b9362eff60b1024bc7b3742816ffff4e85a1c8ca FROMGIT: ASoC: Mediatek: MT8183: Fix build error in mt8183_da7219_max98357_dev_probe
+cb0dfff25530f5f392640e9aa8dcc94ed6fd51ba FROMGIT: platform/chrome: wilco_ec: Standardize mailbox interface
+b3cf1681b922ab7f6064fb5dacd4e9eb06718146 FROMGIT: block, bfq: fix use after free in bfq_bfqq_expire
+7a872bc96ae9b1d70ce863d2c577515177029f74 FROMGIT: ARM: dts: rockchip: Add BT_EN to the power sequence for veyron
+bfcf7f2cabdc4ed2e95a11cef3f3c92e97dc8751 FROMGIT: ARM: dts: rockchip: Remove unnecessary setting of UART0 SCLK rate on veyron
+bce236448c89245c48defc43f8aca662eaa98cbe FROMGIT: ASoC: Mediatek: MT8183: add I2S2 control path from UL2 and UL3
+aeb01b5b643138e3d25b48293159cbff010e8787 FROMGIT: ASoC: Mediatek: MT8183: change supported formats of DL2 and UL1
+30782efd1d0f02049efb8224a242d6db65535775 FROMGIT: ARM: dts: rockchip: vdd_gpu off in suspend for rk3288-veyron
+65071bea1565824b54ff951ebdeaeb66fc685c3b FROMGIT: clk: rockchip: Make rkpwm a critical clock on rk3288
+b8ebcb42a3af6589fdb41fe1d43b2a9119b6b232 FROMGIT: ARM: dts: rockchip: Add dynamic-power-coefficient for rk3288
+dd128c5d6eb59f4273c43364be1acb8b0baafc01 FROMGIT: clk: rockchip: Turn on "aclk_dmac1" for suspend on rk3288
+b3f1722b7e8d375dabf0a139a71b5e1ca696def2 FROMGIT: ARM: dts: rockchip: vcc33_ccd off in suspend for rk3288-veyron-chromebook
+31608326be28f8c61150c95afecf0b628c4b7f38 FROMGIT: clk: rockchip: Fix video codec clocks on rk3288
+3793d8537ecd10a1b658b48f05e15937d4d8f9ad FROMGIT: platform/chrome: cros_ec_spi: Transfer messages at high priority
+7d7f8d6e7bb6358e83d4bc3979359e4efd6a7029 FROMGIT: ARM: dts: rockchip: Add DDR retention/poweroff to rk3288-veyron hogs
+79261c9e31e47e9299e0cdb95ba68e67fc117d58 FROMGIT: ARM: rockchip: Mark pm-init functions __init
+4ab4c40b9470e23be75eb87ad9616c1a90504d5e FROMGIT: platform/chrome: wilco_ec: Add h1_gpio status to debugfs
+aaa3b38b0a7541b47ee5ab33823e8b0ee1d1b995 BACKPORT: FROMGIT: platform/chrome: wilco_ec: Standardize mailbox interface
+5d171c055d9009be0794b40fe0d182d6fb2a170a FROMGIT: clk: rockchip: Limit use of USB PHY clock to USB on rk3288
+5c757746728e0947789de0bf2b1bf2dc8da033d2 FROMGIT: platform/chrome: cros_ec: Add EC host command support using rpmsg
+633273c066ebf3b55dacad9f72519afa0be1b84d FROMGIT: clk: rockchip: undo several noc and special clocks as critical on rk3288
+1cd356704292dd127e5c66f7fa63fcddb55072db FROMGIT: soc: rockchip: Set the proper PWM for rk3288
+09b2815438ff7322fe60663cc3204675419622b9 FROMGIT: ath10k: sdio: workaround firmware UART pin configuration bug
+cbc0714891083d4585d0a0c7e40b3a78322454db FROMGIT: ath10k: don't disable interrupts in ath10k_sdio_remove()
+08f8a9b40a3eb44180b046e8259109f8d2f0f6de FROMGIT: ath10k: htt: don't use txdone_fifo with SDIO
+e653d14ecbc24e97ba6811b5829df57517671338 FROMGIT: ath10k: initialise struct ath10k_bus params to zero
+6b309af367880cbf77bb9b2ab3ef871da48120cd FROMGIT: ath10k: htt: support MSDU ids with SDIO
+650c31c9f8717e4d23f41f47e33c495a7776c446 FROMGIT: ath10k: fix use-after-free on SDIO data frames
+1cfb7ae1be082c4c771f312be443f9f2aea2e572 FROMGIT: i2c: i801: Add support for Intel Comet Lake
+e780fd7d3be279bc684df3fba2c40e09bd0b7282 FROMGIT: Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
+5eff2cf9ac26542b7c0e4eeeb8f1f77ad09919cf FROMGIT: usb: dwc3: pci: add support for Comet Lake PCH ID
+8584e93f7ab98c9cd729f983ca9f91769d031b09 FROMGIT: pinctrl: add drive for I2C related pins on MT8183
+c09c2a61c0bcca4da62fa567f02761b3abc9ca12 FROMGIT: ath10k: add struct for high latency PN replay protection
+22dcbe05fb4d0a5663fc3c528b89c2bfd44e772e FROMGIT: ath10k: add handler for HTT_T2H_MSG_TYPE_SEC_IND event
+c4c1b64f5103d21a149dedb3f31b5d4ccdc2244f FROMGIT: ath10k: add PN replay protection for high latency devices
+42f52746164e625827d2acf2b16e47f11ccaa8c2 FROMGIT: ath10k: add fragmentation handler for high latency devices
+8aea530e6ad44ba980a5f63e7efb10bf1fdc9fd9 FROMGIT: ath10k: enable QCA6174 hw3.2 SDIO hardware
+e377002f070c6fc43753fb69156181a41e3aaf32 FROMGIT: ARM: dts: rockchip: add grf reference in rk3288 tsadc node
+3737d5c25bdbd85729fe1f46dbd2ebacdaa2fd5f BACKPORT: FROMGIT: arm64: dts: qcom: sdm845: Update reserved memory map
+ca2bb6b5f1323d67ae6bf0b7c972a69299018e63 FROMGIT: arm64: dts: qcom: sdm845: Define rmtfs memory
+468e656642c516b6bce032b1bfaa3f771bb3d83f FROMGIT: arm64: dts: sdm845: Introduce ADSP and CDSP PAS nodes
+77f6fb79390dab6b3eab0210a3df628a190659a6 FROMGIT: Bluetooth: hci_qca: Fix crash with non-serdev devices
+be9a9d7f91372dfda0bde2b45fa5bce7458b9ff3 FROMGIT: Bluetooth: hci_qca: Added support for WCN3998
+25d2f6a319f7cc2a7b7456c83f7e0b73e9f76bc4 FROMGIT: dt-bindings: net: bluetooth: Add device tree bindings for QTI chip WCN3998
+eee1bc656c9612436d30b1220b1774e4abf18b2c BACKPORT: ALSA: hda/realtek: merge alc_fixup_headset_jack to alc295_fixup_chromebook
+b555ef906384f72fe3c1822e5ddaac8d76920cf3 BACKPORT: ALSA: hda/realtek - Move to ACT_INIT state
+e9952609c480f24094b6ebcfac95fa795f24e79f FROMGIT: usbnet: ipheth: Simplify device detection
+fbe39dc67f673452e81a1d405fb5b49a62ae047b BACKPORT: FROMGIT: platform/chrome: Add CrOS USB PD logging driver
+f123c97f13e342cba261ff75126e79f03a830120 FROMGIT: ASoC: mediatek: mt6358: initialize setting when ramping volume
+26b886dc2345dfbeec6c68b08c8536cd9129bf0a FROMGIT: ASoC: mediatek: mt6358: save output volume for mixer controls
+ee629e0ec8bb1fdbee3d025f29647a70c6560756 FROMGIT: ASoC: mediatek: mt6358: save PGA for mixer control
+8ad36861ac253abebdb46d43443af8936e81e697 FROMGIT: ath10k: add peer id check in ath10k_peer_find_by_id
+4efc0ff9fa7247117b0e33cd310e52d601429ae5 FROMGIT: ath10k: change swap mail box config for UTF mode of SDIO
+e01affb0e0ce30737a8baf801cf77823cac053e1 FROMGIT: drm/atomic: integrate modeset lock with private objects
+4b8cd160fdf66742fda44ac9fe3174e9473efd3e FROMGIT: drm/dp_mst: Fix memory leak in drm_dp_mst_topology_mgr_destroy()
+e6f2d20bcef9124056fa60324c4328c682a1d723 FROMGIT: drm/dp_mst: Remove bogus conditional in drm_dp_update_payload_part1()
+1914466a2d97760248c8863f08274608e2f6d8bf FROMGIT: drm/dp_mst: Refactor drm_dp_update_payload_part1()
+733a3cdee3b850219b67ea2a6b95f816d24113a9 FROMGIT: drm/dp_mst: Fix some formatting in drm_dp_add_port()
+9c23e9c6b9c18b4ac15ced357dd6e2f8ec952f1e FROMGIT: drm/dp_mst: Fix some formatting in drm_dp_payload_send_msg()
+aca138c26d93f1c079971695a378fa815f4730cd FROMGIT: drm/dp_mst: Fix some formatting in drm_dp_mst_allocate_vcpi()
+52aba8c66d401ec8491782c6613318dc9cd3cb34 FROMGIT: drm/dp_mst: Fix some formatting in drm_dp_mst_deallocate_vcpi()
+1dff7fe11b8345d28dd8901882eeb87e786f1888 FROMGIT: drm/dp_mst: Rename drm_dp_mst_get_validated_(port|mstb)_ref and friends
+a9bb61080ca6efc514cab71d60316e1da41f69ce FROMGIT: drm/dp_mst: Introduce new refcounting scheme for mstbs and ports
+d0449e2defafac8191405fef8c12773f01df1adf FROMGIT: drm/dp_mst: Restart last_connected_port_and_mstb() if topology ref fails
+8a0faed4c2cddb79fb61954dec111b729fe6a3d1 FROMGIT: drm/dp_mst: Stop releasing VCPI when removing ports from topology
+95c57cce8ab3a4a557bb7e25e348f49bd7c7df4d FROMGIT: drm/dp_mst: Fix payload deallocation on hotplugs using malloc refs
+dd3a8a7bc5d8e9d78b9cd6917d7d51ae8595f52a FROMGIT: drm/dp_mst: Add some atomic state iterator macros
+9601f046ae4b3a601d7b5e2877668d3ca35db228 FROMGIT: drm/dp_mst: Start tracking per-port VCPI allocations
+426c5ed7095522bea80c48f5e7a7b37c30398bb9 FROMGIT: drm/dp_mst: Check payload count in drm_dp_mst_atomic_check()
+5e8a4234dce30814d01b6773836c563ca69d717d FROMGIT: drm/dp/mst: Provide defines for ACK vs. NAK reply type
+51d1285ed7cde10c45713259f30b305074664f71 BACKPORT: FROMGIT: mfd: cros_ec: Update the EC feature codes
+6c502465ffabf55474c59dd212d4d283fdae3152 FROMGIT: ACPI: PM: Set enable_for_wake for wakeup GPEs during suspend-to-idle
+8d4f185dbae4f4dfaa51fd3a78c21d63bebf8497 FROMGIT: drm/dp_mst: Fix unbalanced malloc ref in drm_dp_mst_deallocate_vcpi()
+852335cba5942ee8a19dc379e0e08254136ff4cd FROMGIT: drm/nouveau: Use atomic VCPI helpers for MST
+80a648d1142d4e615eec7c29039e62b0e9c815e4 FROMGIT: tracing: kdb: The skip_lines parameter should have been skip_entries
+4a28cd4a64ef227f7f5a119de1cd4ab8482fd723 FROMGIT: tracing: Add trace_total_entries() / trace_total_entries_cpu()
+355f2581d4e9fad12da32c8753b12487f6c94265 FROMGIT: tracing: kdb: Allow ftdump to skip all but the last few entries
+da9defcef0599ab33b85af2150c507deb2b65c6c FROMGIT: ASoC: Mediatek: add memory interface data align
+0b58256e7e7de6290439dad94d15ba42f43e8970 FROMGIT: ASoC: Mediatek: MT8183: set data align
+53d8d2ccfb9df85f72bfe73e83c7fce95ec0ad47 FROMGIT: ASoC: Mediatek: MT8183: fix compile error
+c31358d0892227a34d0b9844b9bc4ae96de9be5c FROMGIT: ASoC: Mediatek: MT8183: fix compile error
+ea78a356135a7fba5c93e2425f3337ea53cf2827 FROMGIT: pstore/ram: Improve backward compatibility with older Chromebooks
+c01d1a3b2b237d161e90b556182f17a7b72bf88b FROMGIT: clk: rockchip: Use clk_hw_get_rate() in MMC phase calculation
+2572b3fe7c472c521fb43690f4c68af80b7bf2e8 FROMGIT: clk: rockchip: Don't yell about bad mmc phases when getting
+384f420e05037d37ca4a1f659b61d5a234ca052c FROMGIT: clk: rockchip: Slightly more accurate math in rockchip_mmc_get_phase()
+7ee3d5b407526cf8993354d282822d95df0aea7a FROMGIT: ASoC: Mediatek: MT8183: enable IIR filter
+4b885b8fe4587e92746fbe7fc94ca9e53689c4cf FROMGIT: pstore: Set tfm to NULL on free_buf_for_compression.
+fb77f1a76250567e61118c51ff1b89b7c6b6f2fe FROMGIT: ARM: dts: rockchip: Mark that the rk3288 timer might stop in suspend
+0197d0eacf633893db70e09662191498ec0dd2fd FROMGIT: ARM: dts: rockchip: Add pin names for rk3288-veyron-jerry
+24b2de5371af10d3705d04f642c008a8571e138c FROMGIT: ARM: dts: rockchip: Add #cooling-cells entry for rk3288 GPU
+fbdfb5852ed79b72d9f394c63f9d7eef43267776 FROMGIT: ARM: dts: rockchip: Use GPU as cooling device for the GPU thermal zone of the rk3288
+8bb84b1183378e6409fb871dd081274aad3e8a37 FROMGIT: ARM: dts: rockchip: remove GPU 500 MHz OPP on rk3288
+53896634aba40973062009d9fffbca5a3497b4dc FROMGIT: ARM: dts: rockchip: Use the GPU to cool CPU thermal zone of veyron mickey
+21143cb7edd4a16119eecf1235abfafebb9950d2 BACKPORT: FROMGIT: ARM: dts: rockchip: Configure the GPU thermal zone for mickey
+77eaabc22304a1b3f136291b3bc80200d726278d FROMGIT: ath10k: sdio: add missing error check
+45502052bd7f40c6a1ac6f01c20700844fa5d7d2 BACKPORT: FROMGIT: dmaengine: mediatek: Add MediaTek UART APDMA support
+e69c39f53c3118eda1947a1dac96a2d2f9e8e0ae FROMGIT: dt-bindings: dma: uart: rename binding
+ecb1b56667491e7117fc5f4fd21e846380dd48fe FROMGIT: ASoC: Mediatek: MT8183: enable dev runtime suspend and resume
+0d128139a0b19999bc75046e473bfdecb1a16321 FROMGIT: ASoC: mediatek: mt8183: move card registration to the end of probe
+40c5851feb7ad569acc589becb438069f14e27f1 FROMGIT: ASoC: mediatek: mt8183: remove unused DAPM pins
+4c85a6e10aaf64c60e0b793afd82559f08edc5cd BACKPORT: FROMGIT: spi: Allow SPI devices to request the pumping thread be realtime
+d89f9712b6c019ea14453b84e4d0c28208612a3b FROMGIT: drm/mediatek: adjust ddp clock control flow
+329c5ef724298dc64534d724511f9b603b7e983a FROMGIT: ASoC: core: use component driver name as component name
+ce92f31126e23039add35a8271ac251fc1b5c856 FROMGIT: pinctrl: mediatek: Add pm_ops to pinctrl-paris
+7935bb5878df44de1ab0b766f04cfa7979f14afc FROMGIT: pinctrl: mediatek: mt8183: Add pm_ops
+77ba005dbf7fb06e3793316b485109ff23ca1381 FROMGIT: drm/mediatek: fix unbind functions
+8db78774546a1271e56f5574ef8141bce3c288f4 FROMGIT: drm/mediatek: unbind components in mtk_drm_unbind()
+32886f5e31a5ccba63451ff15455eb553b51987e FROMGIT: drm/mediatek: call drm_atomic_helper_shutdown() when unbinding driver
+a95ebba505fac7faa530559711f8f2788a8947fa FROMGIT: drm/mediatek: clear num_pipes when unbind driver
+b546592e4c55f43e8c9de23072edd7d537dadd29 FROMGIT: drm/mediatek: call mtk_dsi_stop() after mtk_drm_crtc_atomic_disable()
+64cefd62a1df3ae6beaaaaf866a35b125b28cfa2 FROMGIT: ARM: dts: rockchip: Add pin names for rk3288-veyron jaq, mickey, speedy
+6714a37ed494be3a8a8e95382690f742a8020c6f FROMGIT: Revert "ASoC: core: use component driver name as component name"
+c07f0885937887b78784d060dfe35f60f3ad470a FROMGIT: ASoC: soc-core: fixup references at soc_cleanup_card_resources()
+2339293ab2b8aa08a36a73ff7d73da3b91823eec FROMGIT: dt-bindings: drm/bridge/synopsys: dw-hdmi: Add "unwedge" for ddc bus
+905dc0032e257d3403b0f6169404d3afb7bbce03 FROMGIT: drm/bridge/synopsys: dw-hdmi: Add "unwedge" for ddc bus
+4d4bd6727b5cac27f2ad516087764f1350e0055f FROMGIT: ARM: dts: rockchip: Switch to builtin HDMI DDC bus on rk3288-veyron
+ce84ce0b89369b97da87aa2992ed238eebc20b46 FROMGIT: ARM: dts: rockchip: Add unwedge pinctrl entries for dw_hdmi on rk3288
+9373b33bc2c598a6e33cefece14121a199fd3e5d FROMGIT: ARM: dts: rockchip: Add HDMI i2c unwedging for rk3288-veyron
+7f7162fa6d6a71a89391c7d2c103f50ea4ae70e1 FROMGIT: clk: rockchip: Remove 48 MHz PLL rate from rk3288
+0b606cf839f1ec4ba8453b6d5de6d5e40230cadf BACKPORT: FROMGIT: platform/chrome: wilco_ec: Add version sysfs entries
+60d314555684c19a99d13b0ab466472842f7cd8e FROMGIT: ASoC: Intel: sst: fix kmalloc call with wrong flags
+db473727dfc185494b35fca8f600e24f47d2d10e FROMGIT: mfd: cros_ec: Update license term
+ed1c7f656352288f004dc705749289fa6d95f56e FROMGIT: mfd: cros_ec: Zero BUILD_ macro
+6379a7469f48064f99cee8694050b17763e4c9d6 FROMGIT: mfd: cros_ec: set comments properly
+8e0a2be8debfd8cca3d278a647682c4f3abe390e FROMGIT: mfd: cros_ec: add ec_align macros
+4c5e387471aa9a72b5f9fb424b1b62c794efe089 FROMGIT: mfd: cros_ec: Define commands as 4-digit UPPER CASE hex values
+7c00c8064a023cc61c60d64281f2b280a02d6836 FROMGIT: mfd: cros_ec: use BIT macro
+57722c8de0582f9fa2614445767f8a99a5d5365a FROMGIT: mfd: cros_ec: Update ACPI interface definition
+13b376c57144694afb1a1599aa0272158f8ff3ea FROMGIT: mfd: cros_ec: move HDMI CEC API definition
+1e0918db164139d03c905f41aa59d8e5aa9a22a3 FROMGIT: mfd: cros_ec: Remove zero-size structs
+80ee6879840de50c959b0cba6e8461fb9a8179fc FROMGIT: mfd: cros_ec: Add Flash V2 commands API
+ee3dfbe7766afed255db1645f3c9b963ea2e8627 FROMGIT: mfd: cros_ec: Add PWM_SET_DUTY API
+c97e32cfb6442774d11c9f0053a4dcf8043ce4a1 FROMGIT: mfd: cros_ec: Add lightbar v2 API
+8750f6d6d4c2bd2eef231392df0c391689f0ce74 FROMGIT: mfd: cros_ec: Expand hash API
+1f7594df97c5a455626ee612c4144e05df9172f2 FROMGIT: mfd: cros_ec: Add EC transport protocol v4
+4e177ad0e88ccb8dd59d869fd17169aa55616a25 FROMGIT: mfd: cros_ec: Complete MEMS sensor API
+fd2e4b3fb60a660960b57373e90fd625b52cfa6a FROMGIT: mfd: cros_ec: Fix event processing API
+2a9899180ac1e5dfc88bbacd8e2224daf253328b FROMGIT: mfd: cros_ec: Add fingerprint API
+291dbd2ad0adfd29522d56263e38adae86589ebc FROMGIT: mfd: cros_ec: Fix temperature API
+6c7c12e7cd44654a5f9b010aeaeb692127c78e3c FROMGIT: mfd: cros_ec: Complete Power and USB PD API
+207741963bf36c13b9ae70159845c9c33098b8c2 FROMGIT: mfd: cros_ec: Add API for keyboard testing
+c3d577ddc1bb30f9ef145d29438b181405400b27 FROMGIT: mfd: cros_ec: Add Hibernate API
+7d9e037bae892bfa9f87bd84f69bf95c9a2870af FROMGIT: mfd: cros_ec: Add Smart Battery Firmware update API
+7502490ae5f1ed7e06a24de5d795de475349bc2e FROMGIT: mfd: cros_ec: Add I2C passthru protection API
+15c2765669838931d08400a4091ef3e7f1bd179a FROMGIT: mfd: cros_ec: Add API for EC-EC communication
+faf1ffe0cb2c1730072fb8c682f1790b213de57a FROMGIT: mfd: cros_ec: Add API for Touchpad support
+8184f2225088e269b63a06971606e1be6aac3f91 FROMGIT: mfd: cros_ec: Add API for Fingerprint support
+88af61f2b36ffae0b612d0c3629ddfa76f3201b6 FROMGIT: mfd: cros_ec: Add API for rwsig
+924ef7b609712e0343c6c8e58db3dd611f08d6f6 FROMGIT: mfd: cros_ec: Add SKU ID and Secure storage API
+31d0bc90aaeb9d675f173e5525bfe8d4b3621ce7 FROMGIT: mfd: cros_ec: Add Management API entry points
+3a36d0a5b1cc932dea5391427f7455ebb0e837b7 FROMGIT: mfd: cros_ec: Update I2S API
+8cd182b6c26f5a1726cae37ba610a9afbd09acc0 FROMGIT: drm/rockchip: fix fb references in async update
+ff7640c0f19090459940c74fb3a9e4ed0b03840c FROMGIT: drm: bridge: dw-hdmi: Add hook for resume
+a01fddf49d211eb59d53db24b6026fd2e997ac7d FROMGIT: drm/rockchip: dw_hdmi: Handle suspend/resume
+14248e1a79014441a51039da6d1c0c01874371bc FROMGIT: drm/bridge/synopsys: dw-hdmi: Fix unwedge crash when no pinctrl entries
+8da687159eae66f17a603c5e27cb3122e4651251 BACKPORT: FROMGIT: platform/chrome: wilco_ec: Add event handling
+dc304788484110a8abb545739ec95ed72d2edce1 FROMGIT: mwifiex: Fix possible buffer overflows at parsing bss descriptor
+46b3050ce351b130abbf50b17f1c379c282f6653 FROMGIT: dt-bindings: soc: qcom: Add AOSS QMP binding
+fdd3df25c06810614b642173cf8eca20610958ce FROMGIT: soc: qcom: Add AOSS QMP driver
+52e85914a8a80d47dee7bdd5e541eb80ecc15c8a FROMGIT: arm64: dts: qcom: Add AOSS QMP node
+6d82af430ffd414a171d08f085e129e9e287b9ff BACKPORT: FROMGIT: arm64: dts: qcom: sdm845: Add Q6V5 MSS node
+2afb3ac963a46639de83c5a482c7eefa87bfee21 FROMGIT: vsock/virtio: set SOCK_DONE on peer shutdown
+7aa127c100eba124459cb88ebbeb95e390bca8be FROMGIT: ARM: dts: rockchip: Split GPIO keys for veyron into multiple devices
+e68ffbbe28f2aab4ed9c903fece2462159c374b4 FROMGIT: ARM: dts: rockchip: Configure BT_HOST_WAKE as wake-up signal on veyron
+e60c90342dbc305c9e1fe67cc2d8ee3cfaf19e9e FROMGIT: mmc: core: API to temporarily disable retuning for SDIO CRC errors
+5598445245e58dd474beb5e9185149dc2c0e61cc FROMGIT: brcmfmac: sdio: Disable auto-tuning around commands expected to fail
+a9b8bd5b8921c070d0d226415e82982c84a4e65d FROMGIT: usb: xhci: Don't try to recover an endpoint if port is in error state.
+e0c7c8bb4570d29168d8f6020ae0ef68ba667f1e FROMGIT: ath10k: Extended the HTT stats support to retrieve Mu-MIMO related stats
+f4686474f28f09c244a2282441f9a2dac591d8fe FROMGIT: ath10k: Added support to reset HTT stats in debugfs
+9c58e1ad99a43f01d07e45283e5fb167ae3cc439 FROMGIT: ath10k: Fix the tx stats bytes & packets parsing
+5d0ff8fb66bb27aeadf48251aa20acbbbf2d3c44 FROMGIT: ath10k: Fix encoding for protected management frames
+57c89387d8a8e579bd23d9cde70f374e459e0835 FROMGIT: ath10k: coredump: use struct_size() helper
+a7cda4d7cd5fe18b7741acff09f379c54064a9f7 FROMGIT: ath10k: Check tx_stats before use it
+65dce1cc74f2ecd54fc2d5413c5d9ac67f934582 FROMGIT: drm/rockchip: Properly adjust to a true clock in adjusted_mode
+09a3e3c6e17fd58006ef0da06c88102a64bc8511 FROMGIT: drm/rockchip: Base adjustments of the mode based on prev adjustments
+247806ff6cd1965c7e4a3cafe898b216f2f04923 FROMGIT: net/ipv4: fib_trie: Avoid cryptic ternary expressions
+50c64bd149c8f9d5eb43a7ec2e28df437493b881 FROMGIT: mm: vmscan: fix not scanning anonymous pages when detecting file refaults
+45aecd342c00df7ba7aee8a938a06e752164bddd FROMGIT: netfilter: bridge: port sysctls to use brnf_net
+ca19fea63f55519e40662799bdc4316dc05c922f FROMGIT: netfilter: bridge: namespace bridge netfilter sysctls
+9c3902d4323e09210b61e2140f6084e3497db132 FROMGIT: netfilter: bridge: prevent UAF in brnf_exit_net()
+339283bf89c21d10372509d9314e7b7e3bfec590 FROMGIT: kbuild: Remove unnecessary -Wno-unused-value
+58e7b5c72a71c66cbf0197b827ac1c8c30f380be FROMGIT: ath10k: acquire lock to fix lockdep's warning
+740c80b5c3ca21bff52f08f18a83e867a3078025 FROMGIT: ath10k: add support for firmware crash recovery on SDIO chip
+5e3ed2aef126ff82fe556d54ef08a27756ca8dea FROMGIT: ath10k: change firmware file name for UTF mode of SDIO/USB
+652c6416fdfac3e436f530c27fe8866884e4232b FROMGIT: ath10k: add report MIC error for sdio chip
+511c9de086f080265aa2e527ea585dcf74721229 FROMGIT: ath10k: add missing error handling
+a72f49258d4a8aec21e74fe0da8d38917e4de6a0 BACKPORT: FROMGIT: platform/chrome: cros_ec_debugfs: Add debugfs entry to  retrieve EC uptime
+52bba01fe9782714b2a4d197d4e5bf6ece3d6eca FROMGIT: ACPICA: Clear status of GPEs on first direct enable
+61faaf65556976d606d43233c28074d93bf0b3c7 FROMGIT: ASoC: hdmi-codec: remove function name debug traces
+d9a6ab7ec2a7682d4d709618212cd4aa31d725d1 FROMGIT: ASoC: hdmi-codec: remove reference to the current substream
+5654a39cb41c229e7b4d8a60ab33f6530d0d85f6 FROMGIT: ASoC: hdmi-codec: remove reference to the dai drivers in the private data
+dcbccb6c7a8031a56fc192a3214dfbb1a9a062fd FROMGIT: ASoC: hdmi-codec: remove ops dependency on the dai id
+bcfd987b4ff42670eacf5490afbc1bc65c432627 FROMGIT: ASoC: SOF: fix race in FW boot timeout handling
+0235353e44afe2d1f1be80eb2abbd92715356e99 FROMGIT: ASoC: SOF: fix error in verbose ipc command parsing
+a093744fe347d086b592d99eb1bab854655fae28 FROMGIT: ASoC: soc-pcm: BE dai needs prepare when pause release after resume
+f5349a3ac9c191f1b1ec76bc0d22dacb4367362b FROMGIT: ASoC: SOF: Add Comet Lake PCI IDs
+cb31b9272fb66033872e00f30e5e8df9a5558bf1 FROMGIT: ASoC: SOF: uapi: remove unused sof header files
+3448f522ed36e2cbf4c85d9845b9f282253493cc FROMGIT: ASoC: SOF: pcm: remove runtime PM calls during pcm open/close
+5d180f421cef3f8e83d2d9dce2a1b91c2cbbbabf FROMGIT: ASoC: soc-core: use i on snd_soc_resume()
+be90c95bfac7a30ccd3a3986599d9fb0ef52fa00 FROMGIT: ASoC: soc-core: don't use codec_dais on soc_bind_dai_link()
+bf8df186b3289ecc7ee778f09541346357d87922 FROMGIT: ASoC: soc-core: tidyup soc_bind_dai_link() comment balance
+1f332840880c1518a94720d1fd1df0633774b8c8 FROMGIT: ASoC: soc-core: add soc_component_to_node()
+db9443b75dbe83af8f4673bdd7b3380ea84dfea8 FROMGIT: ASoC: soc-core: use soc_find_component() at snd_soc_get_dai_id()
+f80fc5b1a048fc6669629008e242a1e4903df6c1 FROMGIT: ASoC: soc-pcm: do cpu_dai related operation at same place
+81bfca1999d09e10eea00a08b461d5ea0d025cb1 FROMGIT: ASoC: soc-pcm: add missing cpu_dai->rate = 0
+2d11c7ec0beb38c5fb1cbb2a8b0a4ac864f12e6f FROMGIT: ASoC: soc-pcm: add soc_pcm_components_open()
+e1e9dd29062f6bc4f1ab363c0398a841c5a31977 FROMGIT: ASoC: hdmi-codec: re-introduce mutex locking
+1475a1262a2d50a23fb1572d0ba521bbbede788b FROMGIT: ASoC: dapm: allow muxes to force a disconnect
+cee934b2005fa33494fa201222e87af1c07a2d15 FROMGIT: ASoC: soc-dpm: fixup DAI active unbalance
+60dc424d699c44ccf92ac4580ffb05d708d2659a BACKPORT: FROMGIT: ASoC: Intel: soc-acpi: Fix machine selection order
+7b1c43b7ce4089496accde5a3e0a789bf74936c6 FROMGIT: ASoC: Intel: sof-rt5682: fix for codec button mapping
+07b03b3acaaddf74663345fbc689ac26110f0647 FROMGIT: ASoC: Intel: sof-rt5682: fix AMP quirk support
+48f91d928a0572b1097120862e85c16458d6b8ab FROMGIT: ASoC: Intel: sof-rt5682: add newline for clarity
+2f047331dee105c2525c8a4a45b2d9d45f2c4ac8 FROMGIT: ASoC: soc-pcm: fixup try_module_get()/module_put() timing
+c62f24eb73aac2c980fd9d97e70ab8fee146ca70 FROMGIT: ASoC: SOF: core: remove DSP after unregistering machine driver
+f07363e00a5245ab487a1ab8964e4e99d429faff FROMGIT: ASoC: SOF: core: remove snd_soc_unregister_component in case of error
+7c2af1508da85e31b4a940aac4ae71b13e0e3801 FROMGIT: ASoC: SOF: core: fix error handling with the probe workqueue
+9c8e48eef40d18542f28993f14fdf610a98d449c FROMGIT: ASoC: SOF: pcm: clear hw_params_upon_resume flag correctly
+1e44ab3555c76c28c6403c0534ec83da90af60f0 FROMGIT: ASoC: SOF: pcm: remove warning - initialize workqueue on open
+ff1500884c5a39aa37e3d68606d97df7c72e7adc FROMGIT: ASoC: SOF: control: correct the copy size for bytes kcontrol put
+e0db549326ad4494879a550a0069d5e3e3ea48ef FROMGIT: ASoC: SOF: ipc: fix a race, leading to IPC timeouts
+44f3d24f2945a92dacd12950e724d07f3e863109 FROMGIT: ASoC: SOF: trace: remove code duplication in sof_wait_trace_avail()
+f1e97dc0b135d1c498bca0105538319074c402af FROMGIT: ASoC: SOF: force end-of-file for debugfs trace at suspend
+da78b24d259a769fa73184d96f4a2dd999f75fe0 FROMGIT: Revert "ARM: dts: rockchip: set PWM delay backlight settings for Minnie"
+b9adcd49c3a4387419c5c06cbe66dffd43add6e7 FROMGIT: block, bfq: NULL out the bic when it's no longer valid
+48f6c7e00bb83219f68cb0168e0a4b4b3d12633a FROMGIT: block, bfq: Init saved_wr_start_at_switch_to_srt in unlikely case
+ca219a5b1086f82b32c16103233464bc1856393b FROMGIT: ARM: dts: rockchip: Configure BT_DEV_WAKE in on rk3288-veyron
+bc36dac3f1b10d1d1e1c4edc3dcacd055a550d70 FROMGIT: ath10k: Move non-fatal warn logs to dbg level for SDIO chip
+a259e6fea89c90266306351b3967a593a7dfddcb FROMGIT: ath10k: add new hw_ops for sdio chip
+5a13ba6fd4511157aca91bdfc34763afe390c765 FROMGIT: ath10k: destroy sdio workqueue while remove sdio module
+381fdbfab44c13211b31a4f4a6975f1d1fd3e798 FROMGIT: media: rockchip/vpu: Use pixel format helpers
+0117a2e7f7757ed7a7d7e1a74957b9ceb47a5e3e FROMGIT: media: rockchip/vpu: Use v4l2_m2m_buf_copy_metadata
+df1f85d7123946a9d156c98df6e5484795239ee2 FROMGIT: media: rockchip/vpu: Cleanup macroblock alignment
+b1b4606710f83b1a9b58ea4c20f8ecb6a1fdc448 FROMGIT: media: rockchip/vpu: Cleanup JPEG bounce buffer management
+e3dab7335c8ab15f040845c3aa416958e6a226e8 FROMGIT: media: rockchip/vpu: Remove a useless test
+7dab2fb2741a81d62bfd90df1a631bf1f9964142 FROMGIT: media: v4l2-common: Fix v4l2_fill_pixfmt[_mp]() prototypes
+52fb1c56cfb046e8ffc3e040f6627385d0ef28d7 FROMGIT: media: v4l2-common: Add an helper to apply frmsize constraints
+7bc4548b07b181b6522e6a3a3d4604d8b27191ce FROMGIT: media: rockchip/vpu: Use v4l2_apply_frmsize_constraints() where appropriate
+0e264efac26eda4705abc016808ff38b447d2c4a FROMGIT: media: venus: core: fix max load for msm8996 and sdm845
+de0d22a47e7d1869b0e599ff7285ea87e308bc44 FROMGIT: media: venus: Add support for H265 controls
+10a5187d5fab45fca802f30fd2f638e09ea34ccc FROMGIT: media: venus: hfi_cmds: add more not-implemented properties
+a30927b245e08c7e74b2b75da2163bb4f5e16511 FROMGIT: media: venus: helpers: fix dynamic buffer mode for v4
+d26d4508decc745cfafe5a807fa1995f7b29b405 FROMGIT: media: venus: firmware: fix leaked of_node references
+2c48185692c59bd02cd0102e728d9b68ac5fba36 FROMGIT: media: coda/venus/s5p_mfc: fix control typo
+3b8c0422076e3af2e3e27cc3fb7dc6e5be64e585 BACKPORT: media: v4l2: Make sure all drivers set _MPLANE caps in vdev->device_caps
+c3fea8c4cddae3400a7ba94c2b9636c52b8ae8bc BACKPORT: media: v4l2: Get rid of ->vidioc_enum_fmt_vid_{cap, out}_mplane
+a5c89626fb4aad7db1962df2fb0a2c0bb0450451 FROMGIT: media: v4l2: Fix the _MPLANE format check in v4l_enum_fmt()
+9161dd0d050742cc6fea300e4254a736f5e985db FROMGIT: media: platform: Fix Warning of Unneeded Semicolon reported by coccicheck
+c5b42d6ad249a0c548360158636265f1c7decbcb FROMGIT: ASoC: cros_ec_codec: use devm_snd_soc_register_component()
+d51f54d122359ff16550ecc94e9e57f64584b554 FROMGIT: media: rockchip/vpu: Open-code media controller register
+43f4881c662d467fdae71eecd747d460d7e5e8ff FROMGIT: media: rockchip/vpu: Support the Request API
+cee8d947f5fe852773f586d9d204a783242dbd09 FROMGIT: media: rockchip/vpu: Rename rockchip_vpu_common.h into rockchip_vpu_v4l2.h
+243fc35f582400def9542e5a644f0c060b38fa2a FROMGIT: media: rockchip/vpu: Move encoder logic to a common place
+9325b1981f0e707fbf1baaedbf115569c3b3b59d FROMGIT: media: rockchip/vpu: Provide a helper to reset both src and dst formats
+74d092eb47dfe0d1763a1eca849e254e0cc796d3 BACKPORT: media: rockchip/vpu: Prepare things to support decoders
+72d8fc83b860b1529cd953d37202690772a48915 FROMGIT: media: rockchip/vpu: Add decoder boilerplate
+3d69dc5b4f253bcb685cc0529c47eebf92b7db89 FROMGIT: media: rockchip/vpu: Add support for non-standard controls
+66bdb577590d46e5384a229b8cb96d483f779ae8 FROMGIT: media: rockchip/vpu: Add infra to support MPEG-2 decoding
+a2a34f60e8bcd5546dce827f7fdc2f55ff57d2b6 FROMGIT: media: rockchip/vpu: Add MPEG2 decoding support to RK3399
+0d85a611969e725a54288247d7f375b82ae836b2 FROMGIT: media: rockchip/vpu: Add support for MPEG-2 decoding on RK3288
+3ea394b9bac23da5e62607f965bdee862f25515f BACKPORT: media: pixfmt: Add H264 Slice format
+f6ffbcd70e040130d96c2916eeab7f53d9d3d628 BACKPORT: media: uapi: Add H264 low-level decoder API compound controls.
+b390c4297c612827cc3b1b7e35758d1b24be523c FROMGIT: media: pixfmt: Add H264_SLICE_RAW format documentation
+3077e9298294012d46bb6d9f0a9ec5b364664e1f BACKPORT: media: rockchip/vpu: rename from rockchip to hantro
+7458d6d3cd704a8c05f9d8ef5f13253139a6af37 FROMGIT: media: hantro: print video device name in addition to device node
+d62fc4ab1010c036b54f48cfb35ae3da543fb993 FROMGIT: media: hantro: add PM runtime resume callback
+57b7e23ac9b543415dcf7cd1d8d1bb57c5f2ed84 FROMGIT: media: hantro: make irq names configurable
+81842370962db1c2dbf8141f5726d6967f2bf772 FROMGIT: media: hantro: add support for named register ranges
+c5e5a75b843e9232c43f1f5e41d0b8dab80183b0 FROMGIT: media: hantro: add support for separate control block
+73a4570dc7567dd79c60aeb61a85eb01cf7cb3b3 FROMGIT: media: hantro: allow arbitrary number of clocks
+366470ed96815ea872de8709abfcfc9d970a0d3a FROMGIT: media: hantro: remove an unnecessary NULL check
+4d312a72138dac3f5163a60e247f570998b12fe8 FROMGIT: media: vb2: Introduce a vb2_get_buffer accessor
+54e0365fb2e6e0bf167d6ee6251106c0dc87a3eb FROMGIT: media: hantro: Use vb2_get_buffer
+8743f9e81f836e4f9e85bb411f828abe2341e608 FROMGIT: ASoC: max98357a: request GPIO when device get probed
+6b7250cd91d27f7767cb0ab77b575d948b922583 FROMGIT: ASoC: max98357a: avoid speaker pop when playback startup
+2864f2fac010f69a1ea883fcd9b22ca74122b95d FROMGIT: dt-bindings: net: bluetooth: Add device property firmware-name for QCA6174
+0bcc80faf278bd03db2ac0058845d0787f986e15 FROMGIT: Bluetooth: hci_qca: Load customized NVM based on the device property
+02ca03de14c72801c4ee5af1043342f809cd7079 FROMGIT: ALSA: hda: Fix widget_mutex incomplete protection
+a3426bc60c8735d36131c61f5848b7cbc45b0752 FROMGIT: Bluetooth: btqca: inject command complete event during fw download
+3b17edb82db712623d1d9e05a3d4f8790390fa5f FROMGIT: Bluetooth: hci_qca: wcn3990: Drop baudrate change vendor event
+9d4cf726df4c35ad807f61eb337d17f816884a8b FROMGIT: drm/i915/vbt: Parse and use the new field with PSR2 TP2/3 wakeup time
+73da6490167ad081384763f8c17b919c5b2db58d FROMGIT: drm/i915/psr: Move logic to get TPS registers values to another function
+c03d5a7a1477ac0049ccd7885696502a275280d9 FROMGIT: drm/i915/icl+: Always use TPS2 or TPS3 when exiting PSR1
+68f7cb4a82146b91f2b9f279c8b234f69eda4ae7 FROMGIT: drm/i915/psr: remove drmP.h include that crept in
+30ac35692f9192416f8b39b8557e2aff5a22e564 FROMGIT: drm/i915: Fix PSR2 selective update corruption after PSR1 setup
+58ecae761c4958dffe7ef76426a10a07ce015768 BACKPORT/FROMGIT: drm/i915: extract intel_psr.h from intel_drv.h
+89cfb475ae5aaac164cc4512c57bf22bd3321b99 FROMGIT: drm/i915/psr: Update PSR2 SU corruption workaround comment
+5162f7fb9890281b693c0ee47e82dea2284b7b57 FROMGIT: drm/i915: Remove unused VLV/CHV PSR registers
+475fab6e2e175d4c379c793447c3da88c5040145 FROMGIT: drm/i915/psr: Initialize PSR mutex even when sink is not reliable
+28866e61e4b9b399306585b465ae06aea801cb94 FROMGIT: drm/i915/psr: Do not enable PSR in interlaced mode for all GENs
+5cdb0f24c0499173a54f9e32f97aaafff721e70b BACKPORT: FROMGIT: drm/i915: Check backlight type while doing eDP backlight initializaiton
+075757e0e876df18ba30d1f2c57705d6daebb8b8 FROMGIT: Bluetooth: btqca: Add a short delay before downloading the NVM
+58e97e262501819b4aa2eea6cf226bb583229339 FROMGIT: Bluetooth: hci_qca: Use kfree_skb() instead of kfree()
+d889d8f9c1228a32c1263a35d393e978586067ce FROMGIT: Bluetooth: btqca: Use correct byte format for opcode of injected command
+c7404c50885306c30e2c5cad55fa94a6b3a06e33 BACKPORT: FROMGIT: drm/i915: Add windowing for primary planes on gen2/3 and chv
+2014220d4d9ac427e0d24f47cae61932af1ccce2 BACKPORT: FROMGIT: drm/i915: Disable sprite gamma on ivb-bdw
+5593da8976a98a572a27b71765c97c3ba4138470 BACKPORT: FROMGIT: drm/i915: Program plane gamma ramps
+cdf3aeeba963b4e50f5c8f9c620b409e2989573e FROMGIT: drm/i915: Deal with cpp==8 for g4x watermarks
+85133ed6c5078f57d3c29667136463e48a00b6fc BACKPORT: FROMGIT: drm/i915: Cosmetic fix for skl+ plane switch statement
+6c35fa7fc0c4aac3047ada27a7be34c60b61cff5 FROMGIT: ath10k: add initialization of HTC header
+4ace02f1781bf3ee71f58f40283c696c9a9376c2 FROMGIT: ath10k: fix incorrect multicast/broadcast rate setting
+274acc6640d8c1e78139341ff202257005593783 FROMGIT: ASoC: max98357a: use mdelay for sdmode-delay
+7f7fa9129413d8e63cea0e723d5324ec1a67db33 FROMGIT: drm: Make the bw/link rate calculations more forgiving
+1aaf946502c1e0ed50eaee53c3fae3f6bbdec863 BACKPORT: FROMGIT: nvme-pci: Fix controller freeze wait disabling
+55ec8a1f42b0da59b8bfd40d2cbcba496c0a758c FROMGIT: nvme-pci: Don't disable on timeout in reset state
+c932cb91c7b4ae6eb833f20c430a1cb75ecc70b9 BACKPORT: FROMGIT: nvme-pci: Unblock reset_work on IO failure
+9e9f138440cfca9b9726d6128f2d0cf6854eb28f BACKPORT: FROMGIT: nvme-pci: Sync queues on reset
+5ddf440d305adbbc31743c784ea744c4ee7cf465 FROMGIT: nvme: Export get and set features
+bc7304877066a781782a7b43ea0ed2edcc767637 BACKPORT: FROMGIT: nvme-pci: Use host managed power state for suspend
+062d8c17494404c262a0504940ca141d7cc5dacc FROMGIT: ASoC: mediatek: mt8183: make headset codec optional
+ee6ea266e1f636fc2e2a21641360b844eb47fa14 FROMGIT: ASoC: rockchip-max98090: Remove MICBIAS as supply of input pin IN34

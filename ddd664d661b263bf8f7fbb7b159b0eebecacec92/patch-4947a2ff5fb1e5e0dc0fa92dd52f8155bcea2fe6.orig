@@ -1,0 +1,47 @@
+From 4947a2ff5fb1e5e0dc0fa92dd52f8155bcea2fe6 Mon Sep 17 00:00:00 2001
+From: Hugo Benichi <hugobenichi@google.com>
+Date: Fri, 7 Sep 2018 12:27:03 +0900
+Subject: [PATCH] CHROMIUM: Revert "xfrm: Refuse to insert 32 bit userspace
+ socket policies on 64 bit systems"
+
+For the same reason commit 74005991b78a ("xfrm: Do not parse 32bits
+compiled xfrm netlink msg on 64bits host") is reverted in our local
+source tree, we also revert commit dffe655ddb48 ("xfrm: Refuse to
+insert 32 bit userspace socket policies on 64 bit systems") to work
+around user/kernel ABI incompatibility in xfrm.
+
+BUG=b:114323255
+BUG=b:112641692
+TEST=- Compiled, flashed grunt, booted.
+     - Verified that netd's XfrmController starts correctly (logcat).
+     - Verified that android.net.cts.IpSecBaseTest and
+     android.net.cts.IpSecManagerTest pass.
+Change-Id: I27cd1fe7f634fc034dd3a6cc29a72cd34de4c33b
+Signed-off-by: Hugo Benichi <hugobenichi@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1157958
+Commit-Ready: Hugo Benichi <hugobenichi@google.com>
+Tested-by: Hugo Benichi <hugobenichi@google.com>
+Reviewed-by: Dmitry Torokhov <dtor@chromium.org>
+---
+ net/xfrm/xfrm_state.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 11e09eb138d6..f08ab5c6c5b9 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2091,11 +2091,6 @@ int xfrm_user_policy(struct sock *sk, int optname, u8 __user *optval, int optlen
+ 	struct xfrm_mgr *km;
+ 	struct xfrm_policy *pol = NULL;
+ 
+-#ifdef CONFIG_COMPAT
+-	if (in_compat_syscall())
+-		return -EOPNOTSUPP;
+-#endif
+-
+ 	if (!optval && !optlen) {
+ 		xfrm_sk_policy_insert(sk, XFRM_POLICY_IN, NULL);
+ 		xfrm_sk_policy_insert(sk, XFRM_POLICY_OUT, NULL);
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

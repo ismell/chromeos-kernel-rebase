@@ -1,0 +1,97 @@
+From 9db29185a6b77f109d3f8e17f54a203bec3a93e7 Mon Sep 17 00:00:00 2001
+From: Vincent Palatin <vpalatin@chromium.org>
+Date: Thu, 11 Jan 2018 18:47:52 +0100
+Subject: [PATCH] CHROMIUM: cros_ec: instantiate properly FP MCU device
+
+Support Fingerprint MCU as a special of Cros EC devices.
+The current FP MCU uses the same EC SPI protocol v3 as other cros_ec
+devices on a SPI bus.
+When a MCU has fingerprint support (aka EC_FEATURE_FINGERPRINT),
+it is instantiated behind the /dev/cros_fp node.
+So regardless of the probing order between the actual cros_ec and cros_fp,
+the userspace and other kernel drivers should not confuse them
+(but this likely be the firsy platform where the first node is not
+cros_ec, we might find bugs ...)
+
+Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
+
+BUG=b:35648259,chromium:785506
+TEST=Using the whole suite, check on eve,cyan,glimmer AIDA64 works.
+Check on pixel 2 usb-pd-charger exits.
+
+the real EC shows up when doing 'ectool version'
+e.g. 'RO version:    eve_v1.1.6156-cb68604+ [...]'
+while 'ectool --name=cros_fp version'
+returns 'RO version:    eve_fp_v1.1.6178-a6a24d9+'.
+
+Reviewed-on: https://chromium-review.googlesource.com/453780
+Commit-Ready: Vincent Palatin <vpalatin@chromium.org>
+Tested-by: Vincent Palatin <vpalatin@chromium.org>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+[Forward ported from chromeos-4.4]
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+
+Change-Id: I0ee76587459c78f49491ef245bf46edbdbf563cb
+
+Conflicts:
+	include/linux/mfd/cros_ec_commands.h
+
+[rebase419(groeck): Context conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+---
+ drivers/mfd/cros_ec_dev.c            | 10 ++++++++++
+ include/linux/mfd/cros_ec.h          |  1 +
+ include/linux/mfd/cros_ec_commands.h |  2 ++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index 7ab60b3e9a6a..cf829192ad9f 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -469,6 +469,16 @@ static int ec_device_probe(struct platform_device *pdev)
+ 	device_initialize(&ec->class_dev);
+ 	cdev_init(&ec->cdev, &fops);
+ 
++	/* check whether this is actually a Fingerprint MCU rather than an EC */
++	if (cros_ec_check_features(ec, EC_FEATURE_FINGERPRINT)) {
++		dev_info(dev, "Fingerprint MCU detected.\n");
++		/*
++		 * Help userspace differentiating ECs from FP MCU,
++		 * regardless of the probing order.
++		 */
++		ec_platform->ec_name = CROS_EC_DEV_FP_NAME;
++	}
++
+ 	/*
+ 	 * Add the class device
+ 	 * Link to the character device for creating the /dev entry
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index 1d9fc20dce4a..386f90f25104 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -25,6 +25,7 @@
+ 
+ #define CROS_EC_DEV_NAME "cros_ec"
+ #define CROS_EC_DEV_PD_NAME "cros_pd"
++#define CROS_EC_DEV_FP_NAME "cros_fp"
+ 
+ /*
+  * The EC is unresponsive for a time after a reboot command.  Add a
+diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+index 0ce93a011c7b..b831687de216 100644
+--- a/include/linux/mfd/cros_ec_commands.h
++++ b/include/linux/mfd/cros_ec_commands.h
+@@ -817,6 +817,8 @@ enum ec_feature_code {
+ 	EC_FEATURE_MOTION_SENSE_FIFO = 24,
+ 	/* EC has RTC feature that can be controlled by host commands */
+ 	EC_FEATURE_RTC = 27,
++	/* The MCU exposes a Fingerprint sensor */
++	EC_FEATURE_FINGERPRINT = 28,
+ 	/* EC supports CEC commands */
+ 	EC_FEATURE_CEC = 35,
+ };
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

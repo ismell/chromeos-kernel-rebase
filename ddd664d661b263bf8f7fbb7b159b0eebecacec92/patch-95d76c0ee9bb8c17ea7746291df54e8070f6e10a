@@ -1,0 +1,93 @@
+From 9c6613b2d5a58aa40c5f12cf22184a35661717ae Mon Sep 17 00:00:00 2001
+From: Douglas Anderson <dianders@chromium.org>
+Date: Tue, 11 Aug 2015 11:21:29 -0700
+Subject: [PATCH] CHROMIUM: clk: rockchip: Register some debug clocks as global
+
+In "CHROMIUM: soc: rockchip: Add panic handler for rk3288" we'd like
+to access a few clocks without any associated device. That's pretty
+ugly and gross, but since upstream is likely to have a very different
+solution it doesn't seem to make sense to try to architect something
+cleaner just for our tree.
+
+We'll instead just register a few global clocks.  If this were common
+we would move it to a common rockchip clock file, but since this is
+just for something local to our tree we'll put it in the rk3288 file.
+
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/292860
+Reviewed-by: Andrew Bresticker <abrestic@chromium.org>
+
+BUG=chromium:941638
+TEST=see CL:I576edf75f23c4d0c5c1826e1b0a3017200e7c5ed
+
+Change-Id: Ie83bdf976cdb39fb2123af58f42c9ceac957d320
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1630713
+Commit-Ready: Douglas Anderson <dianders@chromium.org>
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/clk/rockchip/clk-rk3288.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/drivers/clk/rockchip/clk-rk3288.c b/drivers/clk/rockchip/clk-rk3288.c
+index 26097d1ce87c..40c38cf50017 100644
+--- a/drivers/clk/rockchip/clk-rk3288.c
++++ b/drivers/clk/rockchip/clk-rk3288.c
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <linux/clk-provider.h>
++#include <linux/clkdev.h>
+ #include <linux/io.h>
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+@@ -915,6 +916,34 @@ static struct syscore_ops rk3288_clk_syscore_ops = {
+ 	.resume = rk3288_clk_resume,
+ };
+ 
++static const char *const rk3288_global_clocks[] __initconst = {
++	/* NOTE: before adding clocks here, think if there's a better way */
++	"pclk_dbg",
++	"pclk_core_niu",
++	/* NOTE: before adding clocks here, think if there's a better way */
++};
++
++static void __init rk3288_register_global_clocks(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(rk3288_global_clocks); i++) {
++		struct clk *clk = __clk_lookup(rk3288_global_clocks[i]);
++		int ret;
++
++		if (IS_ERR(clk)) {
++			pr_warn("%s: Couldn't lookup clock %s\n", __func__,
++				rk3288_global_clocks[i]);
++			continue;
++		}
++
++		ret = clk_register_clkdev(clk, rk3288_global_clocks[i], NULL);
++		if (ret)
++			pr_warn("%s: Couldn't register clock %s\n", __func__,
++				rk3288_global_clocks[i]);
++	}
++}
++
+ static void __init rk3288_clk_init(struct device_node *np)
+ {
+ 	struct rockchip_clk_provider *ctx;
+@@ -954,5 +983,7 @@ static void __init rk3288_clk_init(struct device_node *np)
+ 	register_syscore_ops(&rk3288_clk_syscore_ops);
+ 
+ 	rockchip_clk_of_add_provider(np, ctx);
++
++	rk3288_register_global_clocks();
+ }
+ CLK_OF_DECLARE(rk3288_cru, "rockchip,rk3288-cru", rk3288_clk_init);
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

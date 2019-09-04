@@ -1,0 +1,162 @@
+From ccd4184660fffd40a3cbdafcff60109e52e3ecd6 Mon Sep 17 00:00:00 2001
+From: Stephen Barber <smbarber@chromium.org>
+Date: Thu, 29 Sep 2016 16:56:24 -0700
+Subject: [PATCH] CHROMIUM: thermal: ratelimit thermal logging messages
+
+The thermal logging added in "CHROMIUM: thermal: add thermal logs in
+devfreq_cooling and cpu_cooling" (e29bbda4) can lead to excessive log
+spam when running up against thermal limits. Add ratelimiting to
+power_allocator, cpu_cooling, and devfreq_cooling to allow only 1 log
+each 30 seconds from each of those subsystems.
+
+BUG=chrome-os-partner:57350
+TEST=run 6 `md5sum /dev/zero &` instances and monitor `dmesg -w`; ensure
+there isn't excessive log spam from thermal subsystems
+
+Signed-off-by: Stephen Barber <smbarber@chromium.org>
+
+Change-Id: I496b2d9fb1898014b38bb47706d343b0e7ff257f
+Reviewed-on: https://chromium-review.googlesource.com/391175
+Commit-Ready: Stephen Barber <smbarber@chromium.org>
+Tested-by: Stephen Barber <smbarber@chromium.org>
+Reviewed-by: Ricky Liang <jcliang@chromium.org>
+
+Conflicts:
+	drivers/thermal/thermal_core.c
+
+[rebase412(groeck): Context conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	drivers/thermal/cpu_cooling.c
+[rebase414(teravest): Fixed rename and cpu_dev access.]
+Signed-off-by: Justin TerAvest <teravest@chromium.org>
+[rebase414(groeck): Context conflicts after dropping notifier call chain]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+[rebase419(groeck): Context conflicts against EAS changes form Android]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/thermal/cpu_cooling.c     | 18 ++++++++++++++----
+ drivers/thermal/devfreq_cooling.c | 13 +++++++++++--
+ drivers/thermal/power_allocator.c | 11 ++++++++++-
+ 3 files changed, 35 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/thermal/cpu_cooling.c b/drivers/thermal/cpu_cooling.c
+index 1f0c9dccc21b..7bf2aad7243f 100644
+--- a/drivers/thermal/cpu_cooling.c
++++ b/drivers/thermal/cpu_cooling.c
+@@ -19,9 +19,17 @@
+ #include <linux/slab.h>
+ #include <linux/cpu.h>
+ #include <linux/cpu_cooling.h>
++#include <linux/ratelimit.h>
+ 
+ #include <trace/events/thermal.h>
+ 
++DEFINE_RATELIMIT_STATE(cpu_cooling_ratelimit_state, 30 * HZ, 1);
++
++int cpu_cooling_ratelimit(void)
++{
++	return __ratelimit(&cpu_cooling_ratelimit_state);
++}
++
+ /*
+  * Cooling state <-> CPUFreq frequency
+  *
+@@ -391,10 +399,12 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ 	cpufreq_update_policy(cpufreq_cdev->policy->cpu);
+ 
+-	cpu_dev = get_cpu_device(cpufreq_cdev->policy->cpu);
+-	dev_info(cpu_dev,
+-		 "Cooling state set to %lu. New max freq = %u\n",
+-		 state, clip_freq);
++	if (cpu_cooling_ratelimit()) {
++		cpu_dev = get_cpu_device(cpufreq_cdev->policy->cpu);
++		dev_info(cpu_dev,
++			 "Cooling state set to %lu. New max freq = %u\n",
++			 state, clip_freq);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/drivers/thermal/devfreq_cooling.c b/drivers/thermal/devfreq_cooling.c
+index e3f564b51c37..cdead6cd5ad4 100644
+--- a/drivers/thermal/devfreq_cooling.c
++++ b/drivers/thermal/devfreq_cooling.c
+@@ -25,6 +25,7 @@
+ #include <linux/slab.h>
+ #include <linux/pm_opp.h>
+ #include <linux/thermal.h>
++#include <linux/ratelimit.h>
+ 
+ #include <trace/events/thermal.h>
+ 
+@@ -32,6 +33,13 @@
+ 
+ static DEFINE_IDA(devfreq_ida);
+ 
++DEFINE_RATELIMIT_STATE(devfreq_cooling_ratelimit_state, 30 * HZ, 1);
++
++int devfreq_cooling_ratelimit(void)
++{
++	return __ratelimit(&devfreq_cooling_ratelimit_state);
++}
++
+ /**
+  * struct devfreq_cooling_device - Devfreq cooling device
+  * @id:		unique integer value corresponding to each
+@@ -150,8 +158,9 @@ static int devfreq_cooling_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ 	dfc->cooling_state = state;
+ 
+-	dev_info(dev, "Cooling state set to %lu. New max freq = %u\n",
+-		 state, dfc->freq_table[state]);
++	if (devfreq_cooling_ratelimit())
++		dev_info(dev, "Cooling state set to %lu. New max freq = %u\n",
++			 state, dfc->freq_table[state]);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/thermal/power_allocator.c b/drivers/thermal/power_allocator.c
+index 85f212c4f760..b85383204b1e 100644
+--- a/drivers/thermal/power_allocator.c
++++ b/drivers/thermal/power_allocator.c
+@@ -15,6 +15,7 @@
+ 
+ #define pr_fmt(fmt) "Power allocator: " fmt
+ 
++#include <linux/ratelimit.h>
+ #include <linux/rculist.h>
+ #include <linux/slab.h>
+ #include <linux/thermal.h>
+@@ -30,6 +31,13 @@
+ #define int_to_frac(x) ((x) << FRAC_BITS)
+ #define frac_to_int(x) ((x) >> FRAC_BITS)
+ 
++DEFINE_RATELIMIT_STATE(power_allocator_ratelimit_state, 30 * HZ, 1);
++
++static int power_allocator_ratelimit(void)
++{
++	return __ratelimit(&power_allocator_ratelimit_state);
++}
++
+ /**
+  * mul_frac() - multiply two fixed-point numbers
+  * @x:	first multiplicand
+@@ -443,7 +451,8 @@ static int allocate_power(struct thermal_zone_device *tz,
+ 				      max_allocatable_power, tz->temperature,
+ 				      control_temp - tz->temperature);
+ 
+-	if (total_granted_power < total_req_power) {
++	if (total_granted_power < total_req_power &&
++			power_allocator_ratelimit()) {
+ 		dev_info(&tz->device, "Controlling power: control_temp=%d "
+ 			 "last_temp=%d, curr_temp=%d total_requested_power=%d "
+ 			 "total_granted_power=%d\n", control_temp,
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

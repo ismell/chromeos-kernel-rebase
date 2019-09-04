@@ -1,0 +1,155 @@
+From a8296e3e282379ae9599429c0c9e6e85e47868c7 Mon Sep 17 00:00:00 2001
+From: Jumin Li <jumin.li@mediatek.com>
+Date: Tue, 16 Apr 2019 13:44:04 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: arm64: dts: mt8183: add usb node
+
+Add USB DTS node to the mt8183 and mt8183-evb.
+
+Signed-off-by: Jumin Li <jumin.li@mediatek.com>
+Signed-off-by: Chunfeng Yun <chunfeng.yun@mediatek.com>
+
+(am from https://patchwork.kernel.org/patch/10901941/)
+[eddie.huang: fix context conflicts]
+
+BUG=b:109911488
+TEST=build, boot to shell
+
+Change-Id: I5cf0234aa4d0b3bdb906f123ffaf8307776ca51d
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1314258
+Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm64/boot/dts/mediatek/mt8183-evb.dts | 21 +++++++++
+ arch/arm64/boot/dts/mediatek/mt8183.dtsi    | 52 +++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+index 1d13bd05d484..85a6f83b467c 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+@@ -6,6 +6,7 @@
+  */
+ 
+ /dts-v1/;
++#include <dt-bindings/gpio/gpio.h>
+ #include "mt8183.dtsi"
+ 
+ / {
+@@ -24,6 +25,16 @@
+ 	chosen {
+ 		stdout-path = "serial0:921600n8";
+ 	};
++
++	usb_p0_vbus: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "vbus";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		gpio = <&pio 42 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
++	};
+ };
+ 
+ &auxadc {
+@@ -281,6 +292,16 @@
+ 
+ };
+ 
++&ssusb {
++	vusb33-supply = <&mt6358_vusb_reg>;
++	dr_mode = "host";
++	status = "okay";
++};
++
++&usb_host {
++	status = "okay";
++};
++
+ &uart0 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+index 2c31a05062e8..71b55475580f 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+@@ -9,6 +9,7 @@
+ #include <dt-bindings/interrupt-controller/arm-gic.h>
+ #include <dt-bindings/interrupt-controller/irq.h>
+ #include <dt-bindings/memory/mt8183-larb-port.h>
++#include <dt-bindings/phy/phy.h>
+ #include <dt-bindings/power/mt8183-power.h>
+ #include "mt8183-pinfunc.h"
+ 
+@@ -629,6 +630,33 @@
+ 			status = "disabled";
+ 		};
+ 
++		ssusb: usb@11201000 {
++			compatible ="mediatek,mt8183-mtu3", "mediatek,mtu3";
++			reg = <0 0x11201000 0 0x2e00>,
++			      <0 0x11203e00 0 0x0100>;
++			reg-names = "mac", "ippc";
++			interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_LOW>;
++			phys = <&u2port0 PHY_TYPE_USB2>;
++			clocks = <&infracfg CLK_INFRA_UNIPRO_SCK>,
++				 <&infracfg CLK_INFRA_USB>;
++			clock-names = "sys_ck", "ref_ck";
++			#address-cells = <2>;
++			#size-cells = <2>;
++			ranges;
++			status = "disabled";
++
++			usb_host: xhci@11200000 {
++				compatible = "mediatek,mtk-xhci";
++				reg = <0 0x11200000 0 0x1000>;
++				reg-names = "mac";
++				interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_LOW>;
++				clocks = <&infracfg CLK_INFRA_UNIPRO_SCK>,
++					 <&infracfg CLK_INFRA_USB>;
++				clock-names = "sys_ck", "ref_ck";
++				status = "disabled";
++			};
++		};
++
+ 		audiosys: syscon@11220000 {
+ 			compatible = "mediatek,mt8183-audiosys", "syscon";
+ 			reg = <0 0x11220000 0 0x1000>;
+@@ -665,6 +693,30 @@
+ 			reg = <0 0x11f10000 0 0x1000>;
+ 		};
+ 
++		u3phy: usb-phy@11f40000 {
++			compatible = "mediatek,generic-tphy-v2";
++			#address-cells = <2>;
++			#size-cells = <2>;
++			ranges;
++			status = "okay";
++
++			u2port0: usb-phy@11f40000 {
++				reg = <0 0x11f40000 0 0x700>;
++				clocks = <&clk26m>;
++				clock-names = "ref";
++				#phy-cells = <1>;
++				status = "okay";
++			};
++
++			u3port0: usb-phy@11f40700 {
++				reg = <0 0x11f40700 0 0x900>;
++				clocks = <&clk26m>;
++				clock-names = "ref";
++				#phy-cells = <1>;
++				status = "okay";
++			};
++		};
++
+ 		mfgcfg: syscon@13000000 {
+ 			compatible = "mediatek,mt8183-mfgcfg", "syscon";
+ 			reg = <0 0x13000000 0 0x1000>;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

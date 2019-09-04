@@ -1,0 +1,284 @@
+From 9600530b8d6bfefee8cd1622f1b58dae30b4ad87 Mon Sep 17 00:00:00 2001
+From: Robert Foss <robert.foss@collabora.com>
+Date: Mon, 12 Nov 2018 17:51:54 +0100
+Subject: [PATCH] UPSTREAM: drm/virtio: add virtio_gpu_alloc_fence()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Refactor fence creation, add fences to relevant GPU
+operations and add cursor helper functions.
+
+This removes the potential for allocation failures from the
+cmd_submit and atomic_commit paths.
+Now a fence will be allocated first and only after that
+will we proceed with the rest of the execution.
+
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.com>
+Signed-off-by: Robert Foss <robert.foss@collabora.com>
+Link: http://patchwork.freedesktop.org/patch/msgid/20181112165157.32765-2-robert.foss@collabora.com
+Suggested-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 9fdd90c0f42440b7f1e4a3f7262d222eee4b4cdf)
+Signed-off-by: Gurchetan Singh <gurchetansingh@chromium.org>
+
+BUG=chromium:924405
+TEST=compile and run on Tatl
+
+Change-Id: I8313f966c84cf25b4feff50cbbe5673df7a2ca1e
+Reviewed-on: https://chromium-review.googlesource.com/1549032
+Commit-Ready: Gurchetan Singh <gurchetansingh@chromium.org>
+Tested-by: Gurchetan Singh <gurchetansingh@chromium.org>
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+Reviewed-by: Gurchetan Singh <gurchetansingh@chromium.org>
+---
+ drivers/gpu/drm/virtio/virtgpu_drv.h   |  4 +++
+ drivers/gpu/drm/virtio/virtgpu_fence.c | 29 ++++++++++++----
+ drivers/gpu/drm/virtio/virtgpu_ioctl.c | 30 +++++++++++++++--
+ drivers/gpu/drm/virtio/virtgpu_plane.c | 46 +++++++++++++++++++++++---
+ drivers/gpu/drm/virtio/virtgpu_vq.c    |  2 +-
+ 5 files changed, 96 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.h b/drivers/gpu/drm/virtio/virtgpu_drv.h
+index 74d95ffe47e7..13d67697f01c 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.h
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.h
+@@ -138,6 +138,7 @@ struct virtio_gpu_framebuffer {
+ 	int x1, y1, x2, y2; /* dirty rect */
+ 	spinlock_t dirty_lock;
+ 	uint32_t hw_res_handle;
++	struct virtio_gpu_fence *fence;
+ };
+ #define to_virtio_gpu_framebuffer(x) \
+ 	container_of(x, struct virtio_gpu_framebuffer, base)
+@@ -353,6 +354,9 @@ void virtio_gpu_ttm_fini(struct virtio_gpu_device *vgdev);
+ int virtio_gpu_mmap(struct file *filp, struct vm_area_struct *vma);
+ 
+ /* virtio_gpu_fence.c */
++struct virtio_gpu_fence *virtio_gpu_fence_alloc(
++	struct virtio_gpu_device *vgdev);
++void virtio_gpu_fence_cleanup(struct virtio_gpu_fence *fence);
+ int virtio_gpu_fence_emit(struct virtio_gpu_device *vgdev,
+ 			  struct virtio_gpu_ctrl_hdr *cmd_hdr,
+ 			  struct virtio_gpu_fence **fence);
+diff --git a/drivers/gpu/drm/virtio/virtgpu_fence.c b/drivers/gpu/drm/virtio/virtgpu_fence.c
+index 00c742a441bf..6b5d92215cfb 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_fence.c
++++ b/drivers/gpu/drm/virtio/virtgpu_fence.c
+@@ -67,6 +67,28 @@ static const struct dma_fence_ops virtio_fence_ops = {
+ 	.timeline_value_str  = virtio_timeline_value_str,
+ };
+ 
++struct virtio_gpu_fence *virtio_gpu_fence_alloc(struct virtio_gpu_device *vgdev)
++{
++	struct virtio_gpu_fence_driver *drv = &vgdev->fence_drv;
++	struct virtio_gpu_fence *fence = kzalloc(sizeof(struct virtio_gpu_fence),
++							GFP_ATOMIC);
++	if (!fence)
++		return fence;
++
++	fence->drv = drv;
++	dma_fence_init(&fence->f, &virtio_fence_ops, &drv->lock, drv->context, 0);
++
++	return fence;
++}
++
++void virtio_gpu_fence_cleanup(struct virtio_gpu_fence *fence)
++{
++	if (!fence)
++		return;
++
++	dma_fence_put(&fence->f);
++}
++
+ int virtio_gpu_fence_emit(struct virtio_gpu_device *vgdev,
+ 			  struct virtio_gpu_ctrl_hdr *cmd_hdr,
+ 			  struct virtio_gpu_fence **fence)
+@@ -74,15 +96,8 @@ int virtio_gpu_fence_emit(struct virtio_gpu_device *vgdev,
+ 	struct virtio_gpu_fence_driver *drv = &vgdev->fence_drv;
+ 	unsigned long irq_flags;
+ 
+-	*fence = kmalloc(sizeof(struct virtio_gpu_fence), GFP_ATOMIC);
+-	if ((*fence) == NULL)
+-		return -ENOMEM;
+-
+ 	spin_lock_irqsave(&drv->lock, irq_flags);
+-	(*fence)->drv = drv;
+ 	(*fence)->seq = ++drv->sync_seq;
+-	dma_fence_init(&(*fence)->f, &virtio_fence_ops, &drv->lock,
+-		       drv->context, (*fence)->seq);
+ 	dma_fence_get(&(*fence)->f);
+ 	list_add_tail(&(*fence)->node, &drv->fences);
+ 	spin_unlock_irqrestore(&drv->lock, irq_flags);
+diff --git a/drivers/gpu/drm/virtio/virtgpu_ioctl.c b/drivers/gpu/drm/virtio/virtgpu_ioctl.c
+index 5a4d14891c82..568e3b377684 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_ioctl.c
++++ b/drivers/gpu/drm/virtio/virtgpu_ioctl.c
+@@ -168,6 +168,13 @@ static int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
+ 		ret = PTR_ERR(buf);
+ 		goto out_unresv;
+ 	}
++
++	fence = virtio_gpu_fence_alloc(vgdev);
++	if (!fence) {
++		kfree(buf);
++		ret = -ENOMEM;
++		goto out_unresv;
++	}
+ 	virtio_gpu_cmd_submit(vgdev, buf, exbuf->size,
+ 			      vfpriv->ctx_id, &fence);
+ 
+@@ -283,11 +290,17 @@ static int virtio_gpu_resource_create_ioctl(struct drm_device *dev, void *data,
+ 		rc_3d.nr_samples = cpu_to_le32(rc->nr_samples);
+ 		rc_3d.flags = cpu_to_le32(rc->flags);
+ 
++		fence = virtio_gpu_fence_alloc(vgdev);
++		if (!fence) {
++			ret = -ENOMEM;
++			goto fail_backoff;
++		}
++
+ 		virtio_gpu_cmd_resource_create_3d(vgdev, qobj, &rc_3d, NULL);
+ 		ret = virtio_gpu_object_attach(vgdev, qobj, &fence);
+ 		if (ret) {
+-			ttm_eu_backoff_reservation(&ticket, &validate_list);
+-			goto fail_unref;
++			virtio_gpu_fence_cleanup(fence);
++			goto fail_backoff;
+ 		}
+ 		ttm_eu_fence_buffer_objects(&ticket, &validate_list, &fence->f);
+ 	}
+@@ -312,6 +325,8 @@ static int virtio_gpu_resource_create_ioctl(struct drm_device *dev, void *data,
+ 		dma_fence_put(&fence->f);
+ 	}
+ 	return 0;
++fail_backoff:
++	ttm_eu_backoff_reservation(&ticket, &validate_list);
+ fail_unref:
+ 	if (vgdev->has_virgl_3d) {
+ 		virtio_gpu_unref_list(&validate_list);
+@@ -395,6 +410,12 @@ static int virtio_gpu_transfer_from_host_ioctl(struct drm_device *dev,
+ 		goto out_unres;
+ 
+ 	convert_to_hw_box(&box, &args->box);
++
++	fence = virtio_gpu_fence_alloc(vgdev);
++	if (!fence) {
++		ret = -ENOMEM;
++		goto out_unres;
++	}
+ 	virtio_gpu_cmd_transfer_from_host_3d
+ 		(vgdev, qobj->hw_res_handle,
+ 		 vfpriv->ctx_id, offset, args->level,
+@@ -444,6 +465,11 @@ static int virtio_gpu_transfer_to_host_ioctl(struct drm_device *dev, void *data,
+ 			(vgdev, qobj, offset,
+ 			 box.w, box.h, box.x, box.y, NULL);
+ 	} else {
++		fence = virtio_gpu_fence_alloc(vgdev);
++		if (!fence) {
++			ret = -ENOMEM;
++			goto out_unres;
++		}
+ 		virtio_gpu_cmd_transfer_to_host_3d
+ 			(vgdev, qobj,
+ 			 vfpriv ? vfpriv->ctx_id : 0, offset,
+diff --git a/drivers/gpu/drm/virtio/virtgpu_plane.c b/drivers/gpu/drm/virtio/virtgpu_plane.c
+index a9f4ae7d4483..b84ac8c25856 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_plane.c
++++ b/drivers/gpu/drm/virtio/virtgpu_plane.c
+@@ -137,6 +137,41 @@ static void virtio_gpu_primary_plane_update(struct drm_plane *plane,
+ 				      plane->state->src_h >> 16);
+ }
+ 
++static int virtio_gpu_cursor_prepare_fb(struct drm_plane *plane,
++					struct drm_plane_state *new_state)
++{
++	struct drm_device *dev = plane->dev;
++	struct virtio_gpu_device *vgdev = dev->dev_private;
++	struct virtio_gpu_framebuffer *vgfb;
++	struct virtio_gpu_object *bo;
++
++	if (!new_state->fb)
++		return 0;
++
++	vgfb = to_virtio_gpu_framebuffer(new_state->fb);
++	bo = gem_to_virtio_gpu_obj(vgfb->base.obj[0]);
++	if (bo && bo->dumb && (plane->state->fb != new_state->fb)) {
++		vgfb->fence = virtio_gpu_fence_alloc(vgdev);
++		if (!vgfb->fence)
++			return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static void virtio_gpu_cursor_cleanup_fb(struct drm_plane *plane,
++					 struct drm_plane_state *old_state)
++{
++	struct virtio_gpu_framebuffer *vgfb;
++
++	if (!plane->state->fb)
++		return;
++
++	vgfb = to_virtio_gpu_framebuffer(plane->state->fb);
++	if (vgfb->fence)
++		virtio_gpu_fence_cleanup(vgfb->fence);
++}
++
+ static void virtio_gpu_cursor_plane_update(struct drm_plane *plane,
+ 					   struct drm_plane_state *old_state)
+ {
+@@ -144,7 +179,6 @@ static void virtio_gpu_cursor_plane_update(struct drm_plane *plane,
+ 	struct virtio_gpu_device *vgdev = dev->dev_private;
+ 	struct virtio_gpu_output *output = NULL;
+ 	struct virtio_gpu_framebuffer *vgfb;
+-	struct virtio_gpu_fence *fence = NULL;
+ 	struct virtio_gpu_object *bo = NULL;
+ 	uint32_t handle;
+ 	int ret = 0;
+@@ -170,13 +204,13 @@ static void virtio_gpu_cursor_plane_update(struct drm_plane *plane,
+ 			(vgdev, bo, 0,
+ 			 cpu_to_le32(plane->state->crtc_w),
+ 			 cpu_to_le32(plane->state->crtc_h),
+-			 0, 0, &fence);
++			 0, 0, &vgfb->fence);
+ 		ret = virtio_gpu_object_reserve(bo, false);
+ 		if (!ret) {
+ 			reservation_object_add_excl_fence(bo->tbo.resv,
+-							  &fence->f);
+-			dma_fence_put(&fence->f);
+-			fence = NULL;
++							  &vgfb->fence->f);
++			dma_fence_put(&vgfb->fence->f);
++			vgfb->fence = NULL;
+ 			virtio_gpu_object_unreserve(bo);
+ 			virtio_gpu_object_wait(bo, false);
+ 		}
+@@ -218,6 +252,8 @@ static const struct drm_plane_helper_funcs virtio_gpu_primary_helper_funcs = {
+ };
+ 
+ static const struct drm_plane_helper_funcs virtio_gpu_cursor_helper_funcs = {
++	.prepare_fb		= virtio_gpu_cursor_prepare_fb,
++	.cleanup_fb		= virtio_gpu_cursor_cleanup_fb,
+ 	.atomic_check		= virtio_gpu_plane_atomic_check,
+ 	.atomic_update		= virtio_gpu_cursor_plane_update,
+ };
+diff --git a/drivers/gpu/drm/virtio/virtgpu_vq.c b/drivers/gpu/drm/virtio/virtgpu_vq.c
+index 5d178121ea7f..446b40492cc7 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_vq.c
++++ b/drivers/gpu/drm/virtio/virtgpu_vq.c
+@@ -942,9 +942,9 @@ void virtio_gpu_object_detach(struct virtio_gpu_device *vgdev,
+ 			      struct virtio_gpu_object *obj)
+ {
+ 	bool use_dma_api = !virtio_has_iommu_quirk(vgdev->vdev);
+-	struct virtio_gpu_fence *fence;
+ 
+ 	if (use_dma_api && obj->mapped) {
++		struct virtio_gpu_fence *fence = virtio_gpu_fence_alloc(vgdev);
+ 		/* detach backing and wait for the host process it ... */
+ 		virtio_gpu_cmd_resource_inval_backing(vgdev, obj->hw_res_handle, &fence);
+ 		dma_fence_wait(&fence->f, true);
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

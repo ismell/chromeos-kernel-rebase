@@ -1,0 +1,52 @@
+From 34a348806d1a26958a53cf4f367b8cdd5bc0b3c5 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <groeck@chromium.org>
+Date: Mon, 1 Oct 2018 14:44:26 -0700
+Subject: [PATCH] FIXUP: FROMLIST: scsi: ufs: Add configfs support for UFS
+ provisioning
+
+Add ufs-configfs.o to ufshcd-core-objs gto fix missing exports.
+
+Also export ufshcd_parse_dev_ref_clk_freq which is needed by
+ufshcd-pltfrm.c.
+
+BUG=b:111557905
+TEST=Build kernel for Cheza
+
+Change-Id: If771d871246e6bc0598821c07a81a05e4c6f1349
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase419(rrangel): Match existing style]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/scsi/ufs/Makefile | 2 +-
+ drivers/scsi/ufs/ufshcd.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/ufs/Makefile b/drivers/scsi/ufs/Makefile
+index 7452c60bed87..168d900b43a1 100644
+--- a/drivers/scsi/ufs/Makefile
++++ b/drivers/scsi/ufs/Makefile
+@@ -7,7 +7,7 @@ obj-$(CONFIG_SCSI_UFS_QCOM) += ufs-qcom.o
+ obj-$(CONFIG_SCSI_UFSHCD) += ufshcd-core.o
+ ufshcd-core-y				+= ufshcd.o ufs-sysfs.o
+ ufshcd-core-$(CONFIG_SCSI_UFS_BSG)	+= ufs_bsg.o
+-obj-$(CONFIG_SCSI_UFS_PROVISION) += ufs-configfs.o
++ufshcd-core-$(CONFIG_SCSI_UFS_PROVISION) += ufs-configfs.o
+ obj-$(CONFIG_SCSI_UFSHCD_PCI) += ufshcd-pci.o
+ obj-$(CONFIG_SCSI_UFSHCD_PLATFORM) += ufshcd-pltfrm.o
+ obj-$(CONFIG_SCSI_UFS_HISI) += ufs-hisi.o
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 447bbb0d776d..176bbd5ae8c5 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -6778,6 +6778,7 @@ void ufshcd_parse_dev_ref_clk_freq(struct ufs_hba *hba, struct clk *refclk)
+ 		dev_err(hba->dev,
+ 		"invalid ref_clk setting = %ld\n", freq);
+ }
++EXPORT_SYMBOL(ufshcd_parse_dev_ref_clk_freq);
+ 
+ static int ufshcd_set_dev_ref_clk(struct ufs_hba *hba)
+ {
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

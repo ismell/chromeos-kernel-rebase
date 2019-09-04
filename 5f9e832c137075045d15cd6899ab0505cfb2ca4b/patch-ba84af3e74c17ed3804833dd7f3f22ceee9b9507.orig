@@ -1,0 +1,151 @@
+From ba84af3e74c17ed3804833dd7f3f22ceee9b9507 Mon Sep 17 00:00:00 2001
+From: Jett Rink <jettrink@chromium.org>
+Date: Fri, 5 Apr 2019 13:45:14 -0600
+Subject: [PATCH] CHROMIUM: cros_ec_istp loops until events are gone
+
+The ISH FW supports a flags that allows the kernel to continue to
+query for more MKBP events until they are all consumed. This is the
+preferred method for consuming events after receiving a MKBP event.
+
+Also record the timestamp as close to the hardware event as possible
+without breaking encapsulation boundaries.
+
+BRANCH=none
+BUG=b:129159505
+TEST=AP is honoring flag and calling to get more events if needed
+
+Change-Id: Id8f433bc08ae5329502668b443da96eb26a8b099
+Signed-off-by: Jett Rink <jettrink@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1555219
+Reviewed-by: Enrico Granata <egranata@chromium.org>
+Reviewed-by: Mathew King <mathewk@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/mfd/cros_ec.c                   |  5 +++--
+ drivers/platform/chrome/cros_ec_ishtp.c | 25 +++++++++++++++++++------
+ include/linux/mfd/cros_ec.h             | 12 ++++++++++++
+ 3 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/mfd/cros_ec.c b/drivers/mfd/cros_ec.c
+index 5bbb7a68d3fd..90f35cf257f5 100644
+--- a/drivers/mfd/cros_ec.c
++++ b/drivers/mfd/cros_ec.c
+@@ -65,7 +65,7 @@ static irqreturn_t ec_irq_handler(int irq, void *data) {
+ 	return IRQ_WAKE_THREAD;
+ }
+ 
+-static bool ec_handle_event(struct cros_ec_device *ec_dev)
++bool cros_ec_handle_event(struct cros_ec_device *ec_dev)
+ {
+ 	bool wake_event = true;
+ 	bool ec_has_more_events = false;
+@@ -87,6 +87,7 @@ static bool ec_handle_event(struct cros_ec_device *ec_dev)
+ 	return ec_has_more_events;
+ 
+ }
++EXPORT_SYMBOL(cros_ec_handle_event);
+ 
+ static irqreturn_t ec_irq_thread(int irq, void *data)
+ {
+@@ -94,7 +95,7 @@ static irqreturn_t ec_irq_thread(int irq, void *data)
+ 	bool ec_has_more_events;
+ 
+ 	do {
+-		ec_has_more_events = ec_handle_event(ec_dev);
++		ec_has_more_events = cros_ec_handle_event(ec_dev);
+ 	} while (ec_has_more_events);
+ 
+ 	return IRQ_HANDLED;
+diff --git a/drivers/platform/chrome/cros_ec_ishtp.c b/drivers/platform/chrome/cros_ec_ishtp.c
+index ba4dcf99cb3b..b20277f54a85 100644
+--- a/drivers/platform/chrome/cros_ec_ishtp.c
++++ b/drivers/platform/chrome/cros_ec_ishtp.c
+@@ -142,11 +142,11 @@ static void ish_evt_handler(struct work_struct *work)
+ 	struct ishtp_cl_data *client_data =
+ 		container_of(work, struct ishtp_cl_data, work_ec_evt);
+ 	struct cros_ec_device *ec_dev = client_data->ec_dev;
++	bool ec_has_more_events;
+ 
+-	if (cros_ec_get_next_event(ec_dev, NULL) > 0) {
+-		blocking_notifier_call_chain(&ec_dev->event_notifier,
+-					     0, ec_dev);
+-	}
++	do {
++		ec_has_more_events = cros_ec_handle_event(ec_dev);
++	} while (ec_has_more_events);
+ }
+ 
+ /**
+@@ -205,13 +205,14 @@ static int ish_send(struct ishtp_cl_data *client_data,
+  * process_recv() -	Received and parse incoming packet
+  * @cros_ish_cl:	Client instance to get stats
+  * @rb_in_proc:		Host interface message buffer
++ * @timestamp:		Timestamp of when parent callback started
+  *
+  * Parse the incoming packet. If it is a response packet then it will
+  * update per instance flags and wake up the caller waiting to for the
+  * response. If it is an event packet then it will schedule event work.
+  */
+ static void process_recv(struct ishtp_cl *cros_ish_cl,
+-			 struct ishtp_cl_rb *rb_in_proc)
++			 struct ishtp_cl_rb *rb_in_proc, s64 timestamp)
+ {
+ 	size_t data_len = rb_in_proc->buf_idx;
+ 	struct ishtp_cl_data *client_data =
+@@ -300,6 +301,11 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
+ 		break;
+ 
+ 	case CROS_MKBP_EVENT:
++		/*
++		 * Set timestamp from beginning of function since we actually
++		 * got an incoming MKBP event
++		 */
++		client_data->ec_dev->last_event_time = timestamp;
+ 		/* The event system doesn't send any data in buffer */
+ 		schedule_work(&client_data->work_ec_evt);
+ 
+@@ -328,10 +334,17 @@ static void ish_event_cb(struct ishtp_cl_device *cl_device)
+ {
+ 	struct ishtp_cl_rb *rb_in_proc;
+ 	struct ishtp_cl	*cros_ish_cl = ishtp_get_drvdata(cl_device);
++	s64 timestamp;
++
++	/*
++	 * Take timestamp as close to hardware interrupt as possible for sensor
++	 * timestamps.
++	 */
++	timestamp = cros_ec_get_time_ns();
+ 
+ 	while ((rb_in_proc = ishtp_cl_rx_get_rb(cros_ish_cl)) != NULL) {
+ 		/* Decide what to do with received data */
+-		process_recv(cros_ish_cl, rb_in_proc);
++		process_recv(cros_ish_cl, rb_in_proc, timestamp);
+ 	}
+ }
+ 
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index 63fd62f77be4..101e538f7768 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -372,4 +372,16 @@ u32 cros_ec_get_host_event(struct cros_ec_device *ec_dev);
+  */
+ s64 cros_ec_get_time_ns(void);
+ 
++
++/**
++ * cros_ec_handle_event - process and forward pending events on EC
++ *
++ * Call this function in a loop when the kernel is notified that the EC has
++ * pending events.
++ *
++ * Returns true if more events are still pending and this function should be
++ * called again.
++ */
++bool cros_ec_handle_event(struct cros_ec_device *ec_dev);
++
+ #endif /* __LINUX_MFD_CROS_EC_H */
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

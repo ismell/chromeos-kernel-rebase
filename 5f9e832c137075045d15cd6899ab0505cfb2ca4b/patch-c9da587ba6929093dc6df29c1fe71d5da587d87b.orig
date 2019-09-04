@@ -1,0 +1,135 @@
+From c9da587ba6929093dc6df29c1fe71d5da587d87b Mon Sep 17 00:00:00 2001
+From: Furquan Shaikh <furquan@google.com>
+Date: Tue, 8 May 2018 22:33:39 -0700
+Subject: [PATCH] CHROMIUM: thermal: Add notifier call chain for hot/critical
+ events
+
+This will allow drivers to register a callback for important
+thermal events and log critical thresholds that cause the system
+to shut down.
+
+There are other places this might work, but after consideration
+I think it makes sense to have the chain at this level:
+
+The ACPI thermal driver has an existing notify function that is
+eventually called into, but that would limit the notifier to only
+working on systems that use ACPI.
+
+The cpufreq driver is already getting a notify callback executed
+in this path (tz->ops->notify) but the threshold info is not passed
+to the cpu_cooling notifier chain so it is not useful for logging.
+
+BUG=b:79449188
+TEST=build ok, no visible changes in this commit
+
+[sonnyrao fixed up notifer calls for 3.8]
+Signed-off-by: Duncan Laurie <dlaurie@chromium.org>
+Reviewed-on: https://gerrit.chromium.org/gerrit/27775
+Reviewed-by: Olof Johansson <olofj@chromium.org>
+Reviewed-by: Vincent Palatin <vpalatin@chromium.org>
+[rebase44(groeck): Updated subject]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Change-Id: I8806c0bf844a08580d936d971aa80a3ec579080a
+Signed-off-by: Furquan Shaikh <furquan@google.com>
+Reviewed-on: https://chromium-review.googlesource.com/1051260
+Commit-Ready: Furquan Shaikh <furquan@chromium.org>
+Tested-by: Furquan Shaikh <furquan@chromium.org>
+Reviewed-by: Aaron Durbin <adurbin@chromium.org>
+---
+ drivers/thermal/thermal_core.c | 38 ++++++++++++++++++++++++++++++++++
+ include/linux/thermal.h        |  4 ++++
+ 2 files changed, 42 insertions(+)
+
+diff --git a/drivers/thermal/thermal_core.c b/drivers/thermal/thermal_core.c
+index bf9721fc2824..3934e8b4332d 100644
+--- a/drivers/thermal/thermal_core.c
++++ b/drivers/thermal/thermal_core.c
+@@ -15,6 +15,7 @@
+ #include <linux/slab.h>
+ #include <linux/kdev_t.h>
+ #include <linux/idr.h>
++#include <linux/notifier.h>
+ #include <linux/thermal.h>
+ #include <linux/reboot.h>
+ #include <linux/string.h>
+@@ -313,12 +314,46 @@ static void monitor_thermal_zone(struct thermal_zone_device *tz)
+ 	mutex_unlock(&tz->lock);
+ }
+ 
++BLOCKING_NOTIFIER_HEAD(thermal_notifier_list);
++
++/**
++ * register_thermal_notifier - Register function to be called for
++ *                             critical thermal events.
++ *
++ * @nb: Info about notifier function to be called
++ *
++ * Currently always returns zero, as blocking_notifier_chain_register()
++ * always returns zero.
++ */
++int register_thermal_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_register(&thermal_notifier_list, nb);
++}
++EXPORT_SYMBOL(register_thermal_notifier);
++
++/**
++ * unregister_thermal_notifier - Unregister thermal notifier
++ *
++ * @nb: Hook to be unregistered
++ *
++ * Returns zero on success, or %-ENOENT on failure.
++ */
++int unregister_thermal_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_unregister(&thermal_notifier_list, nb);
++}
++EXPORT_SYMBOL(unregister_thermal_notifier);
++
++
+ static void handle_non_critical_trips(struct thermal_zone_device *tz,
+ 				      int trip,
+ 				      enum thermal_trip_type trip_type)
+ {
+ 	tz->governor ? tz->governor->throttle(tz, trip) :
+ 		       def_governor->throttle(tz, trip);
++
++	blocking_notifier_call_chain(&thermal_notifier_list,
++				     trip_type, NULL);
+ }
+ 
+ /**
+@@ -385,6 +420,9 @@ static void handle_critical_trips(struct thermal_zone_device *tz,
+ 	if (tz->ops->notify)
+ 		tz->ops->notify(tz, trip, trip_type);
+ 
++	blocking_notifier_call_chain(&thermal_notifier_list,
++				     trip_type, NULL);
++
+ 	if (trip_type == THERMAL_TRIP_CRITICAL) {
+ 		dev_emerg(&tz->device,
+ 			  "critical temperature reached (%d C), shutting down\n",
+diff --git a/include/linux/thermal.h b/include/linux/thermal.h
+index 5f4705f46c2f..b948344d55ca 100644
+--- a/include/linux/thermal.h
++++ b/include/linux/thermal.h
+@@ -13,6 +13,7 @@
+ #include <linux/of.h>
+ #include <linux/idr.h>
+ #include <linux/device.h>
++#include <linux/notifier.h>
+ #include <linux/sysfs.h>
+ #include <linux/workqueue.h>
+ #include <uapi/linux/thermal.h>
+@@ -542,4 +543,7 @@ static inline int thermal_generate_netlink_event(struct thermal_zone_device *tz,
+ }
+ #endif
+ 
++extern int register_thermal_notifier(struct notifier_block *);
++extern int unregister_thermal_notifier(struct notifier_block *);
++
+ #endif /* __THERMAL_H__ */
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

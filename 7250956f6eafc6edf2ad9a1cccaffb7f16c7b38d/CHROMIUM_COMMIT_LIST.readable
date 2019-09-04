@@ -1,0 +1,1695 @@
+4ccd911b0b98942de86875d33f20690035897d43 CHROMIUM: amdgpu/gmc: fix compile warnings/errors
+1d4aca27b1d3eb5425349563a4fdda36b9f7e303 CHROMIUM: Revert "ecryptfs_lookup(): try either only encrypted or plaintext name"
+89294c04595298f24303fa52c1275d2de8c1b529 CHROMIUM: Revert "x86: Allow generating user-space headers without a compiler"
+2797c33ef44c8f198680ed6cc553da3dddb1e130 CHROMIUM: Revert "x86/cpufeature: Guard asm_volatile_goto usage for BPF compilation"
+7c694e1b54a453882734416332b378ac922de78e CHROMIUM: Revert "Makefile: disable PIE before testing asm goto"
+c8d104786bd29308532fc3df1e1631fa43748423 CHROMIUM: Revert "x86: Remove FAST_FEATURE_TESTS"
+e19e02d91f05141abd6310d7a6e2f051ed1bea9f CHROMIUM: Revert "x86: Force asm-goto"
+cd0a8956a67d19518c09f8357aa36699dc7994b3 CHROMIUM: Revert "drm/i915: Warn against variable length arrays"
+6825e3a28a075d0285d3e266b6c5872ec93f817a CHROMIUM: drm/i915/dd: Mark icl_mg_phy_ddi_translation as __maybe_unused
+29f9632fbb4e15b824acc9f3af4c86b51d7dc7b4 ANDROID: add script to fetch android kernel config fragments
+d467d4dbb32275a24deff601bb8212c64b6f4ccd ANDROID: arm: Fix dtb list when DTB_IMAGE_NAMES is empty
+9e5882d00a7206bf60566bc8a6726a1be66028f9 ANDROID: arm: add config option to build zImage/dtb combo
+5d4805a5293404fa9bf43dc4bc053f111b653dc8 ANDROID: arm: convert build of appended dtb zImage to list of dtbs
+81c0f08307774094d9063104f8482f7647a52ad9 ANDROID: arm64: add option to build Image.gz/dtb combo
+a275616b87cdf3df2c88f657d802e2a3cf2f40ce ANDROID: arm64: add option to build Image-dtb
+e3449abb3b81e9682e32c1f588436f9e62429601 ANDROID: arm64: Allow to choose appended kernel image
+a798b6c800f5131f15d77db4d833537bf5f4c55a ANDROID: kdb: support new lines without carriage returns
+aedf2e61b572d8324d0089f6cf2e28e68704835a ANDROID: binder: add support for RT prio inheritance.
+901a75260540fd384cd03f092405e0fc412a0b5e ANDROID: binder: add min sched_policy to node.
+705270154c3bc2dbfb37631cb0fc7821f5a0d9b6 ANDROID: binder: improve priority inheritance.
+6db83b5d4be8e671ab016f642ea05fa8f3103f35 ANDROID: binder: add RT inheritance flag to node.
+3ac72ce12febc917016f4d82a72861652ef3969d ANDROID: binder: don't check prio permissions on restore.
+b3b2f9999b53c73c0ec1ca48b7a923e63db19ea7 ANDROID: binder: Add tracing for binder priority inheritance.
+a1f1a283014fbeb20b8f6571f6aef655f995e5ee ANDROID: binder: init desired_prio.sched_policy before use it
+f859cbf1ef068d6bad492b498c03d44432e8dc43 ANDROID: binder: fix node sched policy calculation
+dc0bd3177eef3d0e1e6e6d397c251fd9df85d5bf ANDROID: cpu: send KOBJ_ONLINE event when enabling cpus
+95a20bd6ae349f770e573f73c69147cd2001e93b ANDROID: cpuset: Make cpusets restore on hotplug
+4a3482b67ede2795bb30c43417e69f5febe3bf94 CHROMIUM: cgroups: relax permissions on moving tasks between cgroups
+871e6b6de593f1c0c50bbf9fc4d37c8024a14a8b ANDROID: dm: verity-fec: add sysfs attribute fec/corrected
+33885d95d75f41d24e365f0ef31b08c9327db9c8 CHROMIUM: dm: boot time specification of dm=
+c84031898ac2074986b2c5167f37be1a40e195cb ANDROID: dm: do_mounts_dm: Rebase on top of 4.9
+b6488ebfb40a0032f3dafed4c00f9dc5c05ac534 ANDROID: dm: do_mounts_dm: fix dm_substitute_devices()
+ca737582e27dc6a315fc8f72444262c62ec486a5 ANDROID: dm: do_mounts_dm: Update init/do_mounts_dm.c to the latest ChromiumOS version.
+fb53974166210ab64292942a73a7fadfe045b0f2 ANDROID: dm: android-verity: Add android verity target
+4afde9cb815ca7abb53da0e4d174246479f3b1d4 ANDROID: dm: android-verity: Mounting root as linear device when verity disabled
+21002cca89bee2ecdded01cfd97e8106293d7ceb ANDROID: dm: android-verity: use name_to_dev_t
+dcf101169b3405d1e888cedbb944f75f9b2bcc1d ANDROID: dm: android-verity: fix signature verification flag
+21d587c530465e6802ddceb8997a636639dc877d ANDROID: dm: android-verity: use default verity public key
+eadf527da7abc1696aeedade5a676b29de1682ab ANDROID: dm: android-verity: mount as linear target if eng build
+9c33b6031c5847c1c38e85c138da90f8446e1782 ANDROID: dm: android-verity: allow adb disable-verity only in userdebug
+db89e81a5600c1764cd2efe4dfdb6249f05383d4 ANDROID: dm: android-verity: Verify header before fetching table
+d9671c9e6392c1f27af35e97689bfef113c5f211 ANDROID: dm: android-verity: pack the fec_header structure
+7073e24a3fd28c80c5cd1a04147136092e975b0b ANDROID: dm: android-verity: adopt changes made to dm callbacks
+48027a39e052ba5a2ef0069880e66a7171e76bba ANDROID: dm: android-verity: Remove fec_header location constraint
+073e5494d95edf84906f68fe344cb2894a4f317b ANDROID: dm: android-verity: rebase for 4.9
+03c22e5a35a69b71e5fc7e0cf2f74cde2ad1c57d ANDROID: dm: android-verity: fix table_make_digest() error handling
+2c03281a5324d4b5b0a46f39bd862da21797f4bd ANDROID: dm: android-verity: allow disable dm-verity for Treble VTS
+87278071fb6be3f2bb2018d29ecf3b42a7098666 ANDROID: dm: android-verity: mark dev as rw for linear target
+f17e3fccae8ed6c2f9cd594bbd06f5ec7ca023c9 ANDROID: dm: verity: add minimum prefetch size
+4460abd2fdc74d836270f0d6c30581e52593470c ANDROID: fs: epoll: use freezable blocking call
+fdf9f87d3014ff96ac07edf9c95a64ce9036422c ANDROID: fs: sched: add a counter to track fsync
+fc573581d74bbc3bb94681d7a17082f8e2ad1e6b ANDROID: fs: FS tracepoints to track IO.
+014610986a187a71473bcfd0507cebcbbf794d07 ANDROID: fs: Refactor FS readpage/write tracepoints.
+f798581e900d8b8a8e056cd3fdb98469aa381752 ANDROID: fs: Fix for in kernel emergency remount when loop mounts are used
+5a2ae5072b9332be08623d3247417c379da66202 ANDROID: goldfish: add ranchu defconfigs
+e21c2138eb773ca81a99840db3fa4f689d72e87c ANDROID: initramfs: Add skip_initramfs command line option
+67d0f63b5a28037a7bcb777d9fb1e80f6e760ccc ANDROID: input: Generic GPIO Input devices
+d79366adec170121ce111e70a6c895be2a0b9ff3 ANDROID: input: gpio_event: remove early suspend
+68bc2040978def7e147dcf1f4380ef3aae53b9f5 ANDROID: input: gpio_input: convert from wakelocks to wakeup sources
+170c890c6d0914f73f29ade8d0e075642789d5cb ANDROID: input: gpio_matrix: Remove wakelock.h dependencies
+fa50e390aa4e9f5596734b01f927e5dca1f19843 ANDROID: input: keyreset: Add keyreset driver.
+8ed72eebf09c47af9218b2f0dca30095e5c0f79c ANDROID: input: keycombo: add keycombo, a general key combo driver.
+5f2afc82f504dfea8707af1c0c1d2ec1b5e3e727 ANDROID: input: keyreset: Changed keyreset to act as a wrapper for keycombo.
+595f7ba388d32fe509b8670b93e871c103b4cf92 ANDROID: input: keyreset: Made keyreset more robust
+9a6baccec822deb0c7d0257c53f3c1a72cafa909 ANDROID: input: keyreset: switch to orderly_reboot
+8dadd301719d7315291624cd7f28aa24e2300eb1 ANDROID: kbuild: make it possible to specify the module output dir
+15c56aac1f3cd1b47601ce1bbc4fe4c9d98d8ef0 ANDROID: kbuild: Makefile.clean: make Kbuild and Makefile optional
+5933bb96ce0cb99c9038c877516bf0b558e3a865 CHROMIUM: kbuild: clang: Disable the 'duplicate-decl-specifier' warning
+e3047f37343f246578d6d534395696e621f09090 ANDROID: Kbuild, LLVMLinux: allow overriding clang target triple
+1ff409524262e30f61307e0a2f3e3ee685c5deb8 ANDROID: mm: add a field to store names for private anonymous memory
+db3a1947c0d65e69aab30ec9e1f03731692f9d23 ANDROID: mmc: core: Add "ignore mmc pm notify" functionality
+07c9d51fd5151a596292d3f02f8883941a686555 ANDROID: net: Paranoid network.
+32e137ee892ce9d314e7c21d19855179f5e5c32b ANDROID: net: paranoid: security: Add AID_NET_RAW and AID_NET_ADMIN capability check in cap_capable().
+101e7a64c22f0213640d05454c8c51968f0f187e ANDROID: net: paranoid: Replace AID_NET_RAW checks with capable(CAP_NET_RAW).
+340fabf67236455e610cbfa94e47346a81ca42fc ANDROID: net: paranoid: Only NET_ADMIN is allowed to fully control TUN interfaces.
+f1d896fd80ce14060390542d0c072b028515b759 ANDROID: net: paranoid: security: Add proper checks for Android specific capability checks
+aacd846e4bd5c8ee1e0b2ec92b6db7e8ea6f1d1f ANDROID: net: paranoid: commoncap: Begin to warn users of implicit PARANOID_NETWORK capability grants
+9d94faa9e20236242e454254624ace914e9b1659 ANDROID: net: ip-sysctl: Document tcp_fwmark_accept
+e5db149038832a43517259a2bd85c8cf6070ceb9 ANDROID: net: ipv4: sysfs_net_ipv4: Add sysfs-based knobs for controlling TCP window size
+b9ea56b0b0d22f7bc13563948ba578bf116ae896 ANDROID: net: ipv4: tcp: add a sysctl to config the tcp_default_init_rwnd
+ec1f3f01a6229983187ccf407f079643b00a0159 ANDROID: net: ipv6: fix crash caused by ipv6_find_hdr()
+0c13a7b58ebcc217a419da1c11fe0f4cd7940c0a ANDROID: net: ipv6: autoconf routes into per-device tables
+eb4ab28c08dc78ac141593a5e66cb3060bee97d6 ANDROID: net: rfkill: Introduce CONFIG_RFKILL_PM and use instead of CONFIG_PM to power down
+a116b28a5364b439306692bdada504cf35ee0c14 ANDROID: net: wireless: Decrease scan entry expiration to avoid stall results
+782cb8c788f2bab0ce0a32ebed5416bb73333c36 ANDROID: net: wireless: wlcore: Disable filtering in AP role
+d11bb14e58bdecafa6d1ba0f448920ac5fc7d6f9 ANDROID: net: xfrm: make PF_KEY SHA256 use RFC-compliant truncation.
+6f7256fc0736c49311bcc20baabc9a7017f8ebe2 ANDROID: netfilter: xt_quota2: adding the original quota2 from xtables-addons
+58b87100d7d22d3a236c37f8a57875108955c312 ANDROID: netfilter: xt_quota2: fixup the quota2, and enable.
+cead6bffca84b298691c58da076022a82af7e6be ANDROID: netfilter: xt_qtaguid: add qtaguid matching module
+dfc23286ff2da055d867b39ab44bf84d98b3c8d9 ANDROID: netfilter: xt_qtaguid: fix ipv6 protocol lookup
+50c2a6d2dae341afcf4f06f6ec59c028f904e73c ANDROID: netfilter: xt_qtaguid: start tracking iface rx/tx at low level
+aa98aba92d80078aebbb54bb1f0703cd61a12da6 ANDROID: netfilter: xt_qtaguid: report only uid tags to non-privileged processes
+118a6fd757400c99ff26a995b02437cdd566c1ef ANDROID: netfilter: xt_qtaguid: fix error exit that would keep a spinlock.
+2e1942bf4e9fcea6750fa47828e0cd08023fe08c ANDROID: netfilter: xt_qtaguid: Don't BUG_ON if create_if_tag_stat fails
+ea746766aa471199661844d54bff6bb20558dcc8 ANDROID: netfilter: xt_qtaguid: remove AID_* dependency for access control
+a28dfae3eab6f568b7ce0f3b515c0dabf161786b ANDROID: netfilter: xt_qtaguid: extend iface stat to report protocols
+f54ca231d961a65ff35b69e7adf475cd27a8c13a ANDROID: netfilter: xt_qtaguid: Allow tracking loopback
+c341ba15cdbcfc775df8ebfca4bceba458637558 ANDROID: netfilter: xt_qtaguid: rate limit some of the printks
+86c2b617f9675cf0861a1f26f14e929d936a86cd ANDROID: netfilter: xt_qtaguid: 3.10 fixes
+bb512927baf562108fe24f2bb8c8c81bc4b4036a ANDROID: netfilter: xt_qtaguid: fix bad tcp_time_wait sock handling
+7563da8a90aa0755ed0b5dbd6358b5ae5dfe3a7b ANDROID: netfilter: xt_qtaguid: Fix boot panic
+46c1fb0553eda63e67375f6cfaa8b914b03e233a ANDROID: netfilter: xt_qtaguid/xt_socket: Build fixups
+086e8b0a8642e31dcc5a4b92074bc18b6f1fa6ee ANDROID: netfilter: xt_qtaguid: Use sk_callback_lock read locks before reading sk->sk_socket
+44de9be0246b71adf6ab34827ba9c758ae9faa55 ANDROID: netfilter: xt_qtaguid: xt_socket: build fixes
+931301645a98f94f13c25f2018cdabf3fc76aad5 ANDROID: netfilter: xt_qtaguid: fix a race condition in if_tag_stat_update
+0a83631a500eb7be968a3192a92a8a6274217617 ANDROID: netfilter: xt_qtaguid: Fix panic caused by synack processing
+eb6fab37ee209ea8752a18e059076f7fd832d718 ANDROID: netfilter: xt_qtaguid: Fix panic caused by processing non-full socket.
+e29268e3e1bb767b7e0ecc005286f3392acdd56a ANDROID: netfilter: xt_qtaguid: Don't show empty tag stats for unprivileged uids
+fe6bc43a5e8411303b6096e8976d87ae052926fd ANDROID: netfilter: xt_qtaguid: fix the deadlock when enable DDEBUG
+3b7f1a55434f3372af1b63f86d095a6ee31d2d0b ANDROID: netfilter: xt_qtaguid: don't check if embedded arrays are NULL
+2079d4c83c284e7956fd5e9f02a6a1e8959c0bf5 ANDROID: netfilter: xt_qtaguid: Add untag hacks to inet_release function
+806542fe875d8d18a6d7f591337d3157147a1aa1 ANDROID: netfilter: xt_qtaguid: handle properly request sockets
+2107a7339729d3f3066fc4a0495650c870c27896 ANDROID: netfilter: xt_qtaguid: fix handling for cases where tunnels are used.
+adcf4c62a4b43828b565ae419f64632ea9e77d1e ANDROID: netfilter: xt_qtaguid: Use sk_uid to replace uid get from socket file
+0bbba996433d3f34b9467c1e66231fa58d7359d6 ANDROID: netfilter: xt_IDLETIMER: Add new netlink msg type
+ac1e26fa745e342feb227cae1a6328bba707d7ed ANDROID: netfilter: xt_IDLETIMER: time-stamp and suspend/resume handling.
+38cc4255d032516eb77fb2cb393159bfbd09879a ANDROID: netfilter: xt_IDLETIMER: Adds the uid field in the msg
+3a6acf342843aacc90afb7ac1c4ff318d09d39e8 ANDROID: netfilter: xt_IDLETIMER: Fix use after free condition during work
+b8c2baef79b591f20a1ecb699d99240f9ca09e33 ANDROID: netfilter: xt_IDLETIMER: Use fullsock when querying uid
+79ff36e448e02bc8caf1e634c79ceb2e103d3173 ANDROID: NFC: st21nfca: Fix out of bounds kernel access when handling ATR_REQ
+4492929d87313f9e543bd4ea5c8a9216f8b66fa4 ANDROID: nfc: fdp: Fix possible buffer overflow in WCS4000 NFC driver
+79b119f8e00c7f57771ed4339c88064596c8130d ANDROID: NFC: st21nfca: Fix memory OOB and leak issues in connectivity events handler
+b03c15908172d4f6804cffc520c07c6f28838f6d ANDROID: of: Support CONFIG_CMDLINE_EXTEND config option
+827b79d0e714c3ada7960b8ce7b4c02fa8f49ab8 ANDROID: arm64: copy CONFIG_CMDLINE_EXTEND from ARM
+12735c7efa049a3d268d326ab447880e9bea88ea ANDROID: power: power_supply: Add custom property for USB High Current mode
+78e3d2305d0ba9cdac3316d6f19f8a2ea39bc5d7 ANDROID: power: power_supply: add POWER_SUPPLY_PROP_USB_OTG
+44cf4d5c5fc0aec8710f8bc239883837e3814d68 ANDROID: power: power_supply: add POWER_SUPPLY_PROP_CHARGE_ENABLED
+62bffebfcd2848faa6d7e85eb4cd9db1d3b177e6 ANDROID: power: power_supply: Add property CHARGE_COUNTER_EXT and 64-bit precision properties
+d99dfffb06d060dcfbd86f5cf0360cfe7de67023 ANDROID: power: wakeup_reason: add an API to log wakeup reasons
+190e5ee5085869007d6f710daa363c17c11d0c2b ANDROID: power: wakeup_reason: Add guard condition for maximum wakeup reasons
+0efcbf6eaef429837eb229f96b44a5a032418a46 ANDROID: power: wakeup_reason: Avoids bogus error messages for the suspend aborts.
+31d5ac8ab75387f1bbbb4a014217ff4dfbc90b35 ANDROID: power: wakeup_reason: Adds functionality to log the last suspend abort reason.
+29c2b1132127d16e2f866773d2f3a6cf758fceb7 ANDROID: power: wakeup_reason: Report suspend times from last_suspend_time
+18f16120c095fbe8c43d9b296b7d1bf122a07948 ANDROID: power: wakeup_reason: fix suspend time reporting
+3e92e6f7d868cc2e4a2b4ea5e2373ea25c9d43bb ANDROID: power: wakeup: Add last wake up source logging for suspend abort reason.
+8353920ff2aa26535cd0014de5269299740381ea ANDROID: power: wakeup: Add the guard condition for len in pm_get_active_wakeup_sources
+5a5233d4149d69f6a1d355d5114e30278c1b21d1 ANDROID: security,perf: Allow further restriction of perf_event_open
+4c04c41a8355311c4c343dbefb408c73ab2b1c3f ANDROID: trace: sched: add sched blocked tracepoint which dumps out context of sleep.
+2df17c38edade7e3c9c71b3312ce4d5e64318794 ANDROID: usb: gadget: f_accessory: Add Android Accessory function
+705bbf6658b8d858a20a1573bc90be8287e87b26 ANDROID: usb: gadget: f_accessory: Add ACCESSORY_SET_AUDIO_MODE control request and ioctl
+5c33a01b223261135e0436520a75a169e2a8c13a ANDROID: usb: gadget: f_accessory: Add support for HID input devices
+63b4eae8bcf99b979d894c6dd1f498e2309302a6 ANDROID: usb: gadget: f_accessory: move userspace interface to uapi
+2d407e7f4e3623cde03e9c159d1488eb88a10a10 ANDROID: usb: gadget: f_accessory: Enabled Zero Length Packet (ZLP) for acc_write
+2e0b3b0eda56d241b749ddd77ebde17dc5a293ee ANDROID: usb: gadget: f_accessory: check for accessory device before disconnecting HIDs
+3569d524d99aeaba37045b90859bf1658a190e34 ANDROID: usb: gadget: f_audio_source: New gadget driver for audio output
+fedd27f62bc2aeff3fea5496e78a54b56e169060 ANDROID: usb: gadget: f_audio_source: change max ISO packet size
+5738b2515e6808557f7dc2c557939c587143343d ANDROID: usb: gadget: f_audio_source: Fixed USB Audio Class Interface Descriptor
+cb4721d4f873df42293d8c46eabcc757d317f4ae ANDROID: usb: gadget: configfs: Add usb_function ptr to fi struct
+a502d26a4f1ff5539049a99f7c33773711f498cc ANDROID: usb: gadget: configfs: Add Uevent to notify userspace
+26c7297e64629cbf88b34ec5e7a0f2cddde38677 ANDROID: usb: gadget: configfs: Add function devices to the parent
+2a7b9db81c9d1dade2b3ccfcd6e373318ea8644d ANDROID: usb: gadget: configfs: Add "state" attribute to android_device
+97ec53f6acb6a7d833912be5f798e1ff3a5ea576 ANDROID: usb: gadget: configfs: Add device attribute to determine gadget state
+246e24d46525d0afbea9757040842ae273e2b1bb ANDROID: usb: gadget: configfs: fix null ptr in android_disconnect
+40b60b4498f67be31f2c9b4aaae153b553f65533 ANDROID: usb: gadget: f_audio_source: Move to USB_FUNCTION API
+9ff1d91d0d24cb142cc2bfed283abf2484b0aeb8 ANDROID: usb: gadget: f_audio_source: Move gadget functions code
+2e8801246794e6818645036147265c4577919003 ANDROID: usb: gadget: f_audio_source: disable the CPU C-states upon playback
+971aa8cfa0e739a60d5433643c55c4eae6118c55 ANDROID: usb: gadget: f_accessory: Migrate to USB_FUNCTION API
+0189f844adf05dc3e1991f39f3c78fa7017839ef ANDROID: usb: gadget: f_accessory: Move gadget functions code
+7331a72597b700caac00467c54128d90954ea94e ANDROID: usb: gadget: f_accessory: fix false disconnect due to a signal sent to the reading process
+a6b8d59fc15871271ae2b5ccc0e1e145e88b3b76 ANDROID: usb: gadget: f_accessory: Fix for UsbAccessory clean unbind.
+e4581510e2ffc0960979d8d6f417f746b3c234b8 ANDROID: usb: gadget: f_accessory: assign no-op request complete callbacks
+395f3ee3e889a19b471a3aa7420375ba218cc706 ANDROID: usb: gadget: f_midi: create F_midi device
+3c02dc9b941b66ef1f94dcb0207f942955681510 ANDROID: usb: gadget: f_midi: set fi->f to NULL when free f_midi function
+ddd84fa18cf1db420f7fc308eac427c8951e13f3 CHROMIUM: usb: gadget: f_audio_source: add .free_func callback
+cf5492a54af24e1f159252e8583a07c215a4487e CHROMIUM: usb: gadget: f_accessory: add .raw_request callback
+b7a02733271a316666fa4197054cc1825f03b89c ANDROID: uid_cputime: Adds accounting for the cputimes per uid.
+011b1a47fa3faf09085088cab78618e929f824f6 ANDROID: uid_cputime: fix cputime overflow
+0543dc58f8412d9720739c51cf6df8f2ca18a384 ANDROID: uid_cputime: Iterates over all the threads instead of processes.
+b1ef21410adc141727e07e7f715127709d39bd90 ANDROID: uid_cputime: Check for the range while removing range of UIDs.
+c244cb4dc3423f28da49ce9f0c601ae2823753fc ANDROID: uid_cputime: add per-uid IO usage accounting
+4ed8012e6b824503db22dc381caafb7e2464b3c6 ANDROID: uid_sys_stats: rename uid_cputime.c to uid_sys_stats.c
+e2fbcbd66863484862974dae76160841543b1add ANDROID: uid_sys_stats: allow writing same state
+1a03d57bcd5f7480d6b74029b347e6f66e51c6b5 ANDROID: uid_sys_stats: fix negative write bytes.
+9425ebfb7fd353f11ea0941b62337ef235f15dd0 ANDROID: uid_sys_stats: account for fsync syscalls
+986fed19565c6a2590f37fc5f9b94072816b9144 ANDROID: uid_sys_stats: change to use rt_mutex
+22ea8e9a7f41866ba040b04eb26c43f686d4050a ANDROID: uid_sys_stats: reduce update_io_stats overhead
+ab444012f0e63175a7b8f20347693d6c0f76ce32 ANDROID: uid_sys_stats: fix access of task_uid(task)
+14d2876e8b183deed18c823d15ecc8f71df27f83 ANDROID: uid_sys_stats: defer io stats calulation for dead tasks
+8224b3f8273c5f62e50e9b3dbc1ccd3f21c99aa3 ANDROID: uid_sys_stats: Kconfig: add depends for UID_SYS_STATS
+e56801d187fef48c64ee4fe160ba7fe7522d6fa2 ANDROID: uid_sys_stats: check previous uid_entry before call find_or_register_uid
+908e265591cb3ca3d654c20e17f8d71d94fa7bb5 ANDROID: uid_sys_stats: log task io with a debug flag
+883e6224a6467c1a2543320c8c865f0f99ca7cd4 ANDROID: memory_state_time: Implement memory_state_time, used by qcom,cpubw
+d2e73f8ee178bc31d802ba4c7f87f1421e9a31b4 ANDROID: memory_state_time: fix undefined behavior with missing DT properties
+1861f3b746f90ebe2881bf67fa5f4c571305ac3a ANDROID: initramfs: call free_initrd() when skipping init
+9cc4eea2090d865f22ae5d012de18eb3c70b6ea2 ANDROID: netfilter: xt_qtaguid: Fix 4.14 compilation
+524d3b845299150413afa0a1eb1e5c05d1f329d0 ANDROID: uid_sys_stats: fix the comment
+4bab34f98a179135efd7a3e34c5aa267cd3e2a05 ANDROID: Fix script to fetch android kernel config fragments for 4.14
+66e43f275194ee238e3f6bbbf6331bbb441638aa ANDROID: vfs: add d_canonical_path for stacked filesystem support
+ab5ee48e3076dc2b41391010cd5f422dfb24b543 ANDROID: mnt: Add filesystem private data to mount points
+71039a6650c56ab55395fafdd479c6aa85d18ec3 ANDROID: fuse: Add support for d_canonical_path
+8385c8dad565a4d4946d480db9de2e806a5aa21f ANDROID: vfs: Allow filesystems to access their private mount data
+7aba20d098aece0485962d4543539f093d6e594b ANDROID: vfs: Add setattr2 for filesystems with per mount permissions
+c8f8e45939d51eada867ffef02844f9c3f59abc0 RFC: ANDROID: vfs: Add permission2 for filesystems with per mount permissions
+81ddfe894887b712089b83456095865ad0d58c2e ANDROID: xattr: Pass EOPNOTSUPP to permission2
+69513bac7694f31c43c8fac9f61d360a7f0fb081 ANDROID: export security_path_chown
+8a865d60dec948f7c5955a596576c24bcc1ff4a1 ANDROID: fs: Export free_fs_struct and set_fs_pwd
+8a97e81e631ff3659d610ee5ad78e3a048d3496a ANDROID: fs: Export d_absolute_path
+6db7cb817c3feace57ca382d081b6638c1bf7251 ANDROID: mm: Export do_munmap
+80a0776f32ba992a88d3c3cbd0874314a86e6813 ANDROID: fs: Export vfs_rmdir2
+d440e09ca08ebd9b8454b70bd97f9b5a89488655 ANDROID: Revert "fs: unexport vfs_read and vfs_write"
+b07c5e2109813ec9569eec7fb0234e596cfbbd19 ANDROID: fsnotify: Notify lower fs of open
+fc2a44d63037cdf66a8f2298e2a8606f85f3f392 ANDROID: qtaguid: Fix the UAF probelm with tag_ref_tree
+dd61e08e1c0885aa0a1b4803d0872ac44e023ab8 ANDROID: uid_sys_stats: Copy task_struct comm field to bigger buffer
+a26dffe777a3a846d5b2935166ae3dbe825b3c01 ANDROID: arm64: Image.gz-dtb build target depends on Image.gz
+29175117c6de05d27c06ce292661d84ac468b32c ANDROID: fuse: Add null terminator to path in canonical path to avoid issue
+e2790d9fe59b4dcbbf90491937cc0d069ea7f440 ANDROID: cpufreq: track per-task time in state
+d0c141fc0b09abe202fce90f4ea041cb0d387f50 ANDROID: cpufreq: times: track per-uid time in state
+c1bd2e2d4e1d6e84a9bb67d64d38306a53abaa90 ANDROID: proc: Add /proc/uid directory
+d70913e3dbfaa6fad0f56a4c98ce45dfa5a59901 ANDROID: cpufreq: Add time_in_state to /proc/uid directories
+f534d2c1abd64457a6ba72ef2d908a21d1079b72 RFC: ANDROID: add support for clang Control Flow Integrity (CFI)
+cfbe23a46c750a7fd97725bcfecb2626dc4d5cca ANDROID: kallsyms: strip the .cfi postfix from symbols with CONFIG_CFI_CLANG
+e7cc778566d45fef5d800cf2746f327b3bf22eab ANDROID: arm64: disable CFI for cpu_replace_ttbr1
+9b61b6457e4bf3d6d151029f83b9fe503cd84e6a ANDROID: arm64: mark kpti_install_ng_mappings as __nocfi
+73cdb35b8c87eff3b6831ec069d1693cfc476ac1 ANDROID: arm64: kvm: disable CFI
+1aa80ede3f44acce28f067bef1d1d66b9aeaf458 ANDROID: arch/arm64/crypto: fix CFI in SHA CE
+8764a162e7ae3940b63bc7ac0cb72ec8a418e51c ANDROID: mm: fix filler function type mismatch
+4f5883a360ed4348bd86b9a65dff9d617695e79f ANDROID: fs: fuse: fix filler function type mismatch
+3af1bb9b3864dff0cb2a51e34437e2c46ababe98 ANDROID: fs: nfs: fix filler function type
+a38569793e457a59852e59ef684108d0b7d583f9 ANDROID: fs: afs: fix filler function type
+331f1ecfee7b01be707b4339bab63cd1a9ae089a ANDROID: fs: exofs: fix filler function type
+beda7a698000723a7cedf24f3a92d6097950d815 ANDROID: fs: gfs2: fix filler function type
+e6b4f0e95efd47d9f27c9efc7a454abd109dffb4 cfi: print target address on failure
+9fb364b1f14c7342b39ab990c552759f4a6eb944 ANDROID: proc: fix undefined behavior in proc_uid_base_readdir
+d146e85102bff0aca14f34bbaddd23fda97b4747 ANDROID: add extra free kbytes tunable
+7f580f9692d4006e00f80b516317514043446a50 ANDROID: Add kconfig to make dm-verity check_at_most_once default enabled
+769b81447964b283455dfef8e6780aca6e3bd2b5 ANDROID: xt_qtaguid: Remove unnecessary null checks to device's name
+94ba58c667bc9ad5eb685bd02036725ab092df3a ANDROID: Reduce use of #ifdef CONFIG_CPU_FREQ_TIMES
+3d05e2b89dd039d16a9e587cb9e4803691934d79 ANDROID: Fix massive cpufreq_times memory leaks
+af44575e10cd10e4d6e928eef98fc4b2fdbd167a ANDROID: mnt: Fix next_descendent
+aa02bd7bac6001fccc19d4cf0f8092a679e8f56c ANDROID: uid_sys_stats: Replace tasklist lock with RCU in uid_cputime_show
+c5f95d67b8c8496d4d80af843679cc451aaff21d ANDROID: verity: fix android-verity Kconfig dependencies
+4314bfd9311d20c7bf6a60817ae8486ebe81b38d ANDROID: android-verity: Add API to verify signature with builtin keys.
+6d580165ebc90ddd84dbcdaa7ab08d05b7f1f6c1 ANDROID: android-verity: Make it work with newer kernels
+b6d6c02c6b2a0cbdd092682f45fab0cbb2e88b15 ANDROID: android-verity: Fix broken parameter handling.
+ab9c3785e0ce459ba0ad3456b5780af4f2cb01ce ANDROID: verity: really fix android-verity Kconfig
+1183bbba7c80acfb5ab39443e9401c47c8ed153b ANDROID: ftrace: fix function type mismatches
+08a4cca3eb2c9ef739ec6bdf6f6b7f628a66808c ANDROID: remove android config fragments
+4efc65000a81093da4f34103e36d21d5b9330d90 ANDROID: AVB error handler to invalidate vbmeta partition.
+9553cc58b570faf1440cc99084487ec4cbe4bb3e FROMLIST: ANDROID: binder: Add BINDER_GET_NODE_INFO_FOR_REF ioctl.
+2908dea2972f20a41357c85913c0a7e6b6af0de8 RFC: ANDROID: net: ipv4: tcp: Namespace-ify sysctl_tcp_default_init_rwnd
+335d351f9a3fca46887c221ea370e0fbf41e7d1d RFC: ANDROID: net: ipv4: sysfs_net_ipv4: Fix TCP window size controlling knobs
+d8b07a6df7b31df2404fe729ac0e94e3824bbbca RFC: ANDROID: proc/uid: switch instantiate_t to d_splice_alias()
+0da3f8bffddae46dc93ccfc6d53012075a9c9c8c RFC: ANDROID: net: ipv6: Flip FIB entries to fib6_info
+e87dd67087a7c7bcfc5c15fca5c428a29ff33517 ANDROID: sched: Prevent unnecessary active balance of single task in sched group
+68ae68cf208110d2a9b48cb52b81b61b0a1b1c78 ANDROID: sched: Enable idle balance to pull single task towards cpu with higher capacity
+533246b36cd2fbf21bdf27ae432e2fef5d248128 ANDROID: arm, arm64: Enable kernel config options required for EAS
+fa4bc9d3939f4f9c53494c774fb8b1a5ae8c1ea2 ANDROID: arm64: dts: juno: Add dynamic-power-coefficient properties
+b458f5c1fcb6d419b9ddf965b90ee9d62dc31b3a ANDROID: arm64: dts: juno-r2: Add dynamic-power-coefficient properties
+83ea98470e0f045882fc1f7a2d509dcfc4d3806c ANDROID: arm: dts: vexpress-v2p-ca15_a7: Add dynamic-power-coefficient properties
+db2c7b5383569d772d9243e0d54625cc9627d739 ANDROID: PM / OPP: cpufreq-dt: Move power estimation function
+c9fed0e335aca24293833b08dcfee1eb2408020d ANDROID: cpufreq: scpi: Register an Energy Model
+2f1b4e910132b312ca4faaa3aa8b62a62fa4239b ANDROID: cpufreq: arm_big_little: Register an Energy Model
+ae25c14257e41aedede3263e73394407a7ad3bff ANDROID: cpufreq: scmi: Register an Energy Model
+7f1f9ec72cbbd80470f22591009960ade9b40eef ANDROID: drivers: Introduce a legacy Energy Model loading driver
+ab0884a85ed9e5ae06085a692b0892bc3552241a ANDROID: sched: Turn ENERGY_AWARE on by default
+b0d19c6f6707e0ddcd6bd5a243f67301582eea00 ANDROID: sched: fair/tune: Add schedtune with cgroups interface
+0241b5c1dd5280cfb32d40e59d1f19a8d50450d6 ANDROID: sched, cpuidle: Track cpuidle state index in the scheduler
+c7514c50aeb82ea91af32ba4deb0eec9497e7ae6 ANDROID: sched: Introduce sysctl_sched_cstate_aware
+de9f4a46d6e886123a8007f82df70752a4487923 ANDROID: sched/fair: Factor out CPU selection from find_energy_efficient_cpu
+506c98d03f5707d57954308913cb7bab8fa9157e ANDROID: Add find_best_target to minimise energy calculation overhead
+eae9b65189f789c5dcc38165fa2faf8ca09e5810 ANDROID: sched: Unconditionally honor sync flag for energy-aware wakeups
+586df0cbb58ce73b3d146c00d5ef3f903c3ac2a4 ANDROID: sched: fair: Bypass energy-aware wakeup for prefer-idle tasks
+3274870a50a81b24576cfca22989355f813aaf6a ANDROID: sched/fair: Bypass energy computation for prefer_idle tasks
+e905babfb75bcca7d02fb93c81071d3c7e4cdfed ANDROID: sched/fair: add arch scaling function for max frequency capping
+1f9816a5e198bdcb088ce91303787b62a1931dea ANDROID: implement max frequency capping
+992a35b68fd611b27f633d29cb938a49533edf34 ANDROID: arm64: enable max frequency capping
+da81b1664b8609bb621f1d9b92b1e639dd6f5ce1 ANDROID: arm: enable max frequency capping
+2b98b9f66c93cd11289ffe3ff3098c34800b06fc ANDROID: sched: Update max cpu capacity in case of max frequency constraints
+0a2cde6addd0e540c460aaa98425b330f2daeffb ANDROID: cpufreq/schedutil: Select frequency using util_avg for RT
+0371b85909cecd58c6e80c30ed2f1cd75878fbd0 ANDROID: cpufreq/schedutil: add up/down frequency transition rate limits
+230892083c461b0693b8da2fcca0dd3d0b8f2c6f ANDROID: sched/fair: Attempt to improve throughput for asym cap systems
+0280c058bd3947d1af300f718730f0e057af4217 ANDROID: sched/fair: Don't balance misfits if it would overload local group
+ae199ea80460fef10de54464a4b51d8d7115fdf1 ANDROID: sched/fair: Also do misfit in overloaded groups
+28a853d05f4be9decdf9e52e6428939efa99ee66 ANDROID: sched/autogroup: Define autogroup_path() for !CONFIG_SCHED_DEBUG
+b78853a18f0d6e87850203751b76b514792f8f05 ANDROID: sched/events: Introduce cfs_rq load tracking trace event
+b9539156e26dfda9acb598d10b57c793d4e3c824 ANDROID: sched/events: Introduce sched_entity load tracking trace event
+1d4ab0419502cc3ed1092c39734078089010f392 ANDROID: sched/events: Introduce task_group load tracking trace event
+139227f24a89d529c550d078ce2dd7a7c0d3d667 ANDROID: sched/events: Introduce util_est trace events
+de1a5d321f391637a2e7269f3b5f93f9cef49dbf ANDROID: sched/events: Introduce find_best_target trace event
+2bc526ced77d42affa952312f0df3c6477989154 ANDROID: sched/events: Introduce schedtune trace events
+c1ccd1a749b2a7144a5cd819851d859e9277149b ANDROID: sched/events: Introduce rt_rq load tracking trace event
+397ca1f1f1e533de46065fd78da8deea5ad28a33 ANDROID: sched/events: Introduce overutilized trace event
+a0d030332eedf00a566c16a29ee3fff32d2d98d1 ANDROID: arm64: defconfig: Enable CONFIG_SCHED_TUNE
+f368f3ff93fd6a25adc266105cdb81f11e6b55a6 ANDROID: sched: Make the cpu_util* accessors available without sugov
+a108fd39624b6670f8b0f24e6536c02f5768bd4a ANDROID: sched/rt: Add schedtune accounting to rt task enqueue/dequeue
+d628a56e9ea499cdd325a8df27937d129d822009 ANDROID: Add hold functionality to schedtune CPU boost
+8d3d5d5441c57a2ceb645fd373998967317b3ab4 ANDROID: thermal: cpu_cooling: Migrate to using the EM framework
+d1d415086d58d07d0389913d03161fe44c98f40e CHROMIUM: config: add configuration files and infrastructure
+1ad808161915b4eff61acff528449812066f5238 CHROMIUM: Ignore the top level build/ directory tree.
+a8201cabbadc603731e814239c072676200dbeea CHROMIUM: setlocalversion: check for .scmversion in output dir also
+0ec7407e7c9dc86df1f332f39c89966e451f991a CHROMIUM: add PRESUBMIT.cfg to disable various checks
+80923f6939925ebb43a96ad110e54d3269f0d9a7 CHROMIUM: Add file containing known smatch errors
+e4edd2cca108d7779abb28b94b965b6ab2e3e26d CHROMIUM: chromeos: Add script to update smatch error whitelist
+f59797e01339dfebf44e6d488bd250bd9ffe3cd4 CHROMIUM: generate_its_script.sh: script to help create Image.fit files
+5020dc5f71bdd287b2fa079d63aebb1239a30f07 CHROMIUM: Initial Add initial COMMIT-QUEUE.ini for v4.19
+2af4c2ed8e33cb4f325bc481e0a2bd27e58b5714 CHROMIUM: config: update configs to latest in 4.19
+e7343b21d0899218178d7ad1ad5eaa2f7f0d9953 CHROMIUM: config: Normlize config for hardended usercopy
+5b5dc56fd23956864484edf3a5558784709d0beb CHROMIUM: config: Enable softlockup detector on all platforms
+b98c496276911b8bbec2dcba7f9ef0b8e2c3866a CHROMIUM: config: Build in i2c_chardev on qualcomm
+285b338603323fb89105c19fa95e77f78a37bc71 CHROMIUM: config: disable CONFIG_EFI for arm64
+86f750c3b06aa545ae8f46521dadb23453d13b17 CHROMIUM: config: disable VCE block in amdgpu
+164714675cdcef9a79b86668cf3746667042b4cd CHROMIUM: arm64: dts: qcom: Add smd845-cheza(-r1,-r2,-r3)
+89529daf0cb1cec03b17cc2855460d8cb1e42e9b CHROMIUM: arm64: dts: qcom: sdm845-cheza: Add qspi nodes for SPI flash
+280e8b8160c57c62e4d1b15d44c872962fe043a9 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Enable uart6
+46b120921fd0e0e5f9dc768ee95fbbd1f557710e CHROMIUM: ACPI: Read TSC upon resume
+a00c61d31e05fa1dab491251e416ad7886ad3ecf CHROMIUM: acpi: thermal: initialize tz_enabled to 1
+7d16e871852c68252b9e79f01f9ad02bb7fd45bd CHROMIUM: acpi: thermal: honor "mode" sysfs file setting
+d4e59ea0a52d6670d4c821644f4469869a166692 CHROMIUM: bluetooth: set advertising intervals
+a040ef0d1f2a4e93c1ee05cd9d1a53d4aaf6b606 CHROMIUM: bluetooth: update advertising parameters for single advertisement
+e142b69f5f3bf3bf7840fc25082d785df022432a CHROMIUM: bluetooth: enlarge supervision timeout to 2 secs
+38bd006f614b5438b800f9d19a2566ad1f432f45 CHROMIUM: bluetooth: disable SC - it is optional anyways & fixing takes longer
+0365ba6bdcd1b97c806a3554a3412dbf595c8390 CHROMIUM: Intel BT 7265 - Fix the firmware download issue
+9002799485ee393f63dad68838d7237e0859f5da CHROMIUM: Bluetooth: btusb: Avoid race condition during controller recovery
+f6e3ef262c637be946961e7d9326dca2ff986471 CHROMIUM: arch: x86: configs: add initial vm defconfig
+0c0040e9a4346c8d82f7c952dad4fde6c4a25b19 CHROMIUM: arch: x86: config: enable CRC32C_INTEL
+818ba3ff9006a4d8f22f8d790778e841f3126be8 CHROMIUM: cpufreq: cpu-boost: Add cpu-boost driver
+7087abb8f84f9a05ac26df33c99d81a7b2ac2468 CHROMIUM: drm: Add drm_master_relax debugfs file (non-root set/drop master ioctls)
+c4a71443b8e827652a65df9d7502039d90fef506 CHROMIUM: drm/virtio: prevent attaching resources with no id
+ffa1334655bd357a5891ab5e439bd25ba20068cf CHROMIUM: drm/ttm: Remove wrong warning
+7a591e78c4e5da16c4dd1cb8fb96bdcafea914c0 CHROMIUM: drm: Allow DRM_IOCTL_MODE_MAP_DUMB for render nodes
+4b861ca41c0ced061eb99c1043f765b770344408 CHROMIUM: drm: Allow render node access to KMS getters
+6b7d1c7febbea10eca095c7c47c6b18bfaeb1a78 drm/evdi: Add atomic evdi drm module
+172fd2adedfbeb4358d2d8cb1c84015eb34871a9 FIXUP: drm/evdi: Add atomic evdi drm module
+6ca9e58fea1b637560e2174b32e2fb80f674adc0 CHROMIUM: drm: Allow DRM_IOCTL_MODE_DESTROY_DUMB for render nodes
+b303c6455c178a647340cd5e75fddbdf57cc697a CHROMIUM: MALI: Bifrost r13p0 EAC release
+2156121cd31a8bc4e3ac87a126c6f876cf48c334 FIXUP: UPSTREAM: drm/bridge: add support for sn65dsi86 bridge driver
+08d1535a122788ad4d22124454764535a9e9bdc5 drm/evdi: remove dependency on CONFIG_FB
+784168785750b1551eda8743dc636a7829549d09 CHROMIUM: drm/mediatek: Add interface to allocate Mediatek GEM buffer.
+40d4fd1a02ec46c9877cd65d79ec2544c81c00b5 CHROMIUM: MALI: Bifrost r14p0 EAC release
+e38c8e5486c6a8658b7a368cc1ca0d7969744069 CHROMIUM: drm/virtio: implement gem_prime_mmap
+a61d32cc061da3eea2c49c40280c6c4a3a8cb529 CHROMIUM: drm/i915/gen9: wait until SYSTEM_RUNNING before loading DMC firmware.
+1d0d4999830b90125416594afdd3a11d82058179 CHROMIUM: i915: prevent brightness from jumping up on enable
+adc1ed1c45b0bc8f9ad3b0450e41f1acbf00d86d CHROMIUM: hid: quickstep: Initial add of driver
+b101b37f0d1b63c161e66456237d37c0a0cccf76 CHROMIUM: HID: input: implement inhibit support
+ec1c501a8093fed44a6697a5913ef2765f518e1f CHROMIUM: thermal: add thermal logs in devfreq_cooling and cpu_cooling
+f2858aaf489dc060a2e828397dfce994f46822a0 CHROMIUM: thermal: ratelimit thermal logging messages
+a257153c52df5bafc9c5fefd3f7f14e8ee4781bc CHROMIUM: thermal: mark ratelimits as static
+ea272bcfc9035dbbef92bb512179026d0db9f6ce CHROMIUM: thermal: Add notifier call chain for hot/critical events
+43ae5b88a99a0d6809e2925ec9fe75aae1cb4761 gsmi: Fix bug in append_to_eventlog sysfs handler
+096c21a07c40e0cd72bf83a5c67b7353ab621a99 gsmi: Add coreboot to list of matching BIOS vendors
+9be4a37c2f01c57a28f10d29644da3ed98b6721a gsmi: Remove autoselected dependency on EFI and EFI_VARS
+aaa9760fa917c46ec93110282adb45d32fd1d80f gsmi: Log event for critical thermal thresholds
+211b276227e6c158b02318c371d48c96bbaf8805 CHROMIUM: drivers/firmware/google/gsmi: Add GSMI commands to log S0ix info
+08f451ec2e87dd0b80a4046f68dfe0fb28a4f84d CHROMIUM: security: enable VFS link restrictions by default
+70d95150a72b9ea134e5dec0aba756a309477820 CHROMIUM: mm: implement /proc/<pid>/totmaps
+cf7885268516ac2f0db0cf8ed33e42b2f7c68acb CHROMIUM: ecryptfs: Have the kthread open the lower file under SELinux
+69b200ee3a737b49df77231bc32340d14e2af048 CHROMIUM: ecryptfs: extra printks for metadata reading errors
+68810aeb5878af6fe3fd1ef5c79efd3479098a12 CHROMIUM: vfs: Add support for superblock-level drop_cache
+52b163f27d2e434a8badfc74af705e61f0bfadaf CHROMIUM: fs: Import esdfs code
+3976de82bc8f5fae593391a6b94a30e15d28f180 CHROMIUM: esdfs: Clean up for Android
+d99eb4d809c342b6c7a611c04989a1aecd169b50 CHROMIUM: esdfs: Always init the sbi list
+89f2aba490acc8d23e7844a526d1bfc255f957a5 CHROMIUM: esdfs: Switch to pkglist
+28b9bc9bffa71d83fa8c9c7eb3d8ae423e273c29 CHROMIUM: esdfs: Add compatibility for user namespaces
+a72c7e4424bc84f264b58fe6a78ddd029d625bd8 CHROMIUM: esdfs: ensure private data exists in kill_sb
+570210390a79a64a6886db61c43c2d4d0ba912cd CHROMIUM: esdfs: Call lower fs's revalidate
+4bab448ce8bc87efd0354021873c89e88cde25b5 CHROMIUM: esdfs: fix esdfs_destroy_inode for the inode RCU approach
+f8c25db562b0d953b622250addbe7aeef7634551 CHROMIUM: esdfs: Allow non-owners to touch
+b73623447c58a35489997ec59150200d0dfdd0d0 CHROMIUM: esdfs: ->iget fixes
+6ed356f75bde2c0698e193b125bbdb45bfd8ee30 CHROMIUM: esdfs: Don't do d_add for lower fs
+e63529318e03341bf54a10b81d783b466d471fa3 CHROMIUM: esdfs: Add support for d_canonicalize
+f7a5bb9ed01b4a2276f7c7d7d7869c6f04b31186 CHROMIUM: esdfs: limit stacking depth
+dead823e37d241eac539f99bb3fef9102d959ee8 CHROMIUM: esdfs: Change inode matching for obb files
+9b180a0271810ec6c02fb386472f4d12088f2b88 CHROMIUM: esdfs: use d_splice_alias
+5955aadf5b6d9825ce4cb1e6d6d3547de2d860df CHROMIUM: esdfs: Use mount_nodev/kill_anon_super
+a82514c450d9c7a3582092dab98a911f68ddf703 CHROMIUM: esdfs: Switch to qstr_case_eq
+daf691dd96cd1e980336126af0bfed753416a408 CHROMIUM: esdfs: Add lower uid/gid modification
+da369595a447f18a84d0731d8d67138ea256dea1 CHROMIUM: esdfs: Add sdcardfs style options
+0a5d8c6147005d472b1439bb8a8b271bab0049f7 CHROMIUM: esdfs: Add default_normal option
+bef1703e171f7efadf354e0f2aad3d52a0d2be8e CHROMIUM: esdfs: drop dentries on d_delete
+6443450580f0e3d546a84be01aa75eabfedf06e5 CHROMIUM: configfs: inherit file and directory owners
+b21571bc1455f78e4d7f7bbb98c57d7f5ebef4f2 CHROMIUM: esdfs: Fix default parsing
+d8a34640927dc21d3cf9d4ba06fb55527d6ef15f FIXUP: CHROMIUM: fs: Import esdfs code
+d367e70e4bdca72dfb092662962f36385fbb40be CHROMIUM: ns: Export user namespace helper functions
+24ee8019f75ee4e359f57e1e5f2535db5b40b623 CHROMIUM: esdfs: Add option to set base namespace
+9a1e0c9466e0f376460ff82b260080cecd299c51 CHROMIUM: esdfs: Interpret options in current ns
+0cd22e78885f5cf2291c07749b97598b1708bd8c CHROMIUM: esdfs: Check for d_fsdata earlier
+dea9df3d413415c03f7e1afa9f7dd1609907a8da CHROMIUM: esdfs: d_make_root calls iput
+65665b38f30870b6a4659bafe2fc562845bfe1fd CHROMIUM: esdfs: Set s_root to NULL after putting
+378dbdc22a4767de7df4e5bf5aed297438f7d410 CHROMIUM: esdfs: Add support for special download folder
+82f462fad3e3e98e900aa105db4d29a567a53b86 CHROMIUM: esdfs: use lower path for Downloads
+881d03ecb750df421f4c2ed1a28dd88d016421fd CHROMIUM: esdfs: setup default Downloads permissions.
+26425f66f343bde59c42f6f61d9d2f667b51fc23 CHROMIUM: esdfs: Fix lower ownership for OBB files
+9e9a6653ab2b480a124f4ad79bd5d7feab3e0baa CHROMIUM: esdfs: Don't cache unused entries
+b70bcf396b02fb74fc69635926b8ad97a1b28ae4 CHROMIUM: esdfs: correct dentry name hashing and getattr.
+23f2bb7927c105fe2dd9d82410183013695317bd CHROMIUM: drivers: Create pkglist for configuration
+c08d613f6c731213e58038067c167a0597d889cc CHROMIUM: pkglist: Add dependency on CONFIG_FS
+70e3a8051925c6e35d381dfc279e3a5e54b6a37b CHROMIUM: input: Add "inhibited" property for input devices
+1a6ca4bbb55651fe4ce6f768f9e5567ea04fd091 CHROMIUM: Input: elan_i2c - add support for inhibit/uninhibit
+68ae969232ab62b0d886a6aa081a881a9da39b86 CHROMIUM: Input: elants_i2c - keep regulators on when unbinding
+8911c6a7d3c9c91e52db1b6bb59dad0bd1f7f3f8 CHROMIUM: iio: core: Add double tap gesture
+7d0ce9125f97fcef06366a97fad2f43bb18d1914 CHROMIUM: Make tsl2583 do async suspend/resume
+58f6309e66f450baadde77bacde2c6c2d08593be CHROMIUM: acpi-als: Add a tuning parameter interface.
+6d0b2ac541616c24920c0906a01186eb2cf3106f CHROMIUM: platform: chrome: add ChromeOS specific platform functions
+29b21088e384788a66c4e7fca4ec7a69465de1c2 CHROMIUM: platform: x86: add ACPI driver for ChromeOS.
+353a450e7124b455d7dd0e2c47dc78c75ec42066 CHROMIUM: platform: arm: add firmware driver for ChromeOS.
+2151ca7ce88e92f3cfcd1cbb6e2cb3bd6f133507 CHROMIUM: platform: arm: add event log support.
+4b208bef8954b096da2f8e1e1ea19cfa2bd84c97 CHROMIUM: iio: cros_ec: add support for single sensor hub FIFO
+72e1ef357ae8a9ef9181c43d5a553ee6d8716537 CHROMIUM: iio: cros_ec_activity: add activity sensor driver
+412423fb5d016c1caf79c634e01dc463f118745e CHROMIUM: iio: cros_ec: add comment for cros_ec_sensors_read_lpc
+ae643ed73b309d99fe71477dedecb2a773e7074a CHROMIUM: iio: cros_ec: Avoid out of bounds memory access
+a5665ff73700f197b141df07c097a073e9693ac4 CHROMIUM: iio: cros_ec: use core mutex in sensors_ring
+2f6b0664a9f5ea07f85a23fea9a9b24bb6f54d94 CHROMIUM: iio: cros_ec: Add protection in FIFO processesing.
+1277410a52897dce577d24aeb5879cf947f3448f CHROMIUM: iio: cros_ec: Drop unnecessary include files
+b5a9d2e4988bac57c09dcd7cc6018811b7126860 CHROMIUM: iio: cros_ec: Readd 'id' sysfs entry
+cf009b066d0d1a309b1c2fbdaba8b91c2494b616 CHROMIUM: mfd: cros_ec_pd_update: Add driver for updating of PD device firmware
+9e3fd8aabbd3e6e34a544266ed38446d099a4589 CHROMIUM: iio: cros_ec: Enable EC fifo int when buffer is used.
+ffe1777ac23185d402c932530cf6c13576f94269 CHROMIUM: iio: cros_ec: Fix a kernel panic when processing first ring message
+9db29185a6b77f109d3f8e17f54a203bec3a93e7 CHROMIUM: cros_ec: instantiate properly FP MCU device
+c9169223020420ba6fb8dc37a70a556bc6ae8c82 CHROMIUM: cros_ec: instantiate properly Touchpad MCU device
+278b15c3f431609a41c42abc705e183772d945bc CHROMIUM: sensors: add extra sensor API
+ffa138380bcd0e6e17b336cc4a9e76d7bb24ea6c CHROMIUM: cros_ec: add a poll handler
+e1140600db9d06da9cc50a5eb6ad8bea88b52359 CHROMIUM: input: Add walker for buttons/switches map
+a64ff8a626a71bea39354f05c7acbe2a5909300c CHROMIUM: input: Allow buttons and switches only
+77d6f83773eaa29a86d1dca554a20c5a19ef45a8 CHROMIUM: drivers: input: keyboard: Enable cros_ec_keyb driver for x86
+31e48ca2503ce8a195ea04acbd6260c65f25a5d9 CHROMIUM: cros-ec: Update cros_ec_commands header to latest version
+b55898fcf41a3539db5134d2a73916de78271718 CHROMIUM: iio: cros_ec: Add synchronization sensor
+9554fa9c4c3adecc67290892da106f6bd7c771da CHROMIUM: platform: arm: Let OF core populate platform device
+b8a2ab15a9d156cd5a94050ee65c9aaac4d71473 CHROMIUM: iio: cros_ec: Fix gyro scale calculation
+1a0373bc918e46a517ce954cd586fb29f231d3d9 CHROMIUM: md: dm-verity fixes chromeos needs
+ebb4ffd1988bcf16db07dfddc7f298ca42f5dedd CHROMIUM: dm: pass up rotational flag
+a1cdacae514011c2084ea934ef542e8ea7a1fa30 CHROMIUM: verity: bring over dm-verity-chromeos.c
+6baa6f90445a7a950c97023b805513123dbd04ff CHROMIUM: dm_verity: speed up boot when not using verity
+b157332aa0375465d547dfcdbf2b63ebfb3ca51b CHROMIUM: drivers: md: dm-verity-chromeos: Fix bio ops and flags
+a20025df61fc5d5d149224df803686ee94d45799 CHROMIUM: drivers: md: dm-verity-chromeos: Add proper error prints
+25eb6c973c27559737d12ce105c7ac349e5f8279 CHROMIUM: v4l2-mem2mem: allow reqbufs(0) with "in use" MMAP buffers
+5b47324d523d47ae239248210478e8cb744ab971 CHROMIUM: vb2: Don't reuse USERPTR buffers.
+699387c88734568852d4eb5a2ce1076af6198f0a CHROMIUM: v4l: Add V4L2_CID_MPEG_VIDEO_H264_SPS_PPS_BEFORE_IDR
+448a1c8f8c465d745e02bf791812184d95793b18 HACK: [media] vb2: Don't unmap a dmabuf while dequeueing
+bb259d03c0e4f95e85f05cb9775759fe082fca5e CHROMIUM: Restrict swapon() to "zram" devices / lock down zram
+179b15db55fc3642a8e9f0e97e15cfe8a74a406e CHROMIUM: mmap, sysctl: add sysctl for controlling VM_MAYEXEC taint
+89587e9d1c30b5f908d4bfe5f2ee0b920c156c14 CHROMIUM: Add /dev/low-mem device for low-memory notification.
+cd6dae3cd4637d08bf6f4672f87fa9929fbdf155 CHROMIUM: low-mem: improve detection of low-memory conditions.
+8fb71ef7b6eca2909f181f58a7b98abf3999ed86 CHROMIUM: low-mem: Fix incorrect logging in debug code for low-mem-notify.
+12a973b9646dbef30fb7b601a240e7f296ecdd46 CHROMIUM: low-mem: fix sign of free memory calculation.
+405e19006b0fe50db4eae70c0ea4e52ddbea3ce4 CHROMIUM: change low-mem to chromeos-low-mem in /sys/kernel/mm.
+1fa6b9516423e6b184dffc1798337a1300132a4f CHROMIUM: low-mem notifier: lower default, change units, enable disabling
+8249734249c731b5227a8f0b40c8ece82154b2b7 CHROMIUM: low-mem: add "on" command and fix error case
+fa92fb263868747ae7c64d8e7ca0fe51ac83709e CHROMIUM: low-mem: work with swap enabled
+d950f3448614c16a878fa628757327bc398ae6c7 CHROMIUM: low_mem: Use get_nr_swap_pages()
+d2902ec012e87d49a831499cdb019d067e8dea91 CHROMIUM: vmscan: add min_filelist_kbytes sysctl for protecting the working set
+7d8e3cf4dc72f8dc411717b1a7aaf6aac344bb41 CHROMIUM: Consider min_free_kbytes in low memory notification.
+36c695647e8c2e20538c0c75f799717a72f11aac CHROMIUM: mm: lower oom dump burst limit to 1
+705c56164a14f2d65c1ecbb4923c18f3b510c6c9 CHROMIUM: low-mem: Add "available" sysfs file.
+950d9e4560cac988755997978e1399efd1546a74 CHROMIUM: low_mem: make ram_vs_swap_weight configurable
+1968c6db14a57d59d3fd80a9e85e77cb1b549d28 CHROMIUM: mm: vmscan: Fix redundant scan loop when file page count is low
+825100e54c02cdcb73fb03dc7910488c6b7b0020 CHROMIUM: low_mem: fix file_size underflow
+2488af57d2421e5a6332bd829f4282ccbbe8959f CHROMIUM: mm: Allow file page scanning when swapping is disabled.
+e0509f4160bce896047dcfb796296eb3d52fe022 CHROMIUM: mm: low-mem-notify: fix LRU counter usage for 4.14
+da545b500aef86782a39a798c3b9dd7979cbe172 CHROMIUM: low_mem: use enum node_stat_item directly to get memory status
+a1f90f2a37a3e4e52d7703515fe21c6b16706224 CHROMIUM: low_mem: notify low memory when anonymous is low
+785186ff7513349e6e0a745947df94b6777b59bd CHROMIUM: low_mem: log low memory notification with rate limit
+51a61f504d114badfee125818a14c75e0544eaf1 CHROMIUM: add DEVTMPFS_SAFE support
+7089cce5f92cf55d8d57cd3c9f453dc2ee1d84a8 CHROMIUM: driver core: Export driver_probe_done
+18486745b3560d82aa1dc3faa11ad2d2ecf7625e MOBLIN: fastboot: remove "wait for all devices before mounting root" delay
+1b944fcc75978529942e762d8cf0dc21d6531a91 CHROMIUM: Add -Werror build option
+9b6a0966752d65b705932d50ccb755f9cf8644b3 CHROMIUM: lib: zstd: Add check for OF_base array bounds
+f658cf75953e699047d34fbbc601e6bc959f6b7c CHROMIUM: i2c: Add device property for probing
+63f80cc2586292a738965d6418e2953c3f97fc79 CHROMIUM: Disable 'constant-conversion' warning for clang
+cd745412d116386f864eb16763e2556072a5e5e6 CHROMIUM: net: cdc_ncm: temporarily ignore Huawei modems
+eeff9e17e144063f761163315007ea67d42106ab CHROMIUM: Introduce ANDROID_PARANOID_NETWORK as per-netns setting
+42721a768f86a1cf7d318b59fa03ba69fa10fb3b CHROMIUM: Export /proc/sys/net/core/android_paranoid in user namespaces
+dd4d4653e069043d1e6ee0e01fa6eaad338d795a CHROMIUM: tun: Use ns_capable() instead of capable() for perm check
+58434c6e560edc267d4bf360e1082590d62a09f8 CHROMIUM: net: Increase net.unix.max_dgram_qlen.
+d2da354a1312242fabe9183f8e888cf5557cb697 CHROMIUM: Implement Android permission overrides for PPTP VPN tunnels
+7d3bf00b80632dd6a106df21b0c714629f556217 CHROMIUM: vsock: Disable loopback connections
+ebd90eee458fdee59e10e2429cb2fe585ece0c73 CHROMIUM: net: xfrm: expose xfrm_acq_expires sysctl to namespaces
+febe2007a82dcc34395a813142f8eb082a7f82e7 CHROMIUM: Revert "xfrm: Do not parse 32bits compiled xfrm netlink msg on 64bits host"
+1481af189b79547b2aece8e290633fbe33fd53e2 CHROMIUM: Revert "xfrm: Refuse to insert 32 bit userspace socket policies on 64 bit systems"
+b5870adcaab5dc06773105f9b2ed0c8ebca123ad CHROMIUM: net: xt_qtaguid: Make the match/check functions userns-aware
+ad2d7571a9795f67ebd88f9ac5786e9c2a815e33 CHROMIUM: net: xt_qtaguid: Enable netns support
+71384307d287c640d1541a2b3fa48beec0b914b6 CHROMIUM: net: xt_qtaguid: Enable user namespace support
+d37a856bf387e7172c2145ace83641cc89075cb0 CHROMIUM: net: xt_qtaguid: Implement net_exit code
+7237bdf73aed0941d6815a924e7a83a2a4ef6286 CHROMIUM: net: xt_qtaguid: Fix iface_create_proc_worker() races
+b1b555d96b64f13a00731591391413d01a7f4d73 CHROMIUM: net: xt_qtaguid: Fix memory leak
+90eaa10192d55643b6307d12a8805ab1ad7bbd4d CHROMIUM: PM / sleep: try to runtime suspend for direct complete
+d0f62c0e44a9188544928588b6a85ec9ded317f5 CHROMIUM: PM: Do not silence the print of last active wakeup source
+485b5dc59510fae9914c17e4b3c75477dee4cfbb CHROMIUM: add test_module module
+c4b53b05a771d145327d0a9e0776e9f71bee345a CHROMIUM: trace: add back legacy tracing_enabled attribute
+d584c3b1cdb43d772ec6db8ca5c0c86cdfc83c00 CHROMIUM: hung_task: dump all UNINTERUPTIBLE tasks
+2129e40c8f711f11719390c6991d94d1c62b258f CHROMIUM: Handle exiting process in audit_log_d_path.
+f7685708e9f9a77563c3f9e0fc44e734b96af987 CHROMIUM: task_work: Disable 'gcc-compat' warning locally
+92edf158537601cc20688fd5c178b7fa095a34db HACK: CHROMIUM: temporarily slow down the NMI watchdog
+611df5848ac74ea633cf7da7fb8773a29a14670c CHROMIUM: scheduler: panic if scheduling while atomic
+c86c33ab7247f3968fad8e5f937cc3cd6249d42f CHROMIUM: sched: tune: allow nested schedtune groups
+39c7ab141aa802cf034e823a6441ff98189fadde CHROMIUM: scsi: allow scsi devices to use direct complete
+0a36c277dc4ad343e2c166e477525b1856877022 CHROMIUM: selinux: Do not log "permissive" denials
+3ec9933b7449ed0daaadd1781b6c0e857212f3fc CHROMIUM: Add CONFIG_SECURITY_SELINUX_PERMISSIVE_DONTAUDIT
+67af35d773c3a709d88b67cdf5815d275fa3cf60 CHROMIUM: LSM: chromiumos security module
+c2185294ad509ea4a6859dc0b4c5e21a9f4ee224 CHROMIUM: alt-syscall: Make required syscalls available for use
+f5ca1a11814da3338ab018b7da26f8f235861b41 CHROMIUM: create alt-syscall infrastructure
+8ca68fc4dd836493f8008c803e3d3ee3ef9c76da CHROMIUM: x86: Add alt-syscall support
+0a9126132ac2e6a69f604a07f5ff8cd2520bbb94 CHROMIUM: ARM64: Define compat syscall numbers
+660b33722d92593d3a91efc10cacce3f1d13e3e4 CHROMIUM: ARM64: Add alt-syscall support
+8ff7bc53d243c77eecad07e6afd23cae37330d98 CHROMIUM: kernel device_jail
+6e82a3c5a18a25052cbb84831d30dd19878ff011 CHROMIUM: compat jail-control interface
+90568b256a5bdd5dbfe15c8bf9ef762e417f4324 CHROMIUM: device_jail: detach all interfaces
+8101decd5fadfe86b5b9c4f0f656efb671b60dff CHROMIUM: LSM: Deny mounting filesystems as exec in unprivileged userns
+e9eb0fdf4c2c68474cf5b6bb29c5d95ca26209fc CHROMIUM: proc: make /proc/self/mem read-only
+72b79af0a1081ab6b0d0c13f00b42de17ce10a95 CHROMIUM: device_jail: use a drop_privileges function for lockdown
+af40910b9ed9a396eefd3b0c209abb3cf6401046 CHROMIUM: stack chromiumos LSM before other LSMs
+c30615bc04aca566ceb8f5140eb78bbee8e5ff4e CHROMIUM: alt-syscall: Fix changed syscall API
+0b5ce6206cb013899ab47514f534db745ae7ae17 CHROMIUM: ASoC: Intel: Boards: Add CNL max98373 I2S machine driver
+bb71b3853c35191bb08b10b89df1989b54ab5aa8 CHROMIUM: ASoC: Intel: Add CNL max98373 machine driver entry
+f05647f6156c7dc3198d1f559ba674d2997a3975 CHROMIUM: ASoC: Intel: Add Geminilake Realtek+Maxim machine driver entry
+fb0cfb997204fd00edd48619801b436957e507a0 CHROMIUM: ASoC: Intel: bxtn: Add constraints for headset dai
+6572234152edf08d37c6c173d0cc62e6624d96ba CHROMIUM: ASoC: max98357a: fix speaker pop when starting playback
+82435d397fe577d95bb7b98186bbe9e24ab2bc58 CHROMIUM: ASoC: max98090: Remove msleep between codec turn off/on
+b0fa9ee035b70f22e88df163bc54d12c04d87a15 CHROMIUM: ASoC: max98090: Enable DMIC at playback when selected.
+fa88d50cde53f1fb7a73891e2a491f87868257a4 CHROMIUM: ASoC: max98090 - Expose HP out enable.
+52c49a61732b801654ced49b15cbe13ea5a4f19a CHROMIUM: ASoC: rt5650: Add Kahlee platform specfic changes
+8e248fe4cd4def1cb9eed2a9080d899ad992dd0b FIXUP: CHROMIUM: ASoC: max98090: Enable DMIC at playback when selected
+88f947dfa2d4b4a7c0dfdb32280b3b94306cfc46 CHROMIUM: ASoC: DA7219: For Grunt save and restore state of register on S3
+f210f6592fbb61446e2fe1b2131a230c632b38fb CHROMIUM: ASoC: Intel: glk: Add rate constraint for HDMI audio
+01f5a0cf0b7367b211276cc6c19e1f6057058083 CHROMIUM: sysrq: Added Chrome OS specific 'x' key
+b9d0b8227f60a46abb6b8d2fc82bb758d0046bac CHROMIUM: sysrq: treat F10 as magic sysrq key
+45c09496232fedc228ea31bfacab2d4db4ce30cc CHROMIUM: sysrq: clear sysrq->active state on sysrq release
+0e2662603a007d492513c164b607dcc3de155d98 CHROMIUM: sysrq: replay the correct keys when releasing SysRq combo
+cd82791444e7fb685dcd12afa272d9c2186e2e62 CHROMIUM: serial: 8250_dw: skip lpss pci UART D3 when used with no_console_suspend
+95a7b66ae5d598b3cf0771a7ee88547ac2f8e5f7 CHROMIUM: TPM: Increase the timeout of the tpm_tis driver
+3edf872e7920fc2c1738cb68072aea8e8d9e9748 CHROMIUM: tpm: add legacy sysfs attributes for tpm2
+40fdbf005b1c08012ea7e6fc3fda2c26268cb099 CHROMIUM: tpm: block messages while suspended
+1dc70359973e5c729fb55820a2c659b0bbb37226 CHROMIUM: tpm: Add driver for cr50 on I2C
+722461fef031402a909333db43a4eb1ac7d100ca CHROMIUM: tpm: control deep-sleep for cr50
+1b33e7096db491c4f1d25daf4e6c1c0b88becad6 CHROMIUM: tpm: cr50: block messages while suspended
+b6a1abac8682f01d623971b150e93cf22a2c3e77 CHROMIUM: tpm: cr50_spi: Wake cr50 after resume
+a98202af734a0100911997bda4d3dea756fbaa71 CHROMIUM: tpm: ignore failed selftest in probe
+57870cd521fb41387cce989c553b712e9c0fa6eb CHROMIUM: tpm: cr50_i2c: Do not warn on first transfer failure
+a3e7c2adbf1e9dcac7ce80df8706568f8bf0cc16 CHROMIUM: tpm: Protect tpm2 sysfs accesses against shutdown
+29cff0295ea5ac4724808d4c31b478dc2c0a768d CHROMIUM: tpm: Don't send control-deep-sleep for cr50
+65de6862a410ff60cd53a2e8285d50885833ce58 CHROMIUM: tpm: cr50_spi: set flow control timeout to timeout A
+49f18f85c3f905dbda51d87ed84d1377e121bf5f CHROMIUM: tpm: cr50_spi: warn about flow control timeout
+48dc13264e98ea8dff6eecadb083756abf93758c CHROMIUM: tpm: Restore quality of tpm-rng to 1000
+a826a454cef2f4eac31481e86d337787b11cb715 CHROMIUM: tpm: cr50_spi: fix tpm ready timeouts
+139b5c428cd7bbf20651eea7e4f041011e971790 CHROMIUM: tpm: cr50_i2c: Set hwrng quality.
+86dec28696838d69cb5020d3c10d0bd0f1b02029 CHROMIUM: tpm: cr50_spi: reduce readiness delay to 2ms
+521d5e3ce5ed6449b8e45207dd6a30aacd96851f CHROMIUM: tpm: fix descriptions for cr50
+0f7f3d2b8c06a3198209b8ecf0eef3774e540c8a CHROMIUM: tpm: cr50_spi: Set hwrng quality.
+53e9ca9568f0b23e2fe4c746121cc9c25dedaaff CHROMIUM: virtwl: add virtwl driver
+dc696162ab651f52cb27ec9a599558a26edcf3f2 CHROMIUM: virtwl: fix incorrect list_for_each_entry_safe usage
+6e4fee9c54bf006fc8567639911d14d668baaa95 CHROMIUM: virtwl: fix deadlock while receiving VFDs
+869eeebe295e0f1ad7aa6f100145d1a12e53848c CHROMIUM: virtwl: change VIRTWL_SEND_MAX_ALLOCS to match libwayland
+ab985e828858981f363b4d7da485b77002d0402e CHROMIUM: virtwl: add compat_ioctl entry for each struct file_operations
+220cb614edced8019b5f6844e0c5dc253ecb839e CHROMIUM: virtwl: use compat_ptr in compat_ioctl implementations
+601c63eee56bf1e10c077beb6c733f6ee7775301 CHROMIUM: virtwl: remove unneeded access_checks in ioctls
+fa1a9f3812c7e62ab9523c301b07987b2071f005 CHROMIUM: virtwl: check for CONFIG_COMPAT before defining compat ioctl
+d27394a4c5215dd2b4378cc06bbfdfae03a9a1d1 CHROMIUM: virtwl: fix asterisk placement around __user
+6aa39e3b99742875d0242edb98c86aa56728b0a7 CHROMIUM: virtwl: properly free qentries that are empty
+c0d9b28d27e0de3f65673a784ce165670e2febf4 CHROMIUM: virtwl: add pipe vfd support
+4c20a0d2c78d1b6cf5851bad57aa5f30860c0b34 CHROMIUM: virtwl: add dmabuf vfd support
+14ff4f577a70b724f62c176d8c0dcfe598dbe9e1 CHROMIUM: virtwl: fix double free in error path for virtwl_ioctl_recv
+9eff02fa8d03d4c4656bbfa86c6d69683c4d6786 CHROMIUM: virtwl: add dmabuf sync ioctl
+476a3fbd78b2f141fb03d40b5e62247a876239be CHROMIUM: virtio/wl: Fix locking order in do_new()
+57564855b657110399e23d1da4414ad2e59b76ab CHROMIUM: virtio/wl: Fix a missing mutex unlock in error path
+4a77ff19aca5bec5706975b4b392ca5bff9213dd CHROMIUM: virtio/wl: Unlock vfd->lock before freeing it
+616d713998037e7384c3157f78a3a2f1533f8cb7 CHROMIUM: virtio/wl: Always update *vfd_count on recv, if given
+c98c75d89d1ea78b17c1f94384d843647e652905 CHROMIUM: usb: quirks: add NO_LPM quirk for plankton
+7a5b9680c97c232bf84d6cb4f63e31d7c3a1b24a CHROMIUM: HACK: xhci: Increase the reset handshake timeout
+5990b1bae6704ef3a5dedbf1c5c36cf97f1e7246 CHROMIUM: usb: quirks: add NO_LPM quirk for Logitech Screen Share
+3515d44271005e4276229371649724a188dec5d8 CHROMIUM: x86: print out initial usec value calculated from TSC and CPU HZ
+13e6cb81d7c7f24491671f3f47fef4d525866dce CHROMIUM: msr: whitelist the i915 thermal control for wrmsr
+a09c0964fdc8c77792ba453be7cb11a71323128c CHROMIUM: X86: Explicitly add -fomit-frame-pointer to boot/compressed.
+d58960a4d787c903e13ae16e1503f71a0a66d62c CHROMIUM: x86: add delay after acpi_reboot
+12123bec1ab6e2ca1cc027f1a8ed1c3134dbebd6 CHROMIUM: x86/mce: Disable 'gcc-compat' warning for mce.c locally
+3040717a7a73b948a37eda23fc4224cf09a31769 CHROMIUM: platform/x86: intel_pmc_ipc: Add GLK XTAL freq
+19a285dca736f114db965493acad844ece9de6e5 CHROMIUM: mwifiex: vendor command support for set tx power mode
+f13de8e112f19e0868481ff0b955480b8f38e10e CHROMIUM: Implement Android permission overrides for PPTP VPN tunnels
+17bb02249e477bbf29aad22fa9e63d1b13439356 CHROMIUM: net: xfrm: expose xfrm_acq_expires sysctl to namespaces
+e28e5d646e9dcbac0d8556a9b663996f1618590b CHROMIUM: Revert "xfrm: Do not parse 32bits compiled xfrm netlink msg on 64bits host"
+a47b039e804644d5c857767e7a7ea7268a995aa5 CHROMIUM: Revert "xfrm: Refuse to insert 32 bit userspace socket policies on 64 bit systems"
+59c956983063cd940b0bdb7be8f6a527f3cb1c2f CHROMIUM: Normalize defconfig
+2af95ded9cf71508cb27a7b36c57ec290c44feca CHROMIUM: arm64: dts: qcom: sdm845: Add UFS to Cheza
+bed65fe25e1774d6d9b11573eefc74c2c11d53af CHROMIUM: arm64: dts: qcom: sdm845-cheza: drop write-protect from 'chromeos-firmware'
+8c44e89ecf091bb53ee252acd046bf15d92aa0f1 CHROMIUM: Take grunt out of the COMMIT-QUEUE.ini
+733b332212ec5fe7fbfb1edf76dfb9126e48401d CHROMIUM: platform: chrome: drop chromeos_arm driver
+7d68eafde8fd4a08c170ee58bf27262fc1e09cba CHROMIUM: config: normalize after dropping CONFIG_CHROMEOS_OF_FIRMWARE
+7f02eaec4129357cd115f1a942f61a668e14112c CHROMIUM: arm64: dts: qcom: sdm845-cheza: rename flash WP# gpio
+5a03528ae6754fee9f8f9fa7031dcf77a804c027 CHROMIUM: Restrict ALT_SYSCALL code to 64 bit builds
+4255405224fb6a7c1b1e72ececd2f79b1794bd39 config/x86: Enable CONFIG_PINCTRL_ICELAKE=y
+34b532e47bbd774ff40c56667354c7218c57b494 CHROMIUM: config: Enable RESET_QCOM_PDC for Qualcomm boards
+55047b053e6181ef48d05bbce43e17915cfeeff2 CHROMIUM: config: Normalize configs
+78ed92f6c4418b13c06b42d16dce3451b3bdb4c5 CHROMIUM: config: Enable Realtek PCI-E SD card driver
+b7ec7fb624dfc8d07e722cf2e0e72ff82ebaec7b CHROMIUM: low-mem: Fix return type of low_mem_notify_poll
+d0e0f3d8f76db360da3ea40ba9de0980d9990be8 CHROMIUM: arm64: dts: qcom: sdm845-cheza: No pulls for BT UART
+a62692ecf4950a06b38befa04cdc213613f95148 CHROMIUM: Separate USB PD charger from USB PD logging
+bf074f2e9bdc0274e4a31073a31b3e19aae335cb CHROMIUM: tpm: cr50_i2c: Add TPM_OPS_AUTO_STARTUP flag
+90d418eeb854d05d6821faa2d7125594044941d2 CHROMIUM: config: increase NR_CPUS to 8
+ca2f362ec9d647ab0b368f0031926d59d4b24fdf CHROMIUM: config: normalize config
+259a83a5b36fa4fdecfa43f2c2944661239e522a CHROMIUM: cros_ec: Fix declaration of ec_device_poll
+1295899fa1d96667e46bb6fdd345260a8dbdce51 CHROMIUM: config: Normalize (CONFIG_UDMABUF)
+e29c8fc2d50fb34b5fdd0cd3f5c77a01257faaed CHROMIUM: config: Normalize (PINCTRL_MT...)
+b2e1f141f501aa530dfc6572751827fe0a7489ec CHROMIUM: config: Normalize (CONFIG_CROS_USBPD_LOGGER)
+da01ac36fccbf36ac6ce35b1ce011273aa2b1d10 CHROMIUM: config: Normalize (CONFIG_ROCKCHIP_RGB)
+24fce82108902059c6d65e0bd50aa3e420c89747 CHROMIUM: config: Normalize (CONFIG_DRM_TOSHIBA_TC358764)
+65cd67231ce06e5f562f68e9367839fcb81d4edc CHROMIUM: Add process mgmt security policies to chromiumos LSM
+29514c0235aba87d196be4e3d39ae180d1ab1758 CHROMIUM: arm64: dts: qcom: cheza: enable Wifi
+d7929e9fcc97e2e2610117f2a136ca393ef22684 FIXUP: CHROMIUM: Add process mgmt security policies to chromiumos LSM
+d589a99f3bd55e3cbdf46772454fe2df397666dd CHROMIUM: arch: configs: renormalize termina configs
+0c918284c7f039073ae9ec7b0a8071fd10212c47 CHROMIUM: config: Normalize configs
+ab36db74baf3f990ec9f67a1f9f2f07ff7e233f5 CHROMIUM: config: Change default governor from performance to powersave
+da4ccb86ec34df92ea62f6f4c7d5315fdddcb2b8 CHROMIUM: arch: configs: Enable xhci driver in termina
+c5227784b3f7feb3630b62b4a4914d506d399536 CHROMIUM: add openat to altsyscall test list
+a405a397652164b46b2a83fcbfb0e6e0508f8061 CHROMIUM: ASoC: max9892x: Add documentation for reset-gpio support
+1f07f0f619b17a36116c7ac5e216350707022689 CHROMIUM: ASoC: max98927: Add reset-gpio support
+20dfab2f11c66db16c60b6b8a4fcb0458e00538e CHROMIUM: Normalize configs
+569fc9fa1947005b63dfff30f923f57f3b709766 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Add thermistor ADC channels
+0eb6b6b675243574a600e3a3030d13b8b1285c4f CHROMIUM: Enable INTEL_ISH_HID module
+495eaf190c29f9af885abb7bb328b51e660e60ca CHROMIUMOS: iwl7000: add driver
+3c5ede29d474c97b51d8e3cc651f3339e59a8c92 CHROMIUM: iwl7000: bump FW API to 44 for 9000 and 22000 series
+a03ba928a8f7096a91d7afae7e727718660a5922 CHROMIUM: iwl7000: mac80211: suspicious RCU usage fix
+c45a3b23de9a839641eca882bd2c3cf30f455a1d CHROMIUM: iwl7000: chromeOS: also use our hardcoded WMM rules on chromeos-4.4
+caa0fe112b7d8bbdebe3ac787c885831443c692d CHROMIUM: iwl7000: pcie: make array 'prop' static, shrinks object size
+464f27343640f802550740ecf41965e7d7ac4a4e CHROMIUM: iwl7000: Revert "iwlwifi: pcie: clarify the used/empty/free list counters"
+95e5da1381cd7562288be75ffd9aa6689a36cc99 CHROMIUM: iwl7000: wrt: remove number of tx and rx fifos from dump
+720a3450b2a3a32a4e047e6eea95b2d638868c69 CHROMIUM: iwl7000: mvm: remove odd tsf_delta
+394a7fa556c523cf8b34f221f1427d6cf81dace5 CHROMIUM: iwl7000: ieee80211: add bits for TWT in Extended Capabilities IE
+ae2b054007bfd42ece4fb10f86140281212e92f2 CHROMIUM: iwl7000: wrt: add to dump number of lmacs, lmac1 and umac error id
+c81a04ccae4773b2986f59020af92a6e551c0041 CHROMIUM: iwl7000: mvm: advertise support for TWT in the Extended Capability IE
+6df68d93a899e9d5fb1012d818914be2ee7df02f CHROMIUM: iwl7000: mac80211: propagate the support for TWT to the driver
+7337f46719f063dcf633bd7ac024fc104d6abc1e CHROMIUM: iwl7000: mvm: rely on mac80211 to configure TWT support
+c0dbc564c92cb6882b96531de05efca9bb030d46 CHROMIUM: iwl7000: Merge remote-tracking branch 'local_auto/master' into merge
+d09c7b0691e744b8340ef892927361947aabd471 CHROMIUM: iwl7000: Merge remote-tracking branch 'auto/master' into merge
+5da4b72f052f99bbfd85e12917b6b16a101cb012 CHROMIUM: iwl7000: Merge remote-tracking branch 'auto/master' into merge
+d1044720010bd3c45595b7cacfb007af7d30a441 CHROMIUM: iwl7000: chromeOS: fix 4.17+ breakage due to NL80211_STA_INFO_ACK_SIGNAL_AVG
+0c90bb8aef6d363bdc09e959aec8312e636231a9 CHROMIUM: iwl7000: don't load 37.ucode for 8000 series
+c8407af95e6e91d14d52eef8dcef1546c2f8c39d CHROMIUM: iwl7000: Revert "iwlwifi: pcie: add RBDs to allocator ownership in multiples of 8"
+3ef62817edc128d09125e600ec0d5557865f92d4 CHROMIUM: iwl7000: add PCI IDs for the 22260 device series
+278de0f5bc70d0f2fabcf25026d060809a86f1e6 CHROMIUM: iwl7000: add 22260 vendor ID for empty OTP
+cff27026cde023d8c814a4036a8d56127fd217d0 CHROMIUM: iwl7000: don't replace 22260 config with 22000
+6549b3249a4e0de1e44b8be7d7d2484596d3cac6 CHROMIUM: iwl7000: chromeOS: fix cfg80211_sinfo_alloc_tid_stats() backport
+efee99ee11a5554a5d4222ca80701936a7b93291 CHROMIUM: iwl7000: mvm: use debugfs option to override FTM request timeout
+3f99c206b6c4efe7799e304e217fd88d2ffd55ef CHROMIUM: iwl7000: pcie: recognize NICs with hw_rev 0x364 correctly
+c959ad26642c8e2c343844d38af7e563fa694fa2 CHROMIUM: iwl7000: chromeOS: remove genlmsg_nlhdr() backport
+ebbcc9eb1d1e12ba79fae49ee9f072eb189359f1 CHROMIUM: iwl7000: mvm: set STATUS_FW_ERROR bit in case of assert during D3
+436e1d8eef79e8d649ca3d111911e758cb6b0905 CHROMIUM: iwl7000: mvm: fix wrong DCM TLC config
+a950316e247f20dd60db0888c87e4cb89ebcaef6 CHROMIUM: iwl7000: xvt: update iwl_xvt_is_unified_fw
+07c84cc1408e4bede0b0b9d804dddd5b9dca3eaa CHROMIUM: iwl7000: mac80211: update HE operation fields to D3.0
+638b22302cf517d255ae98bc60dc7b2c47c54128 CHROMIUM: iwl7000: remove doc about inexisting trans status
+5446f1dad095b396a18df3602f3b49fd127f49aa CHROMIUM: iwl7000: correct one of the PCI struct names
+a4f7994dcfd722e96278a0e35f6af6d39086450d CHROMIUM: iwl7000: add new cards for 22560, 9260 and killer series
+99fa09a767ba81b1831a4c2d9df7655cee415257 CHROMIUM: iwl7000: mvm: fix firmware statistics usage
+ef2360ee4ada127aa375154c5bbf02b16672870f CHROMIUM: iwl7000: remove support for 9000 A-step devices
+d9f9cd84690e7299a4086d6b5aa5b47a4e3ed9d4 CHROMIUM: iwl7000: pcie: remove unnecessary iwl_pcie_enable_rx_wake() function
+102d6e588ffeeb47917b3402f11256c08b7c44cd CHROMIUM: iwl7000: pcie: remove suspend/resume workaround for 9000A devices
+fc7a6a1d78d61abb87371ff2279662655183d84a CHROMIUM: iwl7000: xvt: change iwl_xvt_user_cmd_execute logs
+2a04b9feec5917b6c12f7c4023d626edef37d7d5 CHROMIUM: iwl7000: chromeOS: fix cfg80211_sinfo_alloc_tid_stats() backport (again)
+b2d71722e90a60f93f9dddaab123aeca9600d31f CHROMIUM: iwl7000: mvm: fix regulatory domain update when the firmware starts
+03eb835016084732296d4d6562cede4a1c103431 CHROMIUM: iwl7000: chromeOS: fix wmm backport for 4.17 and 4.18
+61ddf6196bcbbc912db1b61a9b5e0c172b5d6ce1 CHROMIUM: iwl7000: chromeOS: fix definition of free_bucket_spinlocks()
+be39d7d305ff1ef7293b255188d14ea93a892328 CHROMIUM: iwl7000: fix D3 debug data buffer memory leak
+f9279ee7fc6bdb586ff11ee843a3aeb749ea4b95 CHROMIUM: iwl7000: wrt: add 22000 device familiy prph dump support
+c961fd214c9e7f4ceb359684e9c0d7b750c29823 CHROMIUM: iwl7000: chromeOS: check wmm rules change on 4.18.13
+0424d983af5923a1f76a33237cc0a88fc90f3225 CHROMIUM: iwl7000: chromeOS: fix wmm_rule.ap access in newer kernels
+0b2ddbc7f2e7bc75800408652774fb6516ce7d9d CHROMIUM: iwl7000: mvm: make NVM access actually fail on failures
+775039fdfaf97af4e7c3567933ee01d6bf1a59a5 CHROMIUM: iwl7000: mac80211: free skb fraglist before freeing the skb
+f68b0626beaaf076a9e28dcf13945a81ad273664 CHROMIUM: iwl7000: mvm: support mac80211 TXQs model
+d7e4e666a1d0db3a960461054b81c2b16990227f CHROMIUM: iwl7000: mvm: support mac80211 AMSDU
+9ce84dba97efdf721cefc64613a2f3677bea2398 CHROMIUM: iwl7000: chromeOS: make pertid an array in < 4.18
+1f6c111e69f759b8c0fe13e257950c2877bc5eef CHROMIUM: iwl7000: mvm: don't use SAR Geo if basic SAR is not used
+34586109abcb76658ff5acf438223c8bed9bead3 CHROMIUM: iwl7000: mvm: fix values in the table example
+da11a3a74f1f67327108b9749f5c4e85286cf1b8 CHROMIUM: iwl7000: use kmemdup in iwl_parse_nvm_mcc_info()
+a189ffec652147ef42d83d95e3ce29096f1e58f5 CHROMIUM: iwl7000: mac80211: don't build AMSDU from GSO packets
+0856599b5237f973bc482da9716250d25378be0c CHROMIUM: iwl7000: mvm: bring back mvm GSO code
+fa9ff49e55885fb114968d778e0d494e71de7c42 CHROMIUM: iwl7000: mac80211: document RCU requirements for ieee80211_tx_dequeue()
+13bec78ee1ceb9ccad4496bd59b5ea8f272054e2 CHROMIUM: iwl7000: mvm: correctly initialize AMSDU size
+2b1caad34b7f5099249d7bc6018aa438710cd53e CHROMIUM: iwl7000: mvm: Flush transmit queues on P2P Device ROC done
+409532dd6d86408e0dd4c0ae2101a668993cdc50 CHROMIUM: iwl7000: mvm: Set Tx rate and flags when there is not station
+031c49a1c250f3b1d05e834717c8d64df25ed5ad CHROMIUM: iwl7000: mvm: Do not set RTS/CTS protection for P2P Device MAC
+21e4acea9819f5eac43f0300ff5f360f1a530eae CHROMIUM: iwl7000: update hcmds documentation
+3c708e1587fb193a5cc41b43d92d9f0f1056e017 CHROMIUM: iwl7000: xvt: avoid access out of range
+7ced06f74dd82402eb05afbe87d84d5f22f19a08 CHROMIUM: iwl7000: xvt: avoid NULL dereference
+12540c294e08c0d49c067b24af3e1c6ee7088dd1 CHROMIUM: iwl7000: mvm: fix RCU data deref outside read critical section
+73437eb7e7e862497a802febaec09a2ed5570733 CHROMIUM: iwl7000: mvm: make num_active_macs unsigned
+86cb913ac497fc9da7724a02fce232111dd61192 CHROMIUM: iwl7000: tighten boundary checks
+2edf9d08ec80005a844d54276875ac0e7d00b350 CHROMIUM: iwl7000: memcpy from dev_cmd and not dev_cmd->hdr
+326baf2b94adc40312250ed9649167cac43444ba CHROMIUM: iwl7000: mac80211: remove superfluous NULL check
+3118ec144b324c7317e12660e70c0f7399ab6716 CHROMIUM: iwl7000: mac80211: fix a kernel panic when TXing after TXQ teardown
+a390dd035332257e42c2ca5c25620b5230802ab2 CHROMIUM: iwl7000: Revert "iwlwifi: xvt: avoid NULL dereference"
+78e681b21ebce8f5ed3fbd604dacdaa8afe7b51d CHROMIUM: iwl7000: mvm: avoid possible access out of array.
+b23971f3018bedf3b1699c1e20baa3d42c8b7a5c CHROMIUM: iwl7000: iwlfmac: check for access out of array
+d14cc70fc3b9d7ce78eb3cf1d36251b114a2a173 CHROMIUM: iwl7000: avoid access out of memory allocated
+821d4b6f958c5b71aa768bfe22212d640acdd840 CHROMIUM: iwl7000: fw api: remove unused/deprecated filter status
+d65a87411d02bfa9b8c80f24f3f7a4cc86d2645a CHROMIUM: iwl7000: fw api: document WoWLAN patterns command
+d8bfe67fec83b7892824c1e83c5b7512edd8d0a2 CHROMIUM: iwl7000: add support for FMAC recovery buffer TLV
+1fd8c55fecceab358a8af02589cc00ff40b30384 CHROMIUM: iwl7000: pcie: fix the use of a wrong define
+7b171c9a8a91bb6114db1bff19877dbfea62b09a CHROMIUM: iwl7000: iwlmvm: ignore HE PPDU type regarding EOF
+ab8393740fc8e1bb6dda6fc336e9acadd424823c CHROMIUM: iwl7000: iwlmvm: in monitor NDP notif take the NSS from rx_vec
+549c3081764a7329468b55cd31ee79d4d9493d04 CHROMIUM: iwl7000: remove FTM
+731d3b66123f78c52db989881e91e436531bc45e CHROMIUM: iwl7000: Merge remote-tracking branch 'local_auto/master' into merge
+9fd3b98549223353ab85c12bb62bb5c846347474 CHROMIUM: iwl7000: mvm: potential deadlock fix
+6ad32db87809ee122dfc2245648257f2ae1e1633 CHROMIUM: iwl7000: pcie: add prints to track virtual ID
+2793849ef918604026eb6056122d767895a5c873 CHROMIUM: iwl7000: mac80211: never pass NULL params to ieee80211_if_add()
+4c00fc92d56a4d35c94aa2fd5c961863da4801c8 CHROMIUM: iwl7000: mvm: fix %16 to %016 print format
+21b18bc50a0c9c1bd9a12934c261c1bfeec05d7b CHROMIUM: iwl7000: mvm: read IWL_RX_MPDU_PHY_SHORT_PREAMBLE only for CCK
+43e96015ad6c61db8d0425018d1f067cb71f8551 CHROMIUM: iwl7000: pcie: align licensing to dual GPL/BSD
+9d4909eae2e87aee7c7d7531a234f28807bf6924 CHROMIUM: iwl7000: mvm: remove TOF block re-introduced in a mergeback
+d4462863718602d6bfe846ed01a4b20d257b9a82 CHROMIUM: iwl7000: allow overriding MU EDCA
+61aa21ab4b02e1ac72eb22bf77d045b9d9e73e81 CHROMIUM: iwl7000: allow overriding HE MAC and PHY capabilities
+b06825e461b89c1dcf345caa7dc44cc4cc75e48d CHROMIUM: iwl7000: mvm: clean up LDBG config command usage
+97828c1820200d3741ceb0dcd39af0e649257ff9 CHROMIUM: iwl7000: chromeOS: lock mutex before calling iwl_mvm_get_current_regdomain()
+9c60a90f4e4dfa9422c59616aa63900d71dd1339 CHROMIUM: iwl7000: mvm: save and export regdb blob from the NVM
+a4b10d29436c777aef2c849ef38c008789c843a8 CHROMIUM: iwl7000: make iwl_fw_dbg_start_stop_hcmd() inline
+881cf316ca42536c983a655b65fd0c358d831d3b CHROMIUM: iwl7000: bump FW API to 45 for 9000 and 22000 series
+248090d77db52dc2db550ed1297028bde4dfaa87 CHROMIUM: iwl7000: move iwl_enable_{rx,tx}_ampdu to iwl-modparams.h
+59c549c3406a583355a1fc6441ffd233cd873042 CHROMIUM: iwl7000: mvm: check if WGDS is present before warning
+8319635a764a04420bd1742aea856fce1a7c6fda CHROMIUM: iwl7000: mvm: pre-initialize alive_data in wait_alive()
+86a678bec7a2636cd0fd53fa94b883b892970b25 CHROMIUM: iwl7000: calculate pointers from out_cmd instead of out_cmd->hdr
+3b07217366db4f80e2367ce39fab60b27eaa4ee2 CHROMIUM: iwl7000: pcie: remove unnecessary check for null pointer
+bcec825346f011b45c29d758ef225980bf6c8443 CHROMIUM: iwl7000: make sure cur_fw_img is valid before accessing img
+1b1117328b8ae0aa0c0a8d4be7f748579f446c01 CHROMIUM: iwl7000: mvm: remove sta key on wep ap
+cae0a8b9b6f5cae3bc37391530ae212afe337d89 CHROMIUM: iwl7000: monitor dumping flow cleanup
+2e98438146a4292fe502791589f77f7497773929 CHROMIUM: iwl7000: mvm: add an option to dereference vif by id
+da116a8eb995e675f6933d044a24d16d8af24ca8 CHROMIUM: iwl7000: use %zu when printing sizes
+79a31e479f12739b0794e34fad142e00bdf1e1b2 CHROMIUM: iwl7000: mvm: fix NULL pointer dereference
+15748883586af6e083668cd39f340a667a0e10f7 CHROMIUM: iwl7000: chromeOS: copy codel and fq headers
+3a06d0b77fafec19068659913baf694f60a0cc62 CHROMIUM: iwl7000: mvm: fix incorrect "can checksum" determination
+a0759a9e60424e6c3c841cfa7a436273da158bb9 CHROMIUM: iwl7000: mac80211: fix deauth TX when we disconnect
+e6ab1dbbf0a6ae99dd0670a5b5b2575085316c42 CHROMIUM: iwl7000: mvm: fix A-MPDU reference assignment
+8bfa60babbe455e6345f8820afb0a3f782226fc7 CHROMIUM: iwl7000: mvm: get rid of tx_path_lock
+aab56fb4898cfc1d729ec3dd8b9cb24d93e9f55a CHROMIUM: iwl7000: mac80211: allow drivers to use peer measurement API
+e9931605a46ff89cb51254d0dbe5691f67d2a3fa CHROMIUM: iwl7000: mac80211: fix radiotap vendor presence bitmap handling
+7ea4d0b83eaaf1ec872d26a9bf900727b96014d4 CHROMIUM: iwl7000: remove TOF implementation
+d87b558cc979d9a175bc3ce2d276820422de3789 CHROMIUM: iwl7000: pcie: avoid variable shadowing
+6d4b25fee4e0368c3f63520fe7170647699af545 CHROMIUM: iwl7000: pcie: use u32* argument to iwl_trans_get_fw_monitor_len()
+122bc3e91f0d591b33712cdcc5dc9e4375ede47b CHROMIUM: iwl7000: mvm: Disconnect on large beacon loss
+b49e69b94fbb2646de32363f69ab717db0f4b6c0 CHROMIUM: iwl7000: chromeOS: adjust cfg80211 version for HE definitions
+847a800791c4a73020ba0c87378a188ff9b4cd6b CHROMIUM: iwl7000: chromeOS: adjust cfg80211 check for FTM backports
+bc3712333ed2ac183a3748498f18ccc0ae9cba33 CHROMIUM: iwl7000: chromeOS: adjust kernel version check for iftypes_data functions
+edaab6f398159b5661e2081c9119c0925df7e25d CHROMIUM: iwl7000: mvm: add dummy iwl_mvm_sar_get_wgds_table() with !ACPI
+b7539efd25768d12f7fa84a27a889ad7ab367615 CHROMIUM: iwl7000: xvt: don't enable txq on FW init image
+1f04515c0c39fd55035c6eb9f4d8b5c4a59b8b0c CHROMIUM: iwl7000: mvm: add location APIs
+3a32a2833c253a16d86758f310df2de989a2e4bd CHROMIUM: iwl7000: mvm: implement CSI reporting
+42ad573bed0a9110267f23c9aa406fea4818e99f CHROMIUM: iwl7000: mac80211: ignore NullFunc frames in the duplicate detection
+0f5d822660bac5d47eba916b21a8c526276c57c5 CHROMIUM: iwl7000: mvm: fix RCU pointer assignment
+e3a58e582700253f45dcef53bb13aff3a6047b8c CHROMIUM: iwl7000: pcie: recognize NICs with hw_rev 0x364 correctly
+6ff4ea0f415151de911f9819bfe20550001bf0ba CHROMIUM: iwl7000: mvm: Change FW channel info API
+686a3bcb1805c9196063d1fb489357c757d9b62b CHROMIUM: iwl7000: mvm: freeze management TXQ timer when station goes to sleep
+883960b79fd47e15865f9620704749f500d3b5aa CHROMIUM: iwl7000: mvm: disable completely low latency mode with debugfs
+461ccf980667e2d7686539fd3b9354040cfb56f0 CHROMIUM: iwl7000: fix ULTRA_HB_CHANNELS bit to 16
+3c76f1f8be9f47deb5986a004a5da0aa37a2e8c7 CHROMIUM: iwl7000: mvm: set the actual in the new field
+99cdb9c24be4e4caf5b4be8b51583dfb34591317 CHROMIUM: iwl7000: update product name for 9260 and 9560
+cdddf3acd9cbe2b4b9240f3d104e668fe3747ca2 CHROMIUM: iwl7000: mvm: document monitor mode reorder buffer bypass
+b60d3b29bce26bffea3c08e04f710da175beb251 CHROMIUM: iwl7000: mvm: include configured sniffer AID in radiotap
+9771666e6a1d67f49eb95cdbe01b4c362b92c33a CHROMIUM: iwl7000: trigger dump on assert prior to setting the device up
+1f7a588a0ff1603cfd6d99789e66046f5ac8a213 CHROMIUM: iwl7000: mac80211: update driver when MU EDCA params change
+1e1eb91a29516d80cc08464adc9eef81c3ddc410 CHROMIUM: iwl7000: mvm: update firmware when MU EDCA params change
+f4142e2f0036dd1e138ead3623ff2350cf8b1b9c CHROMIUM: iwl7000: chromeos: remove ifdef from bucket spinlock functions again
+677927a01c6d3da8b749629bd1f2848d295f5116 CHROMIUM: iwl7000: dbg_ini: allocate dram buffer with proper flags
+0a9c12ea268568ec468d41fd5743540df52548c1 CHROMIUM: iwl7000: dbg_ini: properly handle ini user trigger
+1a91f60f9c5cbd143eeca4a9d07c34e9aa3805e5 CHROMIUM: iwl7000: dbg_ini: retrieve dump_delay value properly
+b755ee705d4b7ce542997c7d8dcaff6af3bab592 CHROMIUM: iwl7000: dbg_ini: set dump mask BIT(n) instead of n
+d594c9295b1f7d6018c1b30c500e5701e7bb86d2 CHROMIUM: iwl7000: iwiwifi: fix bad monitor buffer register addresses
+b3733a0e55bce7161e28e30594d9284573ce1d0e CHROMIUM: iwl7000: iwlwifi dbg_ini: update ini structs doc
+c106b1f2da9e92190fd30af8c1e2c4510b096e26 CHROMIUM: iwl7000: dbg_ini: fix iwl_fw_ini_buffer_location field enum bad naming
+59f711169ae66dc4d1dfb85f73d99c29834167f9 CHROMIUM: iwl7000: mac80211: suspicious RCU usage fix
+fba683a37804d4cf59b58705846ab0ea0fc20239 CHROMIUM: iwl7000: chromeOS: also use our hardcoded WMM rules on chromeos-4.4
+76d0bf895ed0069249a7e1afea45db5c51d35f78 CHROMIUM: iwl7000: wrt: remove number of tx and rx fifos from dump
+48c9a6a3e2a2a88ba541589350dbb2b12ad39821 CHROMIUM: iwl7000: don't load 37.ucode for 8000 series
+41f1ed0bf2f2f80586f4d9e657b8b2c1a7172a49 CHROMIUM: iwl7000: chromeOS: fix cfg80211_sinfo_alloc_tid_stats() backport
+603e1394b76e1485269cc05927c5f5c2145b8202 CHROMIUM: iwl7000: mvm: set STATUS_FW_ERROR bit in case of assert during D3
+84e1f74d53849ee1de90badd9ba402a5e216e89f CHROMIUM: iwl7000: add PCI IDs for the 22260 device series
+4ee41e94753abb2bce1971ffc1aed09bf01f72b1 CHROMIUM: iwl7000: correct one of the PCI struct names
+7d68d7054780d4b5db7de28e9adbe89c43383d77 CHROMIUM: iwl7000: add new cards for 22560, 9260 and killer series
+ca661492965ea42ac8949e90acb10ef5a07f4817 CHROMIUM: iwl7000: remove doc about inexisting trans status
+30a2ed56cc6642795669a4335d20685fa382adf7 CHROMIUM: iwl7000: don't replace 22260 config with 22000
+bdd1f26d7aaa58be86813cc04cf69bb4491dd23e CHROMIUM: iwl7000: mvm: fix firmware statistics usage
+432fc11c913852f147a1a57aa2db4137b98e90a0 CHROMIUM: iwl7000: remove support for 9000 A-step devices
+3c0e016399894c22c43ff7ae3d5d5f612f370be1 CHROMIUM: iwl7000: chromeOS: fix cfg80211_sinfo_alloc_tid_stats() backport (again)
+17948acdcc891f79a475dee0033bb2f82599accb CHROMIUM: iwl7000: mvm: fix regulatory domain update when the firmware starts
+f588172647e65922035ccf3cdcf7296e67e583f9 CHROMIUM: iwl7000: fix D3 debug data buffer memory leak
+b27cc5fdf72458ffcdc6eeba6013d19d1244c0e4 CHROMIUM: iwl7000: chromeOS: fix wmm backport for 4.17 and 4.18
+e69099d923b378fb3c35e6f8b3242394a0f72fca CHROMIUM: iwl7000: chromeOS: check wmm rules change on 4.18.13
+ce6976b66693e72f32abe040e140ccbcdc977858 CHROMIUM: iwl7000: chromeOS: fix wmm_rule.ap access in newer kernels
+0aca72a7bd5265877072606cedf319aab208235d CHROMIUM: iwl7000: chromeOS: make pertid an array in < 4.18
+aa967c724c0ff1f336d7c2bae97dfae6493fd655 CHROMIUM: iwl7000: Update backport tree
+824495f50e35142f05fd9f5f579b5a7d605ec56f CHROMIUM: iwl7000: mac80211: update led activate ops to 4.19
+24c2bc3f77bc2ec08287115bf273f4660600889e CHROMIUM: iwl7000: mac80211: free skb fraglist before freeing the skb
+50ddcccaa784804f1af6e3ca4199ed40b7dba8aa CHROMIUM: iwl7000: mvm: don't use SAR Geo if basic SAR is not used
+2d040c8f04f52fad689ec52e7d04e09eb6d58322 CHROMIUM: iwl7000: mvm: Flush transmit queues on P2P Device ROC done
+f358e6ea4e64c6d602dea38efff322219c96f41f CHROMIUM: iwl7000: mvm: Set Tx rate and flags when there is not station
+85eecf50eb333b64d8f8e8959eeaf98591b1d606 CHROMIUM: iwl7000: mvm: Do not set RTS/CTS protection for P2P Device MAC
+14255d3773b6b42b371f1666ca6765a1174b2ecf CHROMIUM: iwl7000: xvt: avoid access out of range
+fc2ba33cfc08ffda63c4d70943a449413542b08a CHROMIUM: iwl7000: mvm: make num_active_macs unsigned
+3a3b4bfa4724cd737ff1d5f72946d0cc1ceabc5c CHROMIUM: iwl7000: tighten boundary checks
+b54f00f60190c2027f40bdf03ae4c50e67afc53c CHROMIUM: iwl7000: memcpy from dev_cmd and not dev_cmd->hdr
+90b3d03fae233730ae00b61d0fe56582667846d3 CHROMIUM: iwl7000: mac80211: remove superfluous NULL check
+f1f0f932e56592ab1b79bd3e443363c2a2f303a4 CHROMIUM: iwl7000: mvm: avoid possible access out of array.
+b1877b64380b8e2db313157fc63750f20997d17c CHROMIUM: iwl7000: pcie: fix the use of a wrong define
+f91a1034d046df70f822229beb837673d92ee1f5 CHROMIUM: iwl7000: mvm: check if WGDS is present before warning
+9ef9ad002f3bf75bc4478213d0e18901849e189f CHROMIUM: iwl7000: mvm: remove sta key on wep ap
+f59139dd2138a4dcd47e3b9d98382e5926cc5abf CHROMIUM: iwl7000: mvm: fix A-MPDU reference assignment
+009039a8f921027757ed2097c87ce10c39bcd0e0 CHROMIUM: iwl7000: mac80211: fix radiotap vendor presence bitmap handling
+8ce8e5c2c638dc1fa1dcd363573338982ce6bb54 CHROMIUM: iwl7000: mvm: Disconnect on large beacon loss
+db4cf63a97b2a962ceb2396b3e4238935b8fd111 CHROMIUM: iwl7000: chromeOS: adjust cfg80211 version for HE definitions
+7622b582dd3766c3b882b88f15018ffabb1b24d6 CHROMIUM: iwl7000: mvm: add dummy iwl_mvm_sar_get_wgds_table() with !ACPI
+f56bbd6fc54397e25939fd096bd9a0dfdaf2f299 CHROMIUM: iwl7000: chromeOS: adjust kernel version check for iftypes_data functions
+44a06d7bc35b1bf9f3dc448780cb8397c3b75dd3 CHROMIUM: iwl7000: chromeOS: remove CPTCFG_IWLMVM_TOF_TSF_WA
+4478056df3e23641fb1664364c5d7fecd3dd7a3e CHROMIUM: iwl7000: update product name for 9260 and 9560
+94051b8ae50c34d1c9cfd4f0393a1174d133156c CHROMIUM: iwl7000: trigger dump on assert prior to setting the device up
+4b89b83e75438e6ec653625cfef5aa33d3caab2b CHROMIUM: iwl7000: dbg_ini: fix bad ini tlv parsing
+f7dd77a861d8fcaa1cf67f9792dd545ef902ef7e CHROMIUM: iwl7000: dbg_ini: give better naming to region struct fields
+76a82a82470408ccb1a9f9795926b2c08fb7794d CHROMIUM: iwl7000: fix bad dma handling in page_mem dumping flow
+6e83a9365eb17ecb4eb7e61272b3aba5d99b5421 CHROMIUM: iwl7000: mvm: simplify some return conditions
+ab6ebcc27f63f725e86a9b2bea8633644c9320bd CHROMIUM: iwl7000: mvm: support CHANNEL_SWITCH_TIME_EVENT_CMD command
+97eadfb42cdb436943e6534d8fe1730850db14d7 CHROMIUM: cros_ec: Fix return value from of ec_device_poll
+196a84891d6c5ea05944245c7342892246190a26 CHROMIUM: iwl7000: chromeOS: lock mutex before calling iwl_mvm_get_current_regdomain()
+8a1c868345d1740a9ba708491a58c5d71cc4eebe CHROMIUM: "nosymfollow" mount option for chromiumos LSM
+b07234b56415d9b76ba71c9794395b58ba6d27fa CHROMIUM: mm: collect swap and reclaim metrics
+894b8b1d84afee77dcb9de20dafed60321d6f9af CHROMIUM: iwl7000: differentiate between alive timeout and alive flow failure
+247ec9b03726ea90c3fe3a490dcbd65572155d85 CHROMIUM: iwl7000: mvm: move sniffer AID rtap configuration earlier
+7bc370e1a483b2b7abc659cd5f032d78bd0d4b15 CHROMIUM: configs: skip raid6 benchmark in VM kernel
+15041590a9bdf705eb73d0c3e4e5f39bcef5e9bb CHROMIUM: config: Enable kaslr on arm64
+048d3f377bf14e2f3a3b2a0b70fc3a645d20ceab CHROMIUM: config: Turn on CONFIG_MSM_GPUCC_SDM845 config
+014fa9a54e7deaa9f0e6acf53702045aeba72eb9 CHROMIUM: iwl7000: mvm: fix channel switch flow
+2d3398e929e67d59cacc1c5a97a3b146facce254 CHROMIUM: iwl7000: ChromeOS: include fq.h for all them files
+c412186d682b5f466e87bf077d34dd0670348f9a CHROMIUM: iwl7000: dbg_ini: update ini triggers enum
+c70e3b63f180cd4917e0c4c7b2108db2e3de63e8 CHROMIUM: iwl7000: dbg_ini: update max region id num to  support 64 regions
+42692a71b62a687c9be786cbffc63097c6550647 CHROMIUM: Revert "RFC: ANDROID: net: ipv6: Flip FIB entries to fib6_info"
+65e243b9d1c0ec56fa75dfe46de6288310f36318 CHROMIUM: Revert "ANDROID: net: ipv6: autoconf routes into per-device tables"
+d44d301822f0e62b31c176450922b1d0459af4ff ANDROID: net: ipv6: autoconf routes into per-device tables
+ef308351111448158cb4e5171709a0cb531f1fcd CHROMIUM: config: Set cpufreq perf gov to default for arm64
+b0ec11c21bbde638f64b322f376569da44af72dd CHROMIUM: arch: configs: enable FUSE for VMs
+4b9c27697b7cb421d085c7be1ed5a5631716a4f1 CHROMIUM: iwl7000: mac80211: Properly handle SKB with radiotap only
+fb7384189ae3796c0b07eefe21dc9c04d5f3f439 CHROMIUM: iwl7000: mvm: Fix handling of Rx no data indication
+f03a60696585b93a10838632d7fcf2899e532522 CHROMIUM: iwl7000: mvm: support new format for the beacon notification
+e049c1c287f51639b8dececc3021eabab1f7e214 CHROMIUM: iwl7000: mvm: remove duplicated include from ops.c
+6bde0d4d5d259d8b2197418250dddd357cfaa894 CHROMIUM: iwl7000: Fix pre operational dumping flows
+c93d270302a7bba25dfbe10d7361e22dfefd3223 CHROMIUM: iwl7000: mvm: fix merge damage
+770a8cebe104f53055c30e95d8ee03062b0e7fc3 CHROMIUM: iwl7000: mac80211: set STA flag DISABLE_HE if HE is not supported
+6f5b3dc4944e3a7c13b50ebb3807fd2de2855c66 CHROMIUM: iwl7000: mac80211: do not advertise HE cap IE if HE disabled
+f40e421a29c3872979b72802daacb197fdaa4a41 CHROMIUM: add WARN print statement to chromiumos LSM
+a95b8f2bcfc6015388c6527b964e062ec1406b01 CHROMIUM: iwl7000: dbg_ini: update ini structs meta doc
+7d565d73fb8c430fbe8355c8d9f3c91adfe583a8 CHROMIUM: iwl7000: add a fall through comment in iwl-dnt-cfg.c
+0ee8202f4e52f8454ba8ff629d6f9c1008ea7389 CHROMIUM: iwl7000: fix fallthrough comment in iwl-dnt-cfg.c
+218e67361aa4a22b645bb01d01547d4ab67b5abf CHROMIUM: iwl7000: mvm: add fall through comments where needed
+0b592a211ef2a910fe4b6088f444c304d54d8db9 CHROMIUM: iwl7000: mvm: fix AP mode in WEP
+82126442504b703e96761344827e5fda1b464f14 CHROMIUM: iwl7000: mvm: pre-initialize alive_data in wait_alive()
+77b997c00216c256e346e07e4cb2ab006533a0f7 CHROMIUM: iwl7000: calculate pointers from out_cmd instead of out_cmd->hdr
+7e84c181bf203ce5be57276e9dab9404e710c0a3 CHROMIUM: iwl7000: make sure cur_fw_img is valid before accessing img
+1271802b1e7c9a1c0db36fc5199f7a267075bfd9 CHROMIUM: iwl7000: dbg_ini: allocate dram buffer with proper flags
+035c8d22e7249e422ec6b234b91f8821d45ab0e1 CHROMIUM: iwl7000: dbg_ini: properly handle ini user trigger
+395b0d6eb350f3e476d870867f4af204f68e4570 CHROMIUM: iwl7000: dbg_ini: retrieve dump_delay value properly
+399140fbb317bbc57ab40eeae62f2a6589b5ca61 CHROMIUM: iwl7000: dbg_ini: set dump mask BIT(n) instead of n
+b5b955440ba18bd52333a32435a0d624ad2b22bb CHROMIUM: iwl7000: iwiwifi: fix bad monitor buffer register addresses
+25304df90f956546d977fef256631d93cc591de4 CHROMIUM: iwl7000: dbg_ini: fix bad ini tlv parsing
+864e4f22e0eb4cc1cadd0d6c1dabb2c6d51e1916 CHROMIUM: iwl7000: fix bad dma handling in page_mem dumping flow
+6222f314170bd1a8ebf1c418c44411c461943853 CHROMIUM: iwl7000: differentiate between alive timeout and alive flow failure
+d829ebe67c6c275cdc33625e3869a65b43d4d496 CHROMIUM: iwl7000: mac80211: Properly handle SKB with radiotap only
+9a127432e9677f11d491b8dc866b2f533864687e CHROMIUM: iwl7000: mvm: Fix handling of Rx no data indication
+36dbff2005f71b2e1af3760dbdbe6cd7fc582d3c CHROMIUM: iwl7000: xvt: don't enable txq on FW init image
+cfb3decc73534610a929cd8fcf4e7084d6f20686 CHROMIUM: config: Add CONFIG_INTERCONNECT to Qualcomm
+2b45e1d54cd80cb1f9d39ec09979c07291effee9 CHROMIUM: arm64: dts: qcom: add bridge chip & panel to sdm845-cheza
+70ef12f6d2b07f6134c69961c829e92c4065e1e0 CHROMIUM: iwl7000: xvt: fix stack data leak
+296fc5595ad054658dc0a053e0e4ed3ff64aea73 CHROMIUM: iwl7000: xvt: fix potential memory leak in iwl_xvt_modulated_tx()
+7861b957f5b6d12e187b07c27804125b7a5164ff CHROMIUM: iwl7000: xvt: fix memory leak in iwl_xvt_send_tx_done_notif()
+bfbdfe1ea31b282656d8dbe68b4bd7ca7f5b520b CHROMIUM: iwl7000: mvm: limit AMSDU size to 8K
+c6de8da1d49feeadd1d4be521937798e2cb2ad11 CHROMIUM: iwl7000: mvm: remove redundant condition
+151370ccd55bdc9c805cbaa56a407c15d133f792 CHROMIUM: iwl7000: mvm: limit AMSDU size to 8K
+435950fece97997fd3ac1acb0943f58b627b56cd CHROMIUM: arm64: dts: qcom: Enable SD on sdm845-cheza
+cc7b64ae39144455c19cd2004fd2ab51fd688e8c CHROMIUM: config: Turn on CONFIG_SDM_LPASSCC_845 config
+62f95171f5769c22c6d49f598b13f7ab4ef1957e CHROMIUM: arm64: dts: qcom: sdm845: Add cheza AP_SUSPEND_L
+0830cfb806ff428c0fa3dcbe9523d7aaa77c8825 CHROMIUM: add arm64 userspace set*uid calls to chromiumos LSM
+36ef29b58d70190d3fa832a32caf42f9145035fe CHROMIUM: iwl7000: mvm: add tlc command name to output
+33065fe783de51b695a67af89cc68fc8bd4ec5a1 CHROMIUM: iwl7000: mvm: config mac ctxt to HE before TLC
+0b8a372109bca412dcbdd0a95f407b6365dce414 CHROMIUM: iwl7000: dbg_ini: remove redundant dram buffer allocation
+724f0b14db5c826d5c0aa03fccd3246f0151ae77 CHROMIUM: iwl7000: mvm: add HE TB PPDU SIG-A BW to radiotap
+7bd88eb813c4ba96daafe28b95aa63a4e7d5fe11 CHROMIUM: iwl7000: mvm: don't trust MAC ID coming from FW
+f76576883930b4caa11258bae1146d466e1a5501 CHROMIUM: iwl7000: move config structs to C file
+0aeba5d9ea1f6c52c886a3e22a82787c2ce8354d CHROMIUM: iwl7000: mac80211: ftm responder: remove pointless defensive coding
+ef00b83d6976c40c83906e59234ab018bf65a850 CHROMIUM: iwl7000: mvm: add description to second BAD_COMMAND assert number
+2a365697d0f98edbc3404b5527f8317286006107 CHROMIUM: iwl7000: bump FW API to 46 for 9000 and 22000 series
+322e218aec3be3db20c016dac1e91f2c2d856740 CHROMIUM: iwl7000: mvm: don't hide HE radiotap data in SKB
+05bd440a2fcc2c1ff7a79c96984ad83e57827109 CHROMIUM: iwl7000: mac80211: Properly access radiotap vendor data
+978293b8c2b754d3f2eda40150300a2f67cdc9e3 CHROMIUM: iwl7000: cfg80211/mac80211/iwlwifi: add -Wimplicit-fallthrough make option
+490ec28c3644d493047be996d650706a4600683e FIXUP: CHROMIUM: drm/mediatek: Add interface to allocate Mediatek GEM buffer
+a7563802068640d502c1e652bdbd0a154a143f1e CHROMIUM: iwl7000: mvm: support absolute thresholds in bf configuration
+f1d3c85df47eaf42efd8f880e9085221d1823328 CHROMIUM: iwl7000: mvm: fix potential leak in FIPS test
+d0bc11d443e42b1dcf6a2eeca8d9ce3967a90b75 CHROMIUM: iwl7000: mvm: vendor-cmd: don't allocate nlattr array on stack
+35d4a7946e30cf4b4d1ce01076b164959500b95b CHROMIUM: iwl7000: Apply merge from auto
+58088f867f30c37e274af06af4b1bd00ba5a152b CHROMIUM: iwl7000: chromeOS: fix 4.17+ breakage due to NL80211_STA_INFO_ACK_SIGNAL_AVG
+ce04b0a6ac74781e5a683910ff7ef3e7d367e18a CHROMIUM: iwl7000: chromeos: remove ifdef from bucket spinlock functions again
+405c8fd7482c804effd6a3198433b34890332009 CHROMIUM: iwl7000: chromeOS: copy codel and fq headers
+0fa969df4fd067e98b02cd09997a37a775817b7c CHROMIUM: iwl7000: ChromeOS: include fq.h for all them files
+620ec82234f60b6af927fc4c1c6737d97fc4b870 CHROMIUM: iwl7000: mvm: fix RSS config command
+0928f865711f71e22fe796e9594f16d7d73bf1ff CHROMIUM: iwl7000: dbg_ini: align struct iwl_fw_ini_region_cfg to the FW
+896cc3dbffa60d1f950cc28e9755514f8356e207 CHROMIUM: iwl7000: dbg_ini: create new dump flow and implement prph dump
+9774458a4a5452bf3b206dc22a5ffdf1aeed4575 CHROMIUM: iwl7000: dbg_ini: implement csr memory dump
+e24d065597512a9027694d20eac23717fa9fa499 CHROMIUM: iwl7000: dbg_ini: implement device internal memory dump
+d978c33ad76ce4af4b71ee73e7cb703922a1dd8b CHROMIUM: iwl7000: dbg_ini: implement paging memory dump
+d1f4da961940229f4feabd59e4e5184b9a5ebeda CHROMIUM: iwl7000: fix send hcmd timeout recovery flow
+72ad8dad35cadc745441a13a891c8dcc2a856383 CHROMIUM: iwl7000: refactor NIC init sequence
+4c166f0e72d4f98a14eb69170c7ecc284310f75a CHROMIUM: iwl7000: mvm: fix TX while removing station
+29b9b292c3aa2548592a65c6e201d793e61be054 CHROMIUM: iwl7000: mvm: fix RFH config command with >=10 CPUs
+eb7a4b68b81ce22cbb7b3558d841a625ce21f0db CHROMIUM: iwl7000: implement BISR HW workaround for 22260 devices
+c6951f73d3cc3313925e94531c1f82f0d922e766 CHROMIUM: iwl7000: mvm: fix uninitialized variable use
+2ad92a2178ec5dd113559ef399aea7af6b8aea41 CHROMIUM: iwl7000: mvm: don't send GEO_TX_POWER_LIMIT to old firmwares
+f3b52d6e6f3755c2f5296f12eb31927e0e3bac9e CHROMIUM: iwl7000: mvm: Fix iwl_mvm_tof_update_tsf()
+bc9149feb406ad6012b1b04d5757e7b723b3f4ac CHROMIUM: iwl7000: xvt: fix stack data leak
+27ad09b554fa4b3eeaf16190b4c0d60ec992ea38 CHROMIUM: iwl7000: xvt: fix potential memory leak in iwl_xvt_modulated_tx()
+f103fe83568e2e8ba0aaf03c5f6854b1e57ba2b7 CHROMIUM: iwl7000: xvt: fix memory leak in iwl_xvt_send_tx_done_notif()
+a9563dd4d40c397e417320c63d1d9d21d105903b CHROMIUM: iwl7000: mvm: add description to second BAD_COMMAND assert number
+0f91ca14a8563747ceb9c362208bd664565fc8f4 CHROMIUM: iwl7000: mac80211: Properly access radiotap vendor data
+7f9e11b9fd6f841d14e94f7630bb57206b7f05c8 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Increase mpss/rmtfs memory size
+a9e1ee7ee2258b76deec9b701062824bc9649fe5 CHROMIUM: iwl7000: pcie: fix emergency path
+924fa97f5cafa43e2aff6eae17e3b10320ec8cd1 CHROMIUM: iwl7000: pcie: Fix tracking of pending RB requests
+493bcb36b20224c3f433a1a3146f1c5caf35b3c0 CHROMIUM: iwl7000: pcie: add TPT oriented prints
+c5249ff7f9a1e146ff65ddc733fa40d58e1298bd CHROMIUM: iwl7000: dbg_ini: implement monitor sram memory dump
+0507c43f1411fda13496e48f7a5a6d202f7c2cd1 CHROMIUM: iwl7000: mvm: don't require WOWLAN images when unified
+4df0f9b749b550b0eae146155250310acb083aeb CHROMIUM: iwl7000: dbg_ini: fix buffer overflow while copying region name
+67bf13e5f1ec05c3a250a0bee2ac59640ed55188 CHROMIUM: config: enable QCOM_CPUFREQ_HW
+6a150490e03cafe4fecc72662a821d638b47ede2 CHROMIUM: iwl7000: dbg_ini: implement monitor dram memory dump
+9c72a19397f799f2bec40ecc7879406188019cc1 CHROMIUM: iwl7000: mvm: support FTM responder
+203b804a4b5d57e471a7fe5da3865fa66f6c1041 CHROMIUM: iwl7000: mvm: support FTM initiator
+07ac8cab724e04ddcbbc4444bfe3304f6af3cb71 CHROMIUM: iwl7000: mvm: move CSI reporting out-of-band
+d933c0d0597aff21ec68aaa3b6ff8290f8f330a9 CHROMIUM: iwl7000: mvm: clean up NO_PSDU case
+525050ee7d9619276ee0df993956a51cbe9688a7 CHROMIUM: iwl7000: mac80211: support max channel switch time element
+be591c82fa7d6752d1a22b1ea1acb694076ccfd3 CHROMIUM: iwl7000: mvm: report delayed beacon count to FW
+9c4f12f05bf21c244cabf983df52cebc0756ca5b CHROMIUM: iwl7000: receive umac and lmac error table addresses from TLVs
+dc468cf208544de06fd358477c07fc2937e51027 CHROMIUM: iwl7000: dbg_ini: rewrite trigger flow and align to FW API changes
+91d048a16723f0c576d930d18c25b22852e54936 CHROMIUM: config: Renormalize CONFIG_MM_METRICS
+402feb70395ba74173db99a39cdba2e821264bed CHROMIUM: config: Renormalize CONFIG_SND_SOC_INTEL_SKYLAKE_COMMON/HDAUDIO_CODEC
+d12dc1a835648e06925c9d8f4b4e14017104fe76 CHROMIUM: MALI: Add Mali platform specific source
+adb2e8cc8d772bd9b51fa15093820e2cf69c1415 CHROMIUM: config: Enable Mali GPU configs
+f2bcb17c654efaf8f5ecb9128c6282911e2ba99d FIXUP: CHROMIUM: MALI: Add Mali platform specific source
+847ddb58b4107383b0016b6d6727d9d5cc67ea70 CHROMIUM: config: Renormalize CONFIG_DRM_AMD_DC_DCN1_01
+fefbc1d6cffab67f0e476751f6ededbb84f5cebe CHROMIUM: iwl7000: introduce device family AX210
+c3d13859e94c8b990c7d0a9573c455ac1d611ea0 CHROMIUM: net: xt_qtaguid: Handle race condition in qtaguid_untag
+f738c609efda4ecb7b2ebe87c3ec9b97faeabc06 FIXUP: CHROMIUM: MALI: Add Mali platform specific source
+6f685149cd83dd7564ecee48ca5f67495b4371de CHROMIUM: iwl7000: add FW recovery flow
+2d70bdf994ea8a71cbc51c497bb33a4758ec9a91 CHROMIUM: iwl7000: do not fail on large amount of channels
+e4a919340155bd53ad843ec1b4f7d72a8ef24529 CHROMIUM: iwl7000: mvm: Fix possible NULL pointer dereference
+0b27c04fc7e1f226821469b36a18fe30c8d64b6a CHROMIUM: iwl7000: mac80211: abort CSA if beacon does not include CSA IEs
+a0b3a9064f54367f5f365fd20e13068dfda194f1 CHROMIUM: iwl7000: mvm: support beacon IE injection
+dae4da8310f2b885fc96f2cda0a9e6e0636f2322 CHROMIUM: iwl7000: mvm: implement CSA abort
+c8f9690a35311cc2f5b960bae67f2d4255fde494 CHROMIUM: config: base: make CONFIG_HID_MULTITOUCH builtin
+9d0e82899458dede5ff36dce2ee74f3a77c92ac1 CHROMIUM: iwl7000: xvt: always init both TX queues
+6dfb1ff437243ae098a2dbb977266c9b40fffd17 CHROMIUM: iwl7000: mvm: fix queue stop flow
+ce43df95136563b01077b9490fb61e28dc62c5e1 CHROMIUM: iwl7000: change error table mask to unsigned int
+68f05441c9a5c40bae5c4e30d9ec6bf2da348587 CHROMIUM: iwl7000: pcie: fix TX while flushing
+1de14c58c5336f1c8406cff62f47a98d710a6af5 CHROMIUM: iwl7000: mvm: fix inject IE enablement condition
+34db3974704b53a869e247f6fd0366b6f0af2dde kukui: Add to pre-cq kernel 4.19 config
+1aa8101b4688579863d28899cac7e58d92264a45 CHROMIUM: iwl7000: radiotap: add 0-length PSDU "not captured" type
+d8ebf8319f1c172b1c465662ed9eec0f9e06081e CHROMIUM: iwl7000: mvm: report all NO_DATA events to mac80211
+85265fac8c2ce277b89509c398de142ad871dd78 CHROMIUM: MALI: mali_kbase_vinstr: Use wait_event_interruptible
+e7b76743b875688906c1c9c16796c240057d61b2 CHROMIUM: iwl7000: mvm: fix potential leak in FIPS test
+06a9deda0aee493902094db9f3a6c1800f954016 CHROMIUM: iwl7000: mvm: fix RSS config command
+5998bbf3e860ae9530ecafb11eefcf070de87b1a CHROMIUM: iwl7000: fix send hcmd timeout recovery flow
+7247409045353fdf61117f38f1cfdcb2904e9f6e CHROMIUM: iwl7000: mvm: fix RFH config command with >=10 CPUs
+6d61406cd29653100a95890be7ca5cd5ae1a26f6 CHROMIUM: iwl7000: pcie: fix emergency path
+d8b62dbb954b8e97320bb0519b6500b74fa6e920 CHROMIUM: iwl7000: mvm: Fix possible NULL pointer dereference
+7c8eb8f76e43b6396f3fcf9483c88e66dc5048e1 CHROMIUM: iwl7000: xvt: always init both TX queues
+1a59b577f032d589f853c3985411c114d970ce70 CHROMIUM: iwl7000: pcie: fix TX while flushing
+aa0042e1c299202de6ea7ddbfa717ef60b394d9c CHROMIUM: add new "complete" whitelist to alt-syscall
+e9429d9466d9ee241adfcac844d671a728575d7b CHROMIUM: iwl7000: mvm: add support for 32kHz external clock indication
+8ce737341ad0fc7e12b5cb8932d73d40be5a83d0 CHROMIUM: iwl7000: dbg: temporarily skip periphery dump for AX210 devices
+8f52d1aabf8acb5b7d59e838e2b13eb9b8edaf3a CHROMIUM: iwl7000: align to new periphery address space for AX210 family
+5ffe6772e2626835b68d4024bb4bfbbfb1e22fac CHROMIUM: iwl7000: add force NMI for AX210 devices
+bd498c054f657e996db80a39eb16486003c46f1b CHROMIUM: virtwl: store plane info per virtio_gpu_object
+aeb585ad364dc59b3b7dd31b19063149edcfccb0 CHROMIUM: drm/virtio: Add virtio specific dma_buf_ops.
+cea7ac75b0485305ef7d58b47c67d4ab82e620a3 CHROMIUM: drm/virtio: Add interfaces to share dma bufs via virtwl.
+11a93b73abe7df1fb77b5ec4ee151676457a3cd9 CHROMIUM: virtwl: send foreign id support
+1fef1f410609d5ebfd7d5d4afc95dd7352b641be CHROMIUM: config: Set panic configs properly
+75999860195db6f5b24541c5003c6fe2990c4e5e CHROMIUM: iwl7000: mvm: set common calib in range request correctly
+9cc1e67deafab465fd619e30a6acada83bd46722 CHROMIUM: iwl7000: mvm: enable D3 debug feature via iwl-dbg-cfg.ini
+476793e67f65f792c518522ac682b14d25263237 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Enable pulls for BT RX and CTS lines
+e1cf88c97de113a489b1540dfe7fd10cb20ab03f CHROMIUM: iwl7000: iwiwifi: mvm: Fix FW scan concurrency support assumptions
+742c21bdf3bbd6b4619506e17b72143592f3ecb3 CHROMIUM: iwl7000: dbg: verify fwrt ops exist while checking D3 debug enabled
+c02f10acc11a1974ea995e9158d7b37e6254095f CHROMIUM: arch: config: Normalize VM configs
+6204ebdffd695a006f82c77166c5ed5775dfd84a CHROMIUM: arch: config: add ac97 driver to the guest
+3161af1015502ef76cec540c0f6800e1f1cf33a0 CHROMIUM: iwl7000: mac80211: call drv_ibss_join() on restart
+8f43d6c4b19b6b5dcc7a618123f7ce5f87f55883 CHROMIUM: Fix index computation for buffer inside printable_cmdline
+87a794e384f720daa821c0e3471c64820aefde88 ANDROID: thermal: cpu_cooling: Use related_cpus for energy model cpumask check
+c9bad324e1e60edaf11db0e0e0a9e058b8b6affd CHROMIUM: iwl7000: mvm: add support for new FTM fw API
+8d10a50aaed1e95fa0053f032ff75f42bdf5fd41 CHROMIUM: iwl7000: mvm: add support for new FTM fw API
+3aa413a7ae2388f9738c0edf046b098e8a39831d CHROMIUM: iwl7000: bump FW API to 47 for 22000 series
+85f1aae8a798e4197ec68eaaab822c87ecb3ecad CHROMIUM: iwl7000: mac80211: fix position of vendor_data read
+033e9bc89f187b3c291a2cbdf3fd85c643d77665 CHROMIUM: iwl7000: use bit 17 for FTM new range request API TLV
+276a1f62ed83ae642b10f399647da22e6d466b09 CHROMIUM: iwl7000: use bit 17 for FTM new range request API TLV
+6814c6a28f808364d748c61f68effbb4c9d88064 CHROMIUM: iwl7000: mvm: fix HE radiotap data4 for HE-TB PPDUs
+a5f4fc88cb4b021a69940965e456551bf89ffcdf CHROMIUM: iwl7000: mvm: clear radiotap vendor data padding
+7b41b7223a3f28531ad81dad4084adfacb18f34b CHROMIUM: iwl7000: mvm: add debug prints for FTM
+e41105b0ac25d88e9b5b43371c8ced9e8bda4826 CHROMIUM: iwl7000: start using B-step for some 9000 devices
+280e5ac48bc701ab2fed0f888e1c996d14bce6d9 CHROMIUM: iwl7000: mac80211: notify driver on subsequent CSA beacons
+20eb4c4c393780849eb1dfa7e987e00651b9f1a1 CHROMIUM: iwl7000: mvm: track CSA beacons
+ad6ad2cf3ae96ea8cd91a4789e8b7c1e6a3fa294 CHROMIUM: iwl7000: mvm: notify FW on quiet mode in CSA
+3042e3a353a5bb8723c5adacf7dfe1786d0525fa CHROMIUM: iwl7000: mvm: disconnect in case of bad channel switch parameters
+37f4b2999a9fde82f52379d71cc2037a24ef8df2 CHROMIUM: iwl7000: mac80211: allow CSA to self with immediate quiet
+6df948ec94fd39dfe96a5f48839328ccef27f267 CHROMIUM: iwl7000: mvm: track changes in beacon count during channel switch
+8e7ab0a506613ab4f68411005c0aa5fb979b3f4d CHROMIUM: iwl7000: mac80211: ignore quiet mode in probe
+05df16e7218d40667a4b0684abe066ae99afea62 CHROMIUM: iwl7000: mvm: fix civic request in FTM range request
+ec7b307409874386fdfdda69e4dcdacb1ea14d09 CHROMIUM: iwl7000: dbg_ini: properly use active user trigger
+86f8634fbc933a36d12c8d9b7e8c08489ad9fe42 CHROMIUM: iwl7000: properly use delay option in dump trigger flow
+61299fa1775e6fb9e8a1cd1385544ee75e155d2e CHROMIUM: iwl7000: mvm: set timeout to depend on global timeout factor
+6ea4279661edcde1ec31f805ed050545f870952f CHROMIUM: iwl7000: mac80211: add a missing return
+d425450f3a025f7442f25c5786be009adeee70ae CHROMIUM: config: Turn on rpmhpd option for Qualcomm
+079b19ae87e3a8100adf922c115f32985118c949 CHROMIUM: iwl7000: mvm: fix civic request in FTM range request
+7bcc1851212751dab51cef903cb9f6f5b1103d27 CHROMIUM: ASoC: max98927: Delete list entry for dev in case of i2c failure.
+c4cc35134a89c509e8fe2942b9dd00ee077fe0e4 CHROMIUM: iwl7000: iwiwifi: mvm: Fix FW scan concurrency support assumptions
+0ccd37a6b201352ea3ce754d7758ef50a7e66f85 CHROMIUM: iwl7000: mac80211: call drv_ibss_join() on restart
+be8d5ce67c48a23621527076d2385e4ce5d7b68b CHROMIUM: iwl7000: start using B-step for some 9000 devices
+703a6cb6ed05b1fa231e66789c22d4fb55926815 CHROMIUM: iwl7000: properly use delay option in dump trigger flow
+21a2f6f0c9f7d9dd1f73f08bf0134376b48a5e27 CHROMIUM: iwl7000: dbg_ini: enable ignore consecutive trigger feature
+77db53cff9a541f529aa0f1de477146eb134cbdd CHROMIUM: iwl7000: iwiwifi: mvm: Fix FW scan concurrency support assumptions
+d9aa70808bb9aa8cb2c3d8fcf4bb6e129fc242fb CHROMIUM: iwl7000: dbg: verify fwrt ops exist while checking D3 debug enabled
+c65535fcc0deea7a3af5da87d7c76d2fc7034162 CHROMIUM: iwl7000: mac80211: call drv_ibss_join() on restart
+3622236b8b4465964c317c94d8a2af8b673086e8 CHROMIUM: iwl7000: mvm: add debug prints for FTM
+7922e31038811e61db5c698e096ea9fbf7a78a3d CHROMIUM: iwl7000: start using B-step for some 9000 devices
+61beae217a9ba96f37a92c81bdc958e7d2a750a8 CHROMIUM: iwl7000: dbg_ini: properly use active user trigger
+4370137c8ecc3cda80222bb87a182b94d755f3d0 CHROMIUM: iwl7000: properly use delay option in dump trigger flow
+65f9d81cce10f2ce0bf7dee3fe193cbc1cd4739c CHROMIUM: iwl7000: mac80211: add a missing return
+505b8a9fd57cfd72f0ce79bacbb6a6c0163a5969 CHROMIUM: iwl7000: pcie: phase out dma_zalloc_coherent()
+2d23f50cb4d4eee6ef71ac7ffed506fd6fcee382 CHROMIUM: iwl7000: pcie: phase out dma_zalloc_coherent()
+7ebe233d392e96d52f1c37b865126edabb79cc6c CHROMIUM: iwl7000: pcie: phase out dma_zalloc_coherent()
+af9d4808e9062dd1b9277ed9928356df3c9de708 CHROMIUM: iwl7000: mvm: fix the spatial reuse parsing for HE_TRIG PPDUs
+7e65453a1f72ef49abb928a2f54ba4b653bcab6f CHROMIUM: iwlwifi: depend on not selecting IWL7000
+64989623859789c3edb8b5b293bc7ac5b4bfb807 CHROMIUM: iwl7000: dbg: buffer overflow in non_collect_ts_start array
+69fb3c27cba4bf15ab668b1a50534a17a4c98ebd CHROMIUM: iwl7000: mac80211: fix unitialized value
+949b0a2715ff87ff18ec9374dabd1d80a0371f8a FIXUP: FROMLIST: arm64: dts: qcom: sdm845: add UFS controller FIXUP: FROMLIST: arm64: dts: qcom: sdm845: Add UFS nodes for sdm845-mtp FIXUP: CHROMIUM: arm64: dts: qcom: sdm845: Add UFS to Cheza
+0cdddbdd158e8ef14510ed1473fa1aa5f48e5c3c CHROMIUM: arm64: dts: qcom: sdm845-cheza: Add wcn3990-bt node
+58e22f853418164e93183d429e04c4915edce6e6 FIXUP: Update some EAS patches to newer versions used by Android
+c106d1c1c3d0922a3ae2b0af2b14c0ea8f60810c ANDROID: sched: Align EAS with upstream
+3659b3273369ad216c12d112f1abcb543b82d5aa ANDROID: sched: Clean-up SchedTune documentation
+e86362bf972fc358ac5ab482b359c91ebfb3888d ANDROID: PM / OPP: Add missing of_node_put() to power estimation helper
+919ff4f652210197009d89db6d25d7acf801e9f4 ANDROID: sched/events: Fix out of bound memory access
+a15161b991bc0fcb260c0dfeca676b1c3f051ce1 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Turn on the lpasscc
+eb583faedd73dbca851f78ccc6ae694043949fd3 CHROMIUM: iwl7000: mvm: Don't warn on command failure during restart
+1afbe65c4537602b80500e3827e6e3a289cad368 CHROMIUM: iwl7000: mvm: Do not return an error value on HW restart
+1fd4bf0aadf0b26f0a206e33eb3dc04cd33d114c CHROMIUM: esdfs: do not modify permissions on Downloads directory
+9ba48f0fa543a8372c948dd3cc64e242d52ed810 CHROMIUM: config: Normalize (USB_ROLE_SWITCH)
+5fddfbc070a91d0eac8669d703fee0a95fb7ef3f CHROMIUM: config: Normalize (IWL7000)
+f17833e65bb7184d9fab48ec8ec5fdb6b9753535 CHROMIUM: config: Normalize (MTK_CMDQ)
+a40c0124da7a1b7d91521b5a2a135592df0ae75f CHROMIUM: scripts: Account for clang in the kernel config scripts
+1632a6e133a57786b3de0c1c0e2c9ebcc0240a41 CHROMIUM: config: Normalize (clang vs gcc)
+2cf2c17c8a4398bb494b2996818bcc617d3ad3c6 CHROMIUM: config: Normalize (KCOV, CC_HAS_SANCOV_TRACE_PC)
+92159543e497bdc9b374610f97192f6cacce110a CHROMIUM: iwl7000: fwrt: remove fw_running op
+5f0a2e3bb2abe57e7ce955d795ee82448b750c93 CHROMIUM: iwl7000: fix early debug collection flow
+53371c3e212e8511f7f0d571124eef890c86d59f CHROMIUM: iwl7000: dbg_ini: add early and after alive apply points to unified images
+59b662c012305f1c8dba57e44f22bd49f760077d CHROMIUM: iwl7000: mvm: stop static queues correctly
+4b8293a15ec2709e3c161f6ffa8bf916263a4885 CHROMIUM: iwl7000: pcie: allocate rb_stts's for all queues in one place
+587046d3fc8c9815a90c3e7c8d4da318ff42d961 CHROMIUM: iwl7000: mvm: Don't request HW restart if already requested
+00459934f9107ce760b36152d7899c1553469a6d CHROMIUM: config: mediatek: Enable PINCTRL_MT8183 only
+3f046d037563087de632ecb337b40616f2dc4b9c CHROMIUM: iwl7000: xvt: use read_umac_prph for reading MAC address
+294c063f5acf43351ad986db817901b9611c13a0 CHROMIUM: iwl7000: mvm: use IS_ENABLED(CONFIG_NET) in C instead of CPP
+0ed74cb0ab365bb8d95d7e6832060d1fa1b9107a CHROMIUM: iwl7000: fix false-positive maybe-uninitialized warning
+2127806e6aa92e27bc8ffb8164c8d0936977e639 CHROMIUM: iwl7000: eeprom-parse: use struct_size() in kzalloc()
+aa9ba0040e13a93127a6fed324039db7385f3949 CHROMIUM: iwl7000: nvm-parse: use struct_size() in kzalloc()
+866e781a89b452f3f963ed32953a9b722ea68b3d CHROMIUM: enable request API for Mediatek devices
+4cbf54dba1142d1069a667afd8ed42c45a770832 CHROMIUM: iwl7000: mvm: fix error path in iwl_mvm_mac_setup_register()
+84732b4fcafff496a99554e0448a64539abd5915 CHROMIUM: iwl7000: mac80211: shorten debug print to avoid warning
+f5c22159648e31acc59950b214645c94fa49a3df CHROMIUM: iwl7000: nvm-parse: advertise IEEE80211_VHT_EXT_NSS_BW_CAPABLE in VHT
+9cdf2b9bf2a14807b01e81854989f62a438f277c CHROMIUM: iwl7000: mac80211: pass bssids to elements parsing function
+b42fa79a825061427a0091346bcb4d96e76fb22a CHROMIUM: iwl7000: mac80211: move the bss update from elements to an helper
+1bc2731a449f4e98b0d2dafc5b5c9b7df0605665 CHROMIUM: MALI: Don't log error on EPROBE_DEFER.
+3c646a84b0cd982401018f98260a264e49ba220b CHROMIUM: chromeos_acpi: Don't evaluate the "\\S3UE" object
+6f02e5c90e88628e5036920d131c7f47f627de2c CHROMIUM: iwl7000: fw: no need to check return value of debugfs_create functions
+d5ffbad84dd39cc6da9d50ca56ea9b43dcd759cc CHROMIUM: iwl7000: iwl-drv: no need to check return value of debugfs_create functions
+493da12f4603cf9137b102714b391d4c6cb413e0 chromeos_acpi: Remove the unused variable
+64b3e022476b396332b92d4820b34bbaee063191 CHROMIUM: Remove CONFIG_PHY_QCOM_UFS
+f0ca44068a0287f1fdad25ef736c6803717f34ce CHROMIUM: MALI: Fix GPU kernel memory leak issue
+6db60589f83ccde3a7146b44f2740952ec436f15 CHROMIUM: iwl7000: set AUTO_FUNC_BOOT_ENA bit in AX210 devices
+2823beef30ae5a5519ce439b108518518759d8fc CHROMIUM: iwl7000: cfg80211: Parsing of Multiple BSSID information in scanning
+d31d0fa03ad842e0d702d32aa815bc6af1a5287c CHROMIUM: iwl7000: mac80211: support mbssid
+d890e7779427feefde74e6f5f48347be2acc28d0 CHROMIUM: iwl7000: mac80211: indicate support for multiple BSSID
+d87f66708d5ec0ed35444059611cd77017f0f2e0 CHROMIUM: iwl7000: mvm: support multiple BSSID
+b1f694cb73393485ac1d3cf21dcf64579af2fecc CHROMIUM: iwl7000: mvm: reject new beacons when in inject mode
+369f396069fb99dd04d275b63be37ba668f30f9d CHROMIUM: iwl7000: mvm: add read debugfs for he_sniffer_params
+46e1ac8da48ed5d76485ea98ef5174f730e0fa69 CHROMIUM: iwl7000: mvm: unicast the CSI data
+e34a4e7908dfb9e247a71f8fc2540ddca658b1b3 CHROMIUM: iwl7000: mvm: support non-transmitting AP
+7ba7eed7202ddaa3207af0f37f23318beb2deeb3 CHROMIUM: iwl7000: dbg_ini: enable ignore consecutive trigger feature
+f973e648fbe41a80b54e659bb48af271ac6e52aa CHROMIUM: iwl7000: dbg: buffer overflow in non_collect_ts_start array
+9850d45736b82636f56a163425486c1e8322db42 CHROMIUM: iwl7000: mvm: Don't warn on command failure during restart
+fd59fa4bf6925716bd4a0ede877311cc3864bcee CHROMIUM: iwl7000: mvm: Do not return an error value on HW restart
+f98949e56cdb79771391990fef98c3a29d7f3a0b CHROMIUM: iwl7000: fix early debug collection flow
+bbde04806fb150d6f165ee512b37d04453a3562b CHROMIUM: iwl7000: mvm: stop static queues correctly
+5d823d5d331343ed5ff22baecd0a3fa30099e360 CHROMIUM: iwl7000: mvm: Don't request HW restart if already requested
+72956d08c2ceb700b3162e2f3cb2ad074a362983 CHROMIUM: iwl7000: mvm: fix error path in iwl_mvm_mac_setup_register()
+7d1544bbfd0af46e50655408df0ae09e375ab066 CHROMIUM: iwl7000: mac80211: shorten debug print to avoid warning
+8138712a6f8316abc0bf0b6ac744a12bfc6fa4c9 CHROMIUM: iwl7000: mac80211: update HE IEs to D3.3
+c47149ae0be15f9b17140966bff130a477b9cb8e CHROMIUM: iwl7000: mvm: Set TX_CMD_FLG_PROT_REQUIRE correctly
+7d85b6320794ece7ff3ed4b05f2e011f7588b771 CHROMIUM: iwl7000: mvm: remove IWL_MVM_INIT_STATUS_REG_HW_INIT_COMPLETE
+89502ffd98e722d915842e3b1a32606fece0727d CHROMIUM: iwl7000: mac80211: use int for low/high_th because -1 means not set
+e45ce2b052d157c713aed32a90610d4b59dd3eec CHROMIUM: iwl7000: mvm: use sizeof(dst) in memcpy in iwl_mvm_sniffer_apply()
+21276c91a322bd526f10360eed56e481e8cac093 CHROMIUM: iwl7000: fix send hcmd timeout recovery flow
+7504c87d1e788b66140fafbd66e0841cdc735b9b CHROMIUM: iwl7000: dbg_ini: move INI_DUMP_BIT define inside dbg.h header ifndef
+8691251c72383160ceb50d0225bebb3257a7a1db CHROMIUM: iwl7000: mvm: Allow retries for probe responses
+cede643da1f0b04d4b71ee4a2218872f0d009066 CHROMIUM: iwl7000: mvm: implement VHT extended NSS support in rs.c
+2f932609fcf02f371d032b34b0d465ef6ee40cb8 CHROMIUM: iwl7000: change BISR workaround msleep to mdelay
+e220251ce69daf1df6a656852261ddc706fc3c68 CHROMIUM: iwl7000: mvm: vendor-cmds: use DEFINE_SPINLOCK()
+e6ca568ed2963287e6e9d7b3b898a1ff2cdfd6c0 CHROMIUM: iwl7000: mac80211: Fix Tx aggregation session tear down with ITXQs
+18aae217854acbb58e543a47327043d7d7ef312b CHROMIUM: iwl7000: remove redundant condition from prior alive dump flow
+de3d3c71f645ac51975b343f0a0e85b10b0c17ef CHROMIUM: iwl7000: mvm: add some debug data to TX path
+c0a12ef31153ba3d72cdbfc817bf77956d5ade57 CHROMIUM: iwl7000: dbg_ini: fix infinite time ignore consecutive dumps
+8795a4e15720676872d05b70aa2a0305019b98d2 CHROMIUM: iwl7000: dbg_ini: add print to iwl_dump_ini_mem in case of invalid range
+d102148466c08713e8871eca27b73edf0475e633 CHROMIUM: iwl7000: dbg_ini: make memory dump get_size handler include headers
+b0f08e6e5b866a4651bae7287c617304e00cd497 CHROMIUM: iwl7000: dbg_ini: make fill_range handler accept generic range pointer
+a0a2e1bc62f05c72736acd40f4013e7302cf9c72 CHROMIUM: iwl7000: dbg_ini: add region to fill_header handler
+d04b4ce3e2f000a7ed3e0e498255d84d040ceeb9 CHROMIUM: iwl7000: dbg_ini: implement Tx fifos dump
+0ea421f620e9fca0a850550db384951d92cb59d3 CHROMIUM: iwl7000: dbg_ini: implement Rx fifos dump
+11de2cc78431001baef9cc114fa2046f78118bf9 CHROMIUM: config: Enable BFQ IO scheduler
+592f4e54eed6a0377e4ec268ac5cbf6981c89173 CHROMIUM: tpm: cr50_i2c: handle large burstcnt
+125900ccdbadca5c29424c39a11842e91cc77c92 CHROMIUM: tpm: cr50_i2c: handle small first chunk
+0af520103684cdc3a6cdf2973037bf783058a748 CHROMIUM: tpm: cr50_i2c: Fixed wildcard formatting
+8febd0966b0a88e0d4f3a25b5aa8c5087f12e8d1 CHROMIUM: tpm: cr50_i2c: non-fatal ready-irq timeouts
+a65ca962d9c9915bcb7cfb1833fee6a32dcfe316 CHROMIUM: iwl7000: change BISR workaround msleep to mdelay
+29e9f4af22d0280e8d3cc3618090af689eff3e9e CHROMIUM: iwl7000: add new card for 9260 series
+f303bec647b24a4c635e0fd1f98cb8e393709b61 CHROMIUM: iwl7000: add new cards for 22000 and killer series and change the market name
+f36b55f203fc1fe6a2976093e6779beb43281a8b CHROMIUM: iwl7000: chromeOS: adjust version check for support_mbssid
+7a9411cb0210139b6cee42d65215d95adfca853c CHROMIUM: iwl7000: chromeOS: adjust version check for mbssid code
+b3afc49a1071d5bfa5422c9463e0a25f32e2247b CHROMIUM: iwl7000: chromeOS: adjust FTM initiator version
+63a458042a87eb4fd5d3464e183e187b99ed748a CHROMIUM: iwl7000: chromeOS: include hash.h in mac80211-bp.h
+c3e5534a0679a8ace49fa98c2784d785002b30ac CHROMIUM: iwl7000: dbg: add UMAC periphery offset for RXFIFO2
+9326a406ff6519a9db9f3b18e96f3dd69e4bdbd6 CHROMIUM: iwl7000: add new card for 9260 series
+5133df2897e0898b114154b192eb06a384901ed3 CHROMIUM: iwl7000: add new cards for 22000 and killer series and change the market name
+beb44bc663fe8f15ddf6a93461049fb233c8a132 CHROMIUM: iwl7000: mvm: fix CSI collection after FW crash
+e658b182cb4d4843d9384353c517e7d02d7eac7d CHROMIUM: arm64: dts: qcom: sdm845-cheza: Add alias for Bluetooth node
+c0a3d5796a00fe2c64bc4ec083fd21d38245817f CHROMIUM: wilco_ec: Fix check of NO_RESPONSE flag in mailbox()
+cf19c73fd78d42b5524a7c536fcb899ec1153c99 CHROMIUM: iwl7000: mvm: unicast the CSI data
+944ae37b3364a31da3af740348cfbb3d4a330608 CHROMIUM: iwl7000: mvm: Set TX_CMD_FLG_PROT_REQUIRE correctly
+28e331e858a6c8c43f3d7cb7e1f1651638e01026 CHROMIUM: iwl7000: fix send hcmd timeout recovery flow
+5975904a3e080128efb4f561517a838a13aee83e CHROMIUM: iwl7000: dbg_ini: move INI_DUMP_BIT define inside dbg.h header ifndef
+e5fb14b68e652274417029cabd61e2e71df250ef CHROMIUM: iwl7000: mvm: Allow retries for probe responses
+f3984e5e79187d2c6cf20e8c46a8f702c9744f98 CHROMIUM: iwl7000: mac80211: Increase MAX_MSG_LEN
+d2c15c31aa2225f4171d4931d5ba3f5d4be0bc1c CHROMIUM: iwl7000: mvm: vendor-cmds: use DEFINE_SPINLOCK()
+7214aaa3cf1a3d56b5a7951173d57134129b383d CHROMIUM: iwl7000: mac80211: Fix Tx aggregation session tear down with ITXQs
+a500a97fc5c07206232b2ce277e34ec1f3dc7cbd CHROMIUM: iwl7000: remove redundant condition from prior alive dump flow
+360f70c73ecd7158afe0fd5694c4924240e17e14 CHROMIUM: iwl7000: dbg_ini: fix infinite time ignore consecutive dumps
+87ee387fbbadc20a0772fb34cdbeee39859f53a1 CHROMIUM: iwl7000: chromeOS: adjust FTM initiator version
+59692bd96c3ff19d7d562f62b014b6f21cca4265 CHROMIUM: iwl7000: chromeOS: include hash.h in mac80211-bp.h
+30665c0fd89f4ed04b7f2604d66473a27cface58 CHROMIUM: iwl7000: dbg: add UMAC periphery offset for RXFIFO2
+d9126003297f60e42546b27bce16ac9af6ea3a3f CHROMIUM: iwl7000: mvm: fix CSI collection after FW crash
+4a77a3cd9caa73f8c5fd7956d3bb8f594f6a8a17 CHROMIUM: config: Update TEST_MODULE to TEST_LKM
+d65297cc962d56b8d69b8facbeb92c17d6d9ba87 CHROMIUM: iwl7000: Merge remote-tracking branch 'local_auto/master' into merge
+f3689edf4a19f69eaa9fe3e93482d378406d1f25 CHROMIUM: iwl7000: re-add iwl-dbg-tlv.h
+6f21fbb2705db5549204db2a69357e2fbb99e0db CHROMIUM: iwl7000: mvm: enable HT/VHT IBSS
+53984f3c3dee46b0750d1105d745236d3cae3600 CHROMIUM: iwl7000: mvm: fix TX crypto on 22560+ devices
+d5ba4e7fa0dd8ef53ff224df57e0765306efc509 CHROMIUM: iwl7000: mvm: be more forgiving if num of channels is too big
+d644be29f4f41f517ed239fa31b534765a34c43d CHROMIUM: iwl7000: add support for 6-7 GHz channels
+2be9a53d4c436b4b64a67a7c3a243869f98e8234 CHROMIUM: iwl7000: support new NVM response API
+2cf5b2df55b8777abbc76833f92731d0295af510 CHROMIUM: iwl7000: mvm: don't wake the static queues of a removed station
+50c07ccb623dde05f6aa9ea96390a98d10d44da7 CHROMIUM: iwl7000: mvm: go back to WEP HW crypto for managed mode
+d5fba5725a0b6da5a18957d7c709a26164d885ba CHROMIUM: iwl7000: mvm: Support new format of SCAN_OFFLOAD_PROFILES_QUERY_RSP
+73e86c56e21906204752c312e397ad24370e14ae CHROMIUM: config: Normalize config for 4.19 kernel
+e4c2e1c2320319e0e63ad64a67f1f39db33a4f13 CHROMIUM: iwl7000: chromeOS: fix beacon_ftm_len macro definition
+9676062770af22576a6dc1fde6824d15fe7a0f30 CHROMIUM: iwl7000: remove unused DEBUG_IO
+6dd1589f1895cc09bf18b3aa1e3ea0e075dc37f2 CHROMIUM: iwl7000: dbg: use dump mask for tx command dumping length
+88dbd630b808aa02c60125fdaffdad0c45296296 CHROMIUM: iwl7000: mvm: don't rely on mvm in the IWL_MVM_D3_DEBUG macro
+f0354274b6683e0e16b173a8f73fcd64c6cc6781 CHROMIUM: config: Enable IWL7000 on Intel for 4.19
+3c46e31d93654fd4a0c820b953cb47280de1677d CHROMIUM: iwl7000: cfg80211: add and use strongly typed element iteration macros
+4cc8fb22e241a64dab0eac1ede50af043f8dcc6f CHROMIUM: iwl7000: mac80211: use element iteration macro in parsing
+e051fb30b65b27a1c735504a094d329bb165796d CHROMIUM: iwl7000: mac80211: use for_each_element() for multi-bssid parsing
+d696a97cba485d65e65d473fded4e9a91b84c418 CHROMIUM: iwl7000: mac80211: properly advertise multi-BSSID to HE APs
+c5128527706440691c50dea89861fdb0919af80a CHROMIUM: iwl7000: mvm: use dump worker during restart instead of sync dump
+72c35a00b66069be98994f2ec077c6ce3b842de0 CHROMIUM: iwl7000: ieee80211: fix for_each_element_extid()
+6d03e5980d1ab010779f6079b601c31eb5651430 CHROMIUM: iwl7000: pcie: switch to correct RBD/CD layout for 22560
+dc54601a6686660b243b0d88ec1f23d55523147f CHROMIUM: iwl7000: for AX210 device support radio GF4
+d5610da1ec1722b43be38cdbc97c2b7a2a11dd91 CHROMIUM: iwl7000: mvm: update CSI API
+863b68ecf4f5dcdcc761dbdbc51b7046ecc00fdc CHROMIUM: arch: arm64: configs: renormalize container-vm defconfig
+c93b7efc374a5a70cdc126fec7f03b3d290a4bd2 CHROMIUM: arch: arm64: configs: enable additional container-vm cgroups
+da88074c65b79cedfd8989dadc0942497ac93b38 CHROMIUM: arch: x86: configs: renormalize container-vm defconfig
+477e29c1dca0e3873275ae5458419c9c3641a938 CHROMIUM: arch: x86: configs: enable additional container-vm cgroups
+93bf3f88079c51055c009714d164248a07aa7d96 CHROMIUM: config: disable legacy energy model for SDM845
+f4afad36b8e0189c86b790def03f8c929fc4e849 CHROMIUM: iwl7000: add sync_nmi to trans ops
+31a3a2075f4e2b06092ba65647e8d4c5268a6523 CHROMIUM: iwl7000: dbg_ini: in case of region dump failure set memory to 0
+cbfc1c5b6ed719f686dca3694c9c0b195d434a2b CHROMIUM: iwl7000: mvm: use do_div in ftm to avoid problems with 32-bit platforms
+906f3f9efedf4fb37cba07ede1eba57e84877fce CHROMIUM: iwl7000: mac80211: Increase MAX_MSG_LEN
+fb7cc12a81fe6a8dfa2a02f3bcdef205b8c063b6 CHROMIUM: iwl7000: mvm: enable HT/VHT IBSS
+3ce8ba76545780f4c06c0e0b6fec362617c09483 CHROMIUM: iwl7000: mvm: fix TX crypto on 22560+ devices
+ac253e66995deaf8c48ead179baf7aaf7b73ca7f CHROMIUM: iwl7000: dbg_ini: fix bad dump size calculation
+dff61d84f2b4425d69a8470ee408e3a86aeff3c2 CHROMIUM: iwl7000: use sync nmi in case of init flow failure
+e3f0ffc881e22762bb17d361e7262ee8f246556e CHROMIUM: iwl7000: mvm: go back to WEP HW crypto for managed mode
+29f152f3e6b3ad61d3039aeca333f738fc6555ef CHROMIUM: iwl7000: mvm: don't wake the static queues of a removed station
+6922636ea702d7f16d5bab91999cf9d994f974ec CHROMIUM: iwl7000: mvm: set max amsdu for TLC offload
+13ec476674bbbd09c14efd5410c76e0b9ef01fd8 CHROMIUM: iwl7000: dbg: add DRAM monitor support for AX210 device family
+73b475e844943b55023cc6aceb0742bf898a53ef CHROMIUM: iwl7000: dbg_ini: separate between ini and legacy dump flows
+4c5988c9c2f1679ed0c16cd25aabbffceb0e9ce6 CHROMIUM: iwl7000: Use struct_size() in kzalloc
+bf7c84c36f8ffa90c9a999d781417b8a45d059e3 CHROMIUM: iwl7000: remove unnecessary goto out in iwl_parse_nvm_mcc_info()
+caf78f1df3b6c6fe656592788c29728a10ad2a7b CHROMIUM: iwl7000: dbg_ini: align to FW api version 1
+f870bb588a75117872acdd1933158513a927149d CHROMIUM: Fix for unclose MFGPLL clock
+c83674ce9eecc227cc82fa85f50d3052b3eef220 hatch: Add to pre-cq kernel 4.19 config
+835a5ffdd7a52d199e99389d294f54575c327ee3 CHROMIUM: config: Enable I2C-HID driver
+14720f25d04f57526074e05dc061efe0502ea22b CHROMIUM: iwl7000: dbg_ini: support HW error trigger
+6573f2259d0dd9b80205f5047aff0a6643d6993b CHROMIUM: iwl7000: dbg_ini: enforce always on domain checking
+9c12218c57bd2c3d6a4b52a87dd08db4fec5ed52 CHROMIUM: iwl7000: chromeOS: remove for_each_element() and friends backport
+d0d8df2b358b3b26942ba86a1824224ed3eeb00d CHROMIUM: iwl7000: dbg_ini: fix iwl_dump_ini_dev_mem_iter memory base address
+adc35f61bd318b6902c6efc7d3d9385420f4bf4e CHROMIUM: iwl7000: dbg_ini: add memory offset to the base address of a memory region
+9e088cac46bd6afae7399f14a887d75e7354a52c CHROMIUM: iwl7000: dbg_ini: add version to dump header
+d70bed1ebfe22d2d374c8b72d520aac019d815c2 CHROMIUM: iwl7000: dbg_ini: add region id to the region dump
+09116f515764709675f5045c5e2e4238e9fb6c5b CHROMIUM: iwl7000: trust calling function
+26389e3c4ab01a298e185bcd8e4a7fe1cce49e22 CHROMIUM: iwl7000: dbg_ini: add registers addresses in fifo dump
+23ef5260c35fc9397d766fdabca712603710d5d5 CHROMIUM: iwl7000: mvm: IBSS: use BE FIFO for multicast
+ce74fb4e5468538650f9387ac0752e7bb8dc0d37 CHROMIUM: config: Normalize config for 4.19 kernel
+7ea8393952d6190861b75c7a9fefd2e7aaf10fcc CHROMEOS: config: enable STATIC_USERMODEHELPER
+6045c105b596c1467a55f2f024d5ad5fac531104 CHROMIUM: iwl7000: mvm: define beacon_inject_active also when CONFIG_PM is disabled
+bfa5555e55e0f2e60f712dbe7446bdcba4785f2f CHROMIUM: iwl7000: mvm: Use div64_s64 instead of do_div in iwl_mvm_debug_range_resp
+3ba8da3fe1bce352b626328d94abc42373cea8e2 CHROMIUM: virtwl: fix dma_buf_get() retval handling
+64dd62203eaff5e7b0dd9913588cfa62d9ab0187 CHROMIUM: iwl7000: dbg_ini: change memory range base address to u64
+aa91c2bf898388ffe92da480755bdd881e9ddc0e CHROMIUM: iwl7000: dbg_ini: fix the dram monitor header size
+75a9c22f94644ce24af53c79ea5042db199b2df1 CHROMIUM: iwl7000: dbg_ini: add monitor header to smem monitor
+60ca25dd6618b2b3eb91c7d6a94c878b2cd0bb76 CHROMIUM: iwl7000: mvm: IBSS: use BE FIFO for multicast
+3afcf2a10854744df4d63a1a1b1736fa7f1a6e3e CHROMIUM: iwl7000: mvm: fix pointer reference when setting HE QAM thres
+fd2a9d1886ef4a2c9d5b02bc99ea7a821532351f CHROMIUM: iwl7000: dbg_ini: remove redundant curly brackets from trigger collection flow
+8080a93b819b07181e0731992bc941db2abd0841 CHROMIUM: iwl7000: dbg_ini: remove redundant type argument from iwl_dump_ini_mem
+17581c1507d171c3779e86684baf1e62cdad071a CHROMIUM: iwl7000: dbg_ini: apply rx fifo offset after reading the region registers
+04fdb1751c20b807c81be7b43e2de7389e2b25ca CHROMIUM: Device driver for TPM over virtio
+d1b825f0826a8ecf5f1751e431788cbbdec7d6d0 CHROMIUM: iwl7000: backports: handle RHEL 7.6 kernel
+830fa253ef54b8b9eb273b406f76c293f5ddf198 CHROMIUM: iwl7000: dbg_ini: in case of region dump failure set memory to 0
+14a9f7b3834432a815b84a2dd46590d9fc77dbdf CHROMIUM: iwl7000: mvm: use do_div in ftm to avoid problems with 32-bit platforms
+ddc5c49b9ee57cf561a8ee1d4d743e26f659efd5 CHROMIUM: iwl7000: dbg_ini: fix bad dump size calculation
+3cbb2c61d86bd6acb7de07e83a343170c45e4ea2 CHROMIUM: iwl7000: backports: handle RHEL 7.6 kernel
+264647d7560369dd7ba4842c6719b50ed99e88e3 CHROMIUM: iwl7000: mvm: remove buggy and unnecessary hw_queue initialization
+ac19de4026ff86fe47cdfb98357936ee31263037 CHROMIUM: iwl7000: cfg80211: support non-inheritance element
+1d927bf59fc55bbb7271fb829a57a63ff407019f CHROMIUM: iwl7000: mac80211: support non-inheritance element
+d60f72bd41f29ecfd441dc3381735253561971f2 CHROMIUM: iwl7000: mvm: Use div_s64 instead of do_div in iwl_mvm_debug_range_resp
+9e1073142f0ec077aab691243424d83802990cc7 CHROMIUM: iwl7000: mvm: no need to check return value of debugfs_create functions
+c166b6247ea85e86976fbbf76dafc9a438fcc574 CHROMIUM: iwl7000: pcie: no need to check return value of debugfs_create functions
+dd182c3f3290131680af1b265c6990ca78bc66ca CHROMIUM: ALSA: hda: SND_HDA_CODEC_CA0132 depends on PCI
+13685a4a80be94f9238fea0fac915a3d39911306 CHROMIUM: iwl7000: rename structs to fit the new names
+be13299e1edbe50739f00ef131285c7d49ba59e2 CHROMIUM: iwl7000: add new 0x2723/0x2080 card for 22000
+5b2e13de728eafbf32ce18a878e74b7d7d0d10bc CHROMIUM: iwl7000: dbg: fill radio registers data regardless of fifos data dumping
+63c213f1ef63ab5f16855f2771489d40baaf7bb9 CHROMIUM: iwl7000: mvm: use correct GP2 register address for 22000 family
+77e0d8162f64b6af9062e4893bc1bafe620f1b5a CHROMIUM: iwl7000: mvm: avoid possible deadlock in tx path
+dde7e67247918f8061f3624420f28a75cd746807 CHROMIUM: soc: rockchip: power-domain: Ignore 'shift-count-negative' warning
+fb30686dc3e64d75aa784e175592582c30aa3db2 CHROMIUM: Add generic builders to COMMIT-QUEUE.ini in chromeos-4.19
+4eb1fdcc8e33a51ca736221699605f159c2f9875 CHROMIUM: iwl7000: set 512 TX queue slots for AX210 devices
+a8ec835611f6d62a4ad3bf4518ed0aed870d3714 CHROMIUM: iwl7000: mac80211: support profile split between elements
+990fcffbc3fd90689aa2651f48dfc1952dae6e54 CHROMIUM: iwl7000: mvm: support HE context cmd API change
+5d437a6ce6d155a8cf18504afe3664df6229315a CHROMIUM: iwl7000: xvt: send remove tx q cmd
+67a641795135203a79ae2da4b8e5d570c0452003 CHROMIUM: iwl7000: bump FW API to 48 for 22000 series
+24c770b28eee05f9fea87956863c84775d21e9c7 CHROMIUM: config: VMs don't need LOW_MEM_NOTIFY
+2f00e9b0b7a99ff303a1629c26b8fbeac7a73717 CHROMIUM: Fix Bluetooth controller event mask config during system suspend
+c7f6fe1c8611d4f0481497abb37e6f14cf9ed805 CHROMIUM: Drop Bluetooth connection with weak encryption key
+d4f421e3df2252df80a26b4486595cc6e20945ba CHROMIUM: config: normalize configs
+a1546a569c391739e7cbdc887108ecf7809476c3 CHROMIUM: config: Enable CONFIG_CHARGER_CROS_USBPD
+8d5efbab9fa2f71b3ea8e967bbda570b0a602d02 CHROMIUM: wilco_ec: Add event handling
+572bbaba6fff3155ed4512942320fae1e4c5602f CHROMIUM: config: Normalize config for 4.19 kernel
+e20381a04b9a81b4ea2796ae7d4346976bc11aba CHROMIUM: config: Enable INNOLUX_P079ZCA Panel to Mediatek platform
+11fb6b90d81b150f0982f162065a9e9b1476ec27 CHROMIUM: config: enable Mediatek platform USB3 config
+c04116d2a78c5de42b99bbf53948a68750787b60 CHROMIUM: iwl7000: remove misconfigured pci ids from 22260 series
+c41a1daa05c92ca8d19e178ac78ce35fd5b25cc8 CHROMIUM: iwl7000: mvm: set 512 TX queue slots for AX210 devices
+af0aecca9d83d7d89d624c0607f0934dbf3b04e9 CHROMIUM: iwl7000: xvt: set 512 TX queue slots for AX210 devices
+cf49270ff5b3c4ec345d2744b4fd387791cb0485 CHROMIUM: iwl7000: unite macros with same meaning
+5dddda8df79ea788da0b9accf7e5fc591cc4f82e CHROMIUM: iwl7000: chromeOS: implement set/get iftypes functions for >= 5.0
+3d182e0c5e52500fdea8b0c21dab091d9ec42a17 FIXUP: CHROMIUM: wilco_ec: Add event handling
+743c29e99ecad9998c07d78fa246e138aff738df FIXUP: CHROMIUM: Device driver for TPM over virtio
+aff4464c96e661981f575b2db01963df056a4dcf CHROMIUM: HACK: qcom: sdm845: max vote on all critical corners (ARC resources)
+3d4397b7150409c9744dac83f5f51dac64b75cad CHROMIUM: iwl7000: dbg_ini: support notification and dhc regions type parsing
+ff1ac5b065771314f2d7e57c1d1939f7910741dd CHROMIUM: iwl7000: add FW_INFO debug level
+c2cbeb213d56c029c9adf80040a550608037e26e CHROMIUM: iwl7000: dbg_ini: add debug prints to the ini flows
+e46096d03e4dc3de1c91ff9f136b1e9101a62971 CHROMIUM: Bluetooth: Require Read Encryption Key Size command
+4e6d619da5d9bace923086186882935cd0d8a0d4 CHROMIUM: iwl7000: Revert "iwlwifi: mvm: avoid possible deadlock in tx path"
+c35886b4c73b8b8188f10a25b0f752893902dfca CHROMIUM: iwl7000: mvm: avoid possible deadlock in TX path
+36f1167127e65828d752a5f933eefb5c3f63c362 CHROMIUM: iwl7000: Merge remote-tracking branch 'auto/master'
+5d97e10a45cc8f5a8b4751c939b1c34c0bad073a CHROMIUM: iwl7000: dbg_ini: verify the trigger is active prior setting dump bit
+71aa19ad87564e44da1a1bfdd17f9375f102eca3 CHROMIUM: iwl7000: mac80211: fix kernel panic
+3f55b0ba335e2a7ed5c550d299f3b6c5459b76ac CHROMIUM: set CONFIG_SECURITY_SAFESETID=y
+5aa757484312e20d80387c94b84f8865f38e65f6 CHROMIUM: rip out setuid stuff from chromiumos LSM
+81ba9a26d87da6517ec6da469646e451a60b3528 CHROMIUM: Fix revert of asm-goto to be more valid
+dcc142d824bcaee736b9caa9883002efbd0529de CHROMIUM: x86: x86_64_arcvm_defconfig: Disable VHOST-related configs
+009552c7a036f65f0b1b04697f6c3825c910f22a CHROMIUM: drm/udl: Bugfix in EDID reading routine
+e4559b2a5dfa6e6f7decf64383804f55fe657687 CHROMIUM: drm/udl: Cut >165 MHz modes for DVI
+c719440e8d23da63023acc54269050dbb8c7be92 CHROMIUM: iwl7000: rs: consider LDPC capability in case of HE
+736d1eabb4d557cb72c61128a874a14df02233db CHROMIUM: iwl7000: dbg: add periphery memory dumping support to ax210 device family
+adb81dceefc3057117c809cad0fb470529b773c6 CHROMIUM: config: Modify rcu stall timeout to match default (60 => 21)
+dd51517ba6947bdb75f795b96f34614afc311115 CHROMIUM: config: Ensure CONFIG_SECURITY_SAFESETID=y everywhere
+e8230ce94d92c2b2578e579221a378a32cd21fd0 CHROMIUM: iwl7000: mvm: update offloaded rate control on changes
+f1bfa923dcec4698b79fd4369d8e3239bcfead03 CHROMIUM: Bluetooth: Add config to enforce BT classic security
+a4debca7d330966e22639ca80509e45bbd778557 CHROMIUM: Bluetooth: Normalize kernel config
+82b1b74fdec3c7c78ca780e62fe7339e3db92107 CHROMIUM: iwl7000: dbg: add lmac and umac PC registers to periphery dump
+3f98ea9431c4f63fe65cfb6b89cb95e27e1b54d1 CHROMIUM: iwl7000: mvm: support rtt confidence indication
+9149fca78aeec3f0f643ac9417378980e81046b8 CHROMIUM: iwl7000: ieee80211: update HE IEs to D4.0 spec
+b7384cef56b054aab2a0638c74d3711fdb5d6ae1 CHROMIUM: iwl7000: remove unused 0x40C0 PCI device IDs
+d817dcc58c3a21660ae307d8a015b7361f6d834c CHROMIUM: iwl7000: add support for quz firmwares
+b8d0077b94a1588dfcf50cbb06e0040f242e503f CHROMIUM: iwl7000: mvm: Change an 'else if' into an 'else' in iwl_mvm_send_add_bcast_sta
+4a7a7beea75679690d52d7efeda17dcc90297376 CHROMIUM: Bluetooth: Honor BT_ENFORCE_CLASSIC_SECURITY in more places
+0a7acce569203d86cf78c79484ee353b36fbf0db CHROMIUM: config: Renormalize config
+c852af565f6d23eec00fcec14b3e0d1fe3c4137f CHROMIUM: config: enable Mediatek MT8183 clock config
+bf4c7cf0994da50f44e409e39b3c4fdd57804535 CHROMIUM: config: enable Mediatek MT6358 regulator config
+4fd0a75c2dc5ccfaf917a77151cedf9bee1e2a6b CHROMIUM: config: Enable CONFIG_FANOTIFY
+44c40b7168285dedf02f57e54150fa0915ca0050 CHROMIUM: config: Enable QCA BT configs
+4c0c3581f1413692df9a80e9f3ae3d3bcc7a56b1 CHROMIUM: config: Set mobile lpm policy to min_power_with_partial
+64d5aa2bee9e4dfe8e614f62a020170577fdb14f CHROMIUM: arch: x86: configs: add new config for jail VM
+4e3b8a4092a40207cf7c7b79853aedb7f35c321f CHROMIUM: config: enable ath10k for sdio config for kukui platform
+7995cd000387429323040c7795ac06003791cf7e CHROMIUM: iwl7000: xvt: Enable LTR on FW strartup
+18453cc147ae65ca0c77b7a107d5d19256fd13ff CHROMIUM: iwl7000: dbg_ini: set dump bit only when trigger collection is certain
+e65811cbe47329d6fd19fffed5372f0dbfa1db38 FIXUP: CHROMIUM: wilco_ec: Add event handling
+628290a2c74fcac9ea5259417c7594646d41b28e CHROMIUM: config: Add splitconfig for Denverton
+23a4711b5edd1d8fc111aa032761b575714247de CHROMIUM: config: Enable Mali DMA fence
+fa4428ee98d54ed2f0ac3ba1f0e4046f8f051565 CHROMIUM: block: partitions: efi: Add support for IGNOREME GPT signature
+2830ca7da791f7e4f68b777c46a8cd684ff8fc3f CHROMIUM: config: normalize
+246433cd931a38d2cbdf05c926ca7a80bb587155 CHROMIUM: iwl7000: xvt: Avoid calling LTR config in FW init
+eb0544912e61f55258747b0ac39ae7892ecd911b CHROMIUM: cros_ec_spi: HACK fall-back to spidev to flash cros_fp
+fd1d3bb551fd77d099076a31754c6614b71cde9d CHROMIUM: config: arm: Enable bq27xxx battery driver
+3ff0659f95c0e9cf8cdcc272222a5a1e24db3984 CHROMIUM: config: arm: Enable workarounds for some erratas
+9727db828ba64128c2078613ede6e6f34db47b0a CHROMIUM: cros-ec: record event timestamp in the hard irq
+108d84a7a0c33aa544d9bc69e2fe1d3390e9f7c9 CHROMIUM: iio: cros_ec: Spread timestamps better
+59fbd0fd90061eb3652d1c5f4ab7eee2dc02531d CHROMIUM: iio: cros_ec: Add predictive filter on fifo_timestamp
+ea4fa58d1a195b477a953e5f97138151d63f2f99 CHROMIUM: iio: cros_ec: Add back the legacy timestamp processing code
+05b98d04a54c9f2aa4f81148a90b6c4b2925b7e2 CHROMIUM: cros_ec_sensor_ring: Deal with interleaved samples
+87b02c6494ce6b43c66b2a29908b76e9b8cd5485 CHROMIUM: iio: cros_ec: Reset filter when there've been no recent interrupts
+6abd58c064cc9a39b142c634a92d2db0d71ec77d CHROMIUM: cros_ec: add EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS
+28dde9c8c001d296064cd26441b9cd15de3a745b CHROMIUM: iio: cros_ec: timestamp can be out of oder in tight mode
+f9b2926124b8ed2cba2ca8282dc4858dff3d9a7a CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring
+66e8ab319e44a8ecb633fd2d411103903f2a7772 CHROMIUM: iio: cros_ec: enable spreading across sensor batches
+9ecc0e89ddefdce032ef84aaa60192109ca4494b CHROMIUM: iio: cros_ec: do not use flush packets for batch spreading
+d7c7d441b3b8e0f3011f7691ecb3951c96dad49a CHROMIUM: cros_ec: use ODR events to clear the spreading history
+6207786b69f8ee5598e4caa666ed64b1be66234a CHROMIUM: config: Enable I2C_CHARDEV for wacom touch updater
+5880de573bec0781830fb931e89a1db1c70de39a CHROMIUM: iwl7000: pcie: initialize debug_rfkill to -1
+d8582664243a2c9cf529b6851e3569eefb1c1a66 CHROMIUM: iwl7000: pcie: add 'start-in-rfkill' debug override
+7563f18abd617569843aeab391d58a64584e53db CHROMIUM: iwl7000: pcie: don't crash on invalid RX interrupt
+c5a972a036da0e92037c6f38a156f9109c907016 CHROMIUM: iwl7000: mvm: don't attempt debug collection in rfkill
+7b00a7826027654c567dd9c0a2552ccede025c34 CHROMIUM: iwl7000: dbg_ini: check debug TLV type explicitly
+7d0ce83005be6fccf8b38bce14054d41aa7a84d2 CHROMIUM: iwl7000: mvm: support v2 of the WoWLAN patterns command
+2f1f4daf0ffa733b48a4472f878500b510ff96b1 CHROMIUM: iwl7000: mvm: report FTM start time TSF when applicable
+fc87b92c3e3d96ca72071bc27002023ae0d6f609 CHROMIUM: iwl7000: mvm: don't check for table.valid twice
+e7122768cc7ed5ed215313aae9f9e1bbc9bee85f CHROMIUM: iwl7000: support fseq tlv and print fseq version
+2708b48965c1e2e9e8188e433077efaf11207d97 CHROMIUM: MALI: Fix 32-bit kernels to work
+a2ff56246921ff92e3d12c6eeca0e78a993decd2 CHROMIUM: mali: GPUCORE-17007 : Add reference counting for GPU VA regions
+a4be9458e167b9b31698c3d5fb78155c787f2ac8 CHROMIUM: config: normalize
+e0f6b7b4305a2e1eb0a6b7ac08a7249207364675 CHROMIUM: config: rk3288: enable CONFIG_ROCKCHIP_PM_DOMAINS
+a703ad641248bb0e8e67c2a37afa24f3171bbfcb CHROMIUM: alt-syscall: Simplify whitelist conditions for ARM platforms
+5f6e13b8af57f7b4fd36b94d3bbe3cd34507030f CHROMIUM: drm/rockchip: Add GEM create ioctl support
+627c4af84592a411ccfc8df9dd17bc633b20b0cf CHROMIUM: MALI: Revert mali_kbase_devfreq.c in CL:1317240
+a413143a6ba083366ab7de0876c225cd85e3edfd CHROMIUM: Fix mali_devfreq for platform other than mediatek.
+4d86a6131225c729349faa63f2265a91e578bf62 CHROMIUM: MALI: Don't hardcode that there are 2 regulators
+0cefac73ca19defd842051d55e837f35fb08f7ed CHROMIUM: MALI: Don't silently trash memory if there are > 2 regulators
+a67c1a87a5e5f95b241491fdbdbe04de8d1411c8 CHROMIUM: MALI: Clean up supply-names and make them optional
+b83b2abc963c2ea5bb0acaf06b7fb91c00d54cd6 CHROMIUM: MALI: Make us compatible with upstream bindings
+e36ed056bf9f581e84b960987fc6c1c6f1ad5160 CHROMIUM: MALI: Allow platforms to override PLATFORM_POWER_DOWN_ONLY
+c335bdf220e40540fc0c5913f1e07fb43d986467 CHROMIUM: MALI: More properly handle missing regulators
+cf589506149d74992fc8ab88bc5806f7b234c82f CHROMIUM: MALI: Add support for Rockchip
+84ca4cd42249464d6570d31fa0e86c7ac2fbc228 CHROMIUM: MALI: Remove drivers/staging/android from include path
+e6d4ee4fda58a6d5cac730973729448d1d9a60c6 CHROMIUM: config: Normalize (CLANG_VERSION)
+541368212a1af823b35658d73f8cd64d304e49a9 CHROMIUM: config: Normalize (IRQ_MIGRATION)
+45f82b602ef4004580a4b62e28c09d606668c33c CHROMIUM: config: Normalize (SND_xxx)
+9aecea8f1712844caf05af4b93b91928bcfdfab6 CHROMIUM: config: Turn on mali for Rockchip
+311583fabea18d3f752d080046a434af652831fd CHROMIUM: config: denverton: Add timestamp support
+1d76113a8dc73d70b9d89c70e3e8e8da5f5f4d15 FIXUP: CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring
+b45650aeaa66b16156bf1898c239878359a5baca CHROMIUM: Drop i386 kernel configurations
+88c16a3f5640ae0d40d493187e8b4e993af1e6f1 CHROMIUM: wilco_ec: Add exclusive lock to event node
+8a818857fdd010d007b0e5956c0700a0f8effa94 CHROMIUM: iwl7000: pcie: check pointer, not its address
+db53e51c121d2da0aa9a52c006c34dbfe5fa9592 CHROMIUM: iwl7000: mvm: limit TLC according to our HE capabilities
+3923e87e395b0a098398a498c36a7c2177cc7d8a CHROMIUM: low-mem: handle multiple levels and provide edge notifications
+8b78a49d697d105df5582cf58a2b3de658c20db2 CHROMIUM: iwl7000: dbg_ini: remove dram buffer address from dmesg log
+33090fb9c1944686961ce53bd853aa735d8b573d CHROMIUM: Disable CONFIG_OF for x86_64
+d21f4f3c3940c502a8653dd7c454e32470f9ee49 CHROMIUM: power: supply: cros-usbpd-charger: Fix missing assignment
+b2ecec00ed5cfe0f1c1387472f76b29f1dcd0562 CHROMIUM: config: Enable Intel ISH Loader driver
+9d7fbe693f20842c8e0841ed413fb6e63e6c8152 CHROMIUM: ASoC: Intel: boards: Add CML m/c driver
+792e9cf70d9dbed1a76a84a754d8700c8e39d694 CHROMIUM: ASoC: Intel: Add acpi match cml m/c driver
+f34b1010c0385427df3b71151ae83a5d6bfa8f66 CHROMIUM: config: Normalize config
+66fb25e38b4c8dc2f03176738d0850c3fb8cb858 CHROMIUM: config: Enable CML Audio m/c driver
+b09c50c7943d35ab78c8b77392863bfa54f8b671 CHROMIUM: ASoC: SOF: intel: don't read CTX_SAVE reply
+b83a13eefccc8ac84c74d64b67f35575550bea9c CHROMIUM: ASoC: SOF: make ROM init timeout platform specific
+2a67bf627be346c5e6d70d3d819d1be8593cf7d1 CHROMIUM: alt-syscall: Remove entries for x86_32
+6274f78cf9858e01a368a41da0506ef6d64df640 CHROMIUM: alt-syscall: Fix syscall whitelists for arm32
+e5fbba1913c9d55a6620c8c38b2ff29383521341 CHROMIUM: alt-syscall: Support legacy syscall interface
+8ea9105b170f923e8bda7dca74971b62e9a111c3 CHROMIUM: ARM: Add alt-syscall support
+c35a0a20d47252de59c701bd7e6a28e3b39f7c04 CHROMIUM: config: normalize
+74dcd9675c626f8af9ad1910a968db8309ee46b1 CHROMIUM: config: arm: Enable ALT_SYSCALL and SECURITY_CHROMIUMOS
+ce2ab9af69fa436c6fcaa4dfabed7b958598edde CHROMIUM: config: Disable CONFIG_ION
+5930d2564c07393371e06ab0d8d567f7dda77d70 CHROMIUM: config: normalize
+3a84e3b83ed6b6c4cb78117c54792d90ebf2d266 CHROMIUM: config: Enable Cros EC ISHTP driver
+0892e2f6dde6c30c0369e4b44b958c8fc332646a CHROMIUM: MALI: Fix extra regulator_disable/enable for rk
+7c142064cf208079713777eb4c7a300e3fb7fb35 CHROMIUM: cros_ec_istp loops until events are gone
+be5c0e5950816f52dc7ccad98708841c606813d4 CHROMIUM: FIXUP: Fix mali_devfreq for platform other than mediatek.
+30c7e90642627072155574c16b1e70306fb309d2 CHROMIUM: config: Enable MT8183 audio configs
+eea41cf4930fbd76761ae8c0de82dfd3127f501e CHROMIUM: config: Enable MT8183 CPUFREQ configs
+d4e865e3a2e06a581ad72793dca336c38534317e CHROMIUM: iwl7000: rename structs to fit the new names
+6f3314ee8e60cbaa9e59aa55973375da0bcc43b2 CHROMIUM: iwl7000: add new 0x2723/0x2080 card for 22000
+3565e82c556a0bf9acfd1bd93eaa20ffd176c7f6 CHROMIUM: arch: configs: enable a few usb drivers for termina
+515dda4ce2e91409229e819f12b062fb257fdc97 CHROMIUM: config: Turn on CONFIG_CPU_BOOST for arm32
+6711ce3ab39bed0915253181651505838a556944 CHROMIUM: config: Turn on CONFIG_DEVFREQ_THERMAL for arm32
+e61eac25fbad6948532d014f7b4775854dab8cb3 CHROMIUM: HID: intel-ish-hid: Retry ISH firmware startup on failure
+220985b0ddcca20361af6454ac00afc2f32919f7 CHROMIUM: iwl7000: mvm: support rtt confidence indication
+23f110430ac2f7118392fb49c8fca70b46f515a9 CHROMIUM: iwl7000: dbg: fill radio registers data regardless of fifos data dumping
+67971af3c1015563cce66f54a9351fc4b7e10189 CHROMIUM: iwl7000: add sync_nmi to trans ops
+c3c31a59611761c29365b8b041e34c3a9ba96f56 CHROMIUM: iwl7000: use sync nmi in case of init flow failure
+07767c28cf519b3d3d2aa6964f2aec5d0941a92f CHROMIUM: iwl7000: dbg_ini: fix iwl_dump_ini_dev_mem_iter memory base address
+c642a52904b30287cf28597e756e245af8df25e3 CHROMIUM: iwl7000: add support for quz firmwares
+3dd444341d18b6c1883c8a6d0d06d74aa94e71f5 CHROMIUM: config: Turn on video for arm32 rockchip
+85e07be337e5ed558c502c9165bdf86c9dd89680 CHROMIUM: Bluetooth: Add BT splitter
+7068c62a709db8ab2013eea32e25a70d8f1846c9 CHROMIUM: Bluetooth: Fix init order in BT splitter
+1bf9f27b72a6dc2d05112a1ddc9974da4d930c89 CHROMIUM: Bluetooth: fix deinit when disabled
+57f0b947ed71fec7be2d3f2474a318d7e5d4f72b CHROMIUM: Bluetooth: fix le splitter
+3acd8afdf56be0593c58b973846f1705244f7097 CHROMIUM: Bluetooth: make splitter switchable
+0417eaa05b0fde937b4bb6079fa6bfecbaf0b525 CHROMIUM: Bluetooth: Move sysfs init to beginning of af_bluetooth
+748da512efbe0fe3b218903929c85b649389138e CHROMIUM: Bluetooth: Don't try to power on if splitter is not set
+c7bbfe76fbc576ef0d1051b702ef530cef65c037 CHROMIUM: Bluetooth: refactor locking, fix & add timout
+0c2a7d696146fb972e733626acf52421b90fcd30 CHROMIUM: skip old cros_ec responses
+6b57672c2d2769ca589f1fc0de9303ef1a2e8ebb CHROMIUM: free ishtp buffer before sending event
+ed3746eb15604ebb02afcacd70df758748051ec3 CHROMIUM: iwl7000: mvm: check for length correctness in iwl_mvm_create_skb()
+630750d51000b1273520709afca8727ce6fcf6e0 CHROMIUM: iwl7000: mvm: Don't sleep in RX path
+4d4a3eef2ada7316aa2cf95c2ed023791b2fdeb3 CHROMIUM: iwl7000: csi: fix debugfs parsing of addresses
+5f1a5b52ca484df64b0366acaa3b480d4a37e968 CHROMIUM: iwl7000: avoid allocating memory for region with disabled domain
+57afccc9b6b07ea6f7f2e04464d37f1a5d7822bb CHROMIUM: iwl7000: don't panic in error path on non-msix systems
+515f9ddb0617152601dc3fbe05ab9b05dccfdacc CHROMIUM: iwl7000: mvm: properly check debugfs dentry before using it
+2fc2d5f16929ccabb136a63f8d614f13f54e94ff CHROMIUM: iwl7000: dbg: allow dump collection in case of an early error
+03133698e54d83f4af76283bcf2916ffb5194f3e CHROMIUM: iwl7000: cfg: use family 22560 based_params for AX210 family
+0908c25c3f62ce5447d479ea22d6ca3f0122e41b CHROMIUM: arch: config: Enable CONFIG_SND_SEQUENCER in VM
+f941156783faa9eb2ff7cd5f4e10665f56b41aa5 CHROMIUM: arm64: dts: mt8183: add kukui board dts and Makefile
+555cc0733f6b7d1ce4e65e7b00b9edc4e794867e CHROMIUM: arm64: dts: mt8183: enable USB host in kukui board
+cc210c0edaf6654734b52bed73643db200a05cb4 CHROMIUM: arm64: dts: mt8183: Add mt8183 i2c kukui dts
+55d6b8d88582f6308d120832de6b8ecd3cfa3f8e CHROMIUM: arm64: dts: mt8183: add dependent regulator power of mfg
+5c03fbca4c4c4c4004d1cf189a0f2f744066925a CHROMIUM: arm64: dts: mt8183: add spi node
+877765a6bd882f51e83f5f5a5f1e0b8c1c9ff797 CHROMIUM: arm64: dts: mt8183: add sdio node
+3bb38ce9f5c54b7eca53a798860c73e3a2a686cb CHROMIUM: arm64: dts: mt8183: Add GPU device tree node
+98da6f17e5708766b705de862017debf464882fc CHROMIUM: arm64: dts: mt8183: binding thermal support
+ed1b682526c9f185652519f3172e9ee55c1916b4 CHROMIUM: arm64: dts: mt8183: add Cr50 to dts.
+c24faf12020bfd5625ab64a8a186e5842c4910b5 CHROMIUM: arm64: dts: mt8183: add EC to dts.
+509584ec66730d41a66a2b1876f902a440052f49 CHROMIUM: arm64: dts: mt8183: add EC keyboard/battery driver to dts
+b5ba81270c6f7bb7ef4415c6fce41ca9754b9fa2 CHROMIUM: arm64: dts: mt8183: Add touch dts
+19108f557a72e48aba77a4fac6315c2818016b0f CHROMIUM: arm64: dts: mt8183: kukui-rev1: Add gpio-line-names property.
+24f4c896e51e7578c3e268abecefb21a36a63443 CHROMIUM: dt-bindings: soc: rockchip: Bindings for the rk3288 service bus
+8ec1aed10c2e13eebdf1fca1ecdcde5d75d14555 CHROMIUM: dt-bindings: sram: rockchip: Document ddr sram bindings
+0e4f051fe002db4b83db1ed1f01e2d3de1e19d89 CHROMIUM: dt-bindings: devfreq: Add rk3288_dmc bindings
+f8ff093bdd2b6e37bba5c30e457ff91683e33d1b CHROMIUM: ARM: dts: rockchip: Add common DDR things to rk3288
+37f4c4b5063f2c75343fed5445e40b9eff24daa8 CHROMIUM: ARM: dts: rockchip: Add SDRAM info for rk3288-veyron
+f24735d8639040cc6c6abb1d8f166d310322c5dd CHROMIUM: ARM: rockchip: pm: Support deep suspend
+e3849380713e390d0561f4d9a0362b1f4e3a7712 CHROMIUM: config: renormalize 4.19 config
+4f4214f39392751ce6247a8980de03c032480179 CHROMIUM: config: normalize
+f8d727ffa25b6db6e4a6f1838b71fd6c2b61dca3 CHROMIUM: tpm: cr50_i2c: update send() return value
+9ae0ce61e7314bc2cc9e9499e4d78f1cf8998760 CHROMIUM: arm64: dts: mt8183: kukui: enable spi1.
+e260bb1ff9d3aa165bb514c502179cb6de4330ca FIXUP: CHROMIUM: ARM: rockchip: pm: Support deep suspend
+0f250f47f7fcd2b9e251e99c35a7d89a0639a9d1 FIXUP: CHROMIUM: ARM: rockchip: pm: Support deep suspend (take 2)
+c5f9f33abbd576c2fc2ca6eaf2b3128f0e617585 CHROMIUM: arch: x86: configs: chromiumos-container: convert to defconfig
+5d56e591dff49cbd1c79c5a0c9553d9a6671fff6 CHROMIUM: ARM: dts: rockchip: disable gpu 500 MHz operating point for rk3288
+1cf075d756b79399434abd7e0c109f842ff29103 CHROMIUM: ARM: dts: rockchip: assigned parents for vop dclks for rk3288
+f547f48f5348dacfd3dbe16a940c777ed7e79b00 CHROMIUM: clk: rockchip: leave npll for VOP0 only on rk3288
+74d03848f9507af357a6aa8296366efcca121c8d CHROMIUM: ARM: dts: rockchip: Little VOP=>eDP / big=>HDMI on rk3288-veyron
+6bbb6ad45d36f5caf2aeee7ddbc6bbc1f69ddbea CHROMIUM: arch: configs: disable fbdev related configs
+b5b4be33e8908ca9ad68ff613e75f619ae10c974 CHROMIUM: arch: arm64: configs: chromiumos-container: convert to defconfig
+1678e39e322bdede16b67de7231e8ad7ac582eb3 CHROMIUM: arch: configs: chromiumos-container: add USB serial drivers
+a08028baa752a8e206f68b47d592176297e2fd36 CHROMIUM: CONFIG: Enable UCSI and normalize configs
+80e1ad3f721f024a92e542925c8ebe0f97a7dc7d CHROMIUM: ASoC: Intel: boards: Correct CML HP button mappings
+86c51b0e7c15fb1196094c05fcc38e738601fc57 FIXUP: UPSTREAM: power: supply: Add Spreadtrum SC27XX fuel gauge unit driver
+5de90843278a0cec6a451f56de97be930269a6a6 COMMIT-QUEUE.ini: disable broken cheza pre-cq
+ccc5ad6c84a6d767f41891ac7a8ebc82a0e0d8bd CHROMIUM: config: Enable extra A12 errata
+cc4bc1196308e0ccea2edb9b0fdc7bd931216ebd CHROMIUM: ARM: rockchip: pm: Fixup errata numbers
+76351fbf62a2d87c1b7e6d7724d8013520c8cd99 CHROMIUM: ARM: Add a debugfs file for dumping CP14/CP15 regs
+18aed2d2e25120e06a979930df8350861f201d31 CHROMIUM: ARM: dts: rockchip: Fix DMC voltage points for rk3288-veyron
+63d497c6636902210ea06ea3e4e8d4d79eab7fd7 CHROMIUM: config: Turn on on CPU_FREQ_GOV_SCHEDUTIL for arm32
+90e5e4be11835c24594da668cf83fec7d98adf43 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Temporarily delete reserved-mem changes
+799daf43392b6274a568f5a4d3447cba232f6a02 CHROMIUM: arm64: dts: qcom: sdm845-cheza: Re-add reserved memory
+3066d72082901690a9244693314b1d68a8e4eb96 CHROMIUM: scripts: Fix the name of the armv7 gcc
+9d4d553ed6240ecdeefcfd0c8a93b949180f871b CHROMIUM: enable CONFIG_PROC_CHILDREN
+a9dfadc8100fca5144e3524ce83411018446a700 CHROMIUM: add vmstat counts for different page fault types
+ceb2e38e24bb456ec601270194f1b500a6d7b760 CHROMIUM: devfreq: rockchip: Add dmc-sync interface
+9d93c1fed19f897f8a23f2c6ea60cb2a1a456102 CHROMIUM: ARM: rockchip: Add SRAM code for changing the rk3288 DDR frequency
+8be6b0cd39c3ee338e294490d1e7dece8a25dd87 CHROMIUM: devfreq: rockchip: Add clk-rk3288-dmc driver
+1ff885c39423a1e51bae70d24a1752139df29690 CHROMIUM: devfreq: Add rk3288 DMC driver
+bb54e1045cb73c28d6e5bb3edaba49541a403868 CHROMIUM: config: Enable ARM_RK3288_DMC_DEVFREQ
+355f0f64711f92476cd065d48c8b34b6f4c65478 CHROMIUM: scripts: Drop i386 from config script
+05213e598eb035557b73f72f21c7a759615e93ff CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend
+1b69a5871bfea712e9096ea0f116119956ebea25 CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling sysfs
+aae38863f38bc3b215c0a21612d788922b33849a FIXUP: CHROMIUM: devfreq: rockchip: Add clk-rk3288-dmc driver
+c3856fe9db8e1f1aac57e63e077fddac2ac453de CHROMIUM: devfreq: rockchip: Move to drivers/soc/rockchip
+ab1007b3846e1c17c14d3a8c9e6478bc54f3168f CHROMIUM: Fix MGMT opcodes conflict in BlueZ
+8a7190d75fdb698814201a8be616e98d7d662da9 CHROMIUM: iwl7000: mvm: Add log information about SAR status
+dafd959617f0bb9899de13e2eef3ff4c4ff17edb CHROMIUM: iwl7000: mac80211: do not start any work during reconfigure flow
+3e68815b1a008aca8badc92e2762807a991221d1 CHROMIUM: devfreq: clk-rk3288-dmc: Be less spammy
+15f79200960363a49a7d1cc8336baa190792fa06 CHROMIUM: iwl7000: don't assume LAR support
+c95c07c49e5bc18caf6bdeae963edff05967c97c CHROMIUM: iwl7000: mvm: make wgds_tbl_idx signed
+ca2c739757c4a1e687d772e18053f282547bfd6a CHROMIUM: Enable kernel support for iPhone tethering through USB
+e8da1b7276d9ee70fb513f576463d20c4bba22e9 CHROMIUM: arch: configs: chromiumos-container: remove fbdev emulation.
+c21dc7945232c75ba8d55e4620871bb3c3bc7adf CHROMIUM: config: Turn on SCHED_TUNE for arm32
+73930df662f8e9dc1f5183db8260412154f7e35f CHROMIUM: sched/fair: Kill spam about max cpu_capacity
+349cd0cd486493c219d1b13b0d8601ad29384777 CHROMIUM: iwl7000: Revert "iwlwifi: mvm: Add log information about SAR status"
+48bc966626c66f0e7441a0a9da47a2d75bd7db15 CHROMIUM: esdfs: Take a reference on user_ns
+4777527e50eee3d302d35c513c22907ad21e4d6d CHROMIUM: config: Normalize (CONFIG_ARM_RK3288_DMC_DEVFREQ)
+c12d1b91b64dee4b979413556baa83c5bb496000 CHROMIUM: MALI: Fix GPU regulator power is not turn off issue
+75c4849105817f10f22e4d1cb7d020fc7acb932e CHROMIUM: iwl7000: fix load in rfkill flow for unified firmware
+06eaa6a18414c33115076c3b6de01ee115cd644a CHROMIUM: config: Enable SOF CometLake support
+aea2521dc80bb2ddbd923206d3673c8db5ab02a3 CHROMIUM: arch: config: add ac97 driver to the arcvm
+42758b9cdd722aad418d5207a8b2ee348e29696b CHROMIUM: bluetooth: Add blocked LTKs
+43c7448a3859dddaec1120ea584752b2262c66cb CHROMIUM: arch: x86: configs: enable INET_DIAG
+68d59bfcaf2e1401c251a1bd7dc90066f597a0e0 CHROMIUM: arch: arm64: configs: enable INET_DIAG
+70dcd058f30338d0464cc458da4e5d5edb3dd85b CHROMIUM: arm64: dts: mt8183: Add dsi pwm panel node
+c8012a4e97ae83e98ed3addac40a16f7f912be12 CHROMIUM: iwl7000: cfg80211: util: fix bit count off by one
+6570e4aefe6da479b593c037a2cd67b1c7e3ba59 CHROMIUM: iio: cros_ec: Clamp timestamps in sensor ring
+8d8195e893f99a766e25df71c93bc0b9c587c188 CHROMIUM: devfreq: Fix rk3288_dmc / cpufreq interactions
+14602c32cba5ce2c24a1feefba4ce644766d1b3e CHROMIUM: iwl7000: mvm: correctly fill the ac array in the iwl_mac_ctx_cmd
+3735a79989971a879e8dd701cc11613ee844ece8 CHROMIUM: arm64: dts: Add cpufreq and cci devfreq information to kukui
+c1a0a56e4daceda3ed6ca551a9f6acbe0e2816ed CHROMIUM: arm64: dts: enable mediatek mt8183 chip info node
+f273fda3bb7b4d0770e79055f69adb70041e9abd CHROMIUM: iwl7000: mvm: change TLC config cmd sent by rs to be async
+5b47835cfb7baaf37451ea1da6873b850d09b777 CHROMIUM: iwl7000: print fseq info upon fw assert
+d8418119e8d27de0108ebbe0c766877152b414c4 CHROMIUM: iwl7000: Add support for SAR South Korea limitation
+93fef13dba1d15e3d05fe1441c378118b8412421 CHROMIUM: iwl7000: chromeOS: don't assume LAR support
+5920dd07ff5e6e1b28be3b6ee306942c2d7a24c5 CHROMIUM: iwl7000: mvm: Drop large non sta frames
+aa33990ff98fc46d27487f2218362755eb547044 CHROMIUM: iwl7000: fix AX201 killer sku loading firmware issue
+4ffb811638035f81e6bc43f6a2563ab3587ee4bd CHROMIUM: scripts: Use savedefconfig to minimize kernel config
+2a0411adb95a0cc7a524215758b174ebfe9287f4 CHROMIUM: config: The big savedefconfig normalization
+72e2c1542ad0c3f26979f85d95ce9e4a68e43749 CHROMIUM: arm64: dts: mt8183-kukui: Add more backlight levels
+87b7e466fd4c2bc00a8701c4c29440bb2725a181 CHROMIUM: arm64: dts: mt8183: kukui: add 32k clock
+7dd539a7de1288b1e7f8513f747ccc5e618148ff CHROMIUM: arm64: dts: mt8183: kukui: add bluetooth node
+ead30a14fbf41a68071630a418bce1a33cb9a965 CHROMIUM: arm64: dts: mt8183: add kukui rev2 board dts and Makefile
+e9f58e17c52c37e65e1877a8ea6603d8ecb5ecc6 CHROMIUM: arm64: dts: mt8183-kukui: Add pen controller on >=rev2
+b2c60bfd74b7b57508b76bff550cd2162f60b475 CHROMIUM: arm64: dts: mt8183: move touch dts to rev1/rev2
+1259c355e1476181cc4c197f1c4e7c3418021af3 CHROMIUM: devfreq: Register cooling device for rk3288 DMC properly
+92ab3e2e7c6c88c82cb60a0c85f3211cc311cd70 CHROMIUM: Bluetooth: print FW version after FW download
+e82245fa08a94be7e7cd401816d7daf4de67e667 CHROMIUM: iwl7000: mvm: don't use iwl_geo_tx_power_profiles_cmd_v1
+fd5e78940c69d0fc08b364fdf222a89acb42caff CHROMIUM: config: Enable MT8183 CMDQ configs
+cd6519fb23f955543146ea8a49e3390c17026b94 CHROMIUM: iwl7000: mac80211: do not start any work during reconfigure flow
+3f55965589807ecb3d7e15e6ceacadf7a25666bb CHROMIUM: iwl7000: mvm: make the usage of TWT configurable
+0b410679c49836d1c94d7d4e0caf27425df327fa CHROMIUM: iwl7000: mvm: allow configuring rx agg size
+cd98c8291306aa3853a72aad337c02e7f07f79bc CHROMIUM: iwl7000: parse command version TLV
+ab1d25a7c18169ef33dd657145cf02da193081b7 CHROMIUM: iwl7000: update CSI API
+6bd0dfdb05f22391c9d28804cca77c7c440e89dc CHROMIUM: iwl7000: mvm: add ability to use CSI chunks ver 2
+81136fdb75365c1894c22b4452ba5f7b28dc94be CHROMIUM: arch: x86: configs: enable virtio TPM
+cbdb2e840311bb6578143fd1dbca1ad55690c110 CHROMIUM: arch: arm64: configs: enable virtio TPM
+0e60990f45ee73ef02fabacbdb85cfed84869e12 CHROMIUM: iwl7000: mvm: remove d3_sram debugfs file
+95b6bc5738c472d3802cbbf43271177c3eec968f CHROMIUM: iwl7000: clear persistence bit according to device family
+ee2bc507dee1c558c2501e8209db42753d9fbfd5 CHROMIUM: iwl7000: Fix double-free problems in iwl_req_fw_callback()
+5a287c764a8cd9612f71e9426dd23e5a2e468ada CHROMIUM: iwl7000: mac80211: handle deauthentication/disassociation from TDLS peer
+6cd926745632ae977f48d94e3b02a78aefe786f9 CHROMIUM: iwl7000: pcie: increase the size of PCI dumps
+6a281f8cdcc4dc009c9cb4b8f66ef2f4c4df34e4 CHROMIUM: iwl7000: dbg: fix debug monitor stop and restart delays
+ac1b8c9644f018deaebb42cb0249a22231a7e801 CHROMIUM: iwl7000: add new cards for 22000 and fix struct name
+03f69bee544a8aec4a85f1e16cc79974eedf61de CHROMIUM: iwl7000: support FSEQ TLV even when FMAC is not compiled
+146855cdfa80b2fecfe92edec67005fdf07b623a CHROMIUM: iwl7000: ieee80211: Add a missing extended capability flag definition
+f31d46f15cdb9bcbd85eb964507893e1c98a8326 CHROMIUM: iwl7000: chromeos: Add an implementation of cfg80211_bss_iter()
+02ac69bc5a3521b689b3b296cc0d360de6b57c2c CHROMIUM: iwl7000: mvm: Block 26-tone RU OFDMA transmissions
+e8c48fb091f4406098ab9597745f5b818040bf30 CHROMIUM: ARM: dts: rockchip: Enable 433 MHz DDR frequency for mickey
+ea8eabb0a4804e71ac55dd182bec67d534e25921 CHROMIUM: iwl7000: mvm: don't interrupt the FW load if RF-Kill is asserted
+c90a98e73b2adbfac1d40cf3eb492a809b2786a1 CHROMIUM: iwl7000: pcie: fix ALIVE interrupt handling for gen2 devices w/o MSI-X
+760e2299e0f819f8560f7c1f472d11a6a72be4cf CHROMIUM: iwl7000: fix RF-Kill interrupt while FW load for gen2 devices
+58cf4ac825f2e7bf27416326324e36fc28c5450f CHROMIUM: iwl7000: pcie: don't service an interrupt that was masked
+40d2f31c62de5133740c3e924e4e61689080c5a3 CHROMIUM: iwl7000: don't WARN when calling iwl_get_shared_mem_conf with RF-Kill
+76dbcd23e7831a933510a125e860c5595b8c5749 CHROMIUM: iwl7000: mvm: clear rfkill_safe_init_done when we start the firmware
+4c87eb58b8326b5dea36bb0e9aa6077030377b7a CHROMIUM: iwl7000: chromeOS: fix kernel version for cfg80211_is_element_inherited()
+3dfc86d7de1fd19069e1aa40d8a55fb1a600853f CHROMIUM: iwl7000: chromeOS: adjust kernel version in _ieee802_11_parse_elems_crc()
+1bcc643930233f4c53416eb4a88c7334784e4be7 CHROMIUM: iwl7000: chromeOS: fix kernel version check for cfg80211_bss_iter()
+a88a6bde1c07b73ff3c719ffc8de95ffc5c7560e CHROMIUM: iwl7000: cfg80211: Report Association Request frame IEs in association events
+0df2a827ef77a5e180e40ccdd716ba7f4baf9f91 CHROMIUM: iwl7000: mvm: Add log information about SAR status
+82f12fc4e2604c589d9a4ed866d7a236c32b91a8 CHROMIUM: ARM: dts: rockchip: Throttle DDR frequency on mickey to 433 MHz when CPU gets warm
+e76f2679cc4d508e0d2e4f89d126d9dfb4a5f5e6 CHROMIUM: Add support for older kernel versions in usbip
+db5962f8350e4da213f952ba2f978cbcbf0a5111 CHROMIUM: drm/rockchip: Enable render node
+1599000b058177b291d7d0ccd33e1101bbc11e9f CHROMIUM: improvement: Enable only exception and boot up vendor event
+556480ec7c418b7ad6cf314f9267f92abf69d39c CHROMIUM: scripts: Fix up kernelconfig genconfig
+224af0fa15669671589ebe873a32c8f56badbc85 CHROMIUM: arm64: dts: mt8183-kukui: Drive cr50 SPI CS pin as GPIO
+3af8b08a6c01977eb2bab1fb2f97a495f14d2b49 CHROMIUM: drm/virtio: Ensure cached capset entries are valid before copying.
+d2daa7c74e65df6d939857cb2dbcceaee8e10660 CHROMIUM: drm/virtio: Wake up all waiters when capset response comes in.
+ad64f445731332dced8c6ac3f972687305f2aaf7 CHROMIUM: drm/virtio: Fix cache entry creation race.
+fbd186c14e31e9bb7e220b862430033f3361e3bc CHROMIUM: drm/virtio: Add memory barriers for capset cache.
+9548c845946eb8e166c0407c7505b091bd0fd1fb FIXUP: BACKPORT: media: v4l2-mem2mem: Rename v4l2_m2m_buf_copy_data to v4l2_m2m_buf_copy_metadata
+9891462c1ef6edf1375a9216f4e5eabbe456a8a4 CHROMIUM: iwl7000: mvm: remove d3_sram debugfs file
+073aad313aa8a53914ef9db1c03e107a522fd244 CHROMIUM: iwl7000: mvm: check for length correctness in iwl_mvm_create_skb()
+d5c5c14739bb996e1e1136c190cc6e195dad7017 UPSTREAM: drm/evdi: Mark fullscreen rect based on painter's framebuffer dimensions
+aebdf289a71da51a86c8ac30456d9bd9fd3ea2ac CHROMIUM: iwl7000: protect against double CMD_VERSIONS TLV
+d500a2e49c4ca3876ef96217e5dce9b601fdcc2d CHROMIUM: config: normalize
+abe9ad40686ee2050169451f524dc5ba0b6f473e CHROMIUM: config: denverton: Clean up modules
+5963e9b036c321138ab05b2ad66d8f6660e0986b CHROMIUM: clk: rockchip: Register some debug clocks as global
+e2aaecb440254c353c5f2973355eada927fdaa08 CHROMIUM: fix pgmajfault names in dfl_cftypes
+ddf59118a0bc61cc59e20d376f27cc07e980b4b5 CHROMIUM: config: denverton: Add PCI SPI FLASH
+4d231612a8b15d3d47e0a3b6b0a4a9a3c93e12bf CHROMIUM: soc: rockchip: Add panic handler for rk3288
+54e05b578a89a6b163de4036d588123f531a7d79 CHROMIUM: config: Turn on ROCKCHIP_RK3288_PANIC_HANDLER for arm32
+e5b033239a0339912d521540fbb404cbeba3bfdf CHROMIUM: drm/i915: Disable boost and waitboost
+398020b8c8c4c0028cf6225fd218a273de244cf9 CHROMIUM: iwl7000: don't advertise TWT support
+dcd4527c595a198773db270209d48a75b8318390 CHROMIUM: virtwl: Kick the in virtqueue in virtwl_vfd_remove()
+6f9bcbc60d476cbeea639f7590304b64d7f0bcf0 CHROMIUM: cpufreq: set cpu min frequency through complex-usb-min-frequency property
+02b8810d9409c51076b8dbb56eacf791842c4888 CHROMIUM: HACK: sound: usb: fix rk3288 usbspeaker play music staccato issue
+572aa5a2d2775c85c228946be1aa76ecd90724ee CHROMIUM: ARM: dts: set veyron cpu force_min_frequency property to 1.2 GHz
+92760b53694a8eaa60d292456a2c406010d84ac4 CHROMIUM: ARM: dts: rockchip: Add GPU power model for rk3288
+1314fb4cd7bbf04410ddd6c87c73432d5894eeb7 CHROMIUM: arm64: dts: mt8183: add uart gpio define
+da8b26d8b4fd3ce2d557504fa97b91a87ba2c15e CHROMIUM: config: enable Mediatek MT8183 SCP config
+b3cdaea3a42f87e5d3df6fd8a686c4ed8bd1f54c CHROMIUM: config: Enable energy model config
+5df4ef99a8a04475a68e77dda46741e3e4328cb9 CHROMIUM: iwl7000: pcie: increase the size of PCI dumps
+2a03de2e808fb3d9128af026c300df7714c0a4d8 FIXUP: CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend
+ea201dbf69c6a12461aff4b438a39921825ab8ae FIXUP: CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling sysfs
+706a503cd605a2c06e3c3b40fe3a6205df878a85 CHROMIUM: arm64: dts: mt8183: kukui: Add SCP support
+28348b3b2cef9222f83db368bd0d00b0fd40a5b8 CHROMIUM: arm64: dts: mt8183: add kukui platform audio node
+8604ebfc0e8201382586f29573b94a6495505039 CHROMIUM: Revert "Bluetooth: btusb: driver to enable the usb-wakeup feature"
+d065803a6e8e04a89d090977599402997468bbb7 CHROMIUM: disable 'inline-asm' warning for rk3288 resume code
+de8645d1c642b41e11721db9186316ef79f50b0a CHROMIUM: ARM: rockchip: pm: Don't use C in naked function
+89e0e6a69b7e463aa5f886c409212ee0fba9fad9 CHROMIUM: scripts: Use olddefconfig in editconfig
+59077cf02d0a3d6e179851d7786a829966d16d43 CHROMIUM: Revert "jump_label: move 'asm goto' support test to Kconfig"
+abb47ccba91ff211b3fef3c58ba8d8c6c1e5eadb CHROMIUM: MALI: Freeze temperature polling while suspended
+ea0f6a09a7a993fc7c781fd8ca675b29c42d4719 CHROMIUM: wilco_ec: Add batt_ppid_info command to telemetry driver
+670b16f672c289536c304cd79e84cd9a15e2be17 FIXUP: CHROMIUM: drm/i915: Disable boost and waitboost
+7cf0b79ee2e8dc652b558a9892f0a1373705453a FIXUP: FIXUP: CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling sysfs
+32cc75bf06b074cc6ecff93bdeaea0878a1998f5 CHROMIUM: config: Normalize config
+d13a8b1c9462fd588436acbd3e9cea515836cbfc CHROMIUM: Bluetooth: Log Intel vendor specific HCI events
+40a37551d52cca1946d5e0f8f3fe30247c051dd0 CHROMIUM: Bluetooth: Add warnings to MGMT_OP_{ADD,REMOVE}_ADVERTISING
+b76d8219a3fe6420cfaaaa8f0f3d332ce38538dd CHROMIUM: bluetooth: clean up connection in hci_cs_disconnect
+ab12bd72b635445271c740dcb5bef328c2a9e4c1 CHROMIUM: Bluetooth: Reduce active scan to 50 percent duty cycle
+4d36b9c4e56bf400409bb70a96d19c6679fbb330 CHROMIUM: bluetooth: do not cancel advertising when starting a scan
+d92e64ab10117dc33809efd58aed878a307339c9 CHROMIUM: Bluetooth: change the log level of Intel Hw error
+44023a28336a7192b836d8585bc4976ebe3615e5 FIXUP: CHROMIUM: Bluetooth: Add BT splitter
+d804485a070f2cfa01445308646a52d409e42e7c FIXUP: CHROMIUM: Bluetooth: Add BT splitter (take two)
+bed596db5de8c55d2e80b14dbfc15ab61d85627d CHROMIUM: bluetooth: fix race conditions in discovery update
+8a342032df79ccbd1c89e8541eafd4e496fbbb41 CHROMIUM: bluetooth: include file and function names in logs
+6762690fd07e94d506298c793f9a4f9f85d5139f CHROMIUM: Bluetooth: increase LE auto connection timeout to 5 seconds
+8f04d51b22f4b80d370bd8f077a009fdf2a5f151 Bluetooth: print fw build version in power-on boot
+4ab51c48b6ed9d084a7789add7ca04327d90da69 CHROMIUM: Bluetooth: mgmt: add additional HCI cmd to add_advertising
+13837096d6e69ff56830fffc5e3aa4c85589fa9d CHROMIUM: Bluetooth: mgmt: add mgmt_cmd_status in add_advertising
+6d993410738fd9b2e519748de34b8b8208e4d9e4 CHROMIUM: Bluetooth: mgmt: add additional HCI cmd to remove_advertising
+7a86c036386599a6ed7bea8e96c783c513e43302 CHROMIUM: Bluetooth: btusb: remove HCI_QUIRK_STRICT_DUPLICATE_FILTER bit
+cb35440e972b8d6a55248981944f88bf8cf6cc62 CHROMIUM: Bluetooth: set Filter_Duplicates parameter to 0x00 for LE scanning
+c14d9aca1c09f3e2f78118cefdc81f0efa94c4d5 bluetooth: "Fix" sync of commands for adv & scan
+8f78687bc7fcc63199429bf6ba0e0ff57509f1d7 bluetooth: make eve-specific hacks generic
+0e9994e52965c917e4392393aca784d179072da4 CHROMIUM: bluetooth: properly handle changing values in conditional commands
+bd454761f0c94e90216b95f8ea375cf06f1113f7 CHROMIUM: bluetooth: fix log spewing from is_filter_match()
+1e21054d561818203d71614e0801760cae8236cb CHROMIUM: bluetooth: fix use-after-free error
+5f4fc916b593be590e992a42998a84f67c7b66ef CHROMIUM: bluetooth: fix a regression about power off delay
+29507af27eead180fb0650ece0e30ad19157e456 CHROMIUM: bluetooth: Add a dummy cmd in hci_req_add_le_scan_disable
+4e0dc9fcfadbb18b925346b46c6bb0bb54588ab4 CHROMIUM: Fix command disallow issue during LE scan operation
+5732b250db1ddf17acd3377f251f057d4e9ba5d6 CHROMIUM: bluetooth: disable 5.x LE BlueZ features
+79c9b5739a3a5b7c168bb16c0a43d0861b6191b9 CHROMIUM: iio: cros_ec: Fix Kconfig select rules
+1cf3e176dc23028309c651364589bbe9419c98d3 CHROMIUM: config: load cros_ec_sensors_core explicitly, iio as modules
+a1d97a61e26650adfe341db01fd719a55526de69 CHROMIUM: i915: intel_dp_aux_backlight: Fix max backlight calculations
+33901c602a1a67fded5d428819eaf226ec3a9c08 CHROMIUM: mfd: cros_ec: Remove chromium specific changes in cros_ec_commands.h
+bef0f8bc5663afa2cf547f037306d9b01bdea592 CHROMIUM: bluetooth: fix invalid pointer access to null command
+2b4dc57b38c378d7eb44b763a19f940eb43b3049 CHROMIUM: Bluetooth: Enable Bluetooth LE splitter for x86-64
+1466322e07575c51f2af67a6616e8a983c0c7678 CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
+a2e6f608234aa43e56092a80923f4797bb0023ef CHROMIUM: config: arm{32,64}: panic when a hardlockup is detected
+b8dc50e2d4de799e0f3e96659f8c722a3a3ae6af CHROMIUM: MALI: Add "arm,mali-bifrost" compatible
+dda81553f3f165e509f957dc0850b49e07fe8638 CHROMIUM: arm64: dts: mediatek: Use upstream bindings for GPU
+c592decb324a74797144094007fe77916291f294 CHROMIUM: arm64: dts: mt8183-kukui: add wifi power controller
+b37c953e98cec18600f861bdc914b78c4ed36b73 CHROMIUM: arm64: dts: mt8183: kukui: Add wifi reset pin dt entry
+7fd529266a63f938cb696d219b23bc79e02850ee CHROMIUM: iwl7000: disable d0i3 by default
+c257fa8632bb98df1fbc4e2ac46c91c938428be2 CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
+3800dc09217959944c3fa2f95adeb4ad9acf3b0a CHROMIUM: config: arm{32,64}: enable buddy CPU hardlockup detector
+b55eac4ffdded6a57cea0cceceb333928d0c6534 FIXUP: CHROMIUM: i915: intel_dp_aux_backlight: Fix max backlight calculations
+f0caba2ba832d5e0d856b6e3418da322e8c19d6e CHROMIUM: low_mem: exclude totalreserve_pages from available memory
+b9243bb2ae9d9acb9eec513c67ad007bb24d3793 CHROMIUM: arm64: dts: sdm845-cheza: Add firmware-name to mss-pil
+0cbedda7b2b8ecd679bcf365a6391000e37fd673 CHROMIUM: config: Turn on QCOM_AOSS_QMP config
+ce823a5a51832fa94a7c7e2573489e570462a611 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
+970618977ae1a9a78ea124bbc7d6da2a55a7b639 CHROMIUM: config: Add cros_ec lid angle driver
+6768e99cfe0514e553f4d0a2efe273f4c1d4b137 CHROMIUM: iwl7000: mvm: clear FW_RUNNING bit after debug collection
+05858c92d59144c89670ea0c8f41e995301b1187 CHROMIUM: iwl7000: mvm: avoid possible deadlock in TX path
+9a50016c724bdbe62c8714b521205b442ce8a442 CHROMIUM: drm/rockchip: dw_hdmi: Support lots more pixel clock rates
+dbc2fcd3e290787b0213d960c0b317b12a2d03f4 CHROMIUM: drm/rockchip: dw_hdmi: Handle audio a bit better for weird rk rates
+85b2654efe4bc6e20f439421450a375fc4b84810 CHROMIUM: mfd / platform: cros_ec: Move pd update sysfs to its own driver
+487824cdae3797ef42f2e3bb4ed2e098918f4e38 CHROMIUM: config: Rename CROS_EC_PD_UPDATE config variable
+56f745d53ad56279a15291eb46c548ff8c46dbe5 CHROMIUM: config: Rename CROS_EC_SYSFS config variable
+6d7cede5700f62c7db8a94af657074f7ed608363 CHROMIUM: iwl7000: mac80211: call rate_control_send_low() internally
+2a5d7318c9a577d0bb75f3ed9840f4d681519ecc CHROMIUM: iwl7000: mac80211: use STA info in rate_control_send_low()
+a638e421f2e95cbe44f002d6622b9183eb2ec585 CHROMIUM: iwl7000: mac80211: fill low rate even for HAS_RATE_CONTROL
+95690003a2c8b501ff048a8796aa805c0ab0f28d CHROMIUM: Revert "eCryptfs: don't pass up plaintext names when using filename encryption"
+15781cbd53c369c2b11c4947d597993ca0ea6bc7 CHROMIUM: drm/i915: Add missing access checks in i915_gem_execbuffer2_ioctl
+2264d706ec41ae574f57e20c9a85bd54f03d571a CHROMIUM: config: enable CONFIG_CRYPTO_SHA256_SSSE3
+b095f03b233701c128815e46b27ca8edaf3a291d CHROMIUM: split cros_ec_pd_update driver in two
+8231461097de1e89adc89ba41337f25b0fad7416 CHROMIUM: security: Add task_exit LSM hook
+6ab8b0d55601c11f3def48512a3c48a4b027e6c6 CHROMIUM: config: enable boe TV101WUM panel support
+e00c23be0039bee67eb20a013df99dc55dedc4c7 CHROMIUM: bluetooth: determine wide band speech by controller id
+3dd46b0b864deebec208bab729fb5ccaf388207c CHROMIUM: bluetooth: enable Erroneous Data Reporting
+41622a04b85163ed6dc1e0765f4060273b2afe61 FIXUP: UPSTREAM: kbuild: replace cc-name test with CONFIG_CC_IS_CLANG
+46847f833effc5a0fb702a68a093486a7312a26e CHROMIUM: mfd: cros_ec: Try loading cros_ec_accel_legacy on more models
+a0bf1bdc0db96102248e545ff14fb8da3d71a551 CHROMIUM: config: armel: rockchip: add legacy sensor support
+5e82274a1a662a7f8b9ac9f3251052d9f23a47a8 CHROMIUM: mm: fix divide error in smaps_account
+49d91a7ba50cd7d94e58f106daad154accf21deb CHROMIUM: bluetooth: implement read_supported_capabilities method
+7c966453ee85056944208a7f73c800b608c06b15 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
+6d1ef793a28a992a8f2ac05e8f69f39d08ac8710 arcvm: Regenerate arcvm config using defconfig
+980cc329f7713c63fdc56fe8b61b1245311728df CHROMIUM: config: Normalize config
+2cfc4fe9469fad57830d616e406319f771fc6679 CHROMIUM: Enable SOF CML machine driver
+95ec403c2f39a283a2bb82ab7f8b21dd320d09a8 arcvm: Update kernel config to include xhci_hcd
+bad76f02a2c37974bc62fb664e9d4e2138f6020b CHROMIUM: remove CONFIG_TOUCHSCREEN_MELFAS_MIP4 in mediatek config
+d1fbde2f26ab31ae63c6189f0f67486d4bd5d317 CHROMIUM: arm64: dts: mt8183: add krane dtsi, sku176 dts
+5cfb50cb55ee323aadc2562c42c827df01cfdc11 CHROMIUM: arm64: dts: mt8183: add krane sku0 dts
+c9a6540479b0fcefc8664093029b0dd68006a896 CHROMIUM: Remove COMMIT-QUEUE.ini
+c9c2aa77f5b29ed8e0c7679071d6abbbcc30dac2 CHROMIUM: config: armel: rockchip: Replace ROCKCHIP_VPU with HANTRO
+9f2b0911b9bf7584b3e61df87a3c5fd19647d7e8 CHROMIUM: config: move CONFIG*sst from Y to m
+345e557ceb328ad0d84a71a3759b7f8b01ca901f FIXUP: arm64: dts: mediatek: Modify opp table for cpu big cluster for mt8183
+30705a3966e7c56bc4a769a43a520d9b9b40759b CHROMIUM: ASoC: Intel: Read sst DSP DMA pointer after period elapse occurs
+e081ba1d801950367c2af088175a71c392f89e2c CHROMIUM: arm64: dts: mt8183: add kodama dts
+7f517eb76717982b576a216d7f5b1bb3725c6f79 CHROMIUM: improvement: Recover from Intel firmware download error.
+f4250a24b2fd301e42c6dcac6b297315d5434b67 CHROMIUM: config: Turn off Rockchip crypto for arm64
+b0c96f7dfd5cdea04e07a589c48904c32d8e71c4 CHROMIUM: drm/i915: Modify i915.enable_dpcd_backlight default value
+ceeecb7cbec1ab0ec11c912b92b1a6bc794e97f4 CHROMIUM: drm/i915: Modify AUX backlight enable sequence for specific eDP panel
+deb74929f8cb092a293aff7af3b35fff6ca03b74 CHROMIUM: config: Change HANTRO to be =y, not =m
+de62be4b67cecf466f50142702bcbc8e23aa8d3c CHROMIUM: net: phy: realtek: Add missing genphy_config_init() call for rtl8211e
+92dff21f44ad18e109b6e086a29141fe474b3782 CHROMIUM: security: Container Monitoring LSM
+e452d693d200e6bb6de925543a41864373b73144 CHROMIUM: arm64: dts: mt8183: add krane rotation property
+4f5c81dfb427edcbf98deaf1750cfa3ee6bd9ffc CHROMIUM: mfd: cros_ec: Try loading cros_ec_accel_legacy on more models""
+fc5b20516a9518a1f10c648137fb9e4f06183fbd CHROMIUM: Move some maybe unused config out of arm64/common.config
+65cde872a834fba3521e0e14f5b7363880fbcb49 CHROMIUM: config: Remove unused config from -qualcomm.config
+1472299ed5584f72799af7ed86e94dbb80d8123e CHROMIUM: iio: cros_ec_accel_legacy: Always release lock when returning from _read()
+ffb946eb1c14974b6bc8f06231c2bf9da93f7f20 CHROMIUM: dm-verity: Do not dump command line arguments as warning
+609d9c825d071bdccda7cf330fe791e65775d4d1 CHROMIUM: power: supply: cros-usbpd-charger: Add charge_control_limit_max
+59aabbbb040c11f368e7e53ee40894e80806bf09 CHROMIUM: Revert android-verity
+7159e8020cc04e7697edd940e2dc2e0fbc506c5e CHROMIUM: Revert "ANDROID: dm: verity: add minimum prefetch size"
+4d04fc6b456c4046d7021a6b34585af8e0b00156 CHROMIUM: bluetooth: Enable filter duplicates field for passive scan
+765ef175f41c5963dbd62de6aa950781268ee1fe FROMGIT: ANDROID: kernel: cgroup: cpuset: Add missing allocation of cpus_requested in alloc_trial_cpuset
+801f53f8f8761854c8bb63856093fdcd6811b458 FROMGIT: ANDROID: kernel: cgroup: cpuset: Clear cpus_requested for empty buf
+c561f7c4b869e10e0ce02aa03c52eb2707adf702 CHROMIUM: MALI: Fix printf code for 'seqno'
+e328fb106a2fe0ffcd2a5de9ba9a7d1674dac95b CHROMIUM: config: Set MMAP_RND_BITS to max for arm32
+f9c9ed25e68d66361bf168fa6b91b4c2fdbe10f1 CHROMIUM: config: enable passive cpufreq-map
+4264bcd334dcc14a947157043bc6a00eb514e9d9 CHROMIUM: arm64: dts: mt8183: set devfreq mapping opp tables
+bb5ca42996c7ed8b9436e3bc54fd546a86df883a CHROMIUM: device_jail: drop custom filesystem
+6a24fce8107020d64dc5fcac7db243e7a2faf2c2 CHROMIUM: config: Choose I2S HDMI audio for RK3288
+5121524cc9f3de6058b3ca8bb892b7abb0c4aff0 CHROMIUM: Bluetooth: LE splitter filter BT 5 commands
+221d8b74d352e47b4b37c11d7a0045c4cff31f8a CHROMIUM: arm64: dts: mt8183: make ts3a227e optional
+71c1fb979eb8d1ee21972670119a7aa6bd785d2d CHROMIUM: arm64: dts: mt8183: set devfreq mapping opp tables
+aa2feef09531297098531f8b38bb7266103e00a6 CHROMIUM: iwl7000: mvm: disable TX-AMSDU on older NICs
+f427813a6a5c17fc95cd0888cbc8224052234e6d CHROMIUM: config: enable ps8640 bridge
+86ae50ae158d4152c1510fee4f783e1956e56ce5 CHROMIUM: drm/panel: read panel orientation for BOE tv101wum-nl6
+08ab0c15c87a65f2fccbf10e8749aa64e5df2e00 CHROMIUM: ASoC: Intel: boards: Add da7219+max98357 m/c driver
+3665c4ecb6242703da2d650caab3f6ac1f1ae75e CHROMIUM: config: Enable CML da7219 max98357a machine driver
+1f54ced2709e17aa45a80bb8bc8cf3256fc0ad64 CHROMIUM: arm64: dts: mt8183: kodama: Add support for audio jack

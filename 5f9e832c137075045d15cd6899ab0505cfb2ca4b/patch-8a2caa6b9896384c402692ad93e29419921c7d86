@@ -1,0 +1,47 @@
+From 6494b7df7b27ec00059dcf5aafd6667741381d7a Mon Sep 17 00:00:00 2001
+From: Lee Shawn C <shawn.c.lee@intel.com>
+Date: Mon, 8 Jul 2019 08:36:23 -0700
+Subject: [PATCH] CHROMIUM: drm/i915: Modify i915.enable_dpcd_backlight default
+ value
+
+Give '-1' as default to i915.enable_dpcd_backlight. Driver will switch
+backlight source to aux or PWM depend on backlight type from VBT.
+With this change, we have to make sure VBT with correct backlight type
+to avoid unexpected issue.
+
+Per upstream's comment, the default value may changed in the future if necessary.
+
+Signed-off-by: Lee Shawn C <shawn.c.lee@intel.com>
+
+BUG=b:131376214
+TEST=Backlight driver will respect VBT setting and switch to AUX or PWM backlight source properly.
+
+Change-Id: Ib2e66149d87c7939f3595aad33a279791103a821
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1683659
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Tested-by: Jongpil Jung <jongpil19.jung@samsung.com>
+Commit-Queue: Rajat Jain <rajatja@google.com>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/i915/i915_params.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/i915/i915_params.h b/drivers/gpu/drm/i915/i915_params.h
+index d29ade3b7de6..e6659eeecd92 100644
+--- a/drivers/gpu/drm/i915/i915_params.h
++++ b/drivers/gpu/drm/i915/i915_params.h
+@@ -64,7 +64,8 @@ struct drm_printer;
+ 	param(int, reset, 2) \
+ 	param(unsigned int, inject_load_failure, 0) \
+ 	param(int, fastboot, -1) \
+-	param(int, enable_dpcd_backlight, 0) \
++	/* CHROMIUM: Use VBT to determine whether to use AUX or PWM backlight control */ \
++	param(int, enable_dpcd_backlight, -1) \
+ 	param(char *, force_probe, CONFIG_DRM_I915_FORCE_PROBE) \
+ 	/* leave bools at the end to not create holes */ \
+ 	param(bool, alpha_support, IS_ENABLED(CONFIG_DRM_I915_ALPHA_SUPPORT)) \
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

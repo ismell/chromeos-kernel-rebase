@@ -1,0 +1,245 @@
+From 925f363e3da45fe0c222d1742b6851629602eae1 Mon Sep 17 00:00:00 2001
+From: Hans Verkuil <hans.verkuil@cisco.com>
+Date: Sun, 3 Jun 2018 05:02:27 -0400
+Subject: [PATCH] BACKPORT: media: vb2: drop VB2_BUF_STATE_PREPARED, use bool
+ prepared/synced instead
+
+The PREPARED state becomes a problem with the request API: a buffer
+could be PREPARED but dequeued, or PREPARED and in state IN_REQUEST.
+
+PREPARED is really not a state as such, but more a property of the
+buffer. So make new 'prepared' and 'synced' bools instead to remember
+whether the buffer is prepared and/or synced or not.
+
+V4L2_BUF_FLAG_PREPARED is only set if the buffer is both synced and
+prepared and in the DEQUEUED state.
+
+BUG=chromium:902656
+TEST=Checked that Cheza was working with request API enabled.
+
+Signed-off-by: Hans Verkuil <hans.verkuil@cisco.com>
+Reviewed-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+(cherry picked from commit 55028695c3bbd8f202b969a5a702caa7d7a51675)
+
+Change-Id: I94016e051cbe78ba65cc5986ff3755e2e9f2fa0e
+[acourbot@chromium.org: fixed conflicts in videobuf2-core.c]
+Signed-off-by: Alexandre Courbot <acourbot@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/1325770
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+---
+ .../media/common/videobuf2/videobuf2-core.c   | 38 +++++++++++++------
+ .../media/common/videobuf2/videobuf2-v4l2.c   | 16 +++++---
+ include/media/videobuf2-core.h                | 10 ++++-
+ 3 files changed, 44 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/media/common/videobuf2/videobuf2-core.c b/drivers/media/common/videobuf2/videobuf2-core.c
+index 517e5afc7b89..cbf8d2b18a0d 100644
+--- a/drivers/media/common/videobuf2/videobuf2-core.c
++++ b/drivers/media/common/videobuf2/videobuf2-core.c
+@@ -658,7 +658,7 @@ int vb2_core_reqbufs(struct vb2_queue *q, enum vb2_memory memory,
+ 	    (q->memory != VB2_MEMORY_UNKNOWN && q->memory != memory)) {
+ 		mutex_lock(&q->mmap_lock);
+ 		/*
+-		 * Call queue_cancel to clean up any buffers in the PREPARED or
++		 * Call queue_cancel to clean up any buffers in the
+ 		 * QUEUED state which is possible if buffers were prepared or
+ 		 * queued without ever calling STREAMON.
+ 		 */
+@@ -1183,6 +1183,7 @@ static void __enqueue_in_driver(struct vb2_buffer *vb)
+ static int __buf_prepare(struct vb2_buffer *vb)
+ {
+ 	struct vb2_queue *q = vb->vb2_queue;
++	enum vb2_buffer_state orig_state = vb->state;
+ 	unsigned int plane;
+ 	int ret;
+ 
+@@ -1191,6 +1192,10 @@ static int __buf_prepare(struct vb2_buffer *vb)
+ 		return -EIO;
+ 	}
+ 
++	if (vb->prepared)
++		return 0;
++	WARN_ON(vb->synced);
++
+ 	vb->state = VB2_BUF_STATE_PREPARING;
+ 
+ 	switch (q->memory) {
+@@ -1206,11 +1211,12 @@ static int __buf_prepare(struct vb2_buffer *vb)
+ 	default:
+ 		WARN(1, "Invalid queue type\n");
+ 		ret = -EINVAL;
++		break;
+ 	}
+ 
+ 	if (ret) {
+ 		dprintk(1, "buffer preparation failed: %d\n", ret);
+-		vb->state = VB2_BUF_STATE_DEQUEUED;
++		vb->state = orig_state;
+ 		return ret;
+ 	}
+ 
+@@ -1218,7 +1224,9 @@ static int __buf_prepare(struct vb2_buffer *vb)
+ 	for (plane = 0; plane < vb->num_planes; ++plane)
+ 		call_void_memop(vb, prepare, vb->planes[plane].mem_priv);
+ 
+-	vb->state = VB2_BUF_STATE_PREPARED;
++	vb->synced = true;
++	vb->prepared = true;
++	vb->state = orig_state;
+ 
+ 	return 0;
+ }
+@@ -1234,6 +1242,10 @@ int vb2_core_prepare_buf(struct vb2_queue *q, unsigned int index, void *pb)
+ 			vb->state);
+ 		return -EINVAL;
+ 	}
++	if (vb->prepared) {
++		dprintk(1, "buffer already prepared\n");
++		return -EINVAL;
++	}
+ 
+ 	ret = __buf_prepare(vb);
+ 	if (ret)
+@@ -1325,11 +1337,11 @@ int vb2_core_qbuf(struct vb2_queue *q, unsigned int index, void *pb)
+ 
+ 	switch (vb->state) {
+ 	case VB2_BUF_STATE_DEQUEUED:
+-		ret = __buf_prepare(vb);
+-		if (ret)
+-			return ret;
+-		break;
+-	case VB2_BUF_STATE_PREPARED:
++		if (!vb->prepared) {
++			ret = __buf_prepare(vb);
++			if (ret)
++				return ret;
++		}
+ 		break;
+ 	case VB2_BUF_STATE_PREPARING:
+ 		dprintk(1, "buffer still being prepared\n");
+@@ -1525,6 +1537,7 @@ static void __vb2_dqbuf(struct vb2_buffer *vb)
+ 	/* sync buffers */
+ 	for (i = 0; i < vb->num_planes; ++i)
+ 		call_void_memop(vb, finish, vb->planes[i].mem_priv);
++	vb->synced = false;
+ 
+ 	if (q->memory == VB2_MEMORY_USERPTR) {
+ 		call_void_vb_qop(vb, buf_cleanup, vb);
+@@ -1565,6 +1578,7 @@ int vb2_core_dqbuf(struct vb2_queue *q, unsigned int *pindex, void *pb,
+ 	}
+ 
+ 	call_void_vb_qop(vb, buf_finish, vb);
++	vb->prepared = false;
+ 
+ 	if (pindex)
+ 		*pindex = vb->index;
+@@ -1653,18 +1667,18 @@ static void __vb2_queue_cancel(struct vb2_queue *q)
+ 	for (i = 0; i < q->num_buffers; ++i) {
+ 		struct vb2_buffer *vb = q->bufs[i];
+ 
+-		if (vb->state == VB2_BUF_STATE_PREPARED ||
+-		    vb->state == VB2_BUF_STATE_QUEUED) {
++		if (vb->synced) {
+ 			unsigned int plane;
+ 
+ 			for (plane = 0; plane < vb->num_planes; ++plane)
+ 				call_void_memop(vb, finish,
+ 						vb->planes[plane].mem_priv);
++			vb->synced = false;
+ 		}
+ 
+-		if (vb->state != VB2_BUF_STATE_DEQUEUED) {
+-			vb->state = VB2_BUF_STATE_PREPARED;
++		if (vb->prepared) {
+ 			call_void_vb_qop(vb, buf_finish, vb);
++			vb->prepared = false;
+ 		}
+ 		__vb2_dqbuf(vb);
+ 	}
+diff --git a/drivers/media/common/videobuf2/videobuf2-v4l2.c b/drivers/media/common/videobuf2/videobuf2-v4l2.c
+index 360dc4e7d413..a677e2c26247 100644
+--- a/drivers/media/common/videobuf2/videobuf2-v4l2.c
++++ b/drivers/media/common/videobuf2/videobuf2-v4l2.c
+@@ -352,9 +352,13 @@ static int vb2_queue_or_prepare_buf(struct vb2_queue *q, struct v4l2_buffer *b,
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Copy relevant information provided by the userspace */
+-	memset(vbuf->planes, 0, sizeof(vbuf->planes[0]) * vb->num_planes);
+-	return vb2_fill_vb2_v4l2_buffer(vb, b);
++	if (!vb->prepared) {
++		/* Copy relevant information provided by the userspace */
++		memset(vbuf->planes, 0,
++		       sizeof(vbuf->planes[0]) * vb->num_planes);
++		ret = vb2_fill_vb2_v4l2_buffer(vb, b);
++	}
++	return ret;
+ }
+ 
+ /*
+@@ -443,9 +447,6 @@ static void __fill_v4l2_buffer(struct vb2_buffer *vb, void *pb)
+ 	case VB2_BUF_STATE_DONE:
+ 		b->flags |= V4L2_BUF_FLAG_DONE;
+ 		break;
+-	case VB2_BUF_STATE_PREPARED:
+-		b->flags |= V4L2_BUF_FLAG_PREPARED;
+-		break;
+ 	case VB2_BUF_STATE_PREPARING:
+ 	case VB2_BUF_STATE_DEQUEUED:
+ 	case VB2_BUF_STATE_REQUEUEING:
+@@ -453,6 +454,9 @@ static void __fill_v4l2_buffer(struct vb2_buffer *vb, void *pb)
+ 		break;
+ 	}
+ 
++	if (vb->state == VB2_BUF_STATE_DEQUEUED && vb->synced && vb->prepared)
++		b->flags |= V4L2_BUF_FLAG_PREPARED;
++
+ 	if (vb2_buffer_in_use(q, vb))
+ 		b->flags |= V4L2_BUF_FLAG_MAPPED;
+ 
+diff --git a/include/media/videobuf2-core.h b/include/media/videobuf2-core.h
+index 2f9ce124d4aa..b54298fac306 100644
+--- a/include/media/videobuf2-core.h
++++ b/include/media/videobuf2-core.h
+@@ -205,7 +205,6 @@ enum vb2_io_modes {
+  * enum vb2_buffer_state - current video buffer state.
+  * @VB2_BUF_STATE_DEQUEUED:	buffer under userspace control.
+  * @VB2_BUF_STATE_PREPARING:	buffer is being prepared in videobuf.
+- * @VB2_BUF_STATE_PREPARED:	buffer prepared in videobuf and by the driver.
+  * @VB2_BUF_STATE_QUEUED:	buffer queued in videobuf, but not in driver.
+  * @VB2_BUF_STATE_REQUEUEING:	re-queue a buffer to the driver.
+  * @VB2_BUF_STATE_ACTIVE:	buffer queued in driver and possibly used
+@@ -219,7 +218,6 @@ enum vb2_io_modes {
+ enum vb2_buffer_state {
+ 	VB2_BUF_STATE_DEQUEUED,
+ 	VB2_BUF_STATE_PREPARING,
+-	VB2_BUF_STATE_PREPARED,
+ 	VB2_BUF_STATE_QUEUED,
+ 	VB2_BUF_STATE_REQUEUEING,
+ 	VB2_BUF_STATE_ACTIVE,
+@@ -251,6 +249,12 @@ struct vb2_buffer {
+ 	/* private: internal use only
+ 	 *
+ 	 * state:		current buffer state; do not change
++	 * synced:		this buffer has been synced for DMA, i.e. the
++	 *			'prepare' memop was called. It is cleared again
++	 *			after the 'finish' memop is called.
++	 * prepared:		this buffer has been prepared, i.e. the
++	 *			buf_prepare op was called. It is cleared again
++	 *			after the 'buf_finish' op is called.
+ 	 * queued_entry:	entry on the queued buffers list, which holds
+ 	 *			all buffers queued from userspace
+ 	 * done_entry:		entry on the list that stores all buffers ready
+@@ -258,6 +262,8 @@ struct vb2_buffer {
+ 	 * vb2_plane:		per-plane information; do not change
+ 	 */
+ 	enum vb2_buffer_state	state;
++	bool			synced;
++	bool			prepared;
+ 
+ 	struct vb2_plane	planes[VB2_MAX_PLANES];
+ 	struct list_head	queued_entry;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

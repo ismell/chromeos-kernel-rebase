@@ -1,0 +1,101 @@
+From b7c14479e9c0def2fafb112018fef44dd1917fc1 Mon Sep 17 00:00:00 2001
+From: Andrey Pronin <apronin@chromium.org>
+Date: Thu, 6 Apr 2017 13:34:20 -0700
+Subject: [PATCH] CHROMIUM: tpm: block messages while suspended
+
+Other drivers or userspace may initiate sending a message to the tpm
+while the device itself and the controller of the bus it is on are
+suspended. That may break the bus driver logic.
+Block sending messages while the device is suspended.
+
+BUG=b:35648537
+TEST=Continuously send messages to the tpm, go through suspend
+     to S0ix and back. Check that messages are rejected while
+     the tpm is suspended, and the tpm is accessible after resume.
+
+Change-Id: If5e2ee33ecb9e8e4afec20b2cf1b232b42859547
+Signed-off-by: Andrey Pronin <apronin@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/470747
+Reviewed-by: Duncan Laurie <dlaurie@google.com>
+Conflicts:
+	drivers/char/tpm/tpm-interface.c
+	drivers/char/tpm/tpm.h
+[rebase412(groeck): Resolved conflicts (context changes)]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	drivers/char/tpm/tpm-interface.c
+	drivers/char/tpm/tpm.h
+
+[rebase419(groeck): Resolved conflicts (context changes)]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): tpm1_pm_suspend was moved into tpm1-cmd.c.]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/char/tpm/tpm-interface.c | 7 +++++++
+ drivers/char/tpm/tpm1-cmd.c      | 2 ++
+ include/linux/tpm.h              | 2 ++
+ 3 files changed, 11 insertions(+)
+
+diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
+index 1b4f95c13e00..7ec92483e1d0 100644
+--- a/drivers/char/tpm/tpm-interface.c
++++ b/drivers/char/tpm/tpm-interface.c
+@@ -81,6 +81,11 @@ static ssize_t tpm_try_transmit(struct tpm_chip *chip, void *buf, size_t bufsiz)
+ 		return -E2BIG;
+ 	}
+ 
++	if (test_bit(0, &chip->is_suspended)) {
++		dev_warn(&chip->dev, "blocking transmit while suspended\n");
++		return -EAGAIN;
++	}
++
+ 	rc = chip->ops->send(chip, buf, count);
+ 	if (rc < 0) {
+ 		if (rc != -EPIPE)
+@@ -403,6 +408,7 @@ int tpm_pm_suspend(struct device *dev)
+ 		else
+ 			rc = tpm1_pm_suspend(chip, tpm_suspend_pcr);
+ 
++		set_bit(0, &chip->is_suspended);
+ 		tpm_chip_stop(chip);
+ 	}
+ 
+@@ -421,6 +427,7 @@ int tpm_pm_resume(struct device *dev)
+ 	if (chip == NULL)
+ 		return -ENODEV;
+ 
++	clear_bit(0, &chip->is_suspended);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(tpm_pm_resume);
+diff --git a/drivers/char/tpm/tpm1-cmd.c b/drivers/char/tpm/tpm1-cmd.c
+index faacbe1ffa1a..62ad14a1eba3 100644
+--- a/drivers/char/tpm/tpm1-cmd.c
++++ b/drivers/char/tpm/tpm1-cmd.c
+@@ -773,6 +773,8 @@ int tpm1_pm_suspend(struct tpm_chip *chip, u32 tpm_suspend_pcr)
+ 	else if (try > 0)
+ 		dev_warn(&chip->dev, "TPM savestate took %dms\n",
+ 			 try * TPM_TIMEOUT_RETRY);
++	if (!rc)
++		set_bit(0, &chip->is_suspended);
+ 
+ 	tpm_buf_destroy(&buf);
+ 
+diff --git a/include/linux/tpm.h b/include/linux/tpm.h
+index 53c0ea9ec9df..cea2d3f4fe46 100644
+--- a/include/linux/tpm.h
++++ b/include/linux/tpm.h
+@@ -127,6 +127,8 @@ struct tpm_chip {
+ 	int dev_num;		/* /dev/tpm# */
+ 	unsigned long is_open;	/* only one allowed */
+ 
++	unsigned long is_suspended;
++
+ 	char hwrng_name[64];
+ 	struct hwrng hwrng;
+ 
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

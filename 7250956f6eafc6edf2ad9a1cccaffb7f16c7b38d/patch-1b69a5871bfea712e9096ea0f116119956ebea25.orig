@@ -1,0 +1,512 @@
+From 1b69a5871bfea712e9096ea0f116119956ebea25 Mon Sep 17 00:00:00 2001
+From: Nick Crews <ncrews@chromium.org>
+Date: Tue, 30 Apr 2019 16:53:55 -0600
+Subject: [PATCH] CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling
+ sysfs
+
+This patch adds support to control two charge scheduling
+policies managed by the EC, Peak Shift and Advanced Charging.
+Peak Shift is a power saving policy that minimizes AC usage
+during the peak usage times of the day. Advanced Charging Mode
+maximizes the battery health by adjusting the charging algorithm
+throughout the day. For userspace interface and more info see
+Documentation/ABI/testing/sysfs-platform-wilco-ec
+
+I am applying this locally to Chromium because I want to get this
+in by M75, and it currently is not acceptable by upstream. There is
+a publicly viewable Google Doc [1] that I have been working on with
+Enric Balletbo i Serra (the platform/chrome maintainer) and
+Sebastian Reichel (the power system maintainer) to figure out a
+generalized API to control charge scheduling for Linux. I have
+structured this code in such a way that the sysfs interface and the
+EC communication backend are separate, so that in the future, if the
+user-facing interface changes, the backend can be re-used.
+
+[1] https://docs.google.com/document/d/1ipuxwWUm1G6WRt_tDqNxBniaE49AJ7JnF0BSaNek9Gc
+
+BUG=b:128524060, b:125011171
+TEST=On the device, try:
+localhost # cd
+/sys/bus/platform/devices/GOOG000C:00/wilco-charge-schedule
+localhost # cat advanced_charging_tuesday
+09:30 08:15
+localhost # echo 7:30 13:45 18:00 > peak_shift_sunday
+localhost # cat peak_shift_battery_threshold
+88
+
+Change-Id: I148d3ff29b1d37532fcfa4fd22da91f9b1b5f5ae
+Signed-off-by: Nick Crews <ncrews@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1586182
+Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
+Reviewed-by: Simon Glass <sjg@chromium.org>
+---
+ .../ABI/testing/sysfs-platform-wilco-ec       |  77 +++++
+ drivers/platform/chrome/wilco_ec/Kconfig      |  12 +
+ drivers/platform/chrome/wilco_ec/Makefile     |   3 +
+ .../chrome/wilco_ec/charge_schedule_sysfs.c   | 282 ++++++++++++++++++
+ drivers/platform/chrome/wilco_ec/core.c       |  14 +
+ include/linux/platform_data/wilco-ec.h        |   2 +
+ 6 files changed, 390 insertions(+)
+ create mode 100644 drivers/platform/chrome/wilco_ec/charge_schedule_sysfs.c
+
+diff --git a/Documentation/ABI/testing/sysfs-platform-wilco-ec b/Documentation/ABI/testing/sysfs-platform-wilco-ec
+index 0c07d5e0b737..6694df8d4172 100644
+--- a/Documentation/ABI/testing/sysfs-platform-wilco-ec
++++ b/Documentation/ABI/testing/sysfs-platform-wilco-ec
+@@ -25,3 +25,80 @@ Description:
+ 		  to the port when on AC. Else no power is supplied.
+ 
+ 		Input should be either "0" or "1".
++
++What:          /sys/bus/platform/devices/GOOG000C\:00/wilco-charge-schedule/advanced_charging_enable
++Date:          May 2019
++KernelVersion: 5.3
++Description:
++		Enable/disable the Advanced Charging policy.
++
++		Advanced Charging Mode maximizes the battery health by adjusting
++		the charging algorithm throughout the day. When enabled, the
++		system will use standard charging algorithms and other
++		techniques during non-work hours to maximize battery health.
++		During work hours, an express charge is used, allowing the
++		battery to be charged faster. For each day the time in which the
++		system will be most heavily used is specified by the start time
++		and the duration.
++
++		The input must be parseable by strtobool() from linux/string.h.
++		The output is either "0\n" or "1\n".
++
++What:          /sys/bus/platform/devices/GOOG000C\:00/wilco-charge-schedule/advanced_charging_{sunday,monday,...}
++Date:          May 2019
++KernelVersion: 5.3
++Description:
++		Get or set the Advanced Charging schedule for a day of the week.
++
++		The input and output string have the format
++		"start_hr:start_min duration_hr:duration_min". The hour fields
++		are in the range [0-23], and the minutes are one of
++		{0, 15, 30, 45}.
++
++		For writing, the input string must be parseable by sscanf()
++		using the format string "%d:%d %d:%d". An example valid input is
++		"0006:15 23:45". When reading, the schedule is formatted with
++		"%02d:%02d %02d:%02d\n". An example output is "06:15 23:45\n".
++
++What:          /sys/bus/platform/devices/GOOG000C\:00/wilco-charge-schedule/peak_shift_enable
++Date:          May 2019
++KernelVersion: 5.3
++Description:
++		Enable/disable the Peak Shift power management policy.
++
++		Peak Shift is power saving policy that minimizes AC usage during
++		the peak usage times of the day. For each weekday a start, end,
++		and charge_start time to run in Peak Shift mode can be set.
++		After the start time the system will run from the battery even
++		if the AC is attached, as long as the battery stays above a
++		specified threshold. After the end time the system will run from
++		AC (if attached) but will not charge the battery. The system
++		will again function normally (use AC and recharge the battery)
++		after the charge_start time.
++
++		The input must be parseable by strtobool() from linux/string.h.
++		The output is either "0\n" or "1\n".
++
++What:          /sys/bus/platform/devices/GOOG000C\:00/wilco-charge-schedule/peak_shift_{sunday,monday,...}
++Date:          May 2019
++KernelVersion: 5.3
++Description:
++		Get or set the Peak Shift schedule for a day of the week.
++
++		The input and output string has the format
++		"start_hr:start_min end_hr:end_min charge_start_hr:charge_start_min".
++		The hour fields are in the range [0-23], and the minutes are one
++		of {0, 15, 30, 45}.
++
++		For writing, the input string must be parseable by sscanf()
++		using the format string "%d:%d %d:%d %d:%d". An example valid
++		input is "6:15  009:45 23:0". When reading, the schedule is
++		formatted with "%02d:%02d %02d:%02d %02d:%02d\n". An example
++		output is "06:15 09:45 23:00\n".
++
++What:          /sys/bus/platform/devices/GOOG000C\:00/wilco-charge-schedule/peak_shift_battery_threshold
++Date:          May 2019
++KernelVersion: 5.3
++Description:
++		Read or write the battery percentage threshold for which the
++		peak shift policy is used. The valid range is [15, 100].
+diff --git a/drivers/platform/chrome/wilco_ec/Kconfig b/drivers/platform/chrome/wilco_ec/Kconfig
+index 2d8718deea27..61c0478b4a2f 100644
+--- a/drivers/platform/chrome/wilco_ec/Kconfig
++++ b/drivers/platform/chrome/wilco_ec/Kconfig
+@@ -37,3 +37,15 @@ config WILCO_EC_KBD_BACKLIGHT
+ 	  brightness. This happens via a standard LED driver that uses the
+ 	  Wilco EC mailbox interface. A standard LED class device will
+ 	  appear under /sys/class/leds/chromeos::kbd_backlight
++
++config WILCO_EC_CHARGE_SCHEDULE
++	tristate "Enable Peak Shift and Advanced Battery Charging support"
++	depends on WILCO_EC
++	help
++	  If you say Y here, you get support to control two charge-scheduling
++	  policies managed by the EC, Peak Shift and Advanced Charging. Peak
++	  Shift is a power saving policy that minimizes AC usage during the
++	  peak-usage times of the day. Advanced Charging Mode maximizes battery
++	  health by adjusting the charging algorithm throughout the day. For
++	  userspace interface and more info see
++	  Documentation/ABI/testing/sysfs-platform-wilco-ec
+diff --git a/drivers/platform/chrome/wilco_ec/Makefile b/drivers/platform/chrome/wilco_ec/Makefile
+index 7c94f0a7b126..3ccbd19ee45e 100644
+--- a/drivers/platform/chrome/wilco_ec/Makefile
++++ b/drivers/platform/chrome/wilco_ec/Makefile
+@@ -8,3 +8,6 @@ wilco_ec_events-objs			:= event.o
+ obj-$(CONFIG_WILCO_EC_EVENTS)		+= wilco_ec_events.o
+ wilco_kbd_backlight-objs		:= kbd_led_backlight.o
+ obj-$(CONFIG_WILCO_EC_KBD_BACKLIGHT)	+= wilco_kbd_backlight.o
++wilco_charge_schedule-objs		:= charge_schedule.o \
++					   charge_schedule_sysfs.o
++obj-$(CONFIG_WILCO_EC_CHARGE_SCHEDULE)	+= wilco_charge_schedule.o
+diff --git a/drivers/platform/chrome/wilco_ec/charge_schedule_sysfs.c b/drivers/platform/chrome/wilco_ec/charge_schedule_sysfs.c
+new file mode 100644
+index 000000000000..88af9c2c73e3
+--- /dev/null
++++ b/drivers/platform/chrome/wilco_ec/charge_schedule_sysfs.c
+@@ -0,0 +1,282 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Sysfs interface for Peak Shift and Advanced Battery Charging schedules.
++ *
++ * Copyright 2019 Google LLC
++ *
++ * See Documentation/ABI/testing/sysfs-platform-wilco-ec for more info.
++ */
++
++#include <linux/device.h>
++#include <linux/module.h>
++#include <linux/platform_data/wilco-ec.h>
++#include <linux/platform_device.h>
++#include <linux/string.h>
++#include <linux/sysfs.h>
++
++#include "charge_schedule.h"
++
++#define DRV_NAME "wilco-charge-schedule"
++
++struct wilco_property_attribute {
++	struct device_attribute dev_attr;
++	u32 property_id;
++};
++
++static ssize_t
++bool_property_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_property_attribute *wpa;
++	u8 val;
++	int ret;
++
++	wpa = container_of(attr, struct wilco_property_attribute, dev_attr);
++	ret = wilco_ec_get_byte_property(ec, wpa->property_id, &val);
++	if (ret < 0)
++		return ret;
++
++	return snprintf(buf, PAGE_SIZE, "%d\n", val);
++}
++
++static ssize_t
++bool_property_store(struct device *dev, struct device_attribute *attr,
++		    const char *buf, size_t count)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_property_attribute *wpa;
++	bool val;
++	int ret;
++
++	if (strtobool(buf, &val) < 0)
++		return -EINVAL;
++
++	wpa = container_of(attr, struct wilco_property_attribute, dev_attr);
++	ret = wilco_ec_set_byte_property(ec, wpa->property_id, (u8) val);
++	if (ret < 0)
++		return ret;
++
++	return count;
++}
++
++#define BOOL_PROPERTY_ATTR(_name, _property_id)				\
++	struct wilco_property_attribute _name =	{			\
++		__ATTR(_name, 0644, bool_property_show, bool_property_store), \
++		_property_id						\
++	}
++
++BOOL_PROPERTY_ATTR(peak_shift_enable, PID_PEAK_SHIFT);
++BOOL_PROPERTY_ATTR(advanced_charging_enable, PID_ADV_CHARGING);
++
++static ssize_t
++peak_shift_battery_threshold_show(struct device *dev,
++				  struct device_attribute *attr, char *buf)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	u8 val;
++	int ret;
++
++	ret = wilco_ec_get_byte_property(ec, PID_PEAK_SHIFT_BATTERY_THRESHOLD,
++					 &val);
++	if (ret < 0)
++		return ret;
++
++	return snprintf(buf, PAGE_SIZE, "%d\n", val);
++}
++
++static ssize_t
++peak_shift_battery_threshold_store(struct device *dev,
++				   struct device_attribute *attr,
++				   const char *buf, size_t count)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	u8 val;
++	int ret;
++
++	if (kstrtou8(buf, 10, &val) < 0)
++		return -EINVAL;
++	if (val < PEAK_SHIFT_BATTERY_THRESHOLD_MIN ||
++	    val > PEAK_SHIFT_BATTERY_THRESHOLD_MAX)
++		return -EINVAL;
++
++	ret = wilco_ec_set_byte_property(ec, PID_PEAK_SHIFT_BATTERY_THRESHOLD,
++					 val);
++	if (ret < 0)
++		return ret;
++
++	return count;
++}
++
++DEVICE_ATTR_RW(peak_shift_battery_threshold);
++
++struct wilco_schedule_attribute {
++	struct device_attribute dev_attr;
++	int day_of_week;	/* 0==Sunday, 1==Monday, ... */
++};
++
++#define to_wilco_schedule_attr(_dev_attr) \
++	container_of(_dev_attr, struct wilco_schedule_attribute, dev_attr)
++
++static ssize_t
++advanced_charging_show(struct device *dev, struct device_attribute *attr,
++		       char *buf)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_schedule_attribute *wsa;
++	struct adv_charge_schedule sched;
++	int ret;
++
++	wsa = to_wilco_schedule_attr(attr);
++	sched.day_of_week = wsa->day_of_week;
++	ret = wilco_ec_get_adv_charge_schedule(ec, &sched);
++	if (ret < 0)
++		return ret;
++
++	return snprintf(buf, PAGE_SIZE, "%02d:%02d %02d:%02d\n",
++			sched.start_hours, sched.start_minutes,
++			sched.duration_hours, sched.duration_minutes);
++}
++
++static ssize_t
++advanced_charging_store(struct device *dev, struct device_attribute *attr,
++			const char *buf, size_t count)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_schedule_attribute *wsa;
++	struct adv_charge_schedule sched;
++	int ret;
++
++	ret = sscanf(buf, "%d:%d %d:%d",
++		     &sched.start_hours, &sched.start_minutes,
++		     &sched.duration_hours, &sched.duration_minutes);
++	if (ret != 4)
++		return -EINVAL;
++
++	wsa = to_wilco_schedule_attr(attr);
++	sched.day_of_week = wsa->day_of_week;
++	ret = wilco_ec_set_adv_charge_schedule(ec, &sched);
++	if (ret < 0)
++		return ret;
++
++	return count;
++}
++
++#define ADVANCED_CHARGING_ATTR(_name, _day_of_week)			\
++	struct wilco_property_attribute adv_charging_attr_##_name = {	\
++		__ATTR(advanced_charging_##_name, 0644,			\
++		       advanced_charging_show, advanced_charging_store),\
++		_day_of_week						\
++	}
++
++ADVANCED_CHARGING_ATTR(sunday, 0);
++ADVANCED_CHARGING_ATTR(monday, 1);
++ADVANCED_CHARGING_ATTR(tuesday, 2);
++ADVANCED_CHARGING_ATTR(wednesday, 3);
++ADVANCED_CHARGING_ATTR(thursday, 4);
++ADVANCED_CHARGING_ATTR(friday, 5);
++ADVANCED_CHARGING_ATTR(saturday, 6);
++
++static ssize_t
++peak_shift_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_schedule_attribute *wsa;
++	struct peak_shift_schedule sched;
++	int ret;
++
++	wsa = to_wilco_schedule_attr(attr);
++	sched.day_of_week = wsa->day_of_week;
++	ret = wilco_ec_get_peak_shift_schedule(ec, &sched);
++	if (ret < 0)
++		return ret;
++
++	return snprintf(buf, PAGE_SIZE, "%02d:%02d %02d:%02d %02d:%02d\n",
++			sched.start_hours, sched.start_minutes,
++			sched.end_hours, sched.end_minutes,
++			sched.charge_start_hours, sched.charge_start_minutes);
++}
++
++static ssize_t
++peak_shift_store(struct device *dev, struct device_attribute *attr,
++		 const char *buf, size_t count)
++{
++	struct wilco_ec_device *ec = dev_get_platdata(dev);
++	struct wilco_schedule_attribute *wsa;
++	struct peak_shift_schedule sched;
++	int ret;
++
++	ret = sscanf(buf, "%d:%d %d:%d %d:%d",
++		     &sched.start_hours, &sched.start_minutes,
++		     &sched.end_hours, &sched.end_minutes,
++		     &sched.charge_start_hours, &sched.charge_start_minutes);
++	if (ret != 6)
++		return -EINVAL;
++
++	wsa = to_wilco_schedule_attr(attr);
++	sched.day_of_week = wsa->day_of_week;
++	ret = wilco_ec_set_peak_shift_schedule(ec, &sched);
++	if (ret < 0)
++		return ret;
++
++	return count;
++}
++
++#define PEAK_SHIFT_ATTR(_name, _day_of_week)				\
++	struct wilco_property_attribute peak_shift_attr_##_name = {	\
++		__ATTR(peak_shift_##_name, 0644,			\
++		       peak_shift_show, peak_shift_store),		\
++		_day_of_week						\
++	}
++
++PEAK_SHIFT_ATTR(sunday, 0);
++PEAK_SHIFT_ATTR(monday, 1);
++PEAK_SHIFT_ATTR(tuesday, 2);
++PEAK_SHIFT_ATTR(wednesday, 3);
++PEAK_SHIFT_ATTR(thursday, 4);
++PEAK_SHIFT_ATTR(friday, 5);
++PEAK_SHIFT_ATTR(saturday, 6);
++
++static struct attribute *wilco_charge_schedule_attrs[] = {
++	&advanced_charging_enable.dev_attr.attr,
++	&adv_charging_attr_sunday.dev_attr.attr,
++	&adv_charging_attr_monday.dev_attr.attr,
++	&adv_charging_attr_tuesday.dev_attr.attr,
++	&adv_charging_attr_wednesday.dev_attr.attr,
++	&adv_charging_attr_thursday.dev_attr.attr,
++	&adv_charging_attr_friday.dev_attr.attr,
++	&adv_charging_attr_saturday.dev_attr.attr,
++
++	&peak_shift_enable.dev_attr.attr,
++	&dev_attr_peak_shift_battery_threshold.attr,
++	&peak_shift_attr_sunday.dev_attr.attr,
++	&peak_shift_attr_monday.dev_attr.attr,
++	&peak_shift_attr_tuesday.dev_attr.attr,
++	&peak_shift_attr_wednesday.dev_attr.attr,
++	&peak_shift_attr_thursday.dev_attr.attr,
++	&peak_shift_attr_friday.dev_attr.attr,
++	&peak_shift_attr_saturday.dev_attr.attr,
++	NULL,
++};
++
++static struct attribute_group wilco_charge_schedule_attr_group = {
++	.attrs = wilco_charge_schedule_attrs,
++};
++
++static int wilco_charge_schedule_probe(struct platform_device *pdev)
++{
++	return devm_device_add_group(&pdev->dev,
++				     &wilco_charge_schedule_attr_group);
++}
++
++static struct platform_driver wilco_charge_schedule_driver = {
++	.probe	= wilco_charge_schedule_probe,
++	.driver = {
++		.name = DRV_NAME,
++	}
++};
++module_platform_driver(wilco_charge_schedule_driver);
++
++MODULE_ALIAS("platform:" DRV_NAME);
++MODULE_AUTHOR("Nick Crews <ncrews@chromium.org>");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Wilco EC charge scheduling driver");
+diff --git a/drivers/platform/chrome/wilco_ec/core.c b/drivers/platform/chrome/wilco_ec/core.c
+index 5733be8d8ff8..83ef7df26c3b 100644
+--- a/drivers/platform/chrome/wilco_ec/core.c
++++ b/drivers/platform/chrome/wilco_ec/core.c
+@@ -160,8 +160,21 @@ static int wilco_ec_probe(struct platform_device *pdev)
+ 		goto remove_sysfs;
+ 	}
+ 
++	/* Register child device to be found by charge scheduling driver. */
++	ec->charge_schedule_pdev = platform_device_register_data(dev,
++			"wilco-charge-schedule", PLATFORM_DEVID_NONE,
++			ec, sizeof(*ec));
++	if (IS_ERR(ec->charge_schedule_pdev)) {
++		dev_err(dev,
++			"Failed to create charge schedule platform device\n");
++		ret = PTR_ERR(ec->charge_schedule_pdev);
++		goto unregister_charge_config;
++	}
++
+ 	return 0;
+ 
++unregister_charge_config:
++	platform_device_unregister(ec->charger_pdev);
+ remove_sysfs:
+ 	wilco_ec_remove_sysfs(ec);
+ unregister_kbbl:
+@@ -179,6 +192,7 @@ static int wilco_ec_remove(struct platform_device *pdev)
+ {
+ 	struct wilco_ec_device *ec = platform_get_drvdata(pdev);
+ 
++	platform_device_unregister(ec->charge_schedule_pdev);
+ 	platform_device_unregister(ec->charger_pdev);
+ 	wilco_ec_remove_sysfs(ec);
+ 	platform_device_unregister(ec->kbbl_pdev);
+diff --git a/include/linux/platform_data/wilco-ec.h b/include/linux/platform_data/wilco-ec.h
+index 029d472c7e6a..79dcda504dda 100644
+--- a/include/linux/platform_data/wilco-ec.h
++++ b/include/linux/platform_data/wilco-ec.h
+@@ -34,6 +34,7 @@
+  * @rtc_pdev: The child platform_device used by the RTC sub-driver.
+  * @kbbl_pdev: The child pdev used by the keyboard backlight sub-driver.
+  * @charger_pdev: Child platform_device used by the charger config sub-driver.
++ * @charge_schedule_pdev: Child pdev used by the charge schedule sub-driver.
+  */
+ struct wilco_ec_device {
+ 	struct device *dev;
+@@ -47,6 +48,7 @@ struct wilco_ec_device {
+ 	struct platform_device *rtc_pdev;
+ 	struct platform_device *kbbl_pdev;
+ 	struct platform_device *charger_pdev;
++	struct platform_device *charge_schedule_pdev;
+ };
+ 
+ /**
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

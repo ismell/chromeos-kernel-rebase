@@ -1,0 +1,53 @@
+From b12504593d6869a871575b74adbd88a657c7c902 Mon Sep 17 00:00:00 2001
+From: Enrico Granata <egranata@chromium.org>
+Date: Fri, 5 Oct 2018 10:30:14 -0700
+Subject: [PATCH] CHROMIUM: cros_ec: add
+ EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS
+
+Add EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS from the
+EC (ec_commands.h) into the Linux version
+mfd/cros_ec_commands.h
+
+BUG=b:112111610, chromium:944342
+TEST=tight_timestamps automatically enabled on Nocturne
+
+Conflict in mfd/cros_ec_commands.h: missing feature flags
+
+Change-Id: Idda658156341b7e0adc8ece0ae2268c3dd3aa1a8
+Reviewed-on: https://chromium-review.googlesource.com/1265177
+Commit-Ready: Enrico Granata <egranata@chromium.org>
+Tested-by: Enrico Granata <egranata@chromium.org>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-by: Alexandru M Stan <amstan@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1308063
+Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
+Reviewed-by: Enrico Granata <egranata@chromium.org>
+Signed-off-by: Alexandru M Stan <amstan@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1533344
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/linux/mfd/cros_ec_commands.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+index bfb063617656..ba639f5e7d4d 100644
+--- a/include/linux/mfd/cros_ec_commands.h
++++ b/include/linux/mfd/cros_ec_commands.h
+@@ -1265,8 +1265,12 @@ enum ec_feature_code {
+ 	EC_FEATURE_UNIFIED_WAKE_MASKS = 32,
+ 	/* EC supports 64-bit host events */
+ 	EC_FEATURE_HOST_EVENT64 = 33,
++	/* EC runs code in RAM (not in place, a.k.a. XIP) */
++	EC_FEATURE_EXEC_IN_RAM = 34,
+ 	/* EC supports CEC commands */
+ 	EC_FEATURE_CEC = 35,
++	/* EC supports tight sensor timestamping. */
++	EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS = 36,
+ 	/*
+ 	 * EC supports tablet mode detection aligned to Chrome and allows
+ 	 * setting of threshold by host command using
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

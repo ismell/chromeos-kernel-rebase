@@ -1,0 +1,122 @@
+From 21143cb7edd4a16119eecf1235abfafebb9950d2 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Mon, 20 May 2019 15:00:51 -0700
+Subject: [PATCH] BACKPORT: FROMGIT: ARM: dts: rockchip: Configure the GPU
+ thermal zone for mickey
+
+mickey crams a lot of hardware into a tiny package, which requires
+more aggressive thermal throttling than for devices with a larger
+footprint. Configure the GPU thermal zone to throttle the GPU
+progressively at temperatures >= 60C. Heat dissipated by the
+CPUs also affects the GPU temperature, hence we cap the CPU
+frequency to 1.4 GHz for temperatures above 65C. Further throttling
+of the CPUs may be performed by the CPU thermal zone.
+
+The configuration matches that of the downstream Chrome OS 3.14
+kernel, the 'official' kernel for mickey.
+
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Heiko Stuebner <heiko@sntech.de>
+(cherry picked from commit c87efcc3d1dfdf3f5ecb6558521825a21838dc30
+ git://git.kernel.org/pub/scm/linux/kernel/git/mmind/linux-rockchip.git v5.3-armsoc/dts32)
+
+Conflicts:
+  arch/arm/boot/dts/rk3288-veyron-mickey.dts
+    context delta due to the dmc node in our tree
+
+BUG=chromium:941638
+TEST=on mickey: the GPU is progressively throttled with rising
+  temperatures
+
+Change-Id: Iff519e055d9a3a5e97b8fc737e2ec66b83e67a1b
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1625322
+Commit-Ready: Douglas Anderson <dianders@chromium.org>
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+---
+ arch/arm/boot/dts/rk3288-veyron-mickey.dts | 67 ++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+
+diff --git a/arch/arm/boot/dts/rk3288-veyron-mickey.dts b/arch/arm/boot/dts/rk3288-veyron-mickey.dts
+index c43203150950..85500fd3a901 100644
+--- a/arch/arm/boot/dts/rk3288-veyron-mickey.dts
++++ b/arch/arm/boot/dts/rk3288-veyron-mickey.dts
+@@ -149,6 +149,73 @@
+ 	>;
+ };
+ 
++&gpu_thermal {
++	/delete-node/ trips;
++	/delete-node/ cooling-maps;
++
++	trips {
++		gpu_alert_warmish: gpu_alert_warmish {
++			temperature = <60000>; /* millicelsius */
++			hysteresis = <2000>; /* millicelsius */
++			type = "passive";
++		};
++		gpu_alert_warm: gpu_alert_warm {
++			temperature = <65000>; /* millicelsius */
++			hysteresis = <2000>; /* millicelsius */
++			type = "passive";
++		};
++		gpu_alert_hotter: gpu_alert_hotter {
++			temperature = <84000>; /* millicelsius */
++			hysteresis = <2000>; /* millicelsius */
++			type = "passive";
++		};
++		gpu_alert_very_very_hot: gpu_alert_very_very_hot {
++			temperature = <86000>; /* millicelsius */
++			hysteresis = <2000>; /* millicelsius */
++			type = "passive";
++		};
++		gpu_crit: gpu_crit {
++			temperature = <90000>; /* millicelsius */
++			hysteresis = <2000>; /* millicelsius */
++			type = "critical";
++		};
++	};
++
++	cooling-maps {
++		/* After 1st level throttle the GPU down to as low as 400 MHz */
++		gpu_warmish_limit_gpu {
++			trip = <&gpu_alert_warmish>;
++			cooling-device = <&gpu THERMAL_NO_LIMIT 1>;
++		};
++
++		/*
++		 * Slightly after we throttle the GPU, we'll also make sure that
++		 * the CPU can't go faster than 1.4 GHz.  Note that we won't
++		 * throttle the CPU lower than 1.4 GHz due to GPU heat--we'll
++		 * let the CPU do the rest itself.
++		 */
++		gpu_warm_limit_cpu {
++			trip = <&gpu_alert_warm>;
++			cooling-device = <&cpu0 4 4>,
++					 <&cpu1 4 4>,
++					 <&cpu2 4 4>,
++					 <&cpu3 4 4>;
++		};
++
++		/* When hot, GPU goes down to 300 MHz */
++		gpu_hotter_limit_gpu {
++			trip = <&gpu_alert_hotter>;
++			cooling-device = <&gpu 2 2>;
++		};
++
++		/* When really hot, don't let GPU go _above_ 300 MHz */
++		gpu_very_very_hot_limit_gpu {
++			trip = <&gpu_alert_very_very_hot>;
++			cooling-device = <&gpu 2 THERMAL_NO_LIMIT>;
++		};
++	};
++};
++
+ &i2c2 {
+ 	status = "disabled";
+ };
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

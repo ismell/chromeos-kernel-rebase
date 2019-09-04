@@ -1,0 +1,49 @@
+From 20e5f61e2499f43542068b9fa50cbd0cffa8d507 Mon Sep 17 00:00:00 2001
+From: Daniel Rosenberg <drosen@google.com>
+Date: Tue, 23 Jan 2018 15:02:50 -0800
+Subject: [PATCH] ANDROID: fsnotify: Notify lower fs of open
+
+If the filesystem being watched supports d_canonical_path,
+notify the lower filesystem of the open as well.
+
+Change-Id: I2b1739e068afbaf5eb39950516072bff8345ebfe
+Signed-off-by: Daniel Rosenberg <drosen@google.com>
+Bug: 70706497
+(cherry picked from commit 570f5b7e0dd1e82df3bf2c0cb7864080e4c77423)
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/linux/fsnotify.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/include/linux/fsnotify.h b/include/linux/fsnotify.h
+index a2d5d175d3c1..6048d8f0c498 100644
+--- a/include/linux/fsnotify.h
++++ b/include/linux/fsnotify.h
+@@ -262,6 +262,7 @@ static inline void fsnotify_modify(struct file *file)
+ static inline void fsnotify_open(struct file *file)
+ {
+ 	const struct path *path = &file->f_path;
++	struct path lower_path;
+ 	struct inode *inode = file_inode(file);
+ 	__u32 mask = FS_OPEN;
+ 
+@@ -270,6 +271,13 @@ static inline void fsnotify_open(struct file *file)
+ 	if (file->f_flags & __FMODE_EXEC)
+ 		mask |= FS_OPEN_EXEC;
+ 
++	if (path->dentry->d_op && path->dentry->d_op->d_canonical_path) {
++		path->dentry->d_op->d_canonical_path(path, &lower_path);
++		fsnotify_parent(&lower_path, NULL, mask);
++		fsnotify(lower_path.dentry->d_inode, mask, &lower_path, FSNOTIFY_EVENT_PATH, NULL, 0);
++		path_put(&lower_path);
++	}
++
+ 	fsnotify_path(inode, path, mask);
+ }
+ 
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

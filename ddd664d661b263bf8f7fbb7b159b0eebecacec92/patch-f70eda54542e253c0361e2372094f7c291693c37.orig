@@ -1,0 +1,142 @@
+From f70eda54542e253c0361e2372094f7c291693c37 Mon Sep 17 00:00:00 2001
+From: Vaibhav Rustagi <vaibhavrustagi@google.com>
+Date: Thu, 25 Jul 2019 15:38:14 -0700
+Subject: [PATCH] BACKPORT: FROMLIST: x86/purgatory: do not use
+ __builtin_memcpy and __builtin_memset
+
+Implementing memcpy and memset in terms of __builtin_memcpy and
+__builtin_memset is problematic.
+
+GCC at -O2 will replace calls to the builtins with calls to memcpy and
+memset (but will generate an inline implementation at -Os).  Clang will
+replace the builtins with these calls regardless of optimization level.
+$ llvm-objdump -dr arch/x86/purgatory/string.o | tail
+
+0000000000000339 memcpy:
+     339: 48 b8 00 00 00 00 00 00 00 00 movabsq $0, %rax
+                000000000000033b:  R_X86_64_64  memcpy
+     343: ff e0                         jmpq    *%rax
+
+0000000000000345 memset:
+     345: 48 b8 00 00 00 00 00 00 00 00 movabsq $0, %rax
+                0000000000000347:  R_X86_64_64  memset
+     34f: ff e0
+
+Such code results in infinite recursion at runtime. This is observed
+when doing kexec.
+
+Instead, reuse an implementation from arch/x86/boot/compressed/string.c
+if we define warn as a symbol. Also, Clang may lower memcmp's that
+compare against 0 to bcmp's, so add a small definition, too. See also:
+commit 5f074f3e192f ("lib/string.c: implement a basic bcmp")
+
+Fixes: 8fc5b4d4121c ("purgatory: core purgatory functionality")
+Link: https://bugs.chromium.org/p/chromium/issues/detail?id=984056
+Reported-by: Vaibhav Rustagi <vaibhavrustagi@google.com>
+Debugged-by: Vaibhav Rustagi <vaibhavrustagi@google.com>
+Debugged-by: Manoj Gupta <manojgupta@google.com>
+Suggested-by: Alistair Delva <adelva@google.com>
+Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Vaibhav Rustagi <vaibhavrustagi@google.com>
+
+BUG=b:131425916
+TEST=tryjob and local running 'kexec'
+
+(am from https://lore.kernel.org/patchwork/patch/1105648/)
+
+Signed-off-by: Vaibhav Rustagi <vaibhavrustagi@google.com>
+
+Change-Id: Iaf33bdb774320600a5ea91195e9bb50d2c107d7a
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1717579
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+Commit-Queue: Vaibhav Rustagi <vaibhavrustagi@google.com>
+Tested-by: Vaibhav Rustagi <vaibhavrustagi@google.com>
+---
+ arch/x86/boot/string.c         |  8 ++++++++
+ arch/x86/purgatory/Makefile    |  3 +++
+ arch/x86/purgatory/purgatory.c |  6 ++++++
+ arch/x86/purgatory/string.c    | 25 -------------------------
+ 4 files changed, 17 insertions(+), 25 deletions(-)
+ delete mode 100644 arch/x86/purgatory/string.c
+
+diff --git a/arch/x86/boot/string.c b/arch/x86/boot/string.c
+index c4428a176973..c5f28556dfdb 100644
+--- a/arch/x86/boot/string.c
++++ b/arch/x86/boot/string.c
+@@ -34,6 +34,14 @@ int memcmp(const void *s1, const void *s2, size_t len)
+ 	return diff;
+ }
+ 
++/*
++ * Clang may lower `memcmp == 0` to `bcmp == 0`.
++ */
++int bcmp(const void *s1, const void *s2, size_t len)
++{
++       return memcmp(s1, s2, len);
++}
++
+ int strcmp(const char *str1, const char *str2)
+ {
+ 	const unsigned char *s1 = (const unsigned char *)str1;
+diff --git a/arch/x86/purgatory/Makefile b/arch/x86/purgatory/Makefile
+index 3cf302b26332..91ef244026d2 100644
+--- a/arch/x86/purgatory/Makefile
++++ b/arch/x86/purgatory/Makefile
+@@ -6,6 +6,9 @@ purgatory-y := purgatory.o stack.o setup-x86_$(BITS).o sha256.o entry64.o string
+ targets += $(purgatory-y)
+ PURGATORY_OBJS = $(addprefix $(obj)/,$(purgatory-y))
+ 
++$(obj)/string.o: $(srctree)/arch/x86/boot/compressed/string.c FORCE
++	$(call if_changed_rule,cc_o_c)
++
+ $(obj)/sha256.o: $(srctree)/lib/sha256.c FORCE
+ 	$(call if_changed_rule,cc_o_c)
+ 
+diff --git a/arch/x86/purgatory/purgatory.c b/arch/x86/purgatory/purgatory.c
+index 025c34ac0d84..7971f7a8af59 100644
+--- a/arch/x86/purgatory/purgatory.c
++++ b/arch/x86/purgatory/purgatory.c
+@@ -70,3 +70,9 @@ void purgatory(void)
+ 	}
+ 	copy_backup_region();
+ }
++
++/*
++ * Defined in order to reuse memcpy() and memset() from
++ * arch/x86/boot/compressed/string.c
++ */
++void warn(const char *msg) {}
+diff --git a/arch/x86/purgatory/string.c b/arch/x86/purgatory/string.c
+deleted file mode 100644
+index 795ca4f2cb3c..000000000000
+--- a/arch/x86/purgatory/string.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-/*
+- * Simple string functions.
+- *
+- * Copyright (C) 2014 Red Hat Inc.
+- *
+- * Author:
+- *       Vivek Goyal <vgoyal@redhat.com>
+- *
+- * This source code is licensed under the GNU General Public License,
+- * Version 2.  See the file COPYING for more details.
+- */
+-
+-#include <linux/types.h>
+-
+-#include "../boot/string.c"
+-
+-void *memcpy(void *dst, const void *src, size_t len)
+-{
+-	return __builtin_memcpy(dst, src, len);
+-}
+-
+-void *memset(void *dst, int c, size_t len)
+-{
+-	return __builtin_memset(dst, c, len);
+-}
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

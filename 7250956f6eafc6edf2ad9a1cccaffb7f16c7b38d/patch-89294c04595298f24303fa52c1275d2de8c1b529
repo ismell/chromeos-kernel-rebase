@@ -1,0 +1,52 @@
+From 5c8ff2de7a347884d63e5cf902d41d4bc6b2a4c9 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 25 Sep 2018 15:35:54 -0700
+Subject: [PATCH] CHROMIUM: Revert "x86: Allow generating user-space headers
+ without a compiler"
+
+This reverts commit 829fe4aa9ac16417a904ad1de1307de906854bcf.
+
+This change enforces the use of 'asm goto', which currently is not
+supported by clang.
+
+BUG=chromium:891028
+TEST=build for caroline
+
+Change-Id: I125163b5b692e64c52a17db03d1e935420fef40a
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/x86/Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index ce0d0424a53d..b09afcec2d55 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -175,6 +175,10 @@ ifdef CONFIG_FUNCTION_GRAPH_TRACER
+   endif
+ endif
+ 
++ifndef CC_HAVE_ASM_GOTO
++  $(error Compiler lacks asm-goto support.)
++endif
++
+ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ 	# This compiler flag is not supported by Clang:
+ 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
+@@ -305,10 +309,6 @@ vdso_install:
+ 
+ archprepare: checkbin
+ checkbin:
+-ifndef CONFIG_CC_HAS_ASM_GOTO
+-	@echo Compiler lacks asm-goto support.
+-	@exit 1
+-endif
+ ifdef CONFIG_RETPOLINE
+ ifeq ($(RETPOLINE_CFLAGS),)
+ 	@echo "You are building kernel with non-retpoline compiler." >&2
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

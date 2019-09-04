@@ -1,0 +1,54 @@
+From d4fe27227aaea0147882ef77a7dcfff9b37dd905 Mon Sep 17 00:00:00 2001
+From: Daniel Kurtz <djkurtz@chromium.org>
+Date: Mon, 21 Nov 2016 12:06:29 +0800
+Subject: [PATCH] CHROMIUM: selinux: Do not log "permissive" denials
+
+If an access triggers an denial, but it was allowed due to a global or
+per-domain permissive mode, (ie the message would have a "permissive=1"
+field), don't even bother going through the slow audit path to print the
+message.
+
+The permissive=1 messages spam the kernel logs making it much harder to
+see other useful messages.
+
+On elm, each slow_avc_audit() call consumes ~10-60 us.
+
+Signed-off-by: Daniel Kurtz <djkurtz@chromium.org>
+
+BUG=chromium:653575
+TEST=Boot, inspect /var/log/messages, no more messages like:
+  [    1.372604] audit: type=1400 audit(1475767701.728:4): avc:  denied  { read } for  pid=1 comm="init" name="ld-linux-armhf.so.3" dev="dm-0" ino=40094 scontext=u:r:kernel:s0 tcontext=u:object_r:unlabeled:s0 tclass=lnk_file permissive=1
+  [    1.372640] audit: type=1400 audit(1475767701.728:5): avc:  denied  { execute } for  pid=1 comm="init" name="ld-2.19.so" dev="dm-0" ino=40084 scontext=u:r:kernel:s0 tcontext=u:object_r:unlabeled:s0 tclass=file permissive=1
+
+Change-Id: Ic5b0630299f6bcac53659771b6c0cfef9cc13e2e
+Reviewed-on: https://chromium-review.googlesource.com/413144
+Commit-Ready: Daniel Kurtz <djkurtz@chromium.org>
+Tested-by: Daniel Kurtz <djkurtz@chromium.org>
+Reviewed-by: Luis Hector Chavez <lhchavez@google.com>
+Reviewed-by: Jorge Lucangeli Obes <jorgelo@chromium.org>
+(cherry picked from commit 1456e8755f19355e2d06430f6f378399b52571aa)
+Reviewed-on: https://chromium-review.googlesource.com/414285
+Commit-Ready: Brian Norris <briannorris@chromium.org>
+Tested-by: Brian Norris <briannorris@chromium.org>
+---
+ security/selinux/avc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/security/selinux/avc.c b/security/selinux/avc.c
+index 5de18a6d5c3f..a73f8b80d761 100644
+--- a/security/selinux/avc.c
++++ b/security/selinux/avc.c
+@@ -772,6 +772,10 @@ noinline int slow_avc_audit(struct selinux_state *state,
+ 	struct common_audit_data stack_data;
+ 	struct selinux_audit_data sad;
+ 
++	/* Only log permissive=1 messages for SECURITY_SELINUX_DEVELOP */
++	if (!IS_ENABLED(CONFIG_SECURITY_SELINUX_DEVELOP) && denied && !result)
++		return 0;
++
+ 	if (!a) {
+ 		a = &stack_data;
+ 		a->type = LSM_AUDIT_DATA_NONE;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

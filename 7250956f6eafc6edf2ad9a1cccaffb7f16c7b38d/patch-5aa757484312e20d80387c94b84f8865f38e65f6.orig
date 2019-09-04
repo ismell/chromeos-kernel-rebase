@@ -1,0 +1,618 @@
+From 5aa757484312e20d80387c94b84f8865f38e65f6 Mon Sep 17 00:00:00 2001
+From: Micah Morton <mortonm@chromium.org>
+Date: Tue, 26 Feb 2019 13:43:52 -0800
+Subject: [PATCH] CHROMIUM: rip out setuid stuff from chromiumos LSM
+
+This work has been upstreamed as the 'SafeSetID LSM', so lets use that
+and clean up the chromiumos LSM a bit.
+
+CQ-DEPEND=CL:1489991, CL:1490015
+BUG=chromium:845640
+TEST=security_ProcessManagementPolicy
+
+Change-Id: Ica5c25b97cf9a30cd38fba9c9b954c38e2511926
+Signed-off-by: Micah Morton <mortonm@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1489794
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+Reviewed-by: Dmitry Torokhov <dtor@chromium.org>
+---
+ security/chromiumos/lsm.c                | 286 -----------------------
+ security/chromiumos/process_management.h |  38 ---
+ security/chromiumos/securityfs.c         | 157 -------------
+ 3 files changed, 481 deletions(-)
+ delete mode 100644 security/chromiumos/process_management.h
+
+diff --git a/security/chromiumos/lsm.c b/security/chromiumos/lsm.c
+index 9dade079ef30..c2128de849c5 100644
+--- a/security/chromiumos/lsm.c
++++ b/security/chromiumos/lsm.c
+@@ -35,43 +35,10 @@
+ #include <linux/security.h>
+ 
+ #include "inode_mark.h"
+-#include "process_management.h"
+ #include "utils.h"
+ 
+ #define NUM_BITS 8 // 128 buckets in hash table
+ 
+-static DEFINE_HASHTABLE(process_setuid_policy_hashtable, NUM_BITS);
+-
+-/*
+- * Bool signifying whether to disable fixups for process management related
+- * routines in the kernel (setuid, setgid, kill). Default value is false. Can
+- * be overridden by 'disable_process_management_policies' flag. Static vars get
+- * initialized to 0/false since in BSS.
+- **/
+-static bool disable_process_management_policies;
+-
+-/* Disable process management policies if flag passed */
+-static int set_disable_process_management_policies(char *str)
+-{
+-	disable_process_management_policies = true;
+-	return 1;
+-}
+-__setup("disable_process_management_policies=",
+-	set_disable_process_management_policies);
+-
+-/*
+- * Hash table entry to store process management policy signifying that 'parent'
+- * user can use 'child' user for process management (for now that just means
+- * 'parent' can set*uid() to 'child'). Will be adding exceptions for set*gid()
+- * and kill() in the future.
+- */
+-struct entry {
+-	struct hlist_node next;
+-	struct hlist_node dlist; /* for deletion cleanup */
+-	uint64_t parent_kuid;
+-	uint64_t child_kuid;
+-};
+-
+ static DEFINE_HASHTABLE(sb_nosymfollow_hashtable, NUM_BITS);
+ 
+ struct sb_entry {
+@@ -303,8 +270,6 @@ int chromiumos_security_sb_umount(struct vfsmount *mnt, int flags)
+ 	return 0;
+ }
+ 
+-static DEFINE_SPINLOCK(process_setuid_policy_hashtable_spinlock);
+-
+ /*
+  * NOTE: The WARN() calls will emit a warning in cases of blocked symlink
+  * traversal attempts. These will show up in kernel warning reports
+@@ -366,83 +331,6 @@ static int chromiumos_security_file_open(struct file *file)
+ 	return policy == CHROMIUMOS_INODE_POLICY_BLOCK ? -EACCES : 0;
+ }
+ 
+-bool chromiumos_check_setuid_policy_hashtable_key(kuid_t parent)
+-{
+-	struct entry *entry;
+-
+-	rcu_read_lock();
+-	hash_for_each_possible_rcu(process_setuid_policy_hashtable,
+-				   entry, next, __kuid_val(parent)) {
+-		if (entry->parent_kuid == __kuid_val(parent)) {
+-			rcu_read_unlock();
+-			return true;
+-		}
+-	}
+-	rcu_read_unlock();
+-
+-	/*
+-	 * Using RCU, its possible that a policy gets added in between the time
+-	 * we check above and when we return false here. This is fine, since
+-	 * policy updates only happen during system startup, well before
+-	 * sandboxed system services start running and the policies need to be
+-	 * queried.
+-	 */
+-	return false;
+-}
+-
+-bool chromiumos_check_setuid_policy_hashtable_key_value(kuid_t parent,
+-							kuid_t child)
+-{
+-	struct entry *entry;
+-
+-	rcu_read_lock();
+-	hash_for_each_possible_rcu(process_setuid_policy_hashtable,
+-				   entry, next, __kuid_val(parent)) {
+-		if (entry->parent_kuid == __kuid_val(parent) &&
+-		    entry->child_kuid == __kuid_val(child)) {
+-			rcu_read_unlock();
+-			return true;
+-		}
+-	}
+-	rcu_read_unlock();
+-
+-	/*
+-	 * Using RCU, its possible that a policy gets added in between the time
+-	 * we check above and when we return false here. This is fine, since
+-	 * policy updates only happen during system startup, well before
+-	 * sandboxed system services start running and the policies need to be
+-	 * queried.
+-	 */
+-	return false;
+-}
+-
+-int chromiumos_security_capable(const struct cred *cred,
+-				struct user_namespace *ns,
+-				int cap,
+-				unsigned int opts)
+-{
+-	/* The current->mm check will fail if this is a kernel thread. */
+-	if (!disable_process_management_policies &&
+-	    cap == CAP_SETUID &&
+-	    current->mm &&
+-	    chromiumos_check_setuid_policy_hashtable_key(cred->uid)) {
+-		// syscall_get_nr can theoretically return 0 or -1, but that
+-		// would signify that the syscall is being aborted due to a
+-		// signal, so we don't need to check for this case here.
+-		if (!(opts & CAP_OPT_INSETID)) {
+-			// Deny if we're not in a set*uid() syscall to avoid
+-			// giving powers gated by CAP_SETUID that are related
+-			// to functionality other than calling set*uid() (e.g.
+-			// allowing user to set up userns uid mappings).
+-			WARN(1,
+-			     "Operation requires CAP_SETUID, which is not available to UID %u for operations besides approved set*uid transitions\n",
+-			     __kuid_val(cred->uid));
+-			return -1;
+-		}
+-	}
+-	return 0;
+-}
+-
+ /*
+  * This hook inspects the string pointed to by the first parameter, looking for
+  * the "nosymfollow" mount option. The second parameter points to an empty
+@@ -501,130 +389,6 @@ int chromiumos_sb_copy_data(char *orig, char *copy)
+ 	return 0;
+ }
+ 
+-/*
+- * Emit a warning when no entry found in whitelist. These will show up in
+- * kernel warning reports collected by the crash reporter, so we have some
+- * insight regarding failures that need addressing.
+- */
+-void chromiumos_setuid_policy_warning(kuid_t parent, kuid_t child)
+-{
+-	WARN(1,
+-	     "UID %u is restricted to using certain whitelisted UIDs for process management, and %u is not in the whitelist.\n",
+-	     __kuid_val(parent),
+-	     __kuid_val(child));
+-}
+-
+-int chromiumos_check_uid_transition(kuid_t parent, kuid_t child)
+-{
+-	if (chromiumos_check_setuid_policy_hashtable_key_value(parent, child))
+-		return 0;
+-	chromiumos_setuid_policy_warning(parent, child);
+-	return -1;
+-}
+-
+-/*
+- * Check whether there is either an exception for user under old cred struct to
+- * use user under new cred struct, or the UID transition is allowed (by Linux
+- * set*uid rules) even without CAP_SETUID.
+- */
+-int chromiumos_security_task_fix_setuid(struct cred *new,
+-					const struct cred *old, int flags)
+-{
+-
+-	/*
+-	 * Do nothing if feature is turned off by kernel compile flag or there
+-	 * are no setuid restrictions for this UID.
+-	 */
+-	if (disable_process_management_policies ||
+-	    !chromiumos_check_setuid_policy_hashtable_key(old->uid))
+-		return 0;
+-
+-	switch (flags) {
+-	case LSM_SETID_RE:
+-		/*
+-		 * Users for which setuid restrictions exist can only set the
+-		 * real UID to the real UID or the effective UID, unless an
+-		 * explicit whitelist policy allows the transition.
+-		 */
+-		if (!uid_eq(old->uid, new->uid) &&
+-			!uid_eq(old->euid, new->uid)) {
+-			return chromiumos_check_uid_transition(old->uid,
+-								new->uid);
+-		}
+-		/*
+-		 * Users for which setuid restrictions exist can only set the
+-		 * effective UID to the real UID, the effective UID, or the
+-		 * saved set-UID, unless an explicit whitelist policy allows
+-		 * the transition.
+-		 */
+-		if (!uid_eq(old->uid, new->euid) &&
+-			!uid_eq(old->euid, new->euid) &&
+-			!uid_eq(old->suid, new->euid)) {
+-			return chromiumos_check_uid_transition(old->euid,
+-								new->euid);
+-		}
+-		break;
+-	case LSM_SETID_ID:
+-		/*
+-		 * Users for which setuid restrictions exist cannot change the
+-		 * real UID or saved set-UID unless an explicit whitelist
+-		 * policy allows the transition.
+-		 */
+-		if (!uid_eq(old->uid, new->uid)) {
+-			return chromiumos_check_uid_transition(old->uid,
+-								new->uid);
+-		}
+-		if (!uid_eq(old->suid, new->suid)) {
+-			return chromiumos_check_uid_transition(old->suid,
+-								new->suid);
+-		}
+-		break;
+-	case LSM_SETID_RES:
+-		/*
+-		 * Users for which setuid restrictions exist cannot change the
+-		 * real UID, effective UID, or saved set-UID to anything but
+-		 * one of: the current real UID, the current effective UID or
+-		 * the current saved set-user-ID unless an explicit whitelist
+-		 * policy allows the transition.
+-		 */
+-		if (!uid_eq(new->uid, old->uid) &&
+-			!uid_eq(new->uid, old->euid) &&
+-			!uid_eq(new->uid, old->suid)) {
+-			return chromiumos_check_uid_transition(old->uid,
+-								new->uid);
+-		}
+-		if (!uid_eq(new->euid, old->uid) &&
+-			!uid_eq(new->euid, old->euid) &&
+-			!uid_eq(new->euid, old->suid)) {
+-			return chromiumos_check_uid_transition(old->euid,
+-								new->euid);
+-		}
+-		if (!uid_eq(new->suid, old->uid) &&
+-			!uid_eq(new->suid, old->euid) &&
+-			!uid_eq(new->suid, old->suid)) {
+-			return chromiumos_check_uid_transition(old->suid,
+-								new->suid);
+-		}
+-		break;
+-	case LSM_SETID_FS:
+-		/*
+-		 * Users for which setuid restrictions exist cannot change the
+-		 * filesystem UID to anything but one of: the current real UID,
+-		 * the current effective UID or the current saved set-UID
+-		 * unless an explicit whitelist policy allows the transition.
+-		 */
+-		if (!uid_eq(new->fsuid, old->uid)  &&
+-			!uid_eq(new->fsuid, old->euid)  &&
+-			!uid_eq(new->fsuid, old->suid) &&
+-			!uid_eq(new->fsuid, old->fsuid)) {
+-			return chromiumos_check_uid_transition(old->fsuid,
+-								new->fsuid);
+-		}
+-		break;
+-	}
+-	return 0;
+-}
+-
+ /* Unfortunately the kernel doesn't implement memmem function. */
+ static void *search_buffer(void *haystack, size_t haystacklen,
+ 			   const void *needle, size_t needlelen)
+@@ -661,61 +425,11 @@ static struct security_hook_list chromiumos_security_hooks[] = {
+ 	LSM_HOOK_INIT(sb_mount, chromiumos_security_sb_mount),
+ 	LSM_HOOK_INIT(inode_follow_link, chromiumos_security_inode_follow_link),
+ 	LSM_HOOK_INIT(file_open, chromiumos_security_file_open),
+-	LSM_HOOK_INIT(capable, chromiumos_security_capable),
+-	LSM_HOOK_INIT(task_fix_setuid, chromiumos_security_task_fix_setuid),
+ 	LSM_HOOK_INIT(sb_copy_data, chromiumos_sb_copy_data),
+ 	LSM_HOOK_INIT(sb_kern_mount, chromiumos_sb_kern_mount),
+ 	LSM_HOOK_INIT(sb_umount, chromiumos_security_sb_umount)
+ };
+ 
+-/* Add process management policy to hash table */
+-int chromiumos_add_process_management_entry(kuid_t parent, kuid_t child)
+-{
+-	struct entry *new;
+-
+-	/* Return if entry already exists */
+-	if (chromiumos_check_setuid_policy_hashtable_key_value(parent,
+-							       child))
+-		return 0;
+-
+-	new = kzalloc(sizeof(struct entry), GFP_KERNEL);
+-	if (!new)
+-		return -ENOMEM;
+-	new->parent_kuid = __kuid_val(parent);
+-	new->child_kuid = __kuid_val(child);
+-	spin_lock(&process_setuid_policy_hashtable_spinlock);
+-	hash_add_rcu(process_setuid_policy_hashtable,
+-		     &new->next,
+-		     __kuid_val(parent));
+-	spin_unlock(&process_setuid_policy_hashtable_spinlock);
+-	return 0;
+-}
+-
+-void chromiumos_flush_process_management_entries(void)
+-{
+-	struct entry *entry;
+-	struct hlist_node *hlist_node;
+-	unsigned int bkt_loop_cursor;
+-	HLIST_HEAD(free_list);
+-
+-	/*
+-	 * Could probably use hash_for_each_rcu here instead, but this should
+-	 * be fine as well.
+-	 */
+-	spin_lock(&process_setuid_policy_hashtable_spinlock);
+-	hash_for_each_safe(process_setuid_policy_hashtable, bkt_loop_cursor,
+-			   hlist_node, entry, next) {
+-		hash_del_rcu(&entry->next);
+-		hlist_add_head(&entry->dlist, &free_list);
+-	}
+-	spin_unlock(&process_setuid_policy_hashtable_spinlock);
+-	synchronize_rcu();
+-	hlist_for_each_entry_safe(entry, hlist_node, &free_list, dlist) {
+-		hlist_del(&entry->dlist);
+-		kfree(entry);
+-	}
+-}
+-
+ static int __init chromiumos_security_init(void)
+ {
+ 	security_add_hooks(chromiumos_security_hooks,
+diff --git a/security/chromiumos/process_management.h b/security/chromiumos/process_management.h
+deleted file mode 100644
+index 85538fc2d83e..000000000000
+--- a/security/chromiumos/process_management.h
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/*
+- * Linux Security Module for Chromium OS
+- *
+- * Copyright 2018 Google LLC. All Rights Reserved
+- *
+- * Author:
+- *      Micah Morton       <mortonm@chromium.org>
+- *
+- * This software is licensed under the terms of the GNU General Public
+- * License version 2, as published by the Free Software Foundation, and
+- * may be copied, distributed, and modified under those terms.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-
+-#ifndef _SECURITY_PROCESS_MANAGEMENT_H
+-#define _SECURITY_PROCESS_MANAGEMENT_H
+-
+-#include <linux/types.h>
+-
+-/* Function type. */
+-enum chromiumos_process_management_file_write_type {
+-	CHROMIUMOS_PROCESS_MANAGEMENT_ADD, /* Add whitelist policy. */
+-	CHROMIUMOS_PROCESS_MANAGEMENT_FLUSH, /* Flush whitelist policies. */
+-};
+-
+-/*
+- * Add entry to chromiumos process management policies to allow user 'parent'
+- * to use user 'child' for process management.
+- */
+-int chromiumos_add_process_management_entry(kuid_t parent, kuid_t child);
+-
+-void chromiumos_flush_process_management_entries(void);
+-
+-#endif /* _SECURITY_PROCESS_MANAGEMENT_H */
+diff --git a/security/chromiumos/securityfs.c b/security/chromiumos/securityfs.c
+index 0dee9990b148..ae2d76a08fd9 100644
+--- a/security/chromiumos/securityfs.c
++++ b/security/chromiumos/securityfs.c
+@@ -27,11 +27,9 @@
+ #include <linux/uaccess.h>
+ 
+ #include "inode_mark.h"
+-#include "process_management.h"
+ 
+ static struct dentry *chromiumos_dir;
+ static struct dentry *chromiumos_inode_policy_dir;
+-static struct dentry *chromiumos_process_management_policy_dir;
+ 
+ struct chromiumos_inode_policy_file_entry {
+ 	const char *name;
+@@ -42,12 +40,6 @@ struct chromiumos_inode_policy_file_entry {
+ 	struct dentry *dentry;
+ };
+ 
+-struct chromiumos_process_management_file_entry {
+-	const char *name;
+-	enum chromiumos_process_management_file_write_type type;
+-	struct dentry *dentry;
+-};
+-
+ static int chromiumos_inode_policy_file_write(
+ 	struct chromiumos_inode_policy_file_entry *file_entry,
+ 	struct dentry *dentry)
+@@ -97,14 +89,6 @@ static struct chromiumos_inode_policy_file_entry
+ 	 .handle_write = &chromiumos_inode_policy_file_flush_write},
+ };
+ 
+-static struct chromiumos_process_management_file_entry
+-		chromiumos_process_management_files[] = {
+-	{.name = "add_whitelist_policy",
+-	 .type = CHROMIUMOS_PROCESS_MANAGEMENT_ADD},
+-	{.name = "flush_whitelist_policies",
+-	 .type = CHROMIUMOS_PROCESS_MANAGEMENT_FLUSH},
+-};
+-
+ static int chromiumos_resolve_path(const char __user *buf, size_t len,
+ 				   struct path *path)
+ {
+@@ -194,118 +178,10 @@ static ssize_t chromiumos_inode_file_write(
+ 	return ret < 0 ? ret : len;
+ }
+ 
+-/*
+- * In the case the input buffer contains one or more invalid UIDS, the kuid_t
+- * variables pointed to by 'parent' and 'child' will get updated but this
+- * function will return an error.
+- */
+-static int chromiumos_parse_process_management_policy(const char __user *buf,
+-						      size_t len,
+-						      kuid_t *parent,
+-						      kuid_t *child)
+-{
+-	char *kern_buf;
+-	char *parent_buf;
+-	char *child_buf;
+-	const char separator[] = ":";
+-	int ret;
+-	size_t first_substring_length;
+-	long parsed_parent;
+-	long parsed_child;
+-
+-	/* Duplicate string from user memory and NULL-terminate */
+-	kern_buf = memdup_user_nul(buf, len);
+-	if (IS_ERR(kern_buf))
+-		return PTR_ERR(kern_buf);
+-
+-	/*
+-	 * Format of |buf| string should be <UID>:<UID>.
+-	 * Find location of ":" in kern_buf (copied from |buf|).
+-	 */
+-	first_substring_length = strcspn(kern_buf, separator);
+-	if (first_substring_length == 0 || first_substring_length == len) {
+-		ret = -EINVAL;
+-		goto free_kern;
+-	}
+-
+-	parent_buf = kmemdup_nul(kern_buf, first_substring_length, GFP_KERNEL);
+-	if (!parent_buf) {
+-		ret = -ENOMEM;
+-		goto free_kern;
+-	}
+-
+-	ret = kstrtol(parent_buf, 0, &parsed_parent);
+-	if (ret)
+-		goto free_both;
+-
+-	child_buf = kern_buf + first_substring_length + 1;
+-	ret = kstrtol(child_buf, 0, &parsed_child);
+-	if (ret)
+-		goto free_both;
+-
+-	*parent = make_kuid(current_user_ns(), parsed_parent);
+-	if (!uid_valid(*parent)) {
+-		ret = -EINVAL;
+-		goto free_both;
+-	}
+-
+-	*child = make_kuid(current_user_ns(), parsed_child);
+-	if (!uid_valid(*child)) {
+-		ret = -EINVAL;
+-		goto free_both;
+-	}
+-
+-free_both:
+-	kfree(parent_buf);
+-free_kern:
+-	kfree(kern_buf);
+-	return ret;
+-}
+-
+-static ssize_t chromiumos_process_management_file_write(struct file *file,
+-							const char __user *buf,
+-							size_t len,
+-							loff_t *ppos)
+-{
+-	struct chromiumos_process_management_file_entry *file_entry =
+-		file->f_inode->i_private;
+-	kuid_t parent;
+-	kuid_t child;
+-	int ret;
+-
+-	if (!ns_capable(current_user_ns(), CAP_SYS_ADMIN))
+-		return -EPERM;
+-
+-	if (*ppos != 0)
+-		return -EINVAL;
+-
+-	if (file_entry->type == CHROMIUMOS_PROCESS_MANAGEMENT_FLUSH) {
+-		chromiumos_flush_process_management_entries();
+-		return len;
+-	}
+-
+-	/* file_entry->type must equal CHROMIUMOS_PROCESS_MANAGEMENT_ADD */
+-	ret = chromiumos_parse_process_management_policy(buf, len, &parent,
+-							 &child);
+-	if (ret)
+-		return ret;
+-
+-	ret = chromiumos_add_process_management_entry(parent, child);
+-	if (ret)
+-		return ret;
+-
+-	/* Return len on success so caller won't keep trying to write */
+-	return len;
+-}
+-
+ static const struct file_operations chromiumos_inode_policy_file_fops = {
+ 	.write = chromiumos_inode_file_write,
+ };
+ 
+-static const struct file_operations chromiumos_process_management_file_fops = {
+-	.write = chromiumos_process_management_file_write,
+-};
+-
+ static void chromiumos_shutdown_securityfs(void)
+ {
+ 	int i;
+@@ -317,19 +193,9 @@ static void chromiumos_shutdown_securityfs(void)
+ 		entry->dentry = NULL;
+ 	}
+ 
+-	for (i = 0; i < ARRAY_SIZE(chromiumos_process_management_files); ++i) {
+-		struct chromiumos_process_management_file_entry *entry =
+-			&chromiumos_process_management_files[i];
+-		securityfs_remove(entry->dentry);
+-		entry->dentry = NULL;
+-	}
+-
+ 	securityfs_remove(chromiumos_inode_policy_dir);
+ 	chromiumos_inode_policy_dir = NULL;
+ 
+-	securityfs_remove(chromiumos_process_management_policy_dir);
+-	chromiumos_process_management_policy_dir = NULL;
+-
+ 	securityfs_remove(chromiumos_dir);
+ 	chromiumos_dir = NULL;
+ }
+@@ -366,29 +232,6 @@ static int chromiumos_init_securityfs(void)
+ 		}
+ 	}
+ 
+-	chromiumos_process_management_policy_dir =
+-		securityfs_create_dir(
+-			"process_management_policies",
+-			chromiumos_dir);
+-	if (!chromiumos_process_management_policy_dir) {
+-		ret = PTR_ERR(chromiumos_process_management_policy_dir);
+-		goto error;
+-	}
+-
+-	for (i = 0; i < ARRAY_SIZE(chromiumos_process_management_files); ++i) {
+-		struct chromiumos_process_management_file_entry *entry =
+-			&chromiumos_process_management_files[i];
+-		entry->dentry = securityfs_create_file(
+-			entry->name,
+-			0200,
+-			chromiumos_process_management_policy_dir,
+-			entry, &chromiumos_process_management_file_fops);
+-		if (IS_ERR(entry->dentry)) {
+-			ret = PTR_ERR(entry->dentry);
+-			goto error;
+-		}
+-	}
+-
+ 	return 0;
+ 
+ error:
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

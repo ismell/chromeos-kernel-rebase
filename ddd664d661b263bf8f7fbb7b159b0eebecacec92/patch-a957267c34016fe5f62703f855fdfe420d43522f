@@ -1,0 +1,80 @@
+From f9e192bc51bef807938bc4d14e6b1d49321e11fa Mon Sep 17 00:00:00 2001
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Wed, 25 Apr 2018 16:08:11 -0700
+Subject: [PATCH] ANDROID: mm: fix filler function type mismatch
+
+Bug: 67506682
+Change-Id: I6f615164ccd86b407540ada9bbcb39d910395db9
+Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+(cherry picked from commit a043b399da4bd399e44a32cf161b2a3df6a4db28)
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): read_cache_page_gfp no longer has a filler.]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/linux/pagemap.h | 5 +++--
+ mm/filemap.c            | 4 ++--
+ mm/readahead.c          | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index c7552459a15f..578c3de4723b 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -226,7 +226,7 @@ static inline gfp_t readahead_gfp_mask(struct address_space *x)
+ 	return mapping_gfp_mask(x) | __GFP_NORETRY | __GFP_NOWARN;
+ }
+ 
+-typedef int filler_t(void *, struct page *);
++typedef int filler_t(struct file *, struct page *);
+ 
+ pgoff_t page_cache_next_miss(struct address_space *mapping,
+ 			     pgoff_t index, unsigned long max_scan);
+@@ -383,7 +383,8 @@ extern int read_cache_pages(struct address_space *mapping,
+ static inline struct page *read_mapping_page(struct address_space *mapping,
+ 				pgoff_t index, void *data)
+ {
+-	return read_cache_page(mapping, index, NULL, data);
++	filler_t *filler = mapping->a_ops->readpage;
++	return read_cache_page(mapping, index, filler, data);
+ }
+ 
+ /*
+diff --git a/mm/filemap.c b/mm/filemap.c
+index d0cf700bf201..24461156efc7 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2801,7 +2801,7 @@ static struct page *wait_on_page_read(struct page *page)
+ 
+ static struct page *do_read_cache_page(struct address_space *mapping,
+ 				pgoff_t index,
+-				int (*filler)(void *, struct page *),
++				int (*filler)(struct file *, struct page *),
+ 				void *data,
+ 				gfp_t gfp)
+ {
+@@ -2914,7 +2914,7 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+  */
+ struct page *read_cache_page(struct address_space *mapping,
+ 				pgoff_t index,
+-				int (*filler)(void *, struct page *),
++				int (*filler)(struct file *, struct page *),
+ 				void *data)
+ {
+ 	return do_read_cache_page(mapping, index, filler, data,
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 2fe72cd29b47..425c3cb9c0d2 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -86,7 +86,7 @@ static void read_cache_pages_invalidate_pages(struct address_space *mapping,
+  * Returns: %0 on success, error return by @filler otherwise
+  */
+ int read_cache_pages(struct address_space *mapping, struct list_head *pages,
+-			int (*filler)(void *, struct page *), void *data)
++			int (*filler)(struct file *, struct page *), void *data)
+ {
+ 	struct page *page;
+ 	int ret = 0;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

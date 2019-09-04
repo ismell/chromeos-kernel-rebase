@@ -1,0 +1,44 @@
+From d58b63cfe67a8025e0fe30200a41a67eae5cd8ad Mon Sep 17 00:00:00 2001
+From: Raul E Rangel <rrangel@chromium.org>
+Date: Thu, 15 Aug 2019 12:24:09 -0600
+Subject: [PATCH] CHROMIUM: Revert "kbuild: add -fno-PIE flag unconditionally"
+
+This reverts commit 42a92bccd213ce4b7198d2e943ac0efe88cbe1aa.
+
+Needed so we can cleanly apply: CHROMIUM: Revert "Makefile: disable PIE before testing asm goto"
+
+Change-Id: Ie7f9d7d78b20c4c823af328cc81eeed855a9f11c
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 9be5834073f8..affa33bce43f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -458,9 +458,9 @@ LINUXINCLUDE    := \
+ 		-I$(objtree)/include \
+ 		$(USERINCLUDE)
+ 
+-KBUILD_AFLAGS   := -D__ASSEMBLY__ -fno-PIE
++KBUILD_AFLAGS   := -D__ASSEMBLY__
+ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
+-		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
++		   -fno-strict-aliasing -fno-common -fshort-wchar \
+ 		   -Werror=implicit-function-declaration -Werror=implicit-int \
+ 		   -Wno-format-security \
+ 		   -std=gnu89
+@@ -536,6 +536,9 @@ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
+ endif
+ 
++KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
++KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
++
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

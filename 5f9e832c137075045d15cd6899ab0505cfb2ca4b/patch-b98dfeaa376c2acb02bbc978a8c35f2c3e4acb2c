@@ -1,0 +1,45 @@
+From 4700a6f92f4479e8d9237c6e9db243c73d48f0e1 Mon Sep 17 00:00:00 2001
+From: Daniel Rosenberg <drosen@google.com>
+Date: Tue, 30 Jan 2018 14:24:02 -0800
+Subject: [PATCH] ANDROID: Revert "fs: unexport vfs_read and vfs_write"
+
+This reverts commit bd8df82be66698042d11e7919e244c8d72b042ca.
+
+These functions are used in sdcardfs
+
+Change-Id: If740718cca903c211d1c2832c7fd95a4c4cfe20f
+Signed-off-by: Daniel Rosenberg <drosen@google.com>
+(cherry picked from commit 3a34c88819f1a845cfde61b03f20f4843accc15c)
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ fs/read_write.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 1f5088dec566..e5c563ff0853 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -469,6 +469,8 @@ ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
+ 	return ret;
+ }
+ 
++EXPORT_SYMBOL(vfs_read);
++
+ static ssize_t new_sync_write(struct file *filp, const char __user *buf, size_t len, loff_t *ppos)
+ {
+ 	struct iovec iov = { .iov_base = (void __user *)buf, .iov_len = len };
+@@ -567,6 +569,8 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
+ 	return ret;
+ }
+ 
++EXPORT_SYMBOL(vfs_write);
++
+ /* file_ppos returns &file->f_pos or NULL if file is stream */
+ static inline loff_t *file_ppos(struct file *file)
+ {
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

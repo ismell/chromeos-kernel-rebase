@@ -1,0 +1,325 @@
+From 4fe263e4ca028f2a287f820c4deb079b75fcae04 Mon Sep 17 00:00:00 2001
+From: Joseph Hwang <josephsih@chromium.org>
+Date: Thu, 18 Aug 2016 09:34:18 +0800
+Subject: [PATCH] CHROMIUM: bluetooth: set advertising intervals
+
+This patch supports specification of advertising intervals in
+bluetooth kernel subsystem.
+
+A new set_advertising_intervals mgmt handler is added to support
+the new mgmt opcode MGMT_OP_SET_ADVERTISING_INTERVALS. The
+min_interval and max_interval are simply recorded in hdev struct.
+
+The intervals together with other advertising parameters would be
+sent to the controller before advertising is enabled in the procedure
+of registering an advertisement.
+
+In cases that advertising has been enabled before
+set_advertising_intervals is invoked, it would re-enable advertising
+to make the intervals take effect. This is less preferable since
+bluetooth core specification states that the parameters should be set
+before advertising is enabled. However, the advertising re-enabling
+feature is kept since it might be useful in multi-advertisements.
+
+BUG=chromium:602461
+TEST=Perform the following steps to make and update kernel.
+(cr) $ FEATURES="noclean" cros_workon_make --board=$BOARD --install
+       chromeos-kernel-3_xx
+(cr) $ ~/trunk/src/scripts/update_kernel.sh --remote $DUT_IP
+       --remote_bootargs
+
+Change-Id: I5177b63c14dfacd0d47092fc7c814476ef73e4d8
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/388953
+Commit-Ready: Rahul Chaturvedi <rkc@chromium.org>
+Tested-by: Rahul Chaturvedi <rkc@chromium.org>
+Reviewed-by: Rahul Chaturvedi <rkc@chromium.org>
+
+Conflicts:
+	include/net/bluetooth/mgmt.h
+	net/bluetooth/mgmt.c
+
+[rebase49(groeck): Conflict resolution; updated command numbers]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	include/net/bluetooth/mgmt.h
+	net/bluetooth/mgmt.c
+
+[rebase419(groeck):
+	context conflicts;
+	updated command numbers
+	Squashed commits:
+		CHROMIUM: bluetooth: reset advertising intervals
+		CHROMIUM: bluetooth: adjust advertising duration based on max interval
+		CHROMIUM: bluetooth: set advertising intervals after registering advertisements
+	]
+
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h | 26 ++++++++++-
+ include/net/bluetooth/mgmt.h     |  8 ++++
+ net/bluetooth/hci_core.c         | 14 ++++--
+ net/bluetooth/hci_request.c      |  2 +-
+ net/bluetooth/mgmt.c             | 78 ++++++++++++++++++++++++++++++++
+ 6 files changed, 122 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 89ac29f1dffa..7df8b4dbf2d4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -269,6 +269,7 @@ enum {
+ 	HCI_LE_ENABLED,
+ 	HCI_ADVERTISING,
+ 	HCI_ADVERTISING_CONNECTABLE,
++	HCI_ADVERTISING_INTERVALS,
+ 	HCI_CONNECTABLE,
+ 	HCI_DISCOVERABLE,
+ 	HCI_LIMITED_DISCOVERABLE,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ded574b32c20..a67411285086 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -175,6 +175,7 @@ struct adv_info {
+ 	__u16	timeout;
+ 	__u16	remaining_time;
+ 	__u16	duration;
++	__u8	individual_duration_flag;
+ 	__u16	adv_data_len;
+ 	__u8	adv_data[HCI_MAX_AD_LENGTH];
+ 	__u16	scan_rsp_len;
+@@ -186,7 +187,29 @@ struct adv_info {
+ };
+ 
+ #define HCI_MAX_ADV_INSTANCES		5
+-#define HCI_DEFAULT_ADV_DURATION	2
++#define HCI_DEFAULT_ADV_DURATION	2000
++
++/*
++ * Refer to BLUETOOTH SPECIFICATION Version 4.2 [Vol 2, Part E]
++ * Section 7.8.5 about
++ * - the default min/max intervals, and
++ * - the valid range of min/max intervals.
++ */
++#define HCI_DEFAULT_LE_ADV_MIN_INTERVAL	0x0800
++#define HCI_DEFAULT_LE_ADV_MAX_INTERVAL	0x0800
++#define HCI_VALID_LE_ADV_MIN_INTERVAL	0x0020
++#define HCI_VALID_LE_ADV_MAX_INTERVAL	0x4000
++#define ADV_DURATION_MIN_GRACE_PERIOD	5
++
++/* Multiply m by 0.625 (or 5 / 8) to derive time in ms. */
++#define CONVERT_TO_ADV_INTERVAL_MS(m) ((m * 5) >> 3)
++
++/*
++ * We want to multiply the duration (d) by a factor near 0.1
++ * to derive a grace period in ms. This is done by multiplying
++ * d by 0.109375 (or 7 / 64)
++ */
++#define ADV_DURATION_GRACE_PERIOD(d) ((d * 7) >> 6)
+ 
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
+ 
+@@ -259,6 +282,7 @@ struct hci_dev {
+ 	__u8		le_adv_channel_map;
+ 	__u16		le_adv_min_interval;
+ 	__u16		le_adv_max_interval;
++	__u16		le_adv_duration;
+ 	__u8		le_scan_type;
+ 	__u16		le_scan_interval;
+ 	__u16		le_scan_window;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 9cee7ddc6741..21273d39fdc0 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -102,6 +102,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_CONFIGURATION	0x00004000
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION  0x00010000
++#define MGMT_SETTING_ADVERTISING_INTERVALS	0x00020000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -654,6 +655,13 @@ struct mgmt_cp_set_phy_confguration {
+ } __packed;
+ #define MGMT_SET_PHY_CONFIGURATION_SIZE	4
+ 
++#define MGMT_OP_SET_ADVERTISING_INTERVALS	0x0044
++struct mgmt_cp_set_advertising_intervals {
++	__le16	min_interval;
++	__le16	max_interval;
++} __packed;
++#define MGMT_SET_ADVERTISING_INTERVALS_SIZE	4
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b9585e7d9d2e..a7c57eaec9aa 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2855,10 +2855,13 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 	adv_instance->timeout = timeout;
+ 	adv_instance->remaining_time = timeout;
+ 
+-	if (duration == 0)
+-		adv_instance->duration = HCI_DEFAULT_ADV_DURATION;
+-	else
++	if (duration == 0) {
++		adv_instance->duration = hdev->le_adv_duration;
++		adv_instance->individual_duration_flag = 0;
++	} else {
+ 		adv_instance->duration = duration;
++		adv_instance->individual_duration_flag = 1;
++	}
+ 
+ 	adv_instance->tx_power = HCI_TX_POWER_INVALID;
+ 
+@@ -3177,8 +3180,9 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->sniff_min_interval = 80;
+ 
+ 	hdev->le_adv_channel_map = 0x07;
+-	hdev->le_adv_min_interval = 0x0800;
+-	hdev->le_adv_max_interval = 0x0800;
++	hdev->le_adv_min_interval = HCI_DEFAULT_LE_ADV_MIN_INTERVAL;
++	hdev->le_adv_max_interval = HCI_DEFAULT_LE_ADV_MAX_INTERVAL;
++	hdev->le_adv_duration = HCI_DEFAULT_ADV_DURATION;
+ 	hdev->le_scan_interval = 0x0060;
+ 	hdev->le_scan_window = 0x0030;
+ 	hdev->le_conn_min_interval = 0x0018;
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 621f1a97d803..22c7f79da695 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1750,7 +1750,7 @@ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
+ 		hdev->adv_instance_timeout = timeout;
+ 		queue_delayed_work(hdev->req_workqueue,
+ 			   &hdev->adv_instance_expire,
+-			   msecs_to_jiffies(timeout * 1000));
++			   msecs_to_jiffies(timeout));
+ 	}
+ 
+ 	/* If we're just re-scheduling the same instance again then do not
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 150114e33b20..ad656be3cb8c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -106,6 +106,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_START_LIMITED_DISCOVERY,
+ 	MGMT_OP_READ_EXT_INFO,
+ 	MGMT_OP_SET_APPEARANCE,
++	MGMT_OP_SET_ADVERTISING_INTERVALS,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -769,6 +770,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 		settings |= MGMT_SETTING_SECURE_CONN;
+ 		settings |= MGMT_SETTING_PRIVACY;
+ 		settings |= MGMT_SETTING_STATIC_ADDRESS;
++		settings |= MGMT_SETTING_ADVERTISING_INTERVALS;
+ 	}
+ 
+ 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+@@ -845,6 +847,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 			settings |= MGMT_SETTING_STATIC_ADDRESS;
+ 	}
+ 
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INTERVALS))
++		settings |= MGMT_SETTING_ADVERTISING_INTERVALS;
++
+ 	return settings;
+ }
+ 
+@@ -4609,6 +4614,78 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static int set_advertising_intervals(struct sock *sk, struct hci_dev *hdev,
++				     void *data, u16 len)
++{
++	struct mgmt_cp_set_advertising_intervals *cp = data;
++	int err;
++	u16 max_interval_ms, grace_period;
++	/* If both min_interval and max_interval are 0, use default values. */
++	bool use_default = cp->min_interval == 0 && cp->max_interval == 0;
++	struct adv_info *adv_instance;
++	int instance;
++
++	BT_DBG("%s", hdev->name);
++
++	/* This method is intended for LE devices only.*/
++	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_ADVERTISING_INTERVALS,
++				       MGMT_STATUS_REJECTED);
++
++	/* Check the validity of the intervals. */
++	if (!use_default && (cp->min_interval < HCI_VALID_LE_ADV_MIN_INTERVAL ||
++			     cp->max_interval > HCI_VALID_LE_ADV_MAX_INTERVAL ||
++			     cp->min_interval > cp->max_interval)) {
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_ADVERTISING_INTERVALS,
++				       MGMT_STATUS_INVALID_PARAMS);
++	}
++
++	hci_dev_lock(hdev);
++
++	if (use_default) {
++		hci_dev_clear_flag(hdev, HCI_ADVERTISING_INTERVALS);
++		hdev->le_adv_min_interval = HCI_DEFAULT_LE_ADV_MIN_INTERVAL;
++		hdev->le_adv_max_interval = HCI_DEFAULT_LE_ADV_MAX_INTERVAL;
++		hdev->le_adv_duration = HCI_DEFAULT_ADV_DURATION;
++	} else {
++		hci_dev_set_flag(hdev, HCI_ADVERTISING_INTERVALS);
++		hdev->le_adv_min_interval = cp->min_interval;
++		hdev->le_adv_max_interval = cp->max_interval;
++
++		max_interval_ms = CONVERT_TO_ADV_INTERVAL_MS(cp->max_interval);
++		grace_period = ADV_DURATION_GRACE_PERIOD(max_interval_ms);
++		if (grace_period < ADV_DURATION_MIN_GRACE_PERIOD)
++			grace_period = ADV_DURATION_MIN_GRACE_PERIOD;
++		hdev->le_adv_duration = max_interval_ms + grace_period;
++	}
++
++	/* hdev->le_adv_duration would be copied to adv instances created
++	 * hereafter. However, for any existing adv instance of which the
++	 * individual_duration_flag is false, we should modify its duration.
++	 */
++	for (instance = 1;  instance <= HCI_MAX_ADV_INSTANCES; instance++) {
++		adv_instance = hci_find_adv_instance(hdev, instance);
++		if (adv_instance && !adv_instance->individual_duration_flag)
++			adv_instance->duration = hdev->le_adv_duration;
++	}
++
++	/* If advertising is not enabled, the new parameters will take effect
++	 * when advertising is enabled.
++	 * If advertising has been enabled, the new parameters will take effect
++	 * when next adv instance is scheduled by
++	 * __hci_req_schedule_adv_instance().
++	 * Hence, it is ok to send settings response now.
++	 */
++	err = send_settings_rsp(sk, MGMT_OP_SET_ADVERTISING_INTERVALS, hdev);
++	new_settings(hdev, sk);
++
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	struct mgmt_pending_cmd *cmd;
+@@ -6918,6 +6995,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ set_appearance,	   MGMT_SET_APPEARANCE_SIZE },
+ 	{ get_phy_configuration,   MGMT_GET_PHY_CONFIGURATION_SIZE },
+ 	{ set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
++	{ set_advertising_intervals, MGMT_SET_ADVERTISING_INTERVALS_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

@@ -1,0 +1,288 @@
+From eff2fcaff6c9b45aafb6b57e5c9cb1de299b4494 Mon Sep 17 00:00:00 2001
+From: Gwendal Grignou <gwendal@chromium.org>
+Date: Wed, 3 Jan 2018 11:29:07 -0800
+Subject: [PATCH] CHROMIUM: iio: cros_ec: Add synchronization sensor
+
+EC returns a counter when there is an event on a interrupt line.
+Use to synchronise gyroscope and camera.
+
+BUG=b:67743747
+TEST=On cyan, create a pseudo sensor in EC, see its events through
+sysfs.
+
+Change-Id: I3e2bc154866a28d33b8773bdcdebf67410130483
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/851418
+Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
+Reviewed-by: Alexandru M Stan <amstan@chromium.org>
+
+[rebase419(groeck): Kernel API changes]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+---
+ .../cros_ec_sensors/cros_ec_sensors_core.c    |   9 +
+ drivers/iio/counter/Kconfig                   |  10 +
+ drivers/iio/counter/Makefile                  |   1 +
+ drivers/iio/counter/cros_ec_sensors_sync.c    | 178 ++++++++++++++++++
+ drivers/mfd/cros_ec_dev.c                     |   3 +
+ 5 files changed, 201 insertions(+)
+ create mode 100644 drivers/iio/counter/cros_ec_sensors_sync.c
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+index ed05b9ff4d52..e47471cb79e6 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+@@ -28,6 +28,7 @@
+ static char *cros_ec_loc[] = {
+ 	[MOTIONSENSE_LOC_BASE] = "base",
+ 	[MOTIONSENSE_LOC_LID] = "lid",
++	[MOTIONSENSE_LOC_CAMERA] = "camera",
+ 	[MOTIONSENSE_LOC_MAX] = "unknown",
+ };
+ 
+@@ -56,6 +57,14 @@ static void get_default_min_max_freq_and_fifo_size(enum motionsensor_type type,
+ 		*min_freq = 250;
+ 		*max_freq = 20000;
+ 		break;
++	case MOTIONSENSE_TYPE_SYNC:
++		/*
++		 * Frequency for sync/counter sensors is overloaded for
++		 * enable/disable.
++		 */
++		*min_freq = 0;
++		*max_freq = 1;
++		break;
+ 	case MOTIONSENSE_TYPE_ACTIVITY:
+ 	default:
+ 		*max_fifo_events = 0;
+diff --git a/drivers/iio/counter/Kconfig b/drivers/iio/counter/Kconfig
+index bf1e559ad7cd..2794571c9398 100644
+--- a/drivers/iio/counter/Kconfig
++++ b/drivers/iio/counter/Kconfig
+@@ -22,6 +22,16 @@ config 104_QUAD_8
+ 	  The base port addresses for the devices may be configured via the base
+ 	  array module parameter.
+ 
++config IIO_CROS_EC_SENSORS_SYNC
++	tristate "ChromeOS EC Counter Sensors"
++	depends on IIO_CROS_EC_SENSORS_CORE
++	help
++	  Module to handle synchronisation sensors presented by the ChromeOS EC
++	  Sensor hub.
++	  Synchronisation sensors are counter sensors that are triggered when
++	  events occurs from other subsystems. They are use to synchronised
++	  those subsystem with existing MEMS sensors, like gyroscope.
++
+ config STM32_LPTIMER_CNT
+ 	tristate "STM32 LP Timer encoder counter driver"
+ 	depends on MFD_STM32_LPTIMER || COMPILE_TEST
+diff --git a/drivers/iio/counter/Makefile b/drivers/iio/counter/Makefile
+index 1b9a896eb488..0d8e2200fd09 100644
+--- a/drivers/iio/counter/Makefile
++++ b/drivers/iio/counter/Makefile
+@@ -5,4 +5,5 @@
+ # When adding new entries keep the list in alphabetical order
+ 
+ obj-$(CONFIG_104_QUAD_8)	+= 104-quad-8.o
++obj-$(CONFIG_IIO_CROS_EC_SENSORS_SYNC) += cros_ec_sensors_sync.o
+ obj-$(CONFIG_STM32_LPTIMER_CNT)	+= stm32-lptimer-cnt.o
+diff --git a/drivers/iio/counter/cros_ec_sensors_sync.c b/drivers/iio/counter/cros_ec_sensors_sync.c
+new file mode 100644
+index 000000000000..2c34cc33951d
+--- /dev/null
++++ b/drivers/iio/counter/cros_ec_sensors_sync.c
+@@ -0,0 +1,178 @@
++/*
++ * cros_ec_sensors_sync - Driver for barometer sensor behind CrOS EC.
++ *
++ * Copyright 2018 Google, Inc
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * This driver uses the cros-ec interface to communicate with the Chrome OS
++ * EC about counter sensors. Counters are presented through
++ * iio sysfs.
++ */
++
++#include <linux/delay.h>
++#include <linux/device.h>
++#include <linux/iio/buffer.h>
++#include <linux/iio/common/cros_ec_sensors_core.h>
++#include <linux/iio/iio.h>
++#include <linux/iio/kfifo_buf.h>
++#include <linux/iio/trigger.h>
++#include <linux/iio/triggered_buffer.h>
++#include <linux/iio/trigger_consumer.h>
++#include <linux/kernel.h>
++#include <linux/mfd/cros_ec.h>
++#include <linux/mfd/cros_ec_commands.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++
++/*
++ * One channel for counter, the other for timestamp.
++ */
++#define MAX_CHANNELS (1 + 1)
++
++/* State data for ec_sensors iio driver. */
++struct cros_ec_sensors_sync_state {
++	/* Shared by all sensors */
++	struct cros_ec_sensors_core_state core;
++
++	struct iio_chan_spec channels[MAX_CHANNELS];
++};
++
++static int cros_ec_sensors_sync_read(struct iio_dev *indio_dev,
++				    struct iio_chan_spec const *chan,
++				    int *val, int *val2, long mask)
++{
++	struct cros_ec_sensors_sync_state *st = iio_priv(indio_dev);
++	u16 data;
++	int ret;
++	int idx = chan->scan_index;
++
++	mutex_lock(&st->core.cmd_lock);
++	switch (mask) {
++	case IIO_CHAN_INFO_RAW:
++		ret = cros_ec_sensors_read_cmd(indio_dev, 1 << idx, &data);
++		if (ret < 0)
++			break;
++		ret = IIO_VAL_INT;
++		*val = data;
++		break;
++	default:
++		ret = cros_ec_sensors_core_read(
++				&st->core, chan, val, val2, mask);
++		break;
++	}
++	mutex_unlock(&st->core.cmd_lock);
++	return ret;
++}
++
++static int cros_ec_sensors_write(struct iio_dev *indio_dev,
++				 struct iio_chan_spec const *chan,
++				 int val, int val2, long mask)
++{
++	struct cros_ec_sensors_sync_state *st = iio_priv(indio_dev);
++	int ret;
++
++	mutex_lock(&st->core.cmd_lock);
++
++	ret = cros_ec_sensors_core_write(
++			&st->core, chan, val, val2, mask);
++
++	mutex_unlock(&st->core.cmd_lock);
++	return ret;
++}
++
++static const struct iio_info cros_ec_sensors_sync_info = {
++	.read_raw = &cros_ec_sensors_sync_read,
++	.write_raw = &cros_ec_sensors_write,
++};
++
++static int cros_ec_sensors_sync_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct iio_dev *indio_dev;
++	struct cros_ec_sensors_sync_state *state;
++	struct iio_chan_spec *channel;
++	int ret;
++
++	indio_dev = devm_iio_device_alloc(dev, sizeof(*state));
++	if (!indio_dev)
++		return -ENOMEM;
++
++	ret = cros_ec_sensors_core_init(pdev, indio_dev, true);
++	if (ret)
++		return ret;
++
++	indio_dev->info = &cros_ec_sensors_sync_info;
++	state = iio_priv(indio_dev);
++	channel = state->channels;
++	/* common part */
++	channel->info_mask_separate = BIT(IIO_CHAN_INFO_RAW);
++	channel->info_mask_shared_by_all = BIT(IIO_CHAN_INFO_FREQUENCY);
++	channel->scan_type.realbits = CROS_EC_SENSOR_BITS;
++	channel->scan_type.storagebits = CROS_EC_SENSOR_BITS;
++	channel->scan_type.shift = 0;
++	channel->scan_index = 0;
++	channel->ext_info = cros_ec_sensors_ext_info;
++	channel->scan_type.sign = 'u';
++
++	state->core.calib[0] = 0;
++
++	/* sensor specific */
++	switch (state->core.type) {
++	case MOTIONSENSE_TYPE_SYNC:
++		channel->type = IIO_COUNT;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	/* Timestamp */
++	channel++;
++	channel->type = IIO_TIMESTAMP;
++	channel->channel = -1;
++	channel->scan_index = 1;
++	channel->scan_type.sign = 's';
++	channel->scan_type.realbits = 64;
++	channel->scan_type.storagebits = 64;
++
++	indio_dev->channels = state->channels;
++	indio_dev->num_channels = MAX_CHANNELS;
++
++	state->core.read_ec_sensors_data = cros_ec_sensors_read_cmd;
++
++	ret = devm_iio_triggered_buffer_setup(dev, indio_dev, NULL,
++			cros_ec_sensors_capture, NULL);
++	if (ret)
++		return ret;
++
++	return devm_iio_device_register(dev, indio_dev);
++}
++
++static const struct platform_device_id cros_ec_sensors_sync_ids[] = {
++	{
++		.name = "cros-ec-sync",
++	},
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(platform, cros_ec_sensors_sync_ids);
++
++static struct platform_driver cros_ec_sensors_sync_platform_driver = {
++	.driver = {
++		.name	= "cros-ec-sync",
++		.pm	= &cros_ec_sensors_pm_ops,
++	},
++	.probe		= cros_ec_sensors_sync_probe,
++	.id_table	= cros_ec_sensors_sync_ids,
++};
++module_platform_driver(cros_ec_sensors_sync_platform_driver);
++
++MODULE_DESCRIPTION("ChromeOS EC synchronisation sensor driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index 7a5a078547fb..de3d7a2ff03f 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -499,6 +499,9 @@ static void cros_ec_sensors_register(struct cros_ec_dev *ec)
+ 		case MOTIONSENSE_TYPE_ACTIVITY:
+ 			sensor_cells[id].name = "cros-ec-activity";
+ 			break;
++		case MOTIONSENSE_TYPE_SYNC:
++			sensor_cells[id].name = "cros-ec-sync";
++			break;
+ 		default:
+ 			dev_warn(ec->dev, "unknown type %d\n", resp->info.type);
+ 			continue;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

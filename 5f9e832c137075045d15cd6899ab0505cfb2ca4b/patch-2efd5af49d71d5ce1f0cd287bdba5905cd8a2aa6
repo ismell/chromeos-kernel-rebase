@@ -1,0 +1,54 @@
+From f5e9499d0adc20646af429965550add687ce9c6e Mon Sep 17 00:00:00 2001
+From: Kevin Cernekee <cernekee@chromium.org>
+Date: Wed, 11 Jan 2017 13:53:36 -0800
+Subject: [PATCH] CHROMIUM: Revert "xfrm: Do not parse 32bits compiled xfrm
+ netlink msg on 64bits host"
+
+This reverts commit 74005991b78a ("xfrm: Do not parse 32bits compiled
+xfrm netlink msg on 64bits host").  Our local source tree changes the
+user/kernel ABI to work around the incompatibility.
+
+BUG=chrome-os-partner:57324
+TEST=run l2tp autotests on kevin, samus
+
+Signed-off-by: Kevin Cernekee <cernekee@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/427320
+Reviewed-by: Brian Norris <briannorris@chromium.org>
+
+BUG=b:114323255
+BUG=b:112641692
+TEST=- Compiled, flashed grunt, booted.
+     - Verified that netd's XfrmController starts correctly (logcat).
+     - Verified that android.net.cts.IpSecBaseTest and
+     android.net.cts.IpSecManagerTest pass.
+Change-Id: I35b0c0b711b498dfe7ea764d491f2f1cf92eb304
+(cherry picked from commit bf530aed496b4126a218146ae7b945fa6bd86a48)
+Signed-off-by: Hugo Benichi <hugobenichi@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1215343
+Commit-Ready: Hugo Benichi <hugobenichi@google.com>
+Tested-by: Hugo Benichi <hugobenichi@google.com>
+Reviewed-by: Dmitry Torokhov <dtor@chromium.org>
+
+[rebase52(rrangel): Context conflict. #ifdef was removed upstream.]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ net/xfrm/xfrm_user.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index b88ba45ff1ac..ed6e6790b3e7 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -2634,9 +2634,6 @@ static int xfrm_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	const struct xfrm_link *link;
+ 	int type, err;
+ 
+-	if (in_compat_syscall())
+-		return -EOPNOTSUPP;
+-
+ 	type = nlh->nlmsg_type;
+ 	if (type > XFRM_MSG_MAX)
+ 		return -EINVAL;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

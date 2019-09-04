@@ -1,0 +1,270 @@
+From ba188ed17fbc3bf8ef2da80eef34e1e63da4f0af Mon Sep 17 00:00:00 2001
+From: Enrico Granata <egranata@chromium.org>
+Date: Mon, 3 Dec 2018 13:31:30 -0800
+Subject: [PATCH] BACKPORT: FROMLIST: cros_ec: handle MKBP more events flag
+
+CL:1341159 adds a "more events" flag to allow the EC to notify us that
+there are more MKBP events waiting to be served. This CL extends the
+cros_ec bottom-half IRQ handler to listen to that flag in order to try
+and serve all known events before returning to the kernel with IRQ_HANDLED.
+
+This serves an optimization purpose as it minimizes the round-trip back
+and forth from the interrupt handler, and it also improves the quality
+of sensor timestamping, as it avoids a mismatch of event times between
+EC and AP that can confuse the median filter we use in the sensor ring.
+
+As described in the EC CL, this change is forward and backward compatible.
+
+This would be a cherry-pick of CL:1340983, but the code structure is
+different enough between kernel versions 4.4 and 4.14 that several
+tweaks are required to make things compile and work. It has been sent
+upstream as https://lore.kernel.org/patchwork/patch/1019477/
+
+BUG=b:119570064, b:112102925, b:114915792
+TEST=verify that sensor events come in and have sensible values and
+     timestamps
+
+I had to tweak the merge of cros_ec_proto, but it was straight forward.
+
+Signed-off-by: Enrico Granata <egranata@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1358742
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+
+Change-Id: Ie51c5074489d3f076a907da30762e2f604c0e6f1
+Signed-off-by: Jett Rink <jettrink@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1551940
+Reviewed-by: Enrico Granata <egranata@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/mfd/cros_ec.c                   | 35 +++++++++++------
+ drivers/platform/chrome/cros_ec_proto.c | 51 ++++++++++++++-----------
+ include/linux/mfd/cros_ec.h             |  7 +++-
+ include/linux/mfd/cros_ec_commands.h    | 15 ++++++++
+ 4 files changed, 73 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/mfd/cros_ec.c b/drivers/mfd/cros_ec.c
+index ff8984a2b8c21..aa541d9532432 100644
+--- a/drivers/mfd/cros_ec.c
++++ b/drivers/mfd/cros_ec.c
+@@ -51,25 +51,38 @@ static const struct mfd_cell ec_pd_cell = {
+ 	.pdata_size = sizeof(pd_p),
+ };
+ 
+-static irqreturn_t ec_irq_thread(int irq, void *data)
++static bool ec_handle_event(struct cros_ec_device *ec_dev)
+ {
+-	struct cros_ec_device *ec_dev = data;
+ 	bool wake_event = true;
+-	int ret;
++	bool ec_has_more_events = false;
++	int ret = cros_ec_get_next_event(ec_dev, &wake_event);
+ 
+-	ret = cros_ec_get_next_event(ec_dev, &wake_event);
++	if (ec_dev->mkbp_event_supported) {
++		ec_has_more_events = (ret > 0) &&
++			(ec_dev->event_data.event_type &
++				EC_MKBP_HAS_MORE_EVENTS);
++	}
+ 
+-	/*
+-	 * Signal only if wake host events or any interrupt if
+-	 * cros_ec_get_next_event() returned an error (default value for
+-	 * wake_event is true)
+-	 */
+-	if (wake_event && device_may_wakeup(ec_dev->dev))
++	if (device_may_wakeup(ec_dev->dev) && wake_event)
+ 		pm_wakeup_event(ec_dev->dev, 0);
+ 
+ 	if (ret > 0)
+ 		blocking_notifier_call_chain(&ec_dev->event_notifier,
+-					     0, ec_dev);
++					0, ec_dev);
++
++	return ec_has_more_events;
++
++}
++
++static irqreturn_t ec_irq_thread(int irq, void *data)
++{
++	struct cros_ec_device *ec_dev = data;
++	bool ec_has_more_events;
++
++	do {
++		ec_has_more_events = ec_handle_event(ec_dev);
++	} while (ec_has_more_events);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+diff --git a/drivers/platform/chrome/cros_ec_proto.c b/drivers/platform/chrome/cros_ec_proto.c
+index b95016ad4f8b8..d322e1e0710df 100644
+--- a/drivers/platform/chrome/cros_ec_proto.c
++++ b/drivers/platform/chrome/cros_ec_proto.c
+@@ -431,10 +431,14 @@ int cros_ec_query_all(struct cros_ec_device *ec_dev)
+ 	ret = cros_ec_get_host_command_version_mask(ec_dev,
+ 						    EC_CMD_GET_NEXT_EVENT,
+ 						    &ver_mask);
+-	if (ret < 0 || ver_mask == 0)
++	if (ret < 0 || ver_mask == 0) {
+ 		ec_dev->mkbp_event_supported = 0;
+-	else
+-		ec_dev->mkbp_event_supported = 1;
++		dev_info(ec_dev->dev, "MKBP not supported\n");
++	} else {
++		ec_dev->mkbp_event_supported = fls(ver_mask);
++		dev_info(ec_dev->dev, "MKBP support version %u\n",
++			ec_dev->mkbp_event_supported - 1);
++	}
+ 
+ 	/*
+ 	 * Get host event wake mask, assume all events are wake events
+@@ -519,6 +523,7 @@ EXPORT_SYMBOL(cros_ec_cmd_xfer_status);
+ 
+ static int get_next_event_xfer(struct cros_ec_device *ec_dev,
+ 			       struct cros_ec_command *msg,
++			       struct ec_response_get_next_event_v1 *event,
+ 			       int version, uint32_t size)
+ {
+ 	int ret;
+@@ -531,7 +536,7 @@ static int get_next_event_xfer(struct cros_ec_device *ec_dev,
+ 	ret = cros_ec_cmd_xfer(ec_dev, msg);
+ 	if (ret > 0) {
+ 		ec_dev->event_size = ret - 1;
+-		memcpy(&ec_dev->event_data, msg->data, ret);
++		ec_dev->event_data = *event;
+ 	}
+ 
+ 	return ret;
+@@ -539,30 +544,29 @@ static int get_next_event_xfer(struct cros_ec_device *ec_dev,
+ 
+ static int get_next_event(struct cros_ec_device *ec_dev)
+ {
+-	u8 buffer[sizeof(struct cros_ec_command) + sizeof(ec_dev->event_data)];
+-	struct cros_ec_command *msg = (struct cros_ec_command *)&buffer;
+-	static int cmd_version = 1;
+-	int ret;
++	struct {
++		struct cros_ec_command msg;
++		struct ec_response_get_next_event_v1 event;
++	} __packed buf;
++	struct cros_ec_command *msg = &buf.msg;
++	struct ec_response_get_next_event_v1 *event = &buf.event;
++	const int cmd_version = ec_dev->mkbp_event_supported - 1;
++
++	BUILD_BUG_ON(sizeof(union ec_response_get_next_data_v1) != 16);
++
++	memset(&buf, 0, sizeof(buf));
+ 
+ 	if (ec_dev->suspended) {
+ 		dev_dbg(ec_dev->dev, "Device suspended.\n");
+ 		return -EHOSTDOWN;
+ 	}
+ 
+-	if (cmd_version == 1) {
+-		ret = get_next_event_xfer(ec_dev, msg, cmd_version,
+-				sizeof(struct ec_response_get_next_event_v1));
+-		if (ret < 0 || msg->result != EC_RES_INVALID_VERSION)
+-			return ret;
+-
+-		/* Fallback to version 0 for future send attempts */
+-		cmd_version = 0;
+-	}
+-
+-	ret = get_next_event_xfer(ec_dev, msg, cmd_version,
++	if (cmd_version == 0)
++		return get_next_event_xfer(ec_dev, msg, event, 0,
+ 				  sizeof(struct ec_response_get_next_event));
+ 
+-	return ret;
++	return get_next_event_xfer(ec_dev, msg, event, cmd_version,
++				sizeof(struct ec_response_get_next_event_v1));
+ }
+ 
+ static int get_keyboard_state_event(struct cros_ec_device *ec_dev)
+@@ -606,7 +610,8 @@ int cros_ec_get_next_event(struct cros_ec_device *ec_dev, bool *wake_event)
+ 		return ret;
+ 
+ 	if (wake_event) {
+-		event_type = ec_dev->event_data.event_type;
++		event_type =
++			ec_dev->event_data.event_type & EC_MKBP_EVENT_TYPE_MASK;
+ 		host_event = cros_ec_get_host_event(ec_dev);
+ 
+ 		/*
+@@ -631,10 +636,12 @@ EXPORT_SYMBOL(cros_ec_get_next_event);
+ u32 cros_ec_get_host_event(struct cros_ec_device *ec_dev)
+ {
+ 	u32 host_event;
++	const u8 event_type =
++		ec_dev->event_data.event_type & EC_MKBP_EVENT_TYPE_MASK;
+ 
+ 	BUG_ON(!ec_dev->mkbp_event_supported);
+ 
+-	if (ec_dev->event_data.event_type != EC_MKBP_EVENT_HOST_EVENT)
++	if (event_type != EC_MKBP_EVENT_HOST_EVENT)
+ 		return 0;
+ 
+ 	if (ec_dev->event_size != sizeof(host_event)) {
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index 636dae52c1057..a4bd0a5e913f1 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -120,7 +120,9 @@ struct cros_ec_command {
+  *            code.
+  * @pkt_xfer: Send packet to EC and get response.
+  * @lock: One transaction at a time.
+- * @mkbp_event_supported: True if this EC supports the MKBP event protocol.
++ * @mkbp_event_supported: 0 if MKBP not supported. Otherwise its value is
++ *                        the maximum supported version of the MKBP host event
++ *                        command + 1.
+  * @event_notifier: Interrupt event notifier for transport devices.
+  * @event_data: Raw payload transferred with the MKBP event.
+  * @event_size: Size in bytes of the event data.
+@@ -153,7 +155,8 @@ struct cros_ec_device {
+ 	int (*pkt_xfer)(struct cros_ec_device *ec,
+ 			struct cros_ec_command *msg);
+ 	struct mutex lock;
+-	bool mkbp_event_supported;
++	/* 0 == not supported, otherwise it supports version x - 1 */
++	u8 mkbp_event_supported;
+ 	struct blocking_notifier_head event_notifier;
+ 
+ 	struct ec_response_get_next_event_v1 event_data;
+diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+index 013f05a0f0ee8..e19d272abb8ea 100644
+--- a/include/linux/mfd/cros_ec_commands.h
++++ b/include/linux/mfd/cros_ec_commands.h
+@@ -2148,6 +2148,14 @@ struct ec_result_keyscan_seq_ctrl {
+  */
+ #define EC_CMD_GET_NEXT_EVENT 0x67
+ 
++#define EC_MKBP_HAS_MORE_EVENTS_SHIFT 7
++
++/* EC can provide more MKBP events to host */
++#define EC_MKBP_HAS_MORE_EVENTS (1 << EC_MKBP_HAS_MORE_EVENTS_SHIFT)
++
++/* The mask to apply to get the raw event type */
++#define EC_MKBP_EVENT_TYPE_MASK ((1 << EC_MKBP_HAS_MORE_EVENTS_SHIFT) - 1)
++
+ enum ec_mkbp_event {
+ 	/* Keyboard matrix changed. The event data is the new matrix state. */
+ 	EC_MKBP_EVENT_KEY_MATRIX = 0,
+@@ -2175,6 +2183,13 @@ enum ec_mkbp_event {
+ 
+ 	/* Number of MKBP events */
+ 	EC_MKBP_EVENT_COUNT,
++
++	/*
++	 * Maximum possible event type
++	 * The most significant bit of event type is used to indicate that
++	 * the EC has multiple events for the AP to serve
++	 */
++	EC_MKBP_EVENT_MAX_TYPE = EC_MKBP_EVENT_TYPE_MASK,
+ };
+ 
+ union ec_response_get_next_data {
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

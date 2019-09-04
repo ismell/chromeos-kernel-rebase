@@ -1,0 +1,95 @@
+From 65930b808026c48d743a7e3e37359b480ee0773d Mon Sep 17 00:00:00 2001
+From: Azhar Shaikh <azhar.shaikh@intel.com>
+Date: Fri, 24 May 2019 22:33:18 +0000
+Subject: [PATCH] CHROMIUM: drm/i915: Disable boost and waitboost
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The GT frequency should ideally scale as per the load,
+but on making a Hangouts call or opening the camera
+preview it is pegged to max frequency. This leads to higher than
+expected power consumption(2W+).
+
+The camera stack is probably doing some heavy handed sync operations
+which causes the GPU to be always stuck at max frequency.
+This is a temporary fix until the userspace(camera) is either
+fixed or optimized because we may incur a performance penalty due to
+this change.
+
+This bug is discussed here[1].
+
+1. https://bugs.freedesktop.org/show_bug.cgi?id=110750
+
+BUG=b:130638275
+TEST=Make hangouts call and check power_supply_info energy rate(W).
+     Make sure to disconnect the DUT from AC power.
+     With this patch it shows around 2W power savings on average.
+
+Change-Id: I609db0170bdf934d39844078163a55b9368ae3db
+Signed-off-by: Azhar Shaikh <azhar.shaikh@intel.com>
+Signed-off-by: Nathan Ciobanu <nathan.d.ciobanu@intel.com>
+Reviewed-on: https://chromium-review.googlesource.com/1629431
+Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
+Tested-by: Stéphane Marchesin <marcheu@chromium.org>
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+---
+ drivers/gpu/drm/i915/i915_irq.c | 8 ++++++--
+ drivers/gpu/drm/i915/intel_pm.c | 6 ++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/i915/i915_irq.c b/drivers/gpu/drm/i915/i915_irq.c
+index 72703e63b54e..c75b1d268dfa 100644
+--- a/drivers/gpu/drm/i915/i915_irq.c
++++ b/drivers/gpu/drm/i915/i915_irq.c
+@@ -1296,9 +1296,14 @@ static void gen6_pm_rps_work(struct work_struct *work)
+ 
+ 	/* Make sure we didn't queue anything we're not going to process. */
+ 	WARN_ON(pm_iir & ~dev_priv->pm_rps_events);
++	/*
++	 * FIXME: This is temporary change to improve power consumption
++	 * in hangouts use case. (See: b/130638275)
++	 */
++	/*
+ 	if ((pm_iir & dev_priv->pm_rps_events) == 0 && !client_boost)
+ 		goto out;
+-
++	*/
+ 	mutex_lock(&dev_priv->pcu_lock);
+ 
+ 	pm_iir |= vlv_wa_c0_ei(dev_priv, pm_iir);
+@@ -1355,7 +1360,6 @@ static void gen6_pm_rps_work(struct work_struct *work)
+ 
+ 	mutex_unlock(&dev_priv->pcu_lock);
+ 
+-out:
+ 	/* Make sure not to corrupt PMIMR state used by ringbuffer on GEN6 */
+ 	spin_lock_irq(&dev_priv->irq_lock);
+ 	if (rps->interrupts_enabled)
+diff --git a/drivers/gpu/drm/i915/intel_pm.c b/drivers/gpu/drm/i915/intel_pm.c
+index f2b8e5d74f17..6094f6ce8426 100644
+--- a/drivers/gpu/drm/i915/intel_pm.c
++++ b/drivers/gpu/drm/i915/intel_pm.c
+@@ -6661,12 +6661,18 @@ void gen6_rps_boost(struct i915_request *rq,
+ 
+ 	/* Serializes with i915_request_retire() */
+ 	boost = false;
++	/*
++	 * FIXME: This is temporary change to improve power consumption
++	 * in hangouts use case. (See: b/130638275)
++	 */
++	/*
+ 	spin_lock_irqsave(&rq->lock, flags);
+ 	if (!rq->waitboost && !dma_fence_is_signaled_locked(&rq->fence)) {
+ 		boost = !atomic_fetch_inc(&rps->num_waiters);
+ 		rq->waitboost = true;
+ 	}
+ 	spin_unlock_irqrestore(&rq->lock, flags);
++	*/
+ 	if (!boost)
+ 		return;
+ 
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

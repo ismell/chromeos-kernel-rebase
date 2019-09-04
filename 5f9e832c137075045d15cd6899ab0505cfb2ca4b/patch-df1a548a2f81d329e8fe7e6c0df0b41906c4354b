@@ -1,0 +1,88 @@
+From 1eb87b084bfc571e5af2353daf0c7934e26db854 Mon Sep 17 00:00:00 2001
+From: Sonny Sasaka <sonnysasaka@chromium.org>
+Date: Mon, 11 Mar 2019 13:02:37 -0700
+Subject: [PATCH] CHROMIUM: Bluetooth: Honor BT_ENFORCE_CLASSIC_SECURITY in
+ more places
+
+We want to be able to configure some boards to not have this classic
+security enforcement at all. So, this configuration should be honored at
+all places where the enforcement happens.
+
+BUG=chromium:929763
+TEST=Tested on caroline
+
+Change-Id: I2ee9e9501b4a54a1e8a936af65e91e261f6f0347
+Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1521812
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ net/bluetooth/hci_event.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index eebac7481b30..0c6fa48b9934 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2934,12 +2934,15 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	 * enough.
+ 	 */
+ 	if (rp->status) {
+-		WARN(1, "Read Encryption Key Size command failed, chip may not support this");
+ 		bt_dev_err(hdev, "failed to read key size for handle %u",
+ 			   handle);
++		conn->enc_key_size = HCI_LINK_KEY_SIZE;
++#ifdef CONFIG_BT_ENFORCE_CLASSIC_SECURITY
++		WARN(1, "Read Encryption Key Size command failed, chip may not support this");
+ 		hci_disconnect(conn, HCI_ERROR_REMOTE_USER_TERM);
+ 		hci_conn_drop(conn);
+ 		goto unlock;
++#endif
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 	}
+@@ -3041,17 +3044,31 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		struct hci_cp_read_enc_key_size cp;
+ 		struct hci_request req;
+ 
++		/* Only send HCI_Read_Encryption_Key_Size if the
++		 * controller really supports it. If it doesn't, assume
++		 * the default size (16).
++		 */
++		if (!(hdev->commands[20] & 0x10)) {
++			conn->enc_key_size = HCI_LINK_KEY_SIZE;
++			goto notify;
++		}
++
+ 		hci_req_init(&req, hdev);
+ 
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_req_add(&req, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
+ 
+ 		if (hci_req_run_skb(&req, read_enc_key_size_complete)) {
+-			WARN(1, "Failed sending HCI Read Encryption Key Size, chip may not support this");
+ 			bt_dev_err(hdev, "sending read key size failed");
++			conn->enc_key_size = HCI_LINK_KEY_SIZE;
++#ifdef CONFIG_BT_ENFORCE_CLASSIC_SECURITY
++			WARN(1, "Failed sending HCI Read Encryption Key Size, chip may not support this");
+ 			hci_disconnect(conn, HCI_ERROR_REMOTE_USER_TERM);
+ 			hci_conn_drop(conn);
+ 			goto unlock;
++#else
++			goto notify;
++#endif
+ 		}
+ 
+ 		goto unlock;
+@@ -3076,6 +3093,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			     sizeof(cp), &cp);
+ 	}
+ 
++notify:
+ 	if (conn->state == BT_CONFIG) {
+ 		if (!ev->status)
+ 			conn->state = BT_CONNECTED;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

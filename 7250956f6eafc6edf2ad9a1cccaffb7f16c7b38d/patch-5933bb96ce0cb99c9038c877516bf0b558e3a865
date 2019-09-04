@@ -1,0 +1,39 @@
+From d9248017a73cc71810461659f726a2af57901366 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Fri, 21 Apr 2017 14:04:28 -0700
+Subject: [PATCH] CHROMIUM: kbuild: clang: Disable the
+ 'duplicate-decl-specifier' warning
+
+clang generates plenty of these warnings in different parts of the code.
+They are mostly caused by container_of() and other macros which declare
+a "const <type> *" variable for their internal use which triggers a
+"duplicate 'const' specifier" warning if the <type> is already const
+qualified.
+
+Change-Id: I3ad9d33e31b7b40f926554eed2afeea1ebb7e961
+Wording-mostly-from: Michael Davidson <md@google.com>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+(cherry picked from commit 59005ae20b903e0715de7a5dce379288e647ec15)
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase419(rrangel): Fix conflicts with UPSTREAM changes]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 1fe5c41f1888d..9b95563d55054 100644
+--- a/Makefile
++++ b/Makefile
+@@ -702,6 +702,7 @@ ifdef CONFIG_CC_IS_CLANG
+ KBUILD_CPPFLAGS += -Qunused-arguments
+ KBUILD_CFLAGS += -Wno-format-invalid-specifier
+ KBUILD_CFLAGS += -Wno-gnu
++KBUILD_CFLAGS += -Wno-duplicate-decl-specifier
+ # Quiet clang warning: comparison of unsigned expression < 0 is always false
+ KBUILD_CFLAGS += -Wno-tautological-compare
+ # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

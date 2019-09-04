@@ -1,0 +1,72 @@
+From 84f22639c8dd4688453f5b9ff33a1809016b0df3 Mon Sep 17 00:00:00 2001
+From: Riley Andrews <riandrews@google.com>
+Date: Fri, 2 Oct 2015 00:39:53 -0700
+Subject: [PATCH] ANDROID: trace: sched: add sched blocked tracepoint which
+ dumps out context of sleep.
+
+Decare war on uninterruptible sleep. Add a tracepoint which
+walks the kernel stack and dumps the first non-scheduler function
+called before the scheduler is invoked.
+
+Change-Id: I19e965d5206329360a92cbfe2afcc8c30f65c229
+Signed-off-by: Riley Andrews <riandrews@google.com>
+(cherry picked from commit 338bd47b135c50b6d5788e5e7525c1f600b59ffd)
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/trace/events/sched.h | 24 ++++++++++++++++++++++++
+ kernel/sched/fair.c          |  1 +
+ 2 files changed, 25 insertions(+)
+
+diff --git a/include/trace/events/sched.h b/include/trace/events/sched.h
+index 420e80e56e55..a64d0d70fe07 100644
+--- a/include/trace/events/sched.h
++++ b/include/trace/events/sched.h
+@@ -402,6 +402,30 @@ DEFINE_EVENT_SCHEDSTAT(sched_stat_template, sched_stat_blocked,
+ 	     TP_PROTO(struct task_struct *tsk, u64 delay),
+ 	     TP_ARGS(tsk, delay));
+ 
++/*
++ * Tracepoint for recording the cause of uninterruptible sleep.
++ */
++TRACE_EVENT(sched_blocked_reason,
++
++	TP_PROTO(struct task_struct *tsk),
++
++	TP_ARGS(tsk),
++
++	TP_STRUCT__entry(
++		__field( pid_t,	pid	)
++		__field( void*, caller	)
++		__field( bool, io_wait	)
++	),
++
++	TP_fast_assign(
++		__entry->pid	= tsk->pid;
++		__entry->caller = (void*)get_wchan(tsk);
++		__entry->io_wait = tsk->in_iowait;
++	),
++
++	TP_printk("pid=%d iowait=%d caller=%pS", __entry->pid, __entry->io_wait, __entry->caller)
++);
++
+ /*
+  * Tracepoint for accounting runtime (time the task is executing
+  * on a CPU).
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 036be95a87e9..66760660e92a 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -973,6 +973,7 @@ update_stats_enqueue_sleeper(struct cfs_rq *cfs_rq, struct sched_entity *se)
+ 			}
+ 
+ 			trace_sched_stat_blocked(tsk, delta);
++			trace_sched_blocked_reason(tsk);
+ 
+ 			/*
+ 			 * Blocking time is in units of nanosecs, so shift by
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

@@ -1,0 +1,342 @@
+From 68706f5c6cb3382c702fb2d5edf01a2f1ec1b472 Mon Sep 17 00:00:00 2001
+From: Kevin Cernekee <cernekee@chromium.org>
+Date: Mon, 16 May 2016 22:28:46 -0700
+Subject: [PATCH] CHROMIUM: Introduce ANDROID_PARANOID_NETWORK as per-netns
+ setting
+
+ANDROID_PARANOID_NETWORK requires creators of AF_INET/AF_INET6 sockets
+to be in the AID_INET group.  In our system it is problematic to enable
+this globally.  Change the logic so that the changes apply on a per-netns
+basis.  Also, interpret AID_* as gids instead of kgids.
+
+BUG=b:27932716
+TEST=`echo 1 > /proc/sys/net/core/android_paranoid`
+
+Change-Id: I72b1b743ae36724ae164c75cd1543fb043077fb6
+Signed-off-by: Kevin Cernekee <cernekee@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/362671
+Reviewed-by: Guenter Roeck <groeck@google.com>
+
+Conflicts:
+	Documentation/android.txt (deleted locally)
+	include/net/sock.h
+	net/core/sock.c
+	net/core/sysctl_net_core.c
+	net/ipv6/af_inet6.c
+	security/commoncap.c
+	net/ipv4/af_inet.c
+
+[rebase412(groeck): Clean version, not depending on Android
+	version of ANDROID_PARANOID_NETWORK]
+
+Signed-off-by: Guenter Roeck <groeck@google.com>
+
+Conflicts:
+	net/core/sysctl_net_core.c
+	net/ipv4/af_inet.c
+	net/ipv6/af_inet6.c
+	security/commoncap.c
+
+[rebase419(groeck): Resolve various conflicts]
+Signed-off-by: Guenter Roeck <groeck@google.com>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/net/tun.c           |  5 ++---
+ include/linux/android_aid.h | 14 +++++++-------
+ include/net/netns/core.h    |  1 +
+ include/net/sock.h          |  1 +
+ net/Kconfig                 |  6 ------
+ net/core/sock.c             | 20 ++++++++++++++++++++
+ net/core/sysctl_net_core.c  | 12 ++++++++++++
+ net/ipv4/af_inet.c          | 17 ++---------------
+ net/ipv6/af_inet6.c         | 17 ++---------------
+ security/commoncap.c        | 22 +---------------------
+ 10 files changed, 48 insertions(+), 67 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 6ac2ab3a82198..ec717eebc35b0 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2856,11 +2856,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 	int ret;
+ 	bool do_notify = false;
+ 
+-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+-	if (cmd != TUNGETIFF && !capable(CAP_NET_ADMIN)) {
++	if (current->nsproxy->net_ns->core.sysctl_android_paranoid &&
++	    cmd != TUNGETIFF && !capable(CAP_NET_ADMIN)) {
+ 		return -EPERM;
+ 	}
+-#endif
+ 
+ 	if (cmd == TUNSETIFF || cmd == TUNSETQUEUE ||
+ 	    (_IOC_TYPE(cmd) == SOCK_IOC_TYPE && cmd != SIOCGSKNS)) {
+diff --git a/include/linux/android_aid.h b/include/linux/android_aid.h
+index 6f1fa1792dfc2..97946ef0a383d 100644
+--- a/include/linux/android_aid.h
++++ b/include/linux/android_aid.h
+@@ -17,12 +17,12 @@
+ #define _LINUX_ANDROID_AID_H
+ 
+ /* AIDs that the kernel treats differently */
+-#define AID_OBSOLETE_000 KGIDT_INIT(3001)  /* was NET_BT_ADMIN */
+-#define AID_OBSOLETE_001 KGIDT_INIT(3002)  /* was NET_BT */
+-#define AID_INET         KGIDT_INIT(3003)
+-#define AID_NET_RAW      KGIDT_INIT(3004)
+-#define AID_NET_ADMIN    KGIDT_INIT(3005)
+-#define AID_NET_BW_STATS KGIDT_INIT(3006)  /* read bandwidth statistics */
+-#define AID_NET_BW_ACCT  KGIDT_INIT(3007)  /* change bandwidth statistics accounting */
++#define AID_OBSOLETE_000 (3001)  /* was NET_BT_ADMIN */
++#define AID_OBSOLETE_001 (3002)  /* was NET_BT */
++#define AID_INET         (3003)
++#define AID_NET_RAW      (3004)
++#define AID_NET_ADMIN    (3005)
++#define AID_NET_BW_STATS (3006)  /* read bandwidth statistics */
++#define AID_NET_BW_ACCT  (3007)  /* change bandwidth statistics accounting */
+ 
+ #endif
+diff --git a/include/net/netns/core.h b/include/net/netns/core.h
+index 36c2d998a43c0..2c13b21763359 100644
+--- a/include/net/netns/core.h
++++ b/include/net/netns/core.h
+@@ -10,6 +10,7 @@ struct netns_core {
+ 	struct ctl_table_header	*sysctl_hdr;
+ 
+ 	int	sysctl_somaxconn;
++	int	sysctl_android_paranoid;
+ 
+ #ifdef CONFIG_PROC_FS
+ 	int __percpu *sock_inuse;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 1ece7736c49cd..0253cda040444 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2477,6 +2477,7 @@ bool sk_ns_capable(const struct sock *sk,
+ 		   struct user_namespace *user_ns, int cap);
+ bool sk_capable(const struct sock *sk, int cap);
+ bool sk_net_capable(const struct sock *sk, int cap);
++bool inet_sk_allowed(struct net *net, gid_t gid);
+ 
+ void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
+ 
+diff --git a/net/Kconfig b/net/Kconfig
+index 4d84cee12ab7b..228dfa382eeca 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -92,12 +92,6 @@ source "net/netlabel/Kconfig"
+ 
+ endif # if INET
+ 
+-config ANDROID_PARANOID_NETWORK
+-	bool "Only allow certain groups to create sockets"
+-	default y
+-	help
+-		none
+-
+ config NETWORK_SECMARK
+ 	bool "Security Marking"
+ 	help
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 9c32e8eb64da9..4d5b3394c353a 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -119,6 +119,8 @@
+ #include <linux/static_key.h>
+ #include <linux/memcontrol.h>
+ #include <linux/prefetch.h>
++#include <linux/cred.h>
++#include <linux/uidgid.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -196,6 +198,24 @@ bool sk_net_capable(const struct sock *sk, int cap)
+ }
+ EXPORT_SYMBOL(sk_net_capable);
+ 
++static bool in_android_group(struct user_namespace *user, gid_t gid)
++{
++	kgid_t kgid = make_kgid(user, gid);
++
++	if (!gid_valid(kgid))
++		return false;
++	return in_egroup_p(kgid);
++}
++
++bool inet_sk_allowed(struct net *net, gid_t gid)
++{
++	if (!net->core.sysctl_android_paranoid ||
++	    ns_capable(net->user_ns, CAP_NET_RAW))
++		return true;
++	return in_android_group(net->user_ns, gid);
++}
++EXPORT_SYMBOL(inet_sk_allowed);
++
+ /*
+  * Each address family might have different locking rules, so we have
+  * one slock key per address family and separate keys for internal and
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index d67ec17f2cc86..d20494d0faa42 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -556,6 +556,15 @@ static struct ctl_table netns_core_table[] = {
+ 		.extra1		= &zero,
+ 		.proc_handler	= proc_dointvec_minmax
+ 	},
++	{
++		.procname	= "android_paranoid",
++		.data		= &init_net.core.sysctl_android_paranoid,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.extra1		= &zero,
++		.extra2		= &one,
++		.proc_handler	= proc_dointvec_minmax
++	},
+ 	{ }
+ };
+ 
+@@ -563,6 +572,8 @@ static __net_init int sysctl_core_net_init(struct net *net)
+ {
+ 	struct ctl_table *tbl;
+ 
++	net->core.sysctl_android_paranoid = 0;
++
+ 	tbl = netns_core_table;
+ 	if (!net_eq(net, &init_net)) {
+ 		tbl = kmemdup(tbl, sizeof(netns_core_table), GFP_KERNEL);
+@@ -570,6 +581,7 @@ static __net_init int sysctl_core_net_init(struct net *net)
+ 			goto err_dup;
+ 
+ 		tbl[0].data = &net->core.sysctl_somaxconn;
++		tbl[1].data = &net->core.sysctl_android_paranoid;
+ 
+ 		/* Don't export any sysctls to unprivileged users */
+ 		if (net->user_ns != &init_user_ns) {
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 66c70a1becfe9..9ec62477c9ddb 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -90,6 +90,7 @@
+ #include <linux/random.h>
+ #include <linux/slab.h>
+ #include <linux/netfilter/xt_qtaguid.h>
++#include <linux/android_aid.h>
+ 
+ #include <linux/uaccess.h>
+ 
+@@ -124,20 +125,6 @@
+ 
+ #include <trace/events/sock.h>
+ 
+-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+-#include <linux/android_aid.h>
+-
+-static inline int current_has_network(void)
+-{
+-	return in_egroup_p(AID_INET) || capable(CAP_NET_RAW);
+-}
+-#else
+-static inline int current_has_network(void)
+-{
+-	return 1;
+-}
+-#endif
+-
+ /* The inetsw table contains everything that inet_create needs to
+  * build a new socket.
+  */
+@@ -273,7 +260,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+ 	if (protocol < 0 || protocol >= IPPROTO_MAX)
+ 		return -EINVAL;
+ 
+-	if (!current_has_network())
++	if (!inet_sk_allowed(net, AID_INET))
+ 		return -EACCES;
+ 
+ 	sock->state = SS_UNCONNECTED;
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index cc855d92d740b..76cc02039d3b3 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -43,6 +43,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/icmpv6.h>
+ #include <linux/netfilter_ipv6.h>
++#include <linux/android_aid.h>
+ 
+ #include <net/ip.h>
+ #include <net/ipv6.h>
+@@ -66,20 +67,6 @@
+ #include <linux/uaccess.h>
+ #include <linux/mroute6.h>
+ 
+-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+-#include <linux/android_aid.h>
+-
+-static inline int current_has_network(void)
+-{
+-	return in_egroup_p(AID_INET) || capable(CAP_NET_RAW);
+-}
+-#else
+-static inline int current_has_network(void)
+-{
+-	return 1;
+-}
+-#endif
+-
+ #include "ip6_offload.h"
+ 
+ MODULE_AUTHOR("Cast of dozens");
+@@ -136,7 +123,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
+ 	if (protocol < 0 || protocol >= IPPROTO_MAX)
+ 		return -EINVAL;
+ 
+-	if (!current_has_network())
++	if (!inet_sk_allowed(net, AID_INET))
+ 		return -EACCES;
+ 
+ 	/* Look for the requested type/protocol pair. */
+diff --git a/security/commoncap.c b/security/commoncap.c
+index 2e17e34a862d4..1a200bdf42000 100644
+--- a/security/commoncap.c
++++ b/security/commoncap.c
+@@ -31,10 +31,6 @@
+ #include <linux/binfmts.h>
+ #include <linux/personality.h>
+ 
+-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+-#include <linux/android_aid.h>
+-#endif
+-
+ /*
+  * If a non-root user executes a setuid-root binary in
+  * !secure(SECURE_NOROOT) mode, then we raise capabilities.
+@@ -113,23 +109,7 @@ int __cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
+ int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
+ 		int cap, unsigned int opts)
+ {
+-	int ret = __cap_capable(cred, targ_ns, cap, opts);
+-
+-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+-	if (ret != 0 && cap == CAP_NET_RAW && in_egroup_p(AID_NET_RAW)) {
+-		printk("Process %s granted CAP_NET_RAW from Android group net_raw.\n", current->comm);
+-		printk("  Please update the .rc file to explictly set 'capabilities NET_RAW'\n");
+-		printk("  Implicit grants are deprecated and will be removed in the future.\n");
+-		return 0;
+-	}
+-	if (ret != 0 && cap == CAP_NET_ADMIN && in_egroup_p(AID_NET_ADMIN)) {
+-		printk("Process %s granted CAP_NET_ADMIN from Android group net_admin.\n", current->comm);
+-		printk("  Please update the .rc file to explictly set 'capabilities NET_ADMIN'\n");
+-		printk("  Implicit grants are deprecated and will be removed in the future.\n");
+-		return 0;
+-	}
+-#endif
+-	return ret;
++	return __cap_capable(cred, targ_ns, cap, opts);
+ }
+ /**
+  * cap_settime - Determine whether the current process may set the system clock
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

@@ -1,0 +1,517 @@
+From 58e22f853418164e93183d429e04c4915edce6e6 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Wed, 9 Jan 2019 12:41:21 -0800
+Subject: [PATCH] FIXUP: Update some EAS patches to newer versions used by
+ Android
+
+Android rebased their EAS patch stack in android_common after the
+patches were integrated into our tree. For some patches Android
+uses newer versions, individual FIXUP patches aren't possible in
+all cases since sometimes other patches are based on the updated
+version. Instead have one FIXUP patch that covers all updated
+patches.
+
+The patches that are updated by this change to the version in
+android_common are:
+
+FROMLIST: sched/cpufreq: Prepare schedutil for Energy Aware Scheduling
+FROMLIST: PM: Introduce an Energy Model management framework
+FROMLIST: sched/fair: Introduce an energy estimation helper function
+FROMLIST: sched/fair: Select an energy-efficient CPU on task wake-up
+FROMLIST: sched/topology: Make Energy Aware Scheduling depend on schedutil
+ANDROID: sched/fair: Factor out CPU selection from find_energy_efficient_cpu
+ANDROID: sched/fair: Bypass energy computation for prefer_idle tasks
+FROMLIST: sched: Add over-utilization/tipping point indicator
+FROMLIST: sched/topology: Reference the Energy Model of CPUs when available
+FROMLIST: sched/topology: Disable EAS on inappropriate platforms
+
+BUG=b:122901369, b:111527336
+TEST=build for cheza
+
+Change-Id: Ib57be6204c1532db5588a4b5fcfff23b2ac16681
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1418082
+Reviewed-by: Evan Green <evgreen@chromium.org>
+---
+ include/linux/energy_model.h     |   4 +-
+ kernel/power/energy_model.c      |  12 +++-
+ kernel/sched/cpufreq_schedutil.c |  17 +++--
+ kernel/sched/fair.c              | 103 ++++++++++++++++---------------
+ kernel/sched/sched.h             |  28 +++++++--
+ kernel/sched/topology.c          |  18 +++---
+ 6 files changed, 107 insertions(+), 75 deletions(-)
+
+diff --git a/include/linux/energy_model.h b/include/linux/energy_model.h
+index 69184f4f4ae0..55deab2b38dc 100644
+--- a/include/linux/energy_model.h
++++ b/include/linux/energy_model.h
+@@ -113,7 +113,9 @@ static inline unsigned long em_pd_energy(struct em_perf_domain *pd,
+ 	 *   cs->cap = --------------------                          (1)
+ 	 *                 cpu_max_freq
+ 	 *
+-	 * So, the energy consumed by this CPU at that capacity state is:
++	 * So, ignoring the costs of idle states (which are not available in
++	 * the EM), the energy consumed by this CPU at that capacity state is
++	 * estimated as:
+ 	 *
+ 	 *             cs->power * cpu_util
+ 	 *   cpu_nrg = --------------------                          (2)
+diff --git a/kernel/power/energy_model.c b/kernel/power/energy_model.c
+index 2934ebb09e9d..5ec376d4f2f3 100644
+--- a/kernel/power/energy_model.c
++++ b/kernel/power/energy_model.c
+@@ -162,7 +162,7 @@ static struct em_perf_domain *em_create_pd(cpumask_t *span, int nr_states,
+ 		 */
+ 		opp_eff = freq / power;
+ 		if (opp_eff >= prev_opp_eff)
+-			pr_warn("pd%d: hertz/watts ratio non-monotonically decreasing: OPP%d >= OPP%d\n",
++			pr_warn("pd%d: hertz/watts ratio non-monotonically decreasing: em_cap_state %d >= em_cap_state%d\n",
+ 					cpu, i, i - 1);
+ 		prev_opp_eff = opp_eff;
+ 	}
+@@ -273,8 +273,14 @@ int em_register_perf_domain(cpumask_t *span, unsigned int nr_states,
+ 		goto unlock;
+ 	}
+ 
+-	for_each_cpu(cpu, span)
+-		WRITE_ONCE(per_cpu(em_data, cpu), pd);
++	for_each_cpu(cpu, span) {
++		/*
++		 * The per-cpu array can be read concurrently from em_cpu_get().
++		 * The barrier enforces the ordering needed to make sure readers
++		 * can only access well formed em_perf_domain structs.
++		 */
++		smp_store_release(per_cpu_ptr(&em_data, cpu), pd);
++	}
+ 
+ 	pr_debug("Created perf domain %*pbl\n", cpumask_pr_args(span));
+ unlock:
+diff --git a/kernel/sched/cpufreq_schedutil.c b/kernel/sched/cpufreq_schedutil.c
+index e56afcf60d19..f1841ce4555f 100644
+--- a/kernel/sched/cpufreq_schedutil.c
++++ b/kernel/sched/cpufreq_schedutil.c
+@@ -231,12 +231,10 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
+  * required to meet deadlines.
+  */
+ unsigned long schedutil_freq_util(int cpu, unsigned long util,
+-				  enum schedutil_type type)
++				  unsigned long max, enum schedutil_type type)
+ {
+ 	struct rq *rq = cpu_rq(cpu);
+-	unsigned long irq, max;
+-
+-	max = arch_scale_cpu_capacity(NULL, cpu);
++	unsigned long irq;
+ 
+ 	if (sched_feat(SUGOV_RT_MAX_FREQ) && type == FREQUENCY_UTIL &&
+ 						rt_rq_is_runnable(&rq->rt))
+@@ -316,11 +314,12 @@ static unsigned long sugov_get_util(struct sugov_cpu *sg_cpu)
+ {
+ 	struct rq *rq = cpu_rq(sg_cpu->cpu);
+ 	unsigned long util = boosted_cpu_util(sg_cpu->cpu, cpu_util_rt(rq));
++	unsigned long max = arch_scale_cpu_capacity(NULL, sg_cpu->cpu);
+ 
+-	sg_cpu->max = arch_scale_cpu_capacity(NULL, sg_cpu->cpu);
++	sg_cpu->max = max;
+ 	sg_cpu->bw_dl = cpu_bw_dl(rq);
+ 
+-	return schedutil_freq_util(sg_cpu->cpu, util, FREQUENCY_UTIL);
++	return schedutil_freq_util(sg_cpu->cpu, util, max, FREQUENCY_UTIL);
+ }
+ 
+ /**
+@@ -992,15 +991,15 @@ fs_initcall(sugov_register);
+ 
+ #ifdef CONFIG_ENERGY_MODEL
+ extern bool sched_energy_update;
+-static DEFINE_MUTEX(rebuild_sd_mutex);
++extern struct mutex sched_energy_mutex;
+ 
+ static void rebuild_sd_workfn(struct work_struct *work)
+ {
+-	mutex_lock(&rebuild_sd_mutex);
++	mutex_lock(&sched_energy_mutex);
+ 	sched_energy_update = true;
+ 	rebuild_sched_domains();
+ 	sched_energy_update = false;
+-	mutex_unlock(&rebuild_sd_mutex);
++	mutex_unlock(&sched_energy_mutex);
+ }
+ static DECLARE_WORK(rebuild_sd_work, rebuild_sd_workfn);
+ 
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 856b91dbae91..d6c96a3fb614 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -6875,7 +6875,7 @@ static unsigned long cpu_util_next(int cpu, struct task_struct *p, int dst_cpu)
+ 	 * util_avg should already be correct.
+ 	 */
+ 	if (task_cpu(p) == cpu && dst_cpu != cpu)
+-		util = max_t(long, util - task_util(p), 0);
++		sub_positive(&util, task_util(p));
+ 	else if (task_cpu(p) != cpu && dst_cpu == cpu)
+ 		util += task_util(p);
+ 
+@@ -6894,7 +6894,7 @@ static unsigned long cpu_util_next(int cpu, struct task_struct *p, int dst_cpu)
+ 		util = max(util, util_est);
+ 	}
+ 
+-	return min_t(unsigned long, util, capacity_orig_of(cpu));
++	return min(util, capacity_orig_of(cpu));
+ }
+ 
+ /*
+@@ -6904,13 +6904,13 @@ static unsigned long cpu_util_next(int cpu, struct task_struct *p, int dst_cpu)
+  * to compute what would be the energy if we decided to actually migrate that
+  * task.
+  */
+-static long compute_energy(struct task_struct *p, int dst_cpu,
+-							struct perf_domain *pd)
++static long
++compute_energy(struct task_struct *p, int dst_cpu, struct perf_domain *pd)
+ {
+ 	long util, max_util, sum_util, energy = 0;
+ 	int cpu;
+ 
+-	while (pd) {
++	for (; pd; pd = pd->next) {
+ 		max_util = sum_util = 0;
+ 		/*
+ 		 * The capacity state of CPUs of the current rd can be driven by
+@@ -6925,13 +6925,12 @@ static long compute_energy(struct task_struct *p, int dst_cpu,
+ 		for_each_cpu_and(cpu, perf_domain_span(pd), cpu_online_mask) {
+ 			util = cpu_util_next(cpu, p, dst_cpu);
+ 			util += cpu_util_rt(cpu_rq(cpu));
+-			util = schedutil_freq_util(cpu, util, ENERGY_UTIL);
++			util = schedutil_energy_util(cpu, util);
+ 			max_util = max(util, max_util);
+ 			sum_util += util;
+ 		}
+ 
+-		energy += em_pd_energy(pd->obj, max_util, sum_util);
+-		pd = pd->next;
++		energy += em_pd_energy(pd->em_pd, max_util, sum_util);
+ 	}
+ 
+ 	return energy;
+@@ -6943,7 +6942,7 @@ static void select_max_spare_cap_cpus(struct sched_domain *sd, cpumask_t *cpus,
+ 	unsigned long spare_cap, max_spare_cap, util, cpu_cap;
+ 	int cpu, max_spare_cap_cpu;
+ 
+-	while (pd) {
++	for (; pd; pd = pd->next) {
+ 		max_spare_cap_cpu = -1;
+ 		max_spare_cap = 0;
+ 
+@@ -6970,8 +6969,6 @@ static void select_max_spare_cap_cpus(struct sched_domain *sd, cpumask_t *cpus,
+ 
+ 		if (max_spare_cap_cpu >= 0)
+ 			cpumask_set_cpu(max_spare_cap_cpu, cpus);
+-
+-		pd = pd->next;
+ 	}
+ }
+ 
+@@ -7005,13 +7002,25 @@ static DEFINE_PER_CPU(cpumask_t, energy_cpus);
+  * not so much from breaking the tie between identical CPUs. That's also the
+  * reason why EAS is enabled in the topology code only for systems where
+  * SD_ASYM_CPUCAPACITY is set.
++ *
++ * NOTE: Forkees are not accepted in the energy-aware wake-up path because
++ * they don't have any useful utilization data yet and it's not possible to
++ * forecast their impact on energy consumption. Consequently, they will be
++ * placed by find_idlest_cpu() on the least loaded CPU, which might turn out
++ * to be energy-inefficient in some use-cases. The alternative would be to
++ * bias new tasks towards specific types of CPUs first, or to try to infer
++ * their util_avg from the parent task, but those heuristics could hurt
++ * other use-cases too. So, until someone finds a better way to solve this,
++ * let's keep things simple by re-using the existing slow path.
+  */
+-static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
+-					struct perf_domain *pd, int sync)
++
++static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu, int sync)
+ {
+ 	unsigned long prev_energy = ULONG_MAX, best_energy = ULONG_MAX;
++	struct root_domain *rd = cpu_rq(smp_processor_id())->rd;
+ 	int weight, cpu, best_energy_cpu = prev_cpu;
+ 	unsigned long cur_energy;
++	struct perf_domain *pd;
+ 	struct sched_domain *sd;
+ 	cpumask_t *candidates;
+ 
+@@ -7021,10 +7030,10 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
+ 			return cpu;
+ 	}
+ 
+-	sync_entity_load_avg(&p->se);
+-
+-	if (!task_util_est(p))
+-		return prev_cpu;
++	rcu_read_lock();
++	pd = rcu_dereference(rd->pd);
++	if (!pd || READ_ONCE(rd->overutilized))
++		goto fail;
+ 
+ 	/*
+ 	 * Energy-aware wake-up happens on the lowest sched_domain starting
+@@ -7034,7 +7043,11 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
+ 	while (sd && !cpumask_test_cpu(prev_cpu, sched_domain_span(sd)))
+ 		sd = sd->parent;
+ 	if (!sd)
+-		return prev_cpu;
++		goto fail;
++
++	sync_entity_load_avg(&p->se);
++	if (!task_util_est(p))
++		goto unlock;
+ 
+ 	/* Pre-select a set of candidate CPUs. */
+ 	candidates = this_cpu_ptr(&energy_cpus);
+@@ -7048,13 +7061,15 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
+ 	/* Bail out if no candidate was found. */
+ 	weight = cpumask_weight(candidates);
+ 	if (!weight)
+-		return prev_cpu;
++		goto unlock;
+ 
+ 	/* If there is only one sensible candidate, select it now. */
+ 	cpu = cpumask_first(candidates);
+ 	if (weight == 1 && ((schedtune_prefer_idle(p) && idle_cpu(cpu)) ||
+-			    (cpu == prev_cpu)))
+-		return cpu;
++			    (cpu == prev_cpu))) {
++		best_energy_cpu = cpu;
++		goto unlock;
++	}
+ 
+ 	if (cpumask_test_cpu(prev_cpu, &p->cpus_allowed))
+ 		prev_energy = best_energy = compute_energy(p, prev_cpu, pd);
+@@ -7071,16 +7086,25 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
+ 			best_energy_cpu = cpu;
+ 		}
+ 	}
++unlock:
++	rcu_read_unlock();
+ 
+ 	/*
+ 	 * Pick the best CPU if prev_cpu cannot be used, or if it saves at
+ 	 * least 6% of the energy used by prev_cpu.
+ 	 */
+-	if (prev_energy == ULONG_MAX ||
+-			(prev_energy - best_energy) > (prev_energy >> 4))
++	if (prev_energy == ULONG_MAX)
++		return best_energy_cpu;
++
++	if ((prev_energy - best_energy) > (prev_energy >> 4))
+ 		return best_energy_cpu;
+ 
+ 	return prev_cpu;
++
++fail:
++	rcu_read_unlock();
++
++	return -1;
+ }
+ 
+ /*
+@@ -7105,44 +7129,26 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
+ 	int want_affine = 0;
+ 	int sync = (wake_flags & WF_SYNC) && !(current->flags & PF_EXITING);
+ 
+-	rcu_read_lock();
+ 	if (sd_flag & SD_BALANCE_WAKE) {
+ 		record_wakee(p);
+ 
+-		/*
+-		 * Forkees are not accepted in the energy-aware wake-up path
+-		 * because they don't have any useful utilization data yet and
+-		 * it's not possible to forecast their impact on energy
+-		 * consumption. Consequently, they will be placed by
+-		 * find_idlest_cpu() on the least loaded CPU, which might turn
+-		 * out to be energy-inefficient in some use-cases. The
+-		 * alternative would be to bias new tasks towards specific types
+-		 * of CPUs first, or to try to infer their util_avg from the
+-		 * parent task, but those heuristics could hurt other use-cases
+-		 * too. So, until someone finds a better way to solve this,
+-		 * let's keep things simple by re-using the existing slow path.
+-		 */
+-		if (sched_feat(ENERGY_AWARE)) {
+-			struct root_domain *rd = cpu_rq(cpu)->rd;
+-			struct perf_domain *pd = rcu_dereference(rd->pd);
+-
+-			if (!pd || READ_ONCE(rd->overutilized))
+-				goto affine;
+-
++		if (static_branch_unlikely(&sched_energy_present)) {
+ 			if (schedtune_prefer_idle(p) && !sched_feat(EAS_PREFER_IDLE) && !sync)
+ 				goto sd_loop;
+ 
+-			new_cpu = find_energy_efficient_cpu(p, prev_cpu, pd, sync);
+-			goto unlock;
++			new_cpu = find_energy_efficient_cpu(p, prev_cpu, sync);
++			if (new_cpu >= 0)
++				return new_cpu;
++			new_cpu = prev_cpu;
+ 		}
+ 
+-affine:
+ 		want_affine = !wake_wide(p, sibling_count_hint) &&
+ 			      !wake_cap(p, cpu, prev_cpu) &&
+ 			      cpumask_test_cpu(cpu, &p->cpus_allowed);
+ 	}
+ 
+ sd_loop:
++	rcu_read_lock();
+ 	for_each_domain(cpu, tmp) {
+ 		if (!(tmp->flags & SD_LOAD_BALANCE))
+ 			break;
+@@ -7177,7 +7183,6 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
+ 		if (want_affine)
+ 			current->recent_used_cpu = cpu;
+ 	}
+-unlock:
+ 	rcu_read_unlock();
+ 
+ 	return new_cpu;
+@@ -9224,7 +9229,7 @@ static struct sched_group *find_busiest_group(struct lb_env *env)
+ 	 */
+ 	update_sd_lb_stats(env, &sds);
+ 
+-	if (sched_feat(ENERGY_AWARE)) {
++	if (static_branch_unlikely(&sched_energy_present)) {
+ 		struct root_domain *rd = env->dst_rq->rd;
+ 
+ 		if (rcu_dereference(rd->pd) && !READ_ONCE(rd->overutilized))
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index 5fe12c8836ea..d40aae8aa9b7 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -707,7 +707,7 @@ static inline bool sched_asym_prefer(int a, int b)
+ }
+ 
+ struct perf_domain {
+-	struct em_perf_domain *obj;
++	struct em_perf_domain *em_pd;
+ 	struct perf_domain *next;
+ 	struct rcu_head rcu;
+ };
+@@ -2234,17 +2234,33 @@ static inline void cpufreq_update_util(struct rq *rq, unsigned int flags) {}
+ # define arch_scale_freq_invariant()	false
+ #endif
+ 
++#ifdef CONFIG_CPU_FREQ_GOV_SCHEDUTIL
++/**
++ * enum schedutil_type - CPU utilization type
++ * @FREQUENCY_UTIL:	Utilization used to select frequency
++ * @ENERGY_UTIL:	Utilization used during energy calculation
++ *
++ * The utilization signals of all scheduling classes (CFS/RT/DL) and IRQ time
++ * need to be aggregated differently depending on the usage made of them. This
++ * enum is used within schedutil_freq_util() to differentiate the types of
++ * utilization expected by the callers, and adjust the aggregation accordingly.
++ */
+ enum schedutil_type {
+ 	FREQUENCY_UTIL,
+ 	ENERGY_UTIL,
+ };
+ 
+-#ifdef CONFIG_CPU_FREQ_GOV_SCHEDUTIL
+ unsigned long schedutil_freq_util(int cpu, unsigned long util,
+-				  enum schedutil_type type);
++			          unsigned long max, enum schedutil_type type);
++
++static inline unsigned long schedutil_energy_util(int cpu, unsigned long util)
++{
++	unsigned long max = arch_scale_cpu_capacity(NULL, cpu);
++
++	return schedutil_freq_util(cpu, util, max, ENERGY_UTIL);
++}
+ #else /* CONFIG_CPU_FREQ_GOV_SCHEDUTIL */
+-static inline unsigned long schedutil_freq_util(int cpu, unsigned long util,
+-				  enum schedutil_type type)
++static inline unsigned long schedutil_energy_util(int cpu, unsigned long util)
+ {
+ 	return util;
+ }
+@@ -2308,7 +2324,7 @@ unsigned long scale_irq_capacity(unsigned long util, unsigned long irq, unsigned
+ #endif
+ 
+ #if defined(CONFIG_ENERGY_MODEL) && defined(CONFIG_CPU_FREQ_GOV_SCHEDUTIL)
+-#define perf_domain_span(pd) (to_cpumask(((pd)->obj->cpus)))
++#define perf_domain_span(pd) (to_cpumask(((pd)->em_pd->cpus)))
+ #else
+ #define perf_domain_span(pd) NULL
+ #endif
+diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
+index 3ac30e383731..ca2f4ba6c6c8 100644
+--- a/kernel/sched/topology.c
++++ b/kernel/sched/topology.c
+@@ -203,6 +203,7 @@ sd_parent_degenerate(struct sched_domain *sd, struct sched_domain *parent)
+ 
+ DEFINE_STATIC_KEY_FALSE(sched_energy_present);
+ #if defined(CONFIG_ENERGY_MODEL) && defined(CONFIG_CPU_FREQ_GOV_SCHEDUTIL)
++DEFINE_MUTEX(sched_energy_mutex);
+ bool sched_energy_update;
+ 
+ static void free_pd(struct perf_domain *pd)
+@@ -241,7 +242,7 @@ static struct perf_domain *pd_init(int cpu)
+ 	pd = kzalloc(sizeof(*pd), GFP_KERNEL);
+ 	if (!pd)
+ 		return NULL;
+-	pd->obj = obj;
++	pd->em_pd = obj;
+ 
+ 	return pd;
+ }
+@@ -258,7 +259,7 @@ static void perf_domain_debug(const struct cpumask *cpu_map,
+ 		printk(KERN_CONT " pd%d:{ cpus=%*pbl nr_cstate=%d }",
+ 				cpumask_first(perf_domain_span(pd)),
+ 				cpumask_pr_args(perf_domain_span(pd)),
+-				em_pd_nr_cap_states(pd->obj));
++				em_pd_nr_cap_states(pd->em_pd));
+ 		pd = pd->next;
+ 	}
+ 
+@@ -288,7 +289,7 @@ static void sched_energy_set(bool has_eas)
+ 
+ /*
+  * EAS can be used on a root domain if it meets all the following conditions:
+- *    1. the ENERGY_AWARE sched_feat is enabled;
++ *    1. an Energy Model (EM) is available;
+  *    2. the SD_ASYM_CPUCAPACITY flag is set in the sched_domain hierarchy.
+  *    3. the EM complexity is low enough to keep scheduling overheads low;
+  *    4. schedutil is driving the frequency of all CPUs of the rd;
+@@ -341,8 +342,12 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
+ 			goto free;
+ 		gov = policy->governor;
+ 		cpufreq_cpu_put(policy);
+-		if (gov != &schedutil_gov)
++		if (gov != &schedutil_gov) {
++			if (rd->pd)
++				pr_warn("rd %*pbl: Disabling EAS, schedutil is mandatory\n",
++						cpumask_pr_args(cpu_map));
+ 			goto free;
++		}
+ 
+ 		/* Create the new pd and add it to the local list. */
+ 		tmp = pd_init(i);
+@@ -356,13 +361,12 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
+ 		 * complexity check.
+ 		 */
+ 		nr_pd++;
+-		nr_cs += em_pd_nr_cap_states(pd->obj);
++		nr_cs += em_pd_nr_cap_states(pd->em_pd);
+ 	}
+ 
+ 	/* Bail out if the Energy Model complexity is too high. */
+ 	if (nr_pd * (nr_cs + nr_cpus) > EM_MAX_COMPLEXITY) {
+-		if (sched_debug())
+-			pr_info("rd %*pbl: EM complexity is too high\n ",
++		WARN(1, "rd %*pbl: Failed to start EAS, EM complexity is too high\n",
+ 						cpumask_pr_args(cpu_map));
+ 		goto free;
+ 	}
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
+

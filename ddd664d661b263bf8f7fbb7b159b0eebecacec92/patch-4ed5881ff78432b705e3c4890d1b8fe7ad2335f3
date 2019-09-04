@@ -1,0 +1,292 @@
+From 92d4bfd7ec42c40c7491aada48b1ee44fd3a5de7 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <groeck@chromium.org>
+Date: Fri, 21 Sep 2018 09:33:24 -0700
+Subject: [PATCH] CHROMIUM: alt-syscall: Make required syscalls available for
+ use
+
+Syscalls required by alt-syscall can not be called directly. Unless syscalls
+are already made available for kernel use, create the necessary functions
+as well as wrappers for the real syscalls.
+
+BUG=chromium:885330
+TEST=Build and run on any target or in qemu
+
+Change-Id: Ia0846a1e2a8c168c75046e24fd170d8a952cb46d
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase52(rrangel): 8dabe7245bbc134f2cfcc12cde75c019dab924cc renamed the
+time system calls and also removed compat. Modified patch to account for
+this.]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/linux/compat.h     |  7 +++++++
+ include/linux/syscalls.h   | 18 ++++++++++++++++++
+ kernel/events/core.c       | 12 +++++++++---
+ kernel/sys.c               | 34 ++++++++++++++++++++++++++++------
+ kernel/time/posix-timers.c | 20 ++++++++++++++++----
+ kernel/time/time.c         | 15 +++++++++++++--
+ 6 files changed, 91 insertions(+), 15 deletions(-)
+
+diff --git a/include/linux/compat.h b/include/linux/compat.h
+index 16dafd9f4b86..4dc5715257b4 100644
+--- a/include/linux/compat.h
++++ b/include/linux/compat.h
+@@ -918,6 +918,13 @@ asmlinkage long compat_sys_socketcall(int call, u32 __user *args);
+ 
+ #endif /* CONFIG_ARCH_HAS_SYSCALL_WRAPPER */
+ 
++#ifdef CONFIG_ALT_SYSCALL
++
++int compat_ksys_clock_adjtime(clockid_t which_clock,
++			      struct compat_timex __user *tp);
++int compat_ksys_adjtimex(struct compat_timex __user *utp);
++
++#endif
+ 
+ /*
+  * For most but not all architectures, "am I in a compat syscall?" and
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 88145da7d140..cd4140d55625 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -1402,4 +1402,22 @@ static inline unsigned int ksys_personality(unsigned int personality)
+ 	return old;
+ }
+ 
++#ifdef CONFIG_ALT_SYSCALL
++
++/* Only used with ALT_SYSCALL enabled */
++
++int ksys_prctl(int option, unsigned long arg2, unsigned long arg3,
++	       unsigned long arg4, unsigned long arg5);
++int ksys_setpriority(int which, int who, int niceval);
++int ksys_getpriority(int which, int who);
++int ksys_perf_event_open(
++		struct perf_event_attr __user *attr_uptr,
++		pid_t pid, int cpu, int group_fd, unsigned long flags);
++int ksys_adjtimex(struct timex __user *txc_p);
++int ksys_clock_adjtime(clockid_t which_clock,
++		       struct timex __user *tx);
++int ksys_getcpu(unsigned __user *cpu, unsigned __user *node, struct getcpu_cache __user *cache);
++
++#endif /* CONFIG_ALT_SYSCALL */
++
+ #endif
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 0ce922009dd0..5d3d96ba8db5 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -10785,9 +10785,8 @@ __perf_event_ctx_lock_double(struct perf_event *group_leader,
+  * @cpu:		target cpu
+  * @group_fd:		group leader event fd
+  */
+-SYSCALL_DEFINE5(perf_event_open,
+-		struct perf_event_attr __user *, attr_uptr,
+-		pid_t, pid, int, cpu, int, group_fd, unsigned long, flags)
++int ksys_perf_event_open(struct perf_event_attr __user * attr_uptr, pid_t pid,
++			 int cpu, int group_fd, unsigned long flags)
+ {
+ 	struct perf_event *group_leader = NULL, *output_event = NULL;
+ 	struct perf_event *event, *sibling;
+@@ -11218,6 +11217,13 @@ SYSCALL_DEFINE5(perf_event_open,
+ 	return err;
+ }
+ 
++SYSCALL_DEFINE5(perf_event_open,
++		struct perf_event_attr __user *, attr_uptr,
++		pid_t, pid, int, cpu, int, group_fd, unsigned long, flags)
++{
++	return ksys_perf_event_open(attr_uptr, pid, cpu, group_fd, flags);
++}
++
+ /**
+  * perf_event_create_kernel_counter
+  *
+diff --git a/kernel/sys.c b/kernel/sys.c
+index fe4c6db242b2..7a75ffa5ef9c 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -195,7 +195,7 @@ static int set_one_prio(struct task_struct *p, int niceval, int error)
+ 	return error;
+ }
+ 
+-SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
++int ksys_setpriority(int which, int who, int niceval)
+ {
+ 	struct task_struct *g, *p;
+ 	struct user_struct *user;
+@@ -259,13 +259,18 @@ SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
+ 	return error;
+ }
+ 
++SYSCALL_DEFINE3(setpriority, int, which, int, who, int, niceval)
++{
++	return ksys_setpriority(which, who, niceval);
++}
++
+ /*
+  * Ugh. To avoid negative return values, "getpriority()" will
+  * not return the normal nice-value, but a negated value that
+  * has been offset by 20 (ie it returns 40..1 instead of -20..19)
+  * to stay compatible.
+  */
+-SYSCALL_DEFINE2(getpriority, int, which, int, who)
++int ksys_getpriority(int which, int who)
+ {
+ 	struct task_struct *g, *p;
+ 	struct user_struct *user;
+@@ -330,6 +335,11 @@ SYSCALL_DEFINE2(getpriority, int, which, int, who)
+ 	return retval;
+ }
+ 
++SYSCALL_DEFINE2(getpriority, int, which, int, who)
++{
++	return ksys_getpriority(which, who);
++}
++
+ /*
+  * Unprivileged users may change the real gid to the effective gid
+  * or vice versa.  (BSD-style)
+@@ -2418,8 +2428,8 @@ static int prctl_set_vma(unsigned long opt, unsigned long start,
+ }
+ #endif
+ 
+-SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+-		unsigned long, arg4, unsigned long, arg5)
++int ksys_prctl(int option, unsigned long arg2, unsigned long arg3,
++	       unsigned long arg4, unsigned long arg5)
+ {
+ 	struct task_struct *me = current;
+ 	unsigned char comm[sizeof(me->comm)];
+@@ -2651,8 +2661,14 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
+ 	return error;
+ }
+ 
+-SYSCALL_DEFINE3(getcpu, unsigned __user *, cpup, unsigned __user *, nodep,
+-		struct getcpu_cache __user *, unused)
++SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
++		unsigned long, arg4, unsigned long, arg5)
++{
++	return ksys_prctl(option, arg2, arg3, arg4, arg5);
++}
++
++int ksys_getcpu(unsigned __user *cpup, unsigned __user *nodep,
++		struct getcpu_cache __user *unused)
+ {
+ 	int err = 0;
+ 	int cpu = raw_smp_processor_id();
+@@ -2664,6 +2680,12 @@ SYSCALL_DEFINE3(getcpu, unsigned __user *, cpup, unsigned __user *, nodep,
+ 	return err ? -EFAULT : 0;
+ }
+ 
++SYSCALL_DEFINE3(getcpu, unsigned __user *, cpup, unsigned __user *, nodep,
++		struct getcpu_cache __user *, unused)
++{
++	return ksys_getcpu(cpup, nodep, unused);
++}
++
+ /**
+  * do_sysinfo - fill in sysinfo struct
+  * @info: pointer to buffer to fill
+diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
+index d7f2d91acdac..2fe84c494014 100644
+--- a/kernel/time/posix-timers.c
++++ b/kernel/time/posix-timers.c
+@@ -1052,8 +1052,8 @@ int do_clock_adjtime(const clockid_t which_clock, struct __kernel_timex * ktx)
+ 	return kc->clock_adj(which_clock, ktx);
+ }
+ 
+-SYSCALL_DEFINE2(clock_adjtime, const clockid_t, which_clock,
+-		struct __kernel_timex __user *, utx)
++int ksys_clock_adjtime(const clockid_t which_clock,
++		struct __kernel_timex __user * utx)
+ {
+ 	struct __kernel_timex ktx;
+ 	int err;
+@@ -1069,6 +1069,12 @@ SYSCALL_DEFINE2(clock_adjtime, const clockid_t, which_clock,
+ 	return err;
+ }
+ 
++SYSCALL_DEFINE2(clock_adjtime, const clockid_t, which_clock,
++		struct __kernel_timex __user *, utx)
++{
++	return ksys_clock_adjtime(which_clock, utx);
++}
++
+ SYSCALL_DEFINE2(clock_getres, const clockid_t, which_clock,
+ 		struct __kernel_timespec __user *, tp)
+ {
+@@ -1122,8 +1128,8 @@ SYSCALL_DEFINE2(clock_gettime32, clockid_t, which_clock,
+ 	return err;
+ }
+ 
+-SYSCALL_DEFINE2(clock_adjtime32, clockid_t, which_clock,
+-		struct old_timex32 __user *, utp)
++int ksys_clock_adjtime32(clockid_t which_clock,
++		struct old_timex32 __user * utp)
+ {
+ 	struct __kernel_timex ktx;
+ 	int err;
+@@ -1140,6 +1146,12 @@ SYSCALL_DEFINE2(clock_adjtime32, clockid_t, which_clock,
+ 	return err;
+ }
+ 
++SYSCALL_DEFINE2(clock_adjtime32, clockid_t, which_clock,
++		struct old_timex32 __user *, utp)
++{
++	return ksys_clock_adjtime32(which_clock, utp);
++}
++
+ SYSCALL_DEFINE2(clock_getres_time32, clockid_t, which_clock,
+ 		struct old_timespec32 __user *, tp)
+ {
+diff --git a/kernel/time/time.c b/kernel/time/time.c
+index 5c54ca632d08..172aa97a08d9 100644
+--- a/kernel/time/time.c
++++ b/kernel/time/time.c
+@@ -268,7 +268,7 @@ COMPAT_SYSCALL_DEFINE2(settimeofday, struct old_timeval32 __user *, tv,
+ #endif
+ 
+ #if !defined(CONFIG_64BIT_TIME) || defined(CONFIG_64BIT)
+-SYSCALL_DEFINE1(adjtimex, struct __kernel_timex __user *, txc_p)
++int ksys_adjtimex(struct __kernel_timex __user * txc_p)
+ {
+ 	struct __kernel_timex txc;		/* Local copy of parameter */
+ 	int ret;
+@@ -282,6 +282,11 @@ SYSCALL_DEFINE1(adjtimex, struct __kernel_timex __user *, txc_p)
+ 	ret = do_adjtimex(&txc);
+ 	return copy_to_user(txc_p, &txc, sizeof(struct __kernel_timex)) ? -EFAULT : ret;
+ }
++
++SYSCALL_DEFINE1(adjtimex, struct __kernel_timex __user *, txc_p)
++{
++	return ksys_adjtimex(txc_p);
++}
+ #endif
+ 
+ #ifdef CONFIG_COMPAT_32BIT_TIME
+@@ -348,7 +353,7 @@ int put_old_timex32(struct old_timex32 __user *utp, const struct __kernel_timex
+ 	return 0;
+ }
+ 
+-SYSCALL_DEFINE1(adjtimex_time32, struct old_timex32 __user *, utp)
++int ksys_adjtimex_time32(struct old_timex32 __user * utp)
+ {
+ 	struct __kernel_timex txc;
+ 	int err, ret;
+@@ -365,6 +370,12 @@ SYSCALL_DEFINE1(adjtimex_time32, struct old_timex32 __user *, utp)
+ 
+ 	return ret;
+ }
++
++SYSCALL_DEFINE1(adjtimex_time32, struct old_timex32 __user *, utp)
++{
++	return ksys_adjtimex_time32(utp);
++}
++
+ #endif
+ 
+ /*
+-- 
+2.23.0.187.g17f5b7556c-goog
+
