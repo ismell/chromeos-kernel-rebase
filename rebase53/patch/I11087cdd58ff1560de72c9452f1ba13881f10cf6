@@ -1,0 +1,122 @@
+From 9ce8cf92e036f5b928ef1b208be5c1b144d260bc Mon Sep 17 00:00:00 2001
+From: Daniel Rosenberg <drosen@google.com>
+Date: Thu, 15 Mar 2018 20:58:32 -0700
+Subject: [PATCH] CHROMIUM: configfs: inherit file and directory owners
+
+All entries in configfs are currently owned by root,
+regardless of context. Instead, this preserves the
+current ownership, allowing userspace to choose who
+has permissions to configure the system through
+any particular configfs subsystem.
+
+This means anyone who can create a group will now
+have the ability to create any groups inside of that
+group.
+
+Conflicts:
+  CURRENT_TIME is no longer defined, reworked
+  to use specified time granularity.
+
+BUG=b:63876697
+TEST=compilation, mkdir under configfs after chowning
+
+Change-Id: I11087cdd58ff1560de72c9452f1ba13881f10cf6
+Signed-off-by: Daniel Rosenberg <drosen@google.com>
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/965762
+Tested-by: Gwendal Grignou <gwendal@google.com>
+(cherry picked from commit fa9d2f446d10940f6e6bef4cd8c6d027e95cd0c4)
+Reviewed-on: https://chromium-review.googlesource.com/1102012
+Commit-Ready: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Tested-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+
+[rebase419(groeck): timebase -> timebase64 changes]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase53(rrangel):
+	current_kernel_time64 has been removed
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ fs/configfs/inode.c | 42 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 7 deletions(-)
+
+diff --git a/fs/configfs/inode.c b/fs/configfs/inode.c
+index ab0284321912..3557b6c56e42 100644
+--- a/fs/configfs/inode.c
++++ b/fs/configfs/inode.c
+@@ -40,6 +40,31 @@ static const struct inode_operations configfs_inode_operations ={
+ 	.setattr	= configfs_setattr,
+ };
+ 
++static struct iattr *configfs_alloc_iattr(struct configfs_dirent *sd_parent,
++					  struct configfs_dirent *sd, unsigned int s_time_gran)
++{
++	struct iattr *sd_iattr;
++	struct timespec64 ts;
++
++	sd_iattr = kzalloc(sizeof(struct iattr), GFP_KERNEL);
++	if (!sd_iattr)
++		return NULL;
++	/* assign default attributes */
++	sd_iattr->ia_mode = sd->s_mode;
++	if (sd_parent && sd_parent->s_iattr) {
++		sd_iattr->ia_uid = sd_parent->s_iattr->ia_uid;
++		sd_iattr->ia_gid = sd_parent->s_iattr->ia_gid;
++	} else {
++		sd_iattr->ia_uid = GLOBAL_ROOT_UID;
++		sd_iattr->ia_gid = GLOBAL_ROOT_GID;
++	}
++
++	ktime_get_coarse_real_ts64(&ts);
++	sd_iattr->ia_atime = sd_iattr->ia_mtime =
++			sd_iattr->ia_ctime = timespec64_trunc(ts, s_time_gran);
++	return sd_iattr;
++}
++
+ int configfs_setattr(struct dentry * dentry, struct iattr * iattr)
+ {
+ 	struct inode * inode = d_inode(dentry);
+@@ -54,15 +79,9 @@ int configfs_setattr(struct dentry * dentry, struct iattr * iattr)
+ 	sd_iattr = sd->s_iattr;
+ 	if (!sd_iattr) {
+ 		/* setting attributes for the first time, allocate now */
+-		sd_iattr = kzalloc(sizeof(struct iattr), GFP_KERNEL);
++		sd_iattr = configfs_alloc_iattr(NULL, sd, inode->i_sb->s_time_gran);
+ 		if (!sd_iattr)
+ 			return -ENOMEM;
+-		/* assign default attributes */
+-		sd_iattr->ia_mode = sd->s_mode;
+-		sd_iattr->ia_uid = GLOBAL_ROOT_UID;
+-		sd_iattr->ia_gid = GLOBAL_ROOT_GID;
+-		sd_iattr->ia_atime = sd_iattr->ia_mtime =
+-			sd_iattr->ia_ctime = current_time(inode);
+ 		sd->s_iattr = sd_iattr;
+ 	}
+ 	/* attributes were changed atleast once in past */
+@@ -170,6 +189,7 @@ int configfs_create(struct dentry * dentry, umode_t mode, void (*init)(struct in
+ 	struct inode *inode = NULL;
+ 	struct configfs_dirent *sd;
+ 	struct inode *p_inode;
++	struct dentry *parent;
+ 
+ 	if (!dentry)
+ 		return -ENOENT;
+@@ -178,6 +198,14 @@ int configfs_create(struct dentry * dentry, umode_t mode, void (*init)(struct in
+ 		return -EEXIST;
+ 
+ 	sd = dentry->d_fsdata;
++	parent = dget_parent(dentry);
++	if (parent && !sd->s_iattr) {
++		sd->s_iattr = configfs_alloc_iattr(parent->d_fsdata, sd,
++						   parent->d_sb->s_time_gran);
++		if (!sd->s_iattr)
++			return -ENOMEM;
++	}
++	dput(parent);
+ 	inode = configfs_new_inode(mode, sd, dentry->d_sb);
+ 	if (!inode)
+ 		return -ENOMEM;
+-- 
+2.23.0.187.g17f5b7556c-goog
+

@@ -1,0 +1,55 @@
+From 0da4046349ec78e2d7d485a70e5e838fe5469d27 Mon Sep 17 00:00:00 2001
+From: Sathyanarayana Nujella <sathyanarayana.nujella@intel.com>
+Date: Tue, 2 Jan 2018 18:50:30 -0800
+Subject: [PATCH] CHROMIUM: ASoC: Intel: Add CNL max98373 machine driver entry
+
+This patch adds Cannonlake I2S machine driver which uses
+max98373 speaker codec.
+
+Conflicts:
+	sound/soc/intel/skylake/skl.c
+	conflicts with cbaa7f0bdbee1969bb311c641abbd0d2af6ba861: ASoC:
+	Intel: move SKL+ codec ACPI tables to common directory.
+[rebase419(cujomalainey): Fixed conflicts]
+Signed-off-by: Curtis Malainey <cujomalainey@google.com>
+
+Signed-off-by: Sathyanarayana Nujella <sathyanarayana.nujella@intel.com>
+Signed-off-by: Harsha Priya <harshapriya.n@intel.com>
+
+BUG=b:71724897
+TEST=With whole series applied + DSP Firmware and topology;
+     audio playback works.
+
+Change-Id: I465c335d20d9d4f9194c4d743409974e264b759f
+Signed-off-by: Mike Mason <michael.w.mason@intel.com>
+Reviewed-on: https://chromium-review.googlesource.com/870741
+Commit-Ready: Ben Zhang <benzh@chromium.org>
+Tested-by: Ben Zhang <benzh@chromium.org>
+Reviewed-by: Ben Zhang <benzh@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ sound/soc/intel/common/soc-acpi-intel-cnl-match.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+index 771b0ef21051..5abdef03512e 100644
+--- a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
++++ b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+@@ -28,6 +28,12 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_cnl_machines[] = {
+ 		.sof_fw_filename = "sof-cnl.ri",
+ 		.sof_tplg_filename = "sof-cnl-rt274.tplg",
+ 	},
++	{
++		.id = "MX98373",
++		.drv_name = "cnl_max98373",
++		.fw_filename = "intel/dsp_fw_cnl.bin",
++		.pdata = &cnl_pdata,
++	},
+ 	{
+ 		.id = "MX98357A",
+ 		.drv_name = "sof_rt5682",
+-- 
+2.23.0.187.g17f5b7556c-goog
+

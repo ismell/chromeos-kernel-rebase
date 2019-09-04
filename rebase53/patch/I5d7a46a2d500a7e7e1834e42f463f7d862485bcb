@@ -1,0 +1,292 @@
+From 031d7a1994495eb074801856879298cf68eeefc7 Mon Sep 17 00:00:00 2001
+From: Andrew Bresticker <abrestic@chromium.org>
+Date: Tue, 3 Nov 2015 14:27:00 -0800
+Subject: [PATCH] CHROMIUM: ARM64: Add alt-syscall support
+
+Add ARM64 support for changing a thread's syscall table at runtime using
+the alt-syscall infrastructure.
+
+BUG=b:25408860
+BUG=b:29554103
+TEST=Build and boot on kevin
+
+Originally-Reviewed-on: https://chromium-review.googlesource.com/310601
+Signed-off-by: Andrew Bresticker <abrestic@chromium.org>
+[rebase44(drinkcat):
+- Conflict in arch/arm64/kernel/entry.S, change from adr to adrp by
+  0156411b1 "arm64: Implement the compat_sys_call_table in C"
+- arch/arm64/include/asm/thread_info.h: fixup compat_sys_call_table type definition
+- other minor context conflicts.]
+
+Change-Id: I5d7a46a2d500a7e7e1834e42f463f7d862485bcb
+Reviewed-on: https://chromium-review.googlesource.com/355410
+Commit-Ready: Douglas Anderson <dianders@chromium.org>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	arch/arm64/Kconfig
+	arch/arm64/kernel/Makefile
+	arch/arm64/kernel/asm-offsets.c
+
+[rebase412(groeck): Resolved conflicts; squashed FIXUP patches]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	arch/arm64/kernel/entry.S
+
+[rebase414(groeck): Resolved conflicts; dropped exports]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+Conflicts:
+	arch/arm64/include/asm/thread_info.h
+	arch/arm64/kernel/Makefile
+	arch/arm64/kernel/entry.S
+
+[rebase419(groeck): Resolved conflicts;
+	syscall handling moved to C code]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm64/Kconfig                   |  1 +
+ arch/arm64/include/asm/syscall.h     |  2 +
+ arch/arm64/include/asm/thread_info.h | 26 ++++++++++
+ arch/arm64/kernel/Makefile           |  2 +
+ arch/arm64/kernel/alt-syscall.c      | 78 ++++++++++++++++++++++++++++
+ arch/arm64/kernel/syscall.c          | 14 +++++
+ include/linux/alt-syscall.h          |  3 +-
+ 7 files changed, 125 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kernel/alt-syscall.c
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b1dd948f9665..e83881adfd62 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -16,6 +16,7 @@ config ARM64
+ 	select ARCH_HAS_DMA_MMAP_PGPROT
+ 	select ARCH_HAS_DMA_PREP_COHERENT
+ 	select ARCH_HAS_ACPI_TABLE_UPGRADE if ACPI
++	select ARCH_HAS_ALT_SYSCALL
+ 	select ARCH_HAS_ELF_RANDOMIZE
+ 	select ARCH_HAS_FAST_MULTIPLIER
+ 	select ARCH_HAS_FORTIFY_SOURCE
+diff --git a/arch/arm64/include/asm/syscall.h b/arch/arm64/include/asm/syscall.h
+index 65299a2dcf9c..fdfd52eeaf55 100644
+--- a/arch/arm64/include/asm/syscall.h
++++ b/arch/arm64/include/asm/syscall.h
+@@ -17,6 +17,8 @@ extern const syscall_fn_t sys_call_table[];
+ extern const syscall_fn_t compat_sys_call_table[];
+ #endif
+ 
++#define sys_call_ptr_t syscall_fn_t	/* Needed for alt-syscall	*/
++
+ static inline int syscall_get_nr(struct task_struct *task,
+ 				 struct pt_regs *regs)
+ {
+diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
+index 180b34ec5965..890e8bde7469 100644
+--- a/arch/arm64/include/asm/thread_info.h
++++ b/arch/arm64/include/asm/thread_info.h
+@@ -19,6 +19,7 @@ struct task_struct;
+ #include <asm/memory.h>
+ #include <asm/stack_pointer.h>
+ #include <asm/types.h>
++#include <asm/unistd.h>
+ 
+ typedef unsigned long mm_segment_t;
+ 
+@@ -30,6 +31,14 @@ struct thread_info {
+ 	mm_segment_t		addr_limit;	/* address limit */
+ #ifdef CONFIG_ARM64_SW_TTBR0_PAN
+ 	u64			ttbr0;		/* saved TTBR0_EL1 */
++#endif
++#ifdef CONFIG_ALT_SYSCALL
++	unsigned int		nr_syscalls;
++	const void		*sys_call_table;
++#ifdef CONFIG_COMPAT
++	unsigned int		compat_nr_syscalls;
++	const void		*compat_sys_call_table;
++#endif
+ #endif
+ 	union {
+ 		u64		preempt_count;	/* 0 => preemptible, <0 => bug */
+@@ -45,6 +54,22 @@ struct thread_info {
+ 	};
+ };
+ 
++#ifdef CONFIG_ALT_SYSCALL
++#ifdef CONFIG_COMPAT
++#define INIT_THREAD_INFO_SYSCALL_COMPAT				\
++	.compat_nr_syscalls	= __NR_compat_syscalls,		\
++	.compat_sys_call_table	= &compat_sys_call_table,
++#else
++#define INIT_THREAD_INFO_SYSCALL_COMPAT
++#endif
++#define INIT_THREAD_INFO_SYSCALL				\
++	.nr_syscalls		= __NR_syscalls,		\
++	.sys_call_table		= &sys_call_table,		\
++	INIT_THREAD_INFO_SYSCALL_COMPAT
++#else
++#define INIT_THREAD_INFO_SYSCALL
++#endif
++
+ #define thread_saved_pc(tsk)	\
+ 	((unsigned long)(tsk->thread.cpu_context.pc))
+ #define thread_saved_sp(tsk)	\
+@@ -119,6 +144,7 @@ void arch_release_task_struct(struct task_struct *tsk);
+ 	.flags		= _TIF_FOREIGN_FPSTATE,				\
+ 	.preempt_count	= INIT_PREEMPT_COUNT,				\
+ 	.addr_limit	= KERNEL_DS,					\
++	INIT_THREAD_INFO_SYSCALL					\
+ }
+ 
+ #endif /* __KERNEL__ */
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index 478491f07b4f..5267083d459c 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -64,6 +64,8 @@ obj-$(CONFIG_ARM_SDE_INTERFACE)		+= sdei.o
+ obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
+ obj-$(CONFIG_ARM64_PTR_AUTH)		+= pointer_auth.o
+ 
++obj-$(CONFIG_ALT_SYSCALL)		+= alt-syscall.o
++
+ obj-y					+= vdso/ probes/
+ obj-$(CONFIG_COMPAT_VDSO)		+= vdso32/
+ head-y					:= head.o
+diff --git a/arch/arm64/kernel/alt-syscall.c b/arch/arm64/kernel/alt-syscall.c
+new file mode 100644
+index 000000000000..767c5371cf39
+--- /dev/null
++++ b/arch/arm64/kernel/alt-syscall.c
+@@ -0,0 +1,78 @@
++/*
++ * AArch64 alt-syscall implementation
++ *
++ * Copyright (C) 2015 Google, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/alt-syscall.h>
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/syscalls.h>
++
++#include <asm/syscall.h>
++
++int arch_dup_sys_call_table(struct alt_sys_call_table *entry)
++{
++	int err;
++
++	if (!entry)
++		return -EINVAL;
++	if (entry->table)
++		return -EINVAL;
++#ifdef CONFIG_COMPAT
++	if (entry->compat_table)
++		return -EINVAL;
++#endif
++
++	entry->size = __NR_syscalls;
++	entry->table = kcalloc(entry->size, sizeof(sys_call_ptr_t), GFP_KERNEL);
++	if (!entry->table) {
++		err = -ENOMEM;
++		goto failed;
++	}
++	memcpy(entry->table, sys_call_table,
++	       entry->size * sizeof(sys_call_ptr_t));
++
++#ifdef CONFIG_COMPAT
++	entry->compat_size = __NR_compat_syscalls;
++	entry->compat_table = kcalloc(entry->compat_size,
++				      sizeof(sys_call_ptr_t), GFP_KERNEL);
++	if (!entry->compat_table) {
++		err = -ENOMEM;
++		goto compat_failed;
++	}
++	memcpy(entry->compat_table, compat_sys_call_table,
++	       entry->compat_size * sizeof(sys_call_ptr_t));
++#endif
++
++	return 0;
++
++#ifdef CONFIG_COMPAT
++compat_failed:
++	entry->compat_size = 0;
++	kfree(entry->table);
++	entry->table = NULL;
++#endif
++failed:
++	entry->size = 0;
++	return err;
++}
++
++int arch_set_sys_call_table(struct alt_sys_call_table *entry)
++{
++	if (!entry)
++		return -EINVAL;
++
++	current_thread_info()->nr_syscalls = entry->size;
++	current_thread_info()->sys_call_table = entry->table;
++#ifdef CONFIG_COMPAT
++	current_thread_info()->compat_nr_syscalls = entry->compat_size;
++	current_thread_info()->compat_sys_call_table = entry->compat_table;
++#endif
++
++	return 0;
++}
+diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
+index 871c739f060a..8845cad3f1f4 100644
+--- a/arch/arm64/kernel/syscall.c
++++ b/arch/arm64/kernel/syscall.c
+@@ -156,14 +156,28 @@ static inline void sve_user_discard(void)
+ 
+ asmlinkage void el0_svc_handler(struct pt_regs *regs)
+ {
++	struct thread_info __maybe_unused *ti;
++
+ 	sve_user_discard();
++#ifdef CONFIG_ALT_SYSCALL
++	ti = current_thread_info();
++	el0_svc_common(regs, regs->regs[8], ti->nr_syscalls,
++		       ti->sys_call_table);
++#else
+ 	el0_svc_common(regs, regs->regs[8], __NR_syscalls, sys_call_table);
++#endif
+ }
+ 
+ #ifdef CONFIG_COMPAT
+ asmlinkage void el0_svc_compat_handler(struct pt_regs *regs)
+ {
++#ifdef CONFIG_ALT_SYSCALL
++	struct thread_info *ti = current_thread_info();
++	el0_svc_common(regs, regs->regs[7], ti->compat_nr_syscalls,
++		       ti->compat_sys_call_table);
++#else
+ 	el0_svc_common(regs, regs->regs[7], __NR_compat_syscalls,
+ 		       compat_sys_call_table);
++#endif
+ }
+ #endif
+diff --git a/include/linux/alt-syscall.h b/include/linux/alt-syscall.h
+index 00f37c005eba..f817f89452e3 100644
+--- a/include/linux/alt-syscall.h
++++ b/include/linux/alt-syscall.h
+@@ -14,7 +14,8 @@ struct alt_sys_call_table {
+ 	char name[ALT_SYS_CALL_NAME_MAX + 1];
+ 	sys_call_ptr_t *table;
+ 	int size;
+-#ifdef CONFIG_IA32_EMULATION
++#if defined(CONFIG_IA32_EMULATION) || \
++    (defined(CONFIG_ARM64) && defined(CONFIG_COMPAT))
+ 	sys_call_ptr_t *compat_table;
+ 	int compat_size;
+ #endif
+-- 
+2.23.0.187.g17f5b7556c-goog
+

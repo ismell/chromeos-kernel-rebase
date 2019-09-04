@@ -1,0 +1,223 @@
+From 95d632687c66b604b3de5973a9e2e5d1b15daeb1 Mon Sep 17 00:00:00 2001
+From: CK Hu <ck.hu@mediatek.com>
+Date: Tue, 12 Jan 2016 16:15:50 +0100
+Subject: [PATCH] CHROMIUM: drm/mediatek: Add interface to allocate Mediatek
+ GEM buffer.
+
+Add an interface to allocate Mediatek GEM buffers, allow the IOCTLs
+to be used by render nodes.
+This patch also sets the RENDER driver feature.
+
+Signed-off-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+
+BUG=b:109911488
+TEST=build and boot kukui to UI
+
+Change-Id: Ice3ed33b3f41e5c02c39d77a8f9e6775448a41bb
+Reviewed-on: https://chromium-review.googlesource.com/327581
+Commit-Ready: Daniel Kurtz <djkurtz@chromium.org>
+Tested-by: Daniel Kurtz <djkurtz@chromium.org>
+Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/423687
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1186281
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Tested-by: Pi-Hsun Shih <pihsun@chromium.org>
+
+[rebase53(rrangel):
+	drm_gem_object_unreference_unlocked was deprecated and replaced with drm_gem_object_put_unlocked
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/mediatek/mtk_drm_drv.c | 12 +++++-
+ drivers/gpu/drm/mediatek/mtk_drm_gem.c | 39 +++++++++++++++++
+ drivers/gpu/drm/mediatek/mtk_drm_gem.h | 12 ++++++
+ include/uapi/drm/mediatek_drm.h        | 59 ++++++++++++++++++++++++++
+ 4 files changed, 121 insertions(+), 1 deletion(-)
+ create mode 100644 include/uapi/drm/mediatek_drm.h
+
+diff --git a/drivers/gpu/drm/mediatek/mtk_drm_drv.c b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
+index f4ae858dd017..110aa5da241d 100644
+--- a/drivers/gpu/drm/mediatek/mtk_drm_drv.c
++++ b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
+@@ -338,6 +338,14 @@ static void mtk_drm_kms_deinit(struct drm_device *drm)
+ 	drm_mode_config_cleanup(drm);
+ }
+ 
++static const struct drm_ioctl_desc mtk_ioctls[] = {
++	DRM_IOCTL_DEF_DRV(MTK_GEM_CREATE, mtk_gem_create_ioctl,
++			  DRM_UNLOCKED | DRM_AUTH | DRM_RENDER_ALLOW),
++	DRM_IOCTL_DEF_DRV(MTK_GEM_MAP_OFFSET,
++			  mtk_gem_map_offset_ioctl,
++			  DRM_UNLOCKED | DRM_AUTH | DRM_RENDER_ALLOW),
++};
++
+ static const struct file_operations mtk_drm_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open = drm_open,
+@@ -351,7 +359,7 @@ static const struct file_operations mtk_drm_fops = {
+ 
+ static struct drm_driver mtk_drm_driver = {
+ 	.driver_features = DRIVER_MODESET | DRIVER_GEM | DRIVER_PRIME |
+-			   DRIVER_ATOMIC,
++			   DRIVER_ATOMIC | DRIVER_RENDER,
+ 
+ 	.gem_free_object_unlocked = mtk_drm_gem_free_object,
+ 	.gem_vm_ops = &drm_gem_cma_vm_ops,
+@@ -366,6 +374,8 @@ static struct drm_driver mtk_drm_driver = {
+ 	.gem_prime_mmap = mtk_drm_gem_mmap_buf,
+ 	.gem_prime_vmap = mtk_drm_gem_prime_vmap,
+ 	.gem_prime_vunmap = mtk_drm_gem_prime_vunmap,
++	.ioctls = mtk_ioctls,
++	.num_ioctls = ARRAY_SIZE(mtk_ioctls),
+ 	.fops = &mtk_drm_fops,
+ 
+ 	.name = DRIVER_NAME,
+diff --git a/drivers/gpu/drm/mediatek/mtk_drm_gem.c b/drivers/gpu/drm/mediatek/mtk_drm_gem.c
+index 0d69698f8173..8f41ecd76603 100644
+--- a/drivers/gpu/drm/mediatek/mtk_drm_gem.c
++++ b/drivers/gpu/drm/mediatek/mtk_drm_gem.c
+@@ -6,6 +6,7 @@
+ #include <drm/drmP.h>
+ #include <drm/drm_gem.h>
+ #include <linux/dma-buf.h>
++#include <drm/mediatek_drm.h>
+ 
+ #include "mtk_drm_drv.h"
+ #include "mtk_drm_gem.h"
+@@ -239,6 +240,44 @@ struct drm_gem_object *mtk_gem_prime_import_sg_table(struct drm_device *dev,
+ 	return ERR_PTR(ret);
+ }
+ 
++int mtk_gem_map_offset_ioctl(struct drm_device *drm, void *data,
++			     struct drm_file *file_priv)
++{
++	struct drm_mtk_gem_map_off *args = data;
++
++	return drm->driver->dumb_map_offset(file_priv, drm, args->handle,
++					    &args->offset);
++}
++
++int mtk_gem_create_ioctl(struct drm_device *dev, void *data,
++			 struct drm_file *file_priv)
++{
++	struct mtk_drm_gem_obj *mtk_gem;
++	struct drm_mtk_gem_create *args = data;
++	int ret;
++
++	mtk_gem = mtk_drm_gem_create(dev, args->size, false);
++	if (IS_ERR(mtk_gem))
++		return PTR_ERR(mtk_gem);
++
++	/*
++	 * allocate a id of idr table where the obj is registered
++	 * and handle has the id what user can see.
++	 */
++	ret = drm_gem_handle_create(file_priv, &mtk_gem->base, &args->handle);
++	if (ret)
++		goto err_handle_create;
++
++	/* drop reference from allocate - handle holds it now. */
++	drm_gem_object_put_unlocked(&mtk_gem->base);
++
++	return 0;
++
++err_handle_create:
++	mtk_drm_gem_free_object(&mtk_gem->base);
++	return ret;
++}
++
+ void *mtk_drm_gem_prime_vmap(struct drm_gem_object *obj)
+ {
+ 	struct mtk_drm_gem_obj *mtk_gem = to_mtk_gem_obj(obj);
+diff --git a/drivers/gpu/drm/mediatek/mtk_drm_gem.h b/drivers/gpu/drm/mediatek/mtk_drm_gem.h
+index ff9f976d9807..e59cb8c7c2f6 100644
+--- a/drivers/gpu/drm/mediatek/mtk_drm_gem.h
++++ b/drivers/gpu/drm/mediatek/mtk_drm_gem.h
+@@ -48,4 +48,16 @@ struct drm_gem_object *mtk_gem_prime_import_sg_table(struct drm_device *dev,
+ void *mtk_drm_gem_prime_vmap(struct drm_gem_object *obj);
+ void mtk_drm_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
+ 
++/*
++ * request gem object creation and buffer allocation as the size
++ * that it is calculated with framebuffer information such as width,
++ * height and bpp.
++ */
++int mtk_gem_create_ioctl(struct drm_device *dev, void *data,
++		struct drm_file *file_priv);
++
++/* get buffer offset to map to user space. */
++int mtk_gem_map_offset_ioctl(struct drm_device *dev, void *data,
++		struct drm_file *file_priv);
++
+ #endif
+diff --git a/include/uapi/drm/mediatek_drm.h b/include/uapi/drm/mediatek_drm.h
+new file mode 100644
+index 000000000000..19ea357b5503
+--- /dev/null
++++ b/include/uapi/drm/mediatek_drm.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright (c) 2015 MediaTek Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++
++#ifndef _UAPI_MEDIATEK_DRM_H
++#define _UAPI_MEDIATEK_DRM_H
++
++#include <drm/drm.h>
++
++/**
++ * User-desired buffer creation information structure.
++ *
++ * @size: user-desired memory allocation size.
++ *	- this size value would be page-aligned internally.
++ * @flags: user request for setting memory type or cache attributes.
++ * @handle: returned a handle to created gem object.
++ *	- this handle will be set by gem module of kernel side.
++ */
++struct drm_mtk_gem_create {
++	uint64_t size;
++	uint32_t flags;
++	uint32_t handle;
++};
++
++/**
++ * A structure for getting buffer offset.
++ *
++ * @handle: a pointer to gem object created.
++ * @pad: just padding to be 64-bit aligned.
++ * @offset: relatived offset value of the memory region allocated.
++ *     - this value should be set by user.
++ */
++struct drm_mtk_gem_map_off {
++	uint32_t handle;
++	uint32_t pad;
++	uint64_t offset;
++};
++
++#define DRM_MTK_GEM_CREATE		0x00
++#define DRM_MTK_GEM_MAP_OFFSET		0x01
++
++#define DRM_IOCTL_MTK_GEM_CREATE	DRM_IOWR(DRM_COMMAND_BASE + \
++		DRM_MTK_GEM_CREATE, struct drm_mtk_gem_create)
++
++#define DRM_IOCTL_MTK_GEM_MAP_OFFSET	DRM_IOWR(DRM_COMMAND_BASE + \
++		DRM_MTK_GEM_MAP_OFFSET, struct drm_mtk_gem_map_off)
++
++
++#endif /* _UAPI_MEDIATEK_DRM_H */
+-- 
+2.23.0.187.g17f5b7556c-goog
+

@@ -1,0 +1,871 @@
+From ca5abfa9aace116014a96dd5561475139e58d969 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <groeck@chromium.org>
+Date: Tue, 4 Jun 2019 11:17:49 -0700
+Subject: [PATCH] CHROMIUM: Revert "jump_label: move 'asm goto' support test to
+ Kconfig"
+
+This reverts commit 0276ebf16675f3745d8b6f384dcf917e1379eda2.
+
+clang does not support asm goto, thus we have to revert all asm goto
+related enforcement patches to be able to build images with clang.
+
+BUG=chromium:970208
+TEST=Build with clang
+
+Change-Id: I687a45c699d1c8408a9d1f66f7cecf2e267ef633
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase53(rrangel): Fixed conflicts with UPSTREAM changes]
+Signed-off-by: Raul Rangel <rrangel@chromium.org>
+
+[rebase53(rrangel):
+  * Context conflicts
+  * No longer uses asm-goto: 75d9fc7fd94eb43cdf0bec04499a27ced780af19
+    * arch/powerpc/platforms/powernv/opal-wrappers.S
+    * arch/powerpc/include/asm/asm-prototypes.h: ]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/Kconfig                                  |  1 -
+ arch/arm/kernel/jump_label.c                  |  4 ++++
+ arch/arm64/kernel/jump_label.c                |  4 ++++
+ arch/mips/kernel/jump_label.c                 |  4 ++++
+ arch/powerpc/kernel/jump_label.c              |  2 ++
+ .../platforms/powernv/opal-tracepoints.c      |  2 +-
+ arch/powerpc/platforms/pseries/hvCall.S       |  4 ++--
+ arch/powerpc/platforms/pseries/lpar.c         |  2 +-
+ arch/s390/kernel/Makefile                     |  3 +--
+ arch/s390/kernel/jump_label.c                 |  4 ++++
+ arch/sparc/kernel/Makefile                    |  2 +-
+ arch/sparc/kernel/jump_label.c                |  4 ++++
+ arch/x86/entry/calling.h                      |  2 +-
+ arch/x86/include/asm/jump_label.h             | 13 +++++++++++
+ arch/x86/include/asm/rmwcc.h                  |  6 ++---
+ arch/x86/kernel/Makefile                      |  3 +--
+ arch/x86/kernel/jump_label.c                  |  4 ++++
+ arch/x86/kvm/emulate.c                        |  2 +-
+ include/linux/dynamic_debug.h                 |  6 ++---
+ include/linux/jump_label.h                    | 22 +++++++++++--------
+ include/linux/jump_label_ratelimit.h          |  9 +++++---
+ include/linux/module.h                        |  2 +-
+ include/linux/netfilter.h                     |  4 ++--
+ include/linux/netfilter_ingress.h             |  2 +-
+ init/Kconfig                                  |  3 ---
+ kernel/jump_label.c                           | 10 ++++++---
+ kernel/module.c                               |  2 +-
+ kernel/sched/core.c                           |  2 +-
+ kernel/sched/debug.c                          |  4 ++--
+ kernel/sched/fair.c                           |  6 ++---
+ kernel/sched/sched.h                          |  6 ++---
+ lib/dynamic_debug.c                           |  2 +-
+ net/core/dev.c                                |  6 ++---
+ net/netfilter/core.c                          |  6 ++---
+ scripts/gcc-goto.sh                           |  2 +-
+ tools/arch/x86/include/asm/rmwcc.h            |  6 ++---
+ 36 files changed, 105 insertions(+), 61 deletions(-)
+
+diff --git a/arch/Kconfig b/arch/Kconfig
+index a7b57dd42c26..0d79b3ee8250 100644
+--- a/arch/Kconfig
++++ b/arch/Kconfig
+@@ -71,7 +71,6 @@ config KPROBES
+ config JUMP_LABEL
+        bool "Optimize very unlikely/likely branches"
+        depends on HAVE_ARCH_JUMP_LABEL
+-       depends on CC_HAS_ASM_GOTO
+        help
+          This option enables a transparent branch optimization that
+ 	 makes certain almost-always-true or almost-always-false branch
+diff --git a/arch/arm/kernel/jump_label.c b/arch/arm/kernel/jump_label.c
+index 303b3ab87f7e..90bce3d9928e 100644
+--- a/arch/arm/kernel/jump_label.c
++++ b/arch/arm/kernel/jump_label.c
+@@ -4,6 +4,8 @@
+ #include <asm/patch.h>
+ #include <asm/insn.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ static void __arch_jump_label_transform(struct jump_entry *entry,
+ 					enum jump_label_type type,
+ 					bool is_static)
+@@ -33,3 +35,5 @@ void arch_jump_label_transform_static(struct jump_entry *entry,
+ {
+ 	__arch_jump_label_transform(entry, type, true);
+ }
++
++#endif
+diff --git a/arch/arm64/kernel/jump_label.c b/arch/arm64/kernel/jump_label.c
+index 9a8a0ae1e75f..bd1c5e36855f 100644
+--- a/arch/arm64/kernel/jump_label.c
++++ b/arch/arm64/kernel/jump_label.c
+@@ -9,6 +9,8 @@
+ #include <linux/jump_label.h>
+ #include <asm/insn.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ void arch_jump_label_transform(struct jump_entry *entry,
+ 			       enum jump_label_type type)
+ {
+@@ -36,3 +38,5 @@ void arch_jump_label_transform_static(struct jump_entry *entry,
+ 	 * NOP needs to be replaced by a branch.
+ 	 */
+ }
++
++#endif	/* HAVE_JUMP_LABEL */
+diff --git a/arch/mips/kernel/jump_label.c b/arch/mips/kernel/jump_label.c
+index 662c8db9f45b..6f26330f4137 100644
+--- a/arch/mips/kernel/jump_label.c
++++ b/arch/mips/kernel/jump_label.c
+@@ -16,6 +16,8 @@
+ #include <asm/cacheflush.h>
+ #include <asm/inst.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ /*
+  * Define parameters for the standard MIPS and the microMIPS jump
+  * instruction encoding respectively:
+@@ -88,3 +90,5 @@ void arch_jump_label_transform(struct jump_entry *e,
+ 
+ 	mutex_unlock(&text_mutex);
+ }
++
++#endif /* HAVE_JUMP_LABEL */
+diff --git a/arch/powerpc/kernel/jump_label.c b/arch/powerpc/kernel/jump_label.c
+index ca37702bde97..4c19a35d0c9a 100644
+--- a/arch/powerpc/kernel/jump_label.c
++++ b/arch/powerpc/kernel/jump_label.c
+@@ -7,6 +7,7 @@
+ #include <linux/jump_label.h>
+ #include <asm/code-patching.h>
+ 
++#ifdef HAVE_JUMP_LABEL
+ void arch_jump_label_transform(struct jump_entry *entry,
+ 			       enum jump_label_type type)
+ {
+@@ -17,3 +18,4 @@ void arch_jump_label_transform(struct jump_entry *entry,
+ 	else
+ 		patch_instruction(addr, PPC_INST_NOP);
+ }
++#endif
+diff --git a/arch/powerpc/platforms/powernv/opal-tracepoints.c b/arch/powerpc/platforms/powernv/opal-tracepoints.c
+index f16a43540e30..1ab7d26c0a2c 100644
+--- a/arch/powerpc/platforms/powernv/opal-tracepoints.c
++++ b/arch/powerpc/platforms/powernv/opal-tracepoints.c
+@@ -4,7 +4,7 @@
+ #include <asm/trace.h>
+ #include <asm/asm-prototypes.h>
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ struct static_key opal_tracepoint_key = STATIC_KEY_INIT;
+ 
+ int opal_tracepoint_regfunc(void)
+diff --git a/arch/powerpc/platforms/pseries/hvCall.S b/arch/powerpc/platforms/pseries/hvCall.S
+index 2136e42833af..0de468c1fb7e 100644
+--- a/arch/powerpc/platforms/pseries/hvCall.S
++++ b/arch/powerpc/platforms/pseries/hvCall.S
+@@ -15,7 +15,7 @@
+ 	
+ #ifdef CONFIG_TRACEPOINTS
+ 
+-#ifndef CONFIG_JUMP_LABEL
++#ifndef HAVE_JUMP_LABEL
+ 	.section	".toc","aw"
+ 
+ 	.globl hcall_tracepoint_refcount
+@@ -75,7 +75,7 @@ hcall_tracepoint_refcount:
+ 	mr	r5,BUFREG;					\
+ 	__HCALL_INST_POSTCALL
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ #define HCALL_BRANCH(LABEL)					\
+ 	ARCH_STATIC_BRANCH(LABEL, hcall_tracepoint_key)
+ #else
+diff --git a/arch/powerpc/platforms/pseries/lpar.c b/arch/powerpc/platforms/pseries/lpar.c
+index 09bb878c21e0..b140c22c8576 100644
+--- a/arch/powerpc/platforms/pseries/lpar.c
++++ b/arch/powerpc/platforms/pseries/lpar.c
+@@ -1595,7 +1595,7 @@ EXPORT_SYMBOL(arch_free_page);
+ #endif /* CONFIG_PPC_BOOK3S_64 */
+ 
+ #ifdef CONFIG_TRACEPOINTS
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ struct static_key hcall_tracepoint_key = STATIC_KEY_INIT;
+ 
+ int hcall_tracepoint_regfunc(void)
+diff --git a/arch/s390/kernel/Makefile b/arch/s390/kernel/Makefile
+index 0f255b54b051..fc37a8c71824 100644
+--- a/arch/s390/kernel/Makefile
++++ b/arch/s390/kernel/Makefile
+@@ -49,7 +49,7 @@ CFLAGS_ptrace.o		+= -DUTS_MACHINE='"$(UTS_MACHINE)"'
+ obj-y	:= traps.o time.o process.o base.o early.o setup.o idle.o vtime.o
+ obj-y	+= processor.o sys_s390.o ptrace.o signal.o cpcmd.o ebcdic.o nmi.o
+ obj-y	+= debug.o irq.o ipl.o dis.o diag.o vdso.o early_nobss.o
+-obj-y	+= sysinfo.o lgr.o os_info.o machine_kexec.o pgm_check.o
++obj-y	+= sysinfo.o jump_label.o lgr.o os_info.o machine_kexec.o pgm_check.o
+ obj-y	+= runtime_instr.o cache.o fpu.o dumpstack.o guarded_storage.o sthyi.o
+ obj-y	+= entry.o reipl.o relocate_kernel.o kdebugfs.o alternative.o
+ obj-y	+= nospec-branch.o ipl_vmparm.o machine_kexec_reloc.o unwind_bc.o
+@@ -73,7 +73,6 @@ obj-$(CONFIG_KPROBES)		+= kprobes.o
+ obj-$(CONFIG_FUNCTION_TRACER)	+= mcount.o ftrace.o
+ obj-$(CONFIG_CRASH_DUMP)	+= crash_dump.o
+ obj-$(CONFIG_UPROBES)		+= uprobes.o
+-obj-$(CONFIG_JUMP_LABEL)	+= jump_label.o
+ 
+ obj-$(CONFIG_KEXEC_FILE)	+= machine_kexec_file.o kexec_image.o
+ obj-$(CONFIG_KEXEC_FILE)	+= kexec_elf.o
+diff --git a/arch/s390/kernel/jump_label.c b/arch/s390/kernel/jump_label.c
+index ab584e8e3527..0ded72bbfe1f 100644
+--- a/arch/s390/kernel/jump_label.c
++++ b/arch/s390/kernel/jump_label.c
+@@ -10,6 +10,8 @@
+ #include <linux/jump_label.h>
+ #include <asm/ipl.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ struct insn {
+ 	u16 opcode;
+ 	s32 offset;
+@@ -88,3 +90,5 @@ void arch_jump_label_transform_static(struct jump_entry *entry,
+ {
+ 	__jump_label_transform(entry, type, 1);
+ }
++
++#endif
+diff --git a/arch/sparc/kernel/Makefile b/arch/sparc/kernel/Makefile
+index 97c0e19263d1..cf8640841b7a 100644
+--- a/arch/sparc/kernel/Makefile
++++ b/arch/sparc/kernel/Makefile
+@@ -118,4 +118,4 @@ pc--$(CONFIG_PERF_EVENTS) := perf_event.o
+ obj-$(CONFIG_SPARC64)	+= $(pc--y)
+ 
+ obj-$(CONFIG_UPROBES)	+= uprobes.o
+-obj-$(CONFIG_JUMP_LABEL) += jump_label.o
++obj-$(CONFIG_SPARC64)	+= jump_label.o
+diff --git a/arch/sparc/kernel/jump_label.c b/arch/sparc/kernel/jump_label.c
+index a4cfaeecaf5e..7f8eac51df33 100644
+--- a/arch/sparc/kernel/jump_label.c
++++ b/arch/sparc/kernel/jump_label.c
+@@ -9,6 +9,8 @@
+ 
+ #include <asm/cacheflush.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ void arch_jump_label_transform(struct jump_entry *entry,
+ 			       enum jump_label_type type)
+ {
+@@ -45,3 +47,5 @@ void arch_jump_label_transform(struct jump_entry *entry,
+ 	flushi(insn);
+ 	mutex_unlock(&text_mutex);
+ }
++
++#endif
+diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+index 515c0ceeb4a3..a5349c705e92 100644
+--- a/arch/x86/entry/calling.h
++++ b/arch/x86/entry/calling.h
+@@ -353,7 +353,7 @@ For 32-bit we have the following conventions - kernel is built with
+  */
+ .macro CALL_enter_from_user_mode
+ #ifdef CONFIG_CONTEXT_TRACKING
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	STATIC_JUMP_IF_FALSE .Lafter_call_\@, context_tracking_enabled, def=0
+ #endif
+ 	call enter_from_user_mode
+diff --git a/arch/x86/include/asm/jump_label.h b/arch/x86/include/asm/jump_label.h
+index 06c3cc22a058..e7a7b08851ae 100644
+--- a/arch/x86/include/asm/jump_label.h
++++ b/arch/x86/include/asm/jump_label.h
+@@ -2,6 +2,19 @@
+ #ifndef _ASM_X86_JUMP_LABEL_H
+ #define _ASM_X86_JUMP_LABEL_H
+ 
++#ifndef HAVE_JUMP_LABEL
++/*
++ * For better or for worse, if jump labels (the gcc extension) are missing,
++ * then the entire static branch patching infrastructure is compiled out.
++ * If that happens, the code in here will malfunction.  Raise a compiler
++ * error instead.
++ *
++ * In theory, jump labels and the static branch patching infrastructure
++ * could be decoupled to fix this.
++ */
++#error asm/jump_label.h included on a non-jump-label kernel
++#endif
++
+ #define HAVE_JUMP_LABEL_BATCH
+ 
+ #define JUMP_LABEL_NOP_SIZE 5
+diff --git a/arch/x86/include/asm/rmwcc.h b/arch/x86/include/asm/rmwcc.h
+index 8a9eba191516..46ac84b506f5 100644
+--- a/arch/x86/include/asm/rmwcc.h
++++ b/arch/x86/include/asm/rmwcc.h
+@@ -11,7 +11,7 @@
+ 
+ #define __CLOBBERS_MEM(clb...)	"memory", ## clb
+ 
+-#if !defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(CONFIG_CC_HAS_ASM_GOTO)
++#if !defined(__GCC_ASM_FLAG_OUTPUTS__) && defined(CC_HAVE_ASM_GOTO)
+ 
+ /* Use asm goto */
+ 
+@@ -27,7 +27,7 @@ cc_label:	c = true;						\
+ 	c;								\
+ })
+ 
+-#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) || !defined(CONFIG_CC_HAS_ASM_GOTO) */
++#else /* defined(__GCC_ASM_FLAG_OUTPUTS__) || !defined(CC_HAVE_ASM_GOTO) */
+ 
+ /* Use flags output or a set instruction */
+ 
+@@ -40,7 +40,7 @@ cc_label:	c = true;						\
+ 	c;								\
+ })
+ 
+-#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) || !defined(CONFIG_CC_HAS_ASM_GOTO) */
++#endif /* defined(__GCC_ASM_FLAG_OUTPUTS__) || !defined(CC_HAVE_ASM_GOTO) */
+ 
+ #define GEN_UNARY_RMWcc_4(op, var, cc, arg0)				\
+ 	__GEN_RMWcc(op " " arg0, var, cc, __CLOBBERS_MEM())
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index fcc1cb4afddd..e5415c80db5d 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -49,8 +49,7 @@ obj-$(CONFIG_COMPAT)	+= signal_compat.o
+ obj-y			+= traps.o idt.o irq.o irq_$(BITS).o dumpstack_$(BITS).o
+ obj-y			+= time.o ioport.o dumpstack.o nmi.o
+ obj-$(CONFIG_MODIFY_LDT_SYSCALL)	+= ldt.o
+-obj-y			+= setup.o x86_init.o i8259.o irqinit.o
+-obj-$(CONFIG_JUMP_LABEL)	+= jump_label.o
++obj-y			+= setup.o x86_init.o i8259.o irqinit.o jump_label.o
+ obj-$(CONFIG_IRQ_WORK)  += irq_work.o
+ obj-y			+= probe_roms.o
+ obj-$(CONFIG_X86_64)	+= sys_x86_64.o
+diff --git a/arch/x86/kernel/jump_label.c b/arch/x86/kernel/jump_label.c
+index 044053235302..86a8871c95fd 100644
+--- a/arch/x86/kernel/jump_label.c
++++ b/arch/x86/kernel/jump_label.c
+@@ -16,6 +16,8 @@
+ #include <asm/alternative.h>
+ #include <asm/text-patching.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ union jump_code_union {
+ 	char code[JUMP_LABEL_NOP_SIZE];
+ 	struct {
+@@ -198,3 +200,5 @@ __init_or_module void arch_jump_label_transform_static(struct jump_entry *entry,
+ 	if (jlstate == JL_STATE_UPDATE)
+ 		__jump_label_transform(entry, type, 1);
+ }
++
++#endif
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 718f7d9afedc..91e4b8dc2c69 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -472,7 +472,7 @@ FOP_END;
+ 
+ /*
+  * XXX: inoutclob user must know where the argument is being expanded.
+- *      Relying on CONFIG_CC_HAS_ASM_GOTO would allow us to remove _fault.
++ *      Relying on CC_HAVE_ASM_GOTO would allow us to remove _fault.
+  */
+ #define asm_safe(insn, inoutclob...) \
+ ({ \
+diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.h
+index 6c809440f319..2497292f276f 100644
+--- a/include/linux/dynamic_debug.h
++++ b/include/linux/dynamic_debug.h
+@@ -2,7 +2,7 @@
+ #ifndef _DYNAMIC_DEBUG_H
+ #define _DYNAMIC_DEBUG_H
+ 
+-#if defined(CONFIG_JUMP_LABEL)
++#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
+ #include <linux/jump_label.h>
+ #endif
+ 
+@@ -38,7 +38,7 @@ struct _ddebug {
+ #define _DPRINTK_FLAGS_DEFAULT 0
+ #endif
+ 	unsigned int flags:8;
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	union {
+ 		struct static_key_true dd_key_true;
+ 		struct static_key_false dd_key_false;
+@@ -90,7 +90,7 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
+ 		_DPRINTK_KEY_INIT				\
+ 	}
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 
+ #ifdef DEBUG
+ 
+diff --git a/include/linux/jump_label.h b/include/linux/jump_label.h
+index 3526c0aee954..e7e7856585de 100644
+--- a/include/linux/jump_label.h
++++ b/include/linux/jump_label.h
+@@ -71,6 +71,10 @@
+  * Additional babbling in: Documentation/static-keys.txt
+  */
+ 
++#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
++# define HAVE_JUMP_LABEL
++#endif
++
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/types.h>
+@@ -82,7 +86,7 @@ extern bool static_key_initialized;
+ 				    "%s(): static key '%pS' used before call to jump_label_init()", \
+ 				    __func__, (key))
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 
+ struct static_key {
+ 	atomic_t enabled;
+@@ -110,10 +114,10 @@ struct static_key {
+ struct static_key {
+ 	atomic_t enabled;
+ };
+-#endif	/* CONFIG_JUMP_LABEL */
++#endif	/* HAVE_JUMP_LABEL */
+ #endif /* __ASSEMBLY__ */
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ #include <asm/jump_label.h>
+ 
+ #ifndef __ASSEMBLY__
+@@ -188,7 +192,7 @@ enum jump_label_type {
+ 
+ struct module;
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 
+ #define JUMP_TYPE_FALSE		0UL
+ #define JUMP_TYPE_TRUE		1UL
+@@ -244,7 +248,7 @@ extern void static_key_disable_cpuslocked(struct static_key *key);
+ 	{ .enabled = { 0 },					\
+ 	  { .entries = (void *)JUMP_TYPE_FALSE } }
+ 
+-#else  /* !CONFIG_JUMP_LABEL */
++#else  /* !HAVE_JUMP_LABEL */
+ 
+ #include <linux/atomic.h>
+ #include <linux/bug.h>
+@@ -329,7 +333,7 @@ static inline void static_key_disable(struct static_key *key)
+ #define STATIC_KEY_INIT_TRUE	{ .enabled = ATOMIC_INIT(1) }
+ #define STATIC_KEY_INIT_FALSE	{ .enabled = ATOMIC_INIT(0) }
+ 
+-#endif	/* CONFIG_JUMP_LABEL */
++#endif	/* HAVE_JUMP_LABEL */
+ 
+ #define STATIC_KEY_INIT STATIC_KEY_INIT_FALSE
+ #define jump_label_enabled static_key_enabled
+@@ -393,7 +397,7 @@ extern bool ____wrong_branch_error(void);
+ 	static_key_count((struct static_key *)x) > 0;				\
+ })
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 
+ /*
+  * Combine the right initial value (type) with the right branch order
+@@ -475,12 +479,12 @@ extern bool ____wrong_branch_error(void);
+ 	unlikely(branch);							\
+ })
+ 
+-#else /* !CONFIG_JUMP_LABEL */
++#else /* !HAVE_JUMP_LABEL */
+ 
+ #define static_branch_likely(x)		likely(static_key_enabled(&(x)->key))
+ #define static_branch_unlikely(x)	unlikely(static_key_enabled(&(x)->key))
+ 
+-#endif /* CONFIG_JUMP_LABEL */
++#endif /* HAVE_JUMP_LABEL */
+ 
+ /*
+  * Advanced usage; refcount, branch is enabled when: count != 0
+diff --git a/include/linux/jump_label_ratelimit.h b/include/linux/jump_label_ratelimit.h
+index 8c3ee291b2d8..38193b815486 100644
+--- a/include/linux/jump_label_ratelimit.h
++++ b/include/linux/jump_label_ratelimit.h
+@@ -5,7 +5,7 @@
+ #include <linux/jump_label.h>
+ #include <linux/workqueue.h>
+ 
+-#if defined(CONFIG_JUMP_LABEL)
++#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
+ struct static_key_deferred {
+ 	struct static_key key;
+ 	unsigned long timeout;
+@@ -24,6 +24,9 @@ struct static_key_false_deferred {
+ 	struct delayed_work work;
+ };
+ 
++#endif
++
++#ifdef HAVE_JUMP_LABEL
+ #define static_key_slow_dec_deferred(x)					\
+ 	__static_key_slow_dec_deferred(&(x)->key, &(x)->work, (x)->timeout)
+ #define static_branch_slow_dec_deferred(x)				\
+@@ -60,7 +63,7 @@ extern void jump_label_update_timeout(struct work_struct *work);
+ 						   0),			\
+ 	}
+ 
+-#else	/* !CONFIG_JUMP_LABEL */
++#else	/* !HAVE_JUMP_LABEL */
+ struct static_key_deferred {
+ 	struct static_key  key;
+ };
+@@ -92,7 +95,7 @@ jump_label_rate_limit(struct static_key_deferred *key,
+ {
+ 	STATIC_KEY_CHECK_USE(key);
+ }
+-#endif	/* CONFIG_JUMP_LABEL */
++#endif	/* HAVE_JUMP_LABEL */
+ 
+ #define static_branch_deferred_inc(x)	static_branch_inc(&(x)->key)
+ 
+diff --git a/include/linux/module.h b/include/linux/module.h
+index 1455812dd325..38811b4d6248 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -459,7 +459,7 @@ struct module {
+ 	unsigned int num_bpf_raw_events;
+ 	struct bpf_raw_event_map *bpf_raw_events;
+ #endif
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	struct jump_entry *jump_entries;
+ 	unsigned int num_jump_entries;
+ #endif
+diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
+index 049aeb40fa35..3e56da0a7040 100644
+--- a/include/linux/netfilter.h
++++ b/include/linux/netfilter.h
+@@ -192,7 +192,7 @@ void nf_unregister_net_hooks(struct net *net, const struct nf_hook_ops *reg,
+ int nf_register_sockopt(struct nf_sockopt_ops *reg);
+ void nf_unregister_sockopt(struct nf_sockopt_ops *reg);
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ extern struct static_key nf_hooks_needed[NFPROTO_NUMPROTO][NF_MAX_HOOKS];
+ #endif
+ 
+@@ -214,7 +214,7 @@ static inline int nf_hook(u_int8_t pf, unsigned int hook, struct net *net,
+ 	struct nf_hook_entries *hook_head = NULL;
+ 	int ret = 1;
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	if (__builtin_constant_p(pf) &&
+ 	    __builtin_constant_p(hook) &&
+ 	    !static_key_false(&nf_hooks_needed[pf][hook]))
+diff --git a/include/linux/netfilter_ingress.h b/include/linux/netfilter_ingress.h
+index a13774be2eb5..554c920691dd 100644
+--- a/include/linux/netfilter_ingress.h
++++ b/include/linux/netfilter_ingress.h
+@@ -8,7 +8,7 @@
+ #ifdef CONFIG_NETFILTER_INGRESS
+ static inline bool nf_hook_ingress_active(const struct sk_buff *skb)
+ {
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	if (!static_key_false(&nf_hooks_needed[NFPROTO_NETDEV][NF_NETDEV_INGRESS]))
+ 		return false;
+ #endif
+diff --git a/init/Kconfig b/init/Kconfig
+index 369634aee8f0..9364ae7252a9 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -27,9 +27,6 @@ config CLANG_VERSION
+ config CC_CAN_LINK
+ 	def_bool $(success,$(srctree)/scripts/cc-can-link.sh $(CC))
+ 
+-config CC_HAS_ASM_GOTO
+-	def_bool $(success,$(srctree)/scripts/gcc-goto.sh $(CC))
+-
+ config CC_HAS_WARN_MAYBE_UNINITIALIZED
+ 	def_bool $(cc-option,-Wmaybe-uninitialized)
+ 	help
+diff --git a/kernel/jump_label.c b/kernel/jump_label.c
+index df3008419a1d..93ebbd089f11 100644
+--- a/kernel/jump_label.c
++++ b/kernel/jump_label.c
+@@ -19,6 +19,8 @@
+ #include <linux/cpu.h>
+ #include <asm/sections.h>
+ 
++#ifdef HAVE_JUMP_LABEL
++
+ /* mutex to protect coming/going of the the jump_label table */
+ static DEFINE_MUTEX(jump_label_mutex);
+ 
+@@ -93,13 +95,13 @@ jump_label_sort_entries(struct jump_entry *start, struct jump_entry *stop)
+ static void jump_label_update(struct static_key *key);
+ 
+ /*
+- * There are similar definitions for the !CONFIG_JUMP_LABEL case in jump_label.h.
++ * There are similar definitions for the !HAVE_JUMP_LABEL case in jump_label.h.
+  * The use of 'atomic_read()' requires atomic.h and its problematic for some
+  * kernel headers such as kernel.h and others. Since static_key_count() is not
+- * used in the branch statements as it is for the !CONFIG_JUMP_LABEL case its ok
++ * used in the branch statements as it is for the !HAVE_JUMP_LABEL case its ok
+  * to have it be a function here. Similarly, for 'static_key_enable()' and
+  * 'static_key_disable()', which require bug.h. This should allow jump_label.h
+- * to be included from most/all places for CONFIG_JUMP_LABEL.
++ * to be included from most/all places for HAVE_JUMP_LABEL.
+  */
+ int static_key_count(struct static_key *key)
+ {
+@@ -843,3 +845,5 @@ static __init int jump_label_test(void)
+ }
+ early_initcall(jump_label_test);
+ #endif /* STATIC_KEYS_SELFTEST */
++
++#endif /* HAVE_JUMP_LABEL */
+diff --git a/kernel/module.c b/kernel/module.c
+index 5933395af9a0..97fc98beb54c 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -3116,7 +3116,7 @@ static int find_module_sections(struct module *mod, struct load_info *info)
+ 					   sizeof(*mod->bpf_raw_events),
+ 					   &mod->num_bpf_raw_events);
+ #endif
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	mod->jump_entries = section_objs(info, "__jump_table",
+ 					sizeof(*mod->jump_entries),
+ 					&mod->num_jump_entries);
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 5ede9b28830a..2eb051e10ffb 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -36,7 +36,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(sched_overutilized_tp);
+ 
+ DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
+ 
+-#if defined(CONFIG_SCHED_DEBUG) && defined(CONFIG_JUMP_LABEL)
++#if defined(CONFIG_SCHED_DEBUG) && defined(HAVE_JUMP_LABEL)
+ /*
+  * Debugging: various feature bits
+  *
+diff --git a/kernel/sched/debug.c b/kernel/sched/debug.c
+index f7e4579e746c..6f846b41e22c 100644
+--- a/kernel/sched/debug.c
++++ b/kernel/sched/debug.c
+@@ -70,7 +70,7 @@ static int sched_feat_show(struct seq_file *m, void *v)
+ 	return 0;
+ }
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 
+ #define jump_label_key__true  STATIC_KEY_INIT_TRUE
+ #define jump_label_key__false STATIC_KEY_INIT_FALSE
+@@ -96,7 +96,7 @@ static void sched_feat_enable(int i)
+ #else
+ static void sched_feat_disable(int i) { };
+ static void sched_feat_enable(int i) { };
+-#endif /* CONFIG_JUMP_LABEL */
++#endif /* HAVE_JUMP_LABEL */
+ 
+ static int sched_feat_set(char *cmp)
+ {
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 28847d40f94d..519fcaabb221 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -4314,7 +4314,7 @@ entity_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr, int queued)
+ 
+ #ifdef CONFIG_CFS_BANDWIDTH
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ static struct static_key __cfs_bandwidth_used;
+ 
+ static inline bool cfs_bandwidth_used(void)
+@@ -4331,7 +4331,7 @@ void cfs_bandwidth_usage_dec(void)
+ {
+ 	static_key_slow_dec_cpuslocked(&__cfs_bandwidth_used);
+ }
+-#else /* CONFIG_JUMP_LABEL */
++#else /* HAVE_JUMP_LABEL */
+ static bool cfs_bandwidth_used(void)
+ {
+ 	return true;
+@@ -4339,7 +4339,7 @@ static bool cfs_bandwidth_used(void)
+ 
+ void cfs_bandwidth_usage_inc(void) {}
+ void cfs_bandwidth_usage_dec(void) {}
+-#endif /* CONFIG_JUMP_LABEL */
++#endif /* HAVE_JUMP_LABEL */
+ 
+ /*
+  * default period for cfs group bandwidth.
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index 74183095885e..f4785f5badb9 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -1564,7 +1564,7 @@ enum {
+ 
+ #undef SCHED_FEAT
+ 
+-#if defined(CONFIG_SCHED_DEBUG) && defined(CONFIG_JUMP_LABEL)
++#if defined(CONFIG_SCHED_DEBUG) && defined(HAVE_JUMP_LABEL)
+ 
+ /*
+  * To support run-time toggling of sched features, all the translation units
+@@ -1584,7 +1584,7 @@ static __always_inline bool static_branch_##name(struct static_key *key) \
+ extern struct static_key sched_feat_keys[__SCHED_FEAT_NR];
+ #define sched_feat(x) (static_branch_##x(&sched_feat_keys[__SCHED_FEAT_##x]))
+ 
+-#else /* !(SCHED_DEBUG && CONFIG_JUMP_LABEL) */
++#else /* !(SCHED_DEBUG && HAVE_JUMP_LABEL) */
+ 
+ /*
+  * Each translation unit has its own copy of sysctl_sched_features to allow
+@@ -1600,7 +1600,7 @@ static const_debug __maybe_unused unsigned int sysctl_sched_features =
+ 
+ #define sched_feat(x) !!(sysctl_sched_features & (1UL << __SCHED_FEAT_##x))
+ 
+-#endif /* SCHED_DEBUG && CONFIG_JUMP_LABEL */
++#endif /* SCHED_DEBUG && HAVE_JUMP_LABEL */
+ 
+ extern struct static_key_false sched_numa_balancing;
+ extern struct static_key_false sched_schedstats;
+diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
+index c60409138e13..9d2eaaee0438 100644
+--- a/lib/dynamic_debug.c
++++ b/lib/dynamic_debug.c
+@@ -190,7 +190,7 @@ static int ddebug_change(const struct ddebug_query *query,
+ 			newflags = (dp->flags & mask) | flags;
+ 			if (newflags == dp->flags)
+ 				continue;
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 			if (dp->flags & _DPRINTK_FLAGS_PRINT) {
+ 				if (!(flags & _DPRINTK_FLAGS_PRINT))
+ 					static_branch_disable(&dp->key.dd_key_true);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0891f499c1bb..9d2c4548638f 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1831,7 +1831,7 @@ EXPORT_SYMBOL_GPL(net_dec_egress_queue);
+ #endif
+ 
+ static DEFINE_STATIC_KEY_FALSE(netstamp_needed_key);
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ static atomic_t netstamp_needed_deferred;
+ static atomic_t netstamp_wanted;
+ static void netstamp_clear(struct work_struct *work)
+@@ -1850,7 +1850,7 @@ static DECLARE_WORK(netstamp_work, netstamp_clear);
+ 
+ void net_enable_timestamp(void)
+ {
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	int wanted;
+ 
+ 	while (1) {
+@@ -1870,7 +1870,7 @@ EXPORT_SYMBOL(net_enable_timestamp);
+ 
+ void net_disable_timestamp(void)
+ {
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	int wanted;
+ 
+ 	while (1) {
+diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+index 5d5bdf450091..90d158d529c7 100644
+--- a/net/netfilter/core.c
++++ b/net/netfilter/core.c
+@@ -34,7 +34,7 @@ EXPORT_SYMBOL_GPL(nf_ipv6_ops);
+ DEFINE_PER_CPU(bool, nf_skb_duplicated);
+ EXPORT_SYMBOL_GPL(nf_skb_duplicated);
+ 
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ struct static_key nf_hooks_needed[NFPROTO_NUMPROTO][NF_MAX_HOOKS];
+ EXPORT_SYMBOL(nf_hooks_needed);
+ #endif
+@@ -348,7 +348,7 @@ static int __nf_register_net_hook(struct net *net, int pf,
+ 	if (pf == NFPROTO_NETDEV && reg->hooknum == NF_NETDEV_INGRESS)
+ 		net_inc_ingress_queue();
+ #endif
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 	static_key_slow_inc(&nf_hooks_needed[pf][reg->hooknum]);
+ #endif
+ 	BUG_ON(p == new_hooks);
+@@ -406,7 +406,7 @@ static void __nf_unregister_net_hook(struct net *net, int pf,
+ 		if (pf == NFPROTO_NETDEV && reg->hooknum == NF_NETDEV_INGRESS)
+ 			net_dec_ingress_queue();
+ #endif
+-#ifdef CONFIG_JUMP_LABEL
++#ifdef HAVE_JUMP_LABEL
+ 		static_key_slow_dec(&nf_hooks_needed[pf][reg->hooknum]);
+ #endif
+ 	} else {
+diff --git a/scripts/gcc-goto.sh b/scripts/gcc-goto.sh
+index 8b980fb2270a..083c526073ef 100755
+--- a/scripts/gcc-goto.sh
++++ b/scripts/gcc-goto.sh
+@@ -3,7 +3,7 @@
+ # Test for gcc 'asm goto' support
+ # Copyright (C) 2010, Jason Baron <jbaron@redhat.com>
+ 
+-cat << "END" | $@ -x c - -fno-PIE -c -o /dev/null
++cat << "END" | $@ -x c - -c -o /dev/null >/dev/null 2>&1 && echo "y"
+ int main(void)
+ {
+ #if defined(__arm__) || defined(__aarch64__)
+diff --git a/tools/arch/x86/include/asm/rmwcc.h b/tools/arch/x86/include/asm/rmwcc.h
+index fee7983a90b4..dc90c0c2fae3 100644
+--- a/tools/arch/x86/include/asm/rmwcc.h
++++ b/tools/arch/x86/include/asm/rmwcc.h
+@@ -2,7 +2,7 @@
+ #ifndef _TOOLS_LINUX_ASM_X86_RMWcc
+ #define _TOOLS_LINUX_ASM_X86_RMWcc
+ 
+-#ifdef CONFIG_CC_HAS_ASM_GOTO
++#ifdef CC_HAVE_ASM_GOTO
+ 
+ #define __GEN_RMWcc(fullop, var, cc, ...)				\
+ do {									\
+@@ -20,7 +20,7 @@ cc_label:								\
+ #define GEN_BINARY_RMWcc(op, var, vcon, val, arg0, cc)			\
+ 	__GEN_RMWcc(op " %1, " arg0, var, cc, vcon (val))
+ 
+-#else /* !CONFIG_CC_HAS_ASM_GOTO */
++#else /* !CC_HAVE_ASM_GOTO */
+ 
+ #define __GEN_RMWcc(fullop, var, cc, ...)				\
+ do {									\
+@@ -37,6 +37,6 @@ do {									\
+ #define GEN_BINARY_RMWcc(op, var, vcon, val, arg0, cc)			\
+ 	__GEN_RMWcc(op " %2, " arg0, var, cc, vcon (val))
+ 
+-#endif /* CONFIG_CC_HAS_ASM_GOTO */
++#endif /* CC_HAVE_ASM_GOTO */
+ 
+ #endif /* _TOOLS_LINUX_ASM_X86_RMWcc */
+-- 
+2.23.0.187.g17f5b7556c-goog
+

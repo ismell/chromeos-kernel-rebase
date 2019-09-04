@@ -1,0 +1,41 @@
+From 7b1b26ce9854fac76ba90a4eb2ecf17ee24c03ed Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 25 Sep 2018 15:35:54 -0700
+Subject: [PATCH] CHROMIUM: Revert "x86: Allow generating user-space headers
+ without a compiler"
+
+This reverts commit 829fe4aa9ac16417a904ad1de1307de906854bcf.
+
+This change enforces the use of 'asm goto', which currently is not
+supported by clang.
+
+BUG=chromium:891028
+TEST=build for caroline
+
+Change-Id: I125163b5b692e64c52a17db03d1e935420fef40a
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/x86/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index e95946b2d215..b2e8b18a38b8 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -171,6 +171,10 @@ ifdef CONFIG_FUNCTION_GRAPH_TRACER
+   endif
+ endif
+ 
++ifndef CC_HAVE_ASM_GOTO
++  $(error Compiler lacks asm-goto support.)
++endif
++
+ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ 	# This compiler flag is not supported by Clang:
+ 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
+-- 
+2.23.0.187.g17f5b7556c-goog
+

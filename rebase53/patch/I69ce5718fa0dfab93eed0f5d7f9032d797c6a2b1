@@ -1,0 +1,101 @@
+From 9eb717da04883360eecc80a8b4011955bb4b8d68 Mon Sep 17 00:00:00 2001
+From: "michael.kao" <michael.kao@mediatek.com>
+Date: Fri, 10 May 2019 21:27:00 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: arm64: dts: mt8183: add/update dynamic
+ power coefficients
+
+Add dynamic power coefficients for all cores and update those of
+CPU0 and CPU4.
+
+Signed-off-by: Michael.Kao <michael.kao@mediatek.com>
+
+(am from https://patchwork.kernel.org/patch/10938815/)
+[eddie.huang: fix context conflicts]
+
+BUG=b:131870692
+TEST=build and boot to shell
+
+Change-Id: I69ce5718fa0dfab93eed0f5d7f9032d797c6a2b1
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1516475
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Tested-by: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm64/boot/dts/mediatek/mt8183.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+index 04aeb9681e33..849770193c2d 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+@@ -290,6 +290,7 @@
+ 			reg = <0x000>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <741>;
++			dynamic-power-coefficient = <84>;
+ 			clocks = <&mcucfg CLK_MCU_MP0_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -302,6 +303,7 @@
+ 			reg = <0x001>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <741>;
++			dynamic-power-coefficient = <84>;
+ 			clocks = <&mcucfg CLK_MCU_MP0_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -314,6 +316,7 @@
+ 			reg = <0x002>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <741>;
++			dynamic-power-coefficient = <84>;
+ 			clocks = <&mcucfg CLK_MCU_MP0_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -326,6 +329,7 @@
+ 			reg = <0x003>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <741>;
++			dynamic-power-coefficient = <84>;
+ 			clocks = <&mcucfg CLK_MCU_MP0_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -338,6 +342,7 @@
+ 			reg = <0x100>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <211>;
+ 			clocks = <&mcucfg CLK_MCU_MP2_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -350,6 +355,7 @@
+ 			reg = <0x101>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <211>;
+ 			clocks = <&mcucfg CLK_MCU_MP2_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -362,6 +368,7 @@
+ 			reg = <0x102>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <211>;
+ 			clocks = <&mcucfg CLK_MCU_MP2_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+@@ -374,6 +381,7 @@
+ 			reg = <0x103>;
+ 			enable-method = "psci";
+ 			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <211>;
+ 			clocks = <&mcucfg CLK_MCU_MP2_SEL>,
+ 				 <&topckgen CLK_TOP_ARMPLL_DIV_PLL1>;
+ 			clock-names = "cpu", "intermediate";
+-- 
+2.23.0.187.g17f5b7556c-goog
+

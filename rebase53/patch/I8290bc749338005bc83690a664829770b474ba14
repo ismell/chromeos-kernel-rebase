@@ -1,0 +1,74 @@
+From c812b866be3af5ff8f8b560dcd6effe071dc0307 Mon Sep 17 00:00:00 2001
+From: Chirantan Ekbote <chirantan@chromium.org>
+Date: Wed, 27 Sep 2017 01:00:33 -0700
+Subject: [PATCH] CHROMIUM: vsock: Disable loopback connections
+
+Disable loopback connections, which would otherwise allow applications
+in a VM to connect to other applications on the same VM via vsock.
+
+Chrome OS only uses vsock for host <-> guest communication and it's
+simpler to just disable all loopback connections over vsock instead of
+implementing authentication for every application that uses it.
+
+BUG=none
+TEST=manual.  Run nc-vsock in a guest vm and see that it can no longer
+     connect over loopback
+
+Change-Id: I8290bc749338005bc83690a664829770b474ba14
+Signed-off-by: Chirantan Ekbote <chirantan@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/686296
+Reviewed-by: Stephen Barber <smbarber@chromium.org>
+(cherry picked from commit 869342e840abe64641f19f18023fa628b926b321)
+Reviewed-on: https://chromium-review.googlesource.com/784056
+
+[rebase419(groeck): Context conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase53(rrangel): Make sure the lock is unlocked]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ net/vmw_vsock/virtio_transport.c | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 0815d1357861..1abdaaa08b26 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -113,20 +113,6 @@ static void virtio_transport_loopback_work(struct work_struct *work)
+ 	mutex_unlock(&vsock->rx_lock);
+ }
+ 
+-static int virtio_transport_send_pkt_loopback(struct virtio_vsock *vsock,
+-					      struct virtio_vsock_pkt *pkt)
+-{
+-	int len = pkt->len;
+-
+-	spin_lock_bh(&vsock->loopback_list_lock);
+-	list_add_tail(&pkt->list, &vsock->loopback_list);
+-	spin_unlock_bh(&vsock->loopback_list_lock);
+-
+-	queue_work(virtio_vsock_workqueue, &vsock->loopback_work);
+-
+-	return len;
+-}
+-
+ static void
+ virtio_transport_send_pkt_work(struct work_struct *work)
+ {
+@@ -221,7 +207,12 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
+ 	}
+ 
+ 	if (le64_to_cpu(pkt->hdr.dst_cid) == vsock->guest_cid) {
+-		len = virtio_transport_send_pkt_loopback(vsock, pkt);
++		// Loopback is disabled on chrome os because we don't use it and
++		// it's easier to just block all loopback connections in the
++		// kernel instead of trying to have each individual application
++		// implement proper authentication.
++		virtio_transport_free_pkt(pkt);
++		len = -EPERM;
+ 		goto out_rcu;
+ 	}
+ 
+-- 
+2.23.0.187.g17f5b7556c-goog
+

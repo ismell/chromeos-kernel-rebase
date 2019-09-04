@@ -1,0 +1,51 @@
+From a79cf40f638aa8c0103bcc2bf1e703d61bb3f62f Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 25 Sep 2018 15:22:03 -0700
+Subject: [PATCH] CHROMIUM: Revert "Makefile: disable PIE before testing asm
+ goto"
+
+This reverts commit 8438ee76b004ef66d125ade64c91fc128047d244.
+
+'asm goto' is currently not supported by clang.
+
+BUG=chromium:891028
+TEST=build for caroline
+
+Change-Id: Iab421ebdb58ab5063e1f2b3f9553c0a347bd76b6
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+
+[rebase53(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ Makefile | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 91efc334bd30..a749cfdae96f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -542,9 +542,6 @@ KBUILD_AFLAGS	+= $(CLANG_FLAGS)
+ export CLANG_FLAGS
+ endif
+ 
+-KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
+-KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
+-
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+@@ -633,6 +630,8 @@ endif # KBUILD_EXTMOD
+ # Defaults to vmlinux, but the arch makefile usually adds further targets
+ all: vmlinux
+ 
++KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
++KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
+ CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
+ 	$(call cc-option,-fno-tree-loop-im) \
+ 	$(call cc-disable-warning,maybe-uninitialized,)
+-- 
+2.23.0.187.g17f5b7556c-goog
+

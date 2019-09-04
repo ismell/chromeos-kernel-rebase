@@ -1,0 +1,122 @@
+From ad6433aee81307e9120511762c6f6b8ae23fbd83 Mon Sep 17 00:00:00 2001
+From: David Riley <davidriley@chromium.org>
+Date: Thu, 11 Oct 2018 15:40:27 -0700
+Subject: [PATCH] CHROMIUM: drm/virtio: Add virtio specific dma_buf_ops.
+
+BUG=chromium:892342
+TEST=xeyes repeatedly does not fail
+
+Change-Id: Ic4ed0b2bd3a6cc3afe1bb563e7474f407f1de0ec
+Signed-off-by: David Riley <davidriley@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1351814
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+Reviewed-by: Zach Reizner <zachr@chromium.org>
+
+[rebase53(rrangel):
+	drm_gem_dmabuf_kmap and drm_gem_dmabuf_kunmap have been made private and the default.
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/virtio/virtgpu_drv.c   |  4 +--
+ drivers/gpu/drm/virtio/virtgpu_drv.h   |  7 ++++
+ drivers/gpu/drm/virtio/virtgpu_prime.c | 45 ++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.c b/drivers/gpu/drm/virtio/virtgpu_drv.c
+index c50868753132..4e50a2e63bb3 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.c
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.c
+@@ -207,8 +207,8 @@ static struct drm_driver driver = {
+ #endif
+ 	.prime_handle_to_fd = drm_gem_prime_handle_to_fd,
+ 	.prime_fd_to_handle = drm_gem_prime_fd_to_handle,
+-	.gem_prime_export = drm_gem_prime_export,
+-	.gem_prime_import = drm_gem_prime_import,
++	.gem_prime_export = virtgpu_gem_prime_export,
++	.gem_prime_import = virtgpu_gem_prime_import,
+ 	.gem_prime_get_sg_table = virtgpu_gem_prime_get_sg_table,
+ 	.gem_prime_import_sg_table = virtgpu_gem_prime_import_sg_table,
+ 	.gem_prime_vmap = virtgpu_gem_prime_vmap,
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.h b/drivers/gpu/drm/virtio/virtgpu_drv.h
+index 9982c52c3abd..73eed254fff2 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.h
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.h
+@@ -374,6 +374,13 @@ void virtio_gpu_object_free_sg_table(struct virtio_gpu_object *bo);
+ int virtio_gpu_object_wait(struct virtio_gpu_object *bo, bool no_wait);
+ 
+ /* virtgpu_prime.c */
++struct dma_buf_ops;
++extern const struct dma_buf_ops virtgpu_dmabuf_ops;
++struct dma_buf *virtgpu_gem_prime_export(struct drm_device *dev,
++					 struct drm_gem_object *obj,
++					 int flags);
++struct drm_gem_object *virtgpu_gem_prime_import(struct drm_device *dev,
++						struct dma_buf *buf);
+ struct sg_table *virtgpu_gem_prime_get_sg_table(struct drm_gem_object *obj);
+ struct drm_gem_object *virtgpu_gem_prime_import_sg_table(
+ 	struct drm_device *dev, struct dma_buf_attachment *attach,
+diff --git a/drivers/gpu/drm/virtio/virtgpu_prime.c b/drivers/gpu/drm/virtio/virtgpu_prime.c
+index 8fbf71bd0c5e..1cd3f3616d82 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_prime.c
++++ b/drivers/gpu/drm/virtio/virtgpu_prime.c
+@@ -22,12 +22,57 @@
+  * Authors: Andreas Pokorny
+  */
+ 
++#include <linux/dma-buf.h>
+ #include "virtgpu_drv.h"
+ 
+ /* Empty Implementations as there should not be any other driver for a virtual
+  * device that might share buffers with virtgpu
+  */
+ 
++const struct dma_buf_ops virtgpu_dmabuf_ops =  {
++	.attach = drm_gem_map_attach,
++	.detach = drm_gem_map_detach,
++	.map_dma_buf = drm_gem_map_dma_buf,
++	.unmap_dma_buf = drm_gem_unmap_dma_buf,
++	.release = drm_gem_dmabuf_release,
++	.mmap = drm_gem_dmabuf_mmap,
++	.vmap = drm_gem_dmabuf_vmap,
++	.vunmap = drm_gem_dmabuf_vunmap,
++};
++
++struct dma_buf *virtgpu_gem_prime_export(struct drm_device *dev,
++					 struct drm_gem_object *obj,
++					 int flags)
++{
++	struct dma_buf *buf;
++
++	buf = drm_gem_prime_export(dev, obj, flags);
++	if (!IS_ERR(buf))
++		buf->ops = &virtgpu_dmabuf_ops;
++
++	return buf;
++}
++
++struct drm_gem_object *virtgpu_gem_prime_import(struct drm_device *dev,
++						struct dma_buf *buf)
++{
++	struct drm_gem_object *obj;
++
++	if (buf->ops == &virtgpu_dmabuf_ops) {
++		obj = buf->priv;
++		if (obj->dev == dev) {
++			/*
++			 * Importing dmabuf exported from our own gem increases
++			 * refcount on gem itself instead of f_count of dmabuf.
++			 */
++			drm_gem_object_get(obj);
++			return obj;
++		}
++	}
++
++	return drm_gem_prime_import(dev, buf);
++}
++
+ struct sg_table *virtgpu_gem_prime_get_sg_table(struct drm_gem_object *obj)
+ {
+ 	struct virtio_gpu_object *bo = gem_to_virtio_gpu_obj(obj);
+-- 
+2.23.0.187.g17f5b7556c-goog
+
