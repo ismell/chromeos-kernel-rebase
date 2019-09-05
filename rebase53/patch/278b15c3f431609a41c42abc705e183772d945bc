@@ -25,11 +25,10 @@ Conflicts:
 	]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Most of cros_ec_commands.h was already
-applied.]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Converted DEVICE_STATE_INT_ATTR to use snprintf]
+[rebase53(rrangel): 
+	* Most of cros_ec_commands.h was already applied.
+	* Converted DEVICE_STATE_INT_ATTR to use snprintf
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../cros_ec_sensors/cros_ec_sensors_core.c    | 137 ++++++++++++++++--

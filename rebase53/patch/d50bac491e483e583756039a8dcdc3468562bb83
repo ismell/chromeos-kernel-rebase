@@ -37,9 +37,6 @@ Reviewed-by: Enrico Granata <egranata@chromium.org>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec.c                   | 35 +++++++++++------
  drivers/platform/chrome/cros_ec_proto.c | 51 ++++++++++++++-----------

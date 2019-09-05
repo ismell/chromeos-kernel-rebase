@@ -50,9 +50,6 @@ Reviewed-on: https://chromium-review.googlesource.com/1512277
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/chrome/wilco_ec/Kconfig      |   9 +
  drivers/platform/chrome/wilco_ec/Makefile     |   2 +

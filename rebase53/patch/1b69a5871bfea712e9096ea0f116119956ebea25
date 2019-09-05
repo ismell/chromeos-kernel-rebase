@@ -41,9 +41,6 @@ Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
 Reviewed-by: Simon Glass <sjg@chromium.org>
 
 [rebase53(rrangel): Context conflict]
-Signed-off-by: Raul Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../ABI/testing/sysfs-platform-wilco-ec       |  77 +++++

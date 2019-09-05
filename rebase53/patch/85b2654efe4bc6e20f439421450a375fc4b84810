@@ -31,9 +31,6 @@ Reviewed-by: Benson Leung <bleung@google.com>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  ...sfs-class-chromeos-driver-cros-ec-pd-sysfs |  10 +
  drivers/mfd/Kconfig                           |  11 --

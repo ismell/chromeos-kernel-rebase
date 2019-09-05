@@ -53,9 +53,6 @@ Conflicts:
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
 [rebase53(rrangel): Context conflict]
-Signed-off-by: Raul Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Documentation/ABI/testing/configfs-sdcardfs |  53 ++

@@ -36,9 +36,6 @@ Conflicts:
 [rebase412(groeck): Resolved conflicts]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Resolved conflicts]
-Signed-off-by: Raul Rangel <rrangel@chromium.org>
-
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

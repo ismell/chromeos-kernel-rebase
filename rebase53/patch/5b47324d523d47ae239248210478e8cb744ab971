@@ -57,9 +57,6 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../media/common/videobuf2/videobuf2-core.c   | 60 ++++++++-----------
  1 file changed, 24 insertions(+), 36 deletions(-)

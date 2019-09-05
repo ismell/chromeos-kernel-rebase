@@ -22,9 +22,6 @@ Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/arm64/boot/dts/mediatek/mt8183-evb.dts |  36 +++
  arch/arm64/boot/dts/mediatek/mt8183.dtsi    | 245 ++++++++++++++++++++

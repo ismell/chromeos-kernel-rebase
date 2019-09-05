@@ -35,9 +35,6 @@ Tested-by: Guenter Roeck <groeck@chromium.org>
 Commit-Queue: Guenter Roeck <groeck@chromium.org>
 
 [rebase53(rrangel): Context conflict]
-Signed-off-by: Raul Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/chrome/Makefile              |   2 +-

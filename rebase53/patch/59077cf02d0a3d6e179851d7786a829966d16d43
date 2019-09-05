@@ -15,9 +15,6 @@ TEST=Build with clang
 Change-Id: I687a45c699d1c8408a9d1f66f7cecf2e267ef633
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Fixed conflicts with UPSTREAM changes]
-Signed-off-by: Raul Rangel <rrangel@chromium.org>
-
 [rebase53(rrangel):
   * Context conflicts
   * No longer uses asm-goto: 75d9fc7fd94eb43cdf0bec04499a27ced780af19

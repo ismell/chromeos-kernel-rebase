@@ -16,9 +16,6 @@ Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Makefile | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)

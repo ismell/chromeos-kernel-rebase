@@ -20,9 +20,6 @@ Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
-
-[rebase53(rrangel): Context conflict]
-Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/x86/include/asm/cpufeature.h | 15 ---------------
  samples/bpf/Makefile              |  2 +-
