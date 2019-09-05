@@ -1,0 +1,346 @@
+From c975fa383464878e5d0807b6c08d17843f8a0db0 Mon Sep 17 00:00:00 2001
+From: Mahesh Kumar <mahesh1.kumar@intel.com>
+Date: Tue, 21 Aug 2018 14:08:56 +0530
+Subject: [PATCH] UPSTREAM: drm/crc: Cleanup crtc_crc_open function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch make changes to allocate crc-entries buffer before
+enabling CRC generation.
+It moves all the failure check early in the function before setting
+the source or memory allocation.
+Now set_crc_source takes only two variable inputs, values_cnt we
+already gets as part of verify_crc_source.
+
+Changes since V1:
+ - refactor code to use single spin lock
+Changes since V2:
+ - rebase
+Changes since V3:
+ - rebase on top of VKMS driver
+
+Signed-off-by: Mahesh Kumar <mahesh1.kumar@intel.com>
+Cc: dri-devel@lists.freedesktop.org
+Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Haneen Mohammed <hamohammed.sa@gmail.com>
+Reviewed-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+Acked-by: Leo Li <sunpeng.li@amd.com> (V2)
+Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com> (V3)
+Signed-off-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+Link: https://patchwork.freedesktop.org/patch/msgid/20180821083858.26275-3-mahesh1.kumar@intel.com
+
+(cherry picked from commit c0811a7d5befe34a17772760100e26b09a561c0e)
+
+BUG=None
+TEST=Tested on cheza, build tested everything else
+
+Signed-off-by: Sean Paul <seanpaul@chromium.org>
+Change-Id: Ib90ea9a233e4b1025541ce9101d788ac52a6efc5
+Reviewed-on: https://chromium-review.googlesource.com/1314735
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+---
+ .../gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h |  3 +-
+ .../drm/amd/display/amdgpu_dm/amdgpu_dm_crc.c |  4 +-
+ drivers/gpu/drm/drm_debugfs_crc.c             | 61 +++++++++----------
+ drivers/gpu/drm/i915/intel_drv.h              |  3 +-
+ drivers/gpu/drm/i915/intel_pipe_crc.c         |  4 +-
+ drivers/gpu/drm/rcar-du/rcar_du_crtc.c        |  4 +-
+ drivers/gpu/drm/rockchip/rockchip_drm_vop.c   |  6 +-
+ drivers/gpu/drm/vkms/vkms_crc.c               |  5 +-
+ drivers/gpu/drm/vkms/vkms_drv.h               |  3 +-
+ include/drm/drm_crtc.h                        |  3 +-
+ 10 files changed, 39 insertions(+), 57 deletions(-)
+
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
+index e43ed064dc46..54056d180003 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
+@@ -258,8 +258,7 @@ amdgpu_dm_remove_sink_from_freesync_module(struct drm_connector *connector);
+ 
+ /* amdgpu_dm_crc.c */
+ #ifdef CONFIG_DEBUG_FS
+-int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+-				  size_t *values_cnt);
++int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name);
+ int amdgpu_dm_crtc_verify_crc_source(struct drm_crtc *crtc,
+ 				     const char *src_name,
+ 				     size_t *values_cnt);
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_crc.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_crc.c
+index 16b679faadbd..01fc5717b657 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_crc.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_crc.c
+@@ -62,8 +62,7 @@ amdgpu_dm_crtc_verify_crc_source(struct drm_crtc *crtc, const char *src_name,
+ 	return 0;
+ }
+ 
+-int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+-			   size_t *values_cnt)
++int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name)
+ {
+ 	struct dm_crtc_state *crtc_state = to_dm_crtc_state(crtc->state);
+ 	struct dc_stream_state *stream_state = crtc_state->stream;
+@@ -99,7 +98,6 @@ int amdgpu_dm_crtc_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+ 			return -EINVAL;
+ 	}
+ 
+-	*values_cnt = 3;
+ 	/* Reset crc_skipped on dm state */
+ 	crtc_state->crc_skip_count = 0;
+ 	return 0;
+diff --git a/drivers/gpu/drm/drm_debugfs_crc.c b/drivers/gpu/drm/drm_debugfs_crc.c
+index d7e626331eca..3e0a2cfaa35c 100644
+--- a/drivers/gpu/drm/drm_debugfs_crc.c
++++ b/drivers/gpu/drm/drm_debugfs_crc.c
+@@ -127,11 +127,9 @@ static ssize_t crc_control_write(struct file *file, const char __user *ubuf,
+ 	if (source[len] == '\n')
+ 		source[len] = '\0';
+ 
+-	if (crtc->funcs->verify_crc_source) {
+-		ret = crtc->funcs->verify_crc_source(crtc, source, &values_cnt);
+-		if (ret)
+-			return ret;
+-	}
++	ret = crtc->funcs->verify_crc_source(crtc, source, &values_cnt);
++	if (ret)
++		return ret;
+ 
+ 	spin_lock_irq(&crc->lock);
+ 
+@@ -197,40 +195,40 @@ static int crtc_crc_open(struct inode *inode, struct file *filep)
+ 			return ret;
+ 	}
+ 
++	ret = crtc->funcs->verify_crc_source(crtc, crc->source, &values_cnt);
++	if (ret)
++		return ret;
++
++	if (WARN_ON(values_cnt > DRM_MAX_CRC_NR))
++		return -EINVAL;
++
++	if (WARN_ON(values_cnt == 0))
++		return -EINVAL;
++
++	entries = kcalloc(DRM_CRC_ENTRIES_NR, sizeof(*entries), GFP_KERNEL);
++	if (!entries)
++		return -ENOMEM;
++
+ 	spin_lock_irq(&crc->lock);
+-	if (!crc->opened)
++	if (!crc->opened) {
+ 		crc->opened = true;
+-	else
++		crc->entries = entries;
++		crc->values_cnt = values_cnt;
++	} else {
+ 		ret = -EBUSY;
++	}
+ 	spin_unlock_irq(&crc->lock);
+ 
+-	if (ret)
++	if (ret) {
++		kfree(entries);
+ 		return ret;
++	}
+ 
+-	ret = crtc->funcs->set_crc_source(crtc, crc->source, &values_cnt);
++	ret = crtc->funcs->set_crc_source(crtc, crc->source);
+ 	if (ret)
+ 		goto err;
+ 
+-	if (WARN_ON(values_cnt > DRM_MAX_CRC_NR)) {
+-		ret = -EINVAL;
+-		goto err_disable;
+-	}
+-
+-	if (WARN_ON(values_cnt == 0)) {
+-		ret = -EINVAL;
+-		goto err_disable;
+-	}
+-
+-	entries = kcalloc(DRM_CRC_ENTRIES_NR, sizeof(*entries), GFP_KERNEL);
+-	if (!entries) {
+-		ret = -ENOMEM;
+-		goto err_disable;
+-	}
+-
+ 	spin_lock_irq(&crc->lock);
+-	crc->entries = entries;
+-	crc->values_cnt = values_cnt;
+-
+ 	/*
+ 	 * Only return once we got a first frame, so userspace doesn't have to
+ 	 * guess when this particular piece of HW will be ready to start
+@@ -247,7 +245,7 @@ static int crtc_crc_open(struct inode *inode, struct file *filep)
+ 	return 0;
+ 
+ err_disable:
+-	crtc->funcs->set_crc_source(crtc, NULL, &values_cnt);
++	crtc->funcs->set_crc_source(crtc, NULL);
+ err:
+ 	spin_lock_irq(&crc->lock);
+ 	crtc_crc_cleanup(crc);
+@@ -259,9 +257,8 @@ static int crtc_crc_release(struct inode *inode, struct file *filep)
+ {
+ 	struct drm_crtc *crtc = filep->f_inode->i_private;
+ 	struct drm_crtc_crc *crc = &crtc->crc;
+-	size_t values_cnt;
+ 
+-	crtc->funcs->set_crc_source(crtc, NULL, &values_cnt);
++	crtc->funcs->set_crc_source(crtc, NULL);
+ 
+ 	spin_lock_irq(&crc->lock);
+ 	crtc_crc_cleanup(crc);
+@@ -367,7 +364,7 @@ int drm_debugfs_crtc_crc_add(struct drm_crtc *crtc)
+ {
+ 	struct dentry *crc_ent, *ent;
+ 
+-	if (!crtc->funcs->set_crc_source)
++	if (!crtc->funcs->set_crc_source || !crtc->funcs->verify_crc_source)
+ 		return 0;
+ 
+ 	crc_ent = debugfs_create_dir("crc", crtc->debugfs_entry);
+diff --git a/drivers/gpu/drm/i915/intel_drv.h b/drivers/gpu/drm/i915/intel_drv.h
+index b228e4874eb2..5f63e1a9c25b 100644
+--- a/drivers/gpu/drm/i915/intel_drv.h
++++ b/drivers/gpu/drm/i915/intel_drv.h
+@@ -2172,8 +2172,7 @@ void lspcon_wait_pcon_mode(struct intel_lspcon *lspcon);
+ 
+ /* intel_pipe_crc.c */
+ #ifdef CONFIG_DEBUG_FS
+-int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name,
+-			      size_t *values_cnt);
++int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name);
+ int intel_crtc_verify_crc_source(struct drm_crtc *crtc,
+ 				 const char *source_name, size_t *values_cnt);
+ const char *const *intel_crtc_get_crc_sources(struct drm_crtc *crtc,
+diff --git a/drivers/gpu/drm/i915/intel_pipe_crc.c b/drivers/gpu/drm/i915/intel_pipe_crc.c
+index 83f9ade0cd81..f3c9010e332a 100644
+--- a/drivers/gpu/drm/i915/intel_pipe_crc.c
++++ b/drivers/gpu/drm/i915/intel_pipe_crc.c
+@@ -583,8 +583,7 @@ int intel_crtc_verify_crc_source(struct drm_crtc *crtc, const char *source_name,
+ 	return -EINVAL;
+ }
+ 
+-int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name,
+-			      size_t *values_cnt)
++int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name)
+ {
+ 	struct drm_i915_private *dev_priv = to_i915(crtc->dev);
+ 	struct intel_pipe_crc *pipe_crc = &dev_priv->pipe_crc[crtc->index];
+@@ -623,7 +622,6 @@ int intel_crtc_set_crc_source(struct drm_crtc *crtc, const char *source_name,
+ 	}
+ 
+ 	pipe_crc->skipped = 0;
+-	*values_cnt = 5;
+ 
+ out:
+ 	intel_display_power_put(dev_priv, power_domain);
+diff --git a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+index 57db868da4fe..8a9e5e6f16b4 100644
+--- a/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
++++ b/drivers/gpu/drm/rcar-du/rcar_du_crtc.c
+@@ -887,8 +887,7 @@ const char *const *rcar_du_crtc_get_crc_sources(struct drm_crtc *crtc,
+ }
+ 
+ static int rcar_du_crtc_set_crc_source(struct drm_crtc *crtc,
+-				       const char *source_name,
+-				       size_t *values_cnt)
++				       const char *source_name)
+ {
+ 	struct rcar_du_crtc *rcrtc = to_rcar_crtc(crtc);
+ 	struct drm_modeset_acquire_ctx ctx;
+@@ -903,7 +902,6 @@ static int rcar_du_crtc_set_crc_source(struct drm_crtc *crtc,
+ 		return ret;
+ 
+ 	index = ret;
+-	*values_cnt = 1;
+ 
+ 	/* Perform an atomic commit to set the CRC source. */
+ 	drm_modeset_acquire_init(&ctx, 0);
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+index c9a5ea38e86b..38f8cae7ef51 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+@@ -1111,7 +1111,7 @@ static struct drm_connector *vop_get_edp_connector(struct vop *vop)
+ }
+ 
+ static int vop_crtc_set_crc_source(struct drm_crtc *crtc,
+-				   const char *source_name, size_t *values_cnt)
++				   const char *source_name)
+ {
+ 	struct vop *vop = to_vop(crtc);
+ 	struct drm_connector *connector;
+@@ -1121,8 +1121,6 @@ static int vop_crtc_set_crc_source(struct drm_crtc *crtc,
+ 	if (!connector)
+ 		return -EINVAL;
+ 
+-	*values_cnt = 3;
+-
+ 	if (source_name && strcmp(source_name, "auto") == 0)
+ 		ret = analogix_dp_start_crc(connector);
+ 	else if (!source_name)
+@@ -1146,7 +1144,7 @@ vop_crtc_verify_crc_source(struct drm_crtc *crtc, const char *source_name,
+ 
+ #else
+ static int vop_crtc_set_crc_source(struct drm_crtc *crtc,
+-				   const char *source_name, size_t *values_cnt)
++				   const char *source_name)
+ {
+ 	return -ENODEV;
+ }
+diff --git a/drivers/gpu/drm/vkms/vkms_crc.c b/drivers/gpu/drm/vkms/vkms_crc.c
+index 68421d3d809a..ed47d67cecd6 100644
+--- a/drivers/gpu/drm/vkms/vkms_crc.c
++++ b/drivers/gpu/drm/vkms/vkms_crc.c
+@@ -101,8 +101,7 @@ int vkms_verify_crc_source(struct drm_crtc *crtc, const char *src_name,
+ 	return 0;
+ }
+ 
+-int vkms_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+-			size_t *values_cnt)
++int vkms_set_crc_source(struct drm_crtc *crtc, const char *src_name)
+ {
+ 	struct vkms_output *out = drm_crtc_to_vkms_output(crtc);
+ 	bool enabled = false;
+@@ -111,8 +110,6 @@ int vkms_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+ 
+ 	ret = vkms_crc_parse_source(src_name, &enabled);
+ 
+-	*values_cnt = 1;
+-
+ 	/* make sure nothing is scheduled on crtc workq */
+ 	flush_workqueue(out->crc_workq);
+ 
+diff --git a/drivers/gpu/drm/vkms/vkms_drv.h b/drivers/gpu/drm/vkms/vkms_drv.h
+index 090c5e4f5544..2017a2ccc43d 100644
+--- a/drivers/gpu/drm/vkms/vkms_drv.h
++++ b/drivers/gpu/drm/vkms/vkms_drv.h
+@@ -123,8 +123,7 @@ int vkms_gem_vmap(struct drm_gem_object *obj);
+ void vkms_gem_vunmap(struct drm_gem_object *obj);
+ 
+ /* CRC Support */
+-int vkms_set_crc_source(struct drm_crtc *crtc, const char *src_name,
+-			size_t *values_cnt);
++int vkms_set_crc_source(struct drm_crtc *crtc, const char *src_name);
+ int vkms_verify_crc_source(struct drm_crtc *crtc, const char *source_name,
+ 			   size_t *values_cnt);
+ void vkms_crc_work_handle(struct work_struct *work);
+diff --git a/include/drm/drm_crtc.h b/include/drm/drm_crtc.h
+index f2dd180a867a..b21437bc95bf 100644
+--- a/include/drm/drm_crtc.h
++++ b/include/drm/drm_crtc.h
+@@ -744,8 +744,7 @@ struct drm_crtc_funcs {
+ 	 *
+ 	 * 0 on success or a negative error code on failure.
+ 	 */
+-	int (*set_crc_source)(struct drm_crtc *crtc, const char *source,
+-			      size_t *values_cnt);
++	int (*set_crc_source)(struct drm_crtc *crtc, const char *source);
+ 	/**
+ 	 * @verify_crc_source:
+ 	 *
+-- 
+2.23.0.187.g17f5b7556c-goog
+

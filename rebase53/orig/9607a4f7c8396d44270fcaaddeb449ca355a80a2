@@ -1,0 +1,196 @@
+From 9607a4f7c8396d44270fcaaddeb449ca355a80a2 Mon Sep 17 00:00:00 2001
+From: Luigi Semenzato <semenzato@chromium.org>
+Date: Wed, 22 May 2019 15:40:55 -0700
+Subject: [PATCH] FROMLIST: mm: smaps: split PSS into components
+
+Report separate components (anon, file, and shmem)
+for PSS in smaps and smaps_rollup.
+
+This helps understand and tune the memory manager behavior
+in consumer devices, particularly mobile devices.  Many of
+them (e.g. chromebooks and Android-based devices) use zram
+for anon memory, and perform disk reads for discarded file
+pages.  The difference in latency is large (e.g. reading
+a single page from SSD is 30 times slower than decompressing
+a zram page on one popular device), thus it is useful to know
+how much of the PSS is anon vs. file.
+
+This patch also removes a small code duplication in smaps_account,
+which would have gotten worse otherwise.
+
+(am from https://patchwork.kernel.org/patch/10969397/)
+
+BUG=chromium:962973
+TEST=ran it
+
+Change-Id: I0f76984678a03c3940f5959be8c6c02bb81a20ca
+Signed-off-by: Luigi Semenzato <semenzato@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1627304
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Yu Zhao <yuzhao@chromium.org>
+---
+ fs/proc/task_mmu.c | 89 +++++++++++++++++++++++++++++++---------------
+ 1 file changed, 60 insertions(+), 29 deletions(-)
+
+diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
+index 148136e46fb7..0170a7118d0c 100644
+--- a/fs/proc/task_mmu.c
++++ b/fs/proc/task_mmu.c
+@@ -474,17 +474,53 @@ struct mem_size_stats {
+ 	unsigned long shared_hugetlb;
+ 	unsigned long private_hugetlb;
+ 	u64 pss;
++	u64 pss_anon;
++	u64 pss_file;
++	u64 pss_shmem;
+ 	u64 pss_locked;
+ 	u64 swap_pss;
+ 	bool check_shmem_swap;
+ };
+ 
++static void smaps_page_accumulate(struct mem_size_stats *mss,
++		struct page *page, unsigned long size, unsigned long pss,
++		bool dirty, bool locked, bool private)
++{
++	mss->pss += pss;
++
++	if (PageAnon(page))
++		mss->pss_anon += pss;
++	else if (PageSwapBacked(page))
++		mss->pss_shmem += pss;
++	else
++		mss->pss_file += pss;
++
++	if (locked)
++		mss->pss_locked += pss;
++
++	if (dirty || PageDirty(page)) {
++		if (private)
++			mss->private_dirty += size;
++		else
++			mss->shared_dirty += size;
++	} else {
++		if (private)
++			mss->private_clean += size;
++		else
++			mss->shared_clean += size;
++	}
++}
++
+ static void smaps_account(struct mem_size_stats *mss, struct page *page,
+ 		bool compound, bool young, bool dirty, bool locked)
+ {
+ 	int i, nr = compound ? 1 << compound_order(page) : 1;
+ 	unsigned long size = nr * PAGE_SIZE;
+ 
++	/*
++	 * First accumulate quantities that depend only on |size| and the type
++	 * of the compound page.
++	 */
+ 	if (PageAnon(page)) {
+ 		mss->anonymous += size;
+ 		if (!PageSwapBacked(page) && !dirty && !PageDirty(page))
+@@ -497,42 +533,23 @@ static void smaps_account(struct mem_size_stats *mss, struct page *page,
+ 		mss->referenced += size;
+ 
+ 	/*
++	 * Then accumulate quantities that may depend on sharing, or that may
++	 * differ page-by-page.
++	 *
+ 	 * page_count(page) == 1 guarantees the page is mapped exactly once.
+ 	 * If any subpage of the compound page mapped with PTE it would elevate
+ 	 * page_count().
+ 	 */
+ 	if (page_count(page) == 1) {
+-		if (dirty || PageDirty(page))
+-			mss->private_dirty += size;
+-		else
+-			mss->private_clean += size;
+-		mss->pss += (u64)size << PSS_SHIFT;
+-		if (locked)
+-			mss->pss_locked += (u64)size << PSS_SHIFT;
++		smaps_page_accumulate(mss, page, size, size << PSS_SHIFT, dirty,
++				      locked, true);
+ 		return;
+ 	}
+-
+ 	for (i = 0; i < nr; i++, page++) {
+ 		int mapcount = page_mapcount(page);
+ 		unsigned long pss = (PAGE_SIZE << PSS_SHIFT);
+-
+-		if (mapcount >= 2) {
+-			if (dirty || PageDirty(page))
+-				mss->shared_dirty += PAGE_SIZE;
+-			else
+-				mss->shared_clean += PAGE_SIZE;
+-			mss->pss += pss / mapcount;
+-			if (locked)
+-				mss->pss_locked += pss / mapcount;
+-		} else {
+-			if (dirty || PageDirty(page))
+-				mss->private_dirty += PAGE_SIZE;
+-			else
+-				mss->private_clean += PAGE_SIZE;
+-			mss->pss += pss;
+-			if (locked)
+-				mss->pss_locked += pss;
+-		}
++		smaps_page_accumulate(mss, page, PAGE_SIZE, pss / mapcount,
++			dirty, locked, mapcount < 2);
+ 	}
+ }
+ 
+@@ -811,10 +828,21 @@ static void smap_gather_stats(struct vm_area_struct *vma,
+ 		seq_put_decimal_ull_width(m, str, (val) >> 10, 8)
+ 
+ /* Show the contents common for smaps and smaps_rollup */
+-static void __show_smap(struct seq_file *m, const struct mem_size_stats *mss)
++static void __show_smap(struct seq_file *m, const struct mem_size_stats *mss,
++	bool rollup_mode)
+ {
+ 	SEQ_PUT_DEC("Rss:            ", mss->resident);
+ 	SEQ_PUT_DEC(" kB\nPss:            ", mss->pss >> PSS_SHIFT);
++	if (rollup_mode) {
++		// These are meaningful only for smaps_rollup, otherwise two of
++		// them are zero, and the other is the same as Pss.
++		SEQ_PUT_DEC(" kB\nPss_Anon:       ",
++			    mss->pss_anon >> PSS_SHIFT);
++		SEQ_PUT_DEC(" kB\nPss_File:       ",
++			    mss->pss_file >> PSS_SHIFT);
++		SEQ_PUT_DEC(" kB\nPss_Shmem:      ",
++			    mss->pss_shmem >> PSS_SHIFT);
++	}
+ 	SEQ_PUT_DEC(" kB\nShared_Clean:   ", mss->shared_clean);
+ 	SEQ_PUT_DEC(" kB\nShared_Dirty:   ", mss->shared_dirty);
+ 	SEQ_PUT_DEC(" kB\nPrivate_Clean:  ", mss->private_clean);
+@@ -856,7 +884,7 @@ static int show_smap(struct seq_file *m, void *v)
+ 	SEQ_PUT_DEC(" kB\nMMUPageSize:    ", vma_mmu_pagesize(vma));
+ 	seq_puts(m, " kB\n");
+ 
+-	__show_smap(m, &mss);
++	__show_smap(m, &mss, false);
+ 
+ 	if (arch_pkeys_enabled())
+ 		seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
+@@ -872,6 +900,9 @@ static void add_smaps_sum(struct mem_size_stats *mss,
+ {
+ 	mss_sum->resident += mss->resident;
+ 	mss_sum->pss += mss->pss;
++	mss_sum->pss_anon += mss->pss_anon;
++	mss_sum->pss_file += mss->pss_file;
++	mss_sum->pss_shmem += mss->pss_shmem;
+ 	mss_sum->shared_clean += mss->shared_clean;
+ 	mss_sum->shared_dirty += mss->shared_dirty;
+ 	mss_sum->private_clean += mss->private_clean;
+@@ -976,7 +1007,7 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
+ 	seq_pad(m, ' ');
+ 	seq_puts(m, "[rollup]\n");
+ 
+-	__show_smap(m, &mss);
++	__show_smap(m, &mss, true);
+ 
+ 	release_task_mempolicy(priv);
+ 	up_read(&mm->mmap_sem);
+-- 
+2.23.0.187.g17f5b7556c-goog
+

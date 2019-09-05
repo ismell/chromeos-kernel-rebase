@@ -1,0 +1,118 @@
+From 68810aeb5878af6fe3fd1ef5c79efd3479098a12 Mon Sep 17 00:00:00 2001
+From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date: Wed, 4 Oct 2017 17:18:20 -0700
+Subject: [PATCH] CHROMIUM: vfs: Add support for superblock-level drop_cache
+
+Drops caches and evicts inodes for a superblock. Requires
+CAP_SYS_ADMIN. Used as a workaround, by cryptohome, for clearing
+cached unencrypted data for ext4 mounts.
+(forward port from chromeos-4.4).
+
+BUG=chromium:703307
+TEST=User data is encrypted immediately after logout
+
+ Conflicts:
+        fs/ioctl.c
+        include/linux/fs.h
+
+Change-Id: Ib27c7e7a2e5a186e7fe2e8c3a2864562f156d8f9
+Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/701920
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+(cherry picked from commit 96e56ffa00a57f0990f7d0dbf9161668fa11f620)
+Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/927489
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+---
+ fs/compat_ioctl.c       |  1 +
+ fs/ioctl.c              | 23 +++++++++++++++++++++++
+ include/linux/fs.h      |  1 +
+ include/uapi/linux/fs.h |  7 +++++++
+ 4 files changed, 32 insertions(+)
+
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index a9b00942e87d..36f12ff0d95c 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -775,6 +775,7 @@ COMPATIBLE_IOCTL(FIGETBSZ)
+ COMPATIBLE_IOCTL(FIFREEZE)
+ COMPATIBLE_IOCTL(FITHAW)
+ COMPATIBLE_IOCTL(FITRIM)
++COMPATIBLE_IOCTL(FS_IOC_DROP_CACHE)
+ COMPATIBLE_IOCTL(KDGETKEYCODE)
+ COMPATIBLE_IOCTL(KDSETKEYCODE)
+ COMPATIBLE_IOCTL(KDGKBTYPE)
+diff --git a/fs/ioctl.c b/fs/ioctl.c
+index 2005529af560..24779df005eb 100644
+--- a/fs/ioctl.c
++++ b/fs/ioctl.c
+@@ -616,6 +616,26 @@ static int ioctl_file_dedupe_range(struct file *file, void __user *arg)
+ 	return ret;
+ }
+ 
++/**
++ * ioctl_drop_cache - drop all caches for a superblock
++ *
++ * @sb: superblock to drop caches for
++ *
++ * Clears the dcache and evicts all inodes for a mount
++ *
++ * Returns 0 on success, -EPERM on permission failure.
++ */
++static int ioctl_drop_cache(struct super_block *sb)
++{
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	shrink_dcache_sb(sb);
++	invalidate_inodes(sb, false);
++
++	return 0;
++}
++
+ /*
+  * When you add any new common ioctls to the switches above and below
+  * please update compat_sys_ioctl() too.
+@@ -680,6 +700,9 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
+ 	case FIDEDUPERANGE:
+ 		return ioctl_file_dedupe_range(filp, argp);
+ 
++	case FS_IOC_DROP_CACHE:
++		return ioctl_drop_cache(inode->i_sb);
++
+ 	default:
+ 		if (S_ISREG(inode->i_mode))
+ 			error = file_ioctl(filp, cmd, arg);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index b12dc3fcf0cd..a0db0e354131 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3174,6 +3174,7 @@ extern struct super_block *get_super_exclusive_thawed(struct block_device *bdev)
+ extern struct super_block *get_active_super(struct block_device *bdev);
+ extern void drop_super(struct super_block *sb);
+ extern void drop_super_exclusive(struct super_block *sb);
++extern int invalidate_inodes(struct super_block *sb, bool kill_dirty);
+ extern void iterate_supers(void (*)(struct super_block *, void *), void *);
+ extern void iterate_supers_type(struct file_system_type *,
+ 			        void (*)(struct super_block *, void *), void *);
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index 73e01918f996..526e549eea9b 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -244,6 +244,13 @@ struct fsxattr {
+ 
+ #define FSLABEL_MAX 256	/* Max chars for the interface; each fs may differ */
+ 
++/*
++ * This IOCTL has been added as a workaround for cryptohome to clear
++ * cached unencrypted user data on logout.
++ * Drop caches for a superblock
++ */
++#define	FS_IOC_DROP_CACHE		_IO('f', 129)
++
+ #define	FS_IOC_GETFLAGS			_IOR('f', 1, long)
+ #define	FS_IOC_SETFLAGS			_IOW('f', 2, long)
+ #define	FS_IOC_GETVERSION		_IOR('v', 1, long)
+-- 
+2.23.0.187.g17f5b7556c-goog
+

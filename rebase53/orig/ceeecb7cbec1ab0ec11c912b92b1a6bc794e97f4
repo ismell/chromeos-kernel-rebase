@@ -1,0 +1,72 @@
+From ceeecb7cbec1ab0ec11c912b92b1a6bc794e97f4 Mon Sep 17 00:00:00 2001
+From: Lee Shawn C <shawn.c.lee@intel.com>
+Date: Mon, 8 Jul 2019 20:13:33 -0700
+Subject: [PATCH] CHROMIUM: drm/i915: Modify AUX backlight enable sequence for
+ specific eDP panel
+
+Everything read from DPCD are fine but nothing display while trying to enable old display.
+Then we found driver must set backlight_enable (DPCD 0x720, bit 0) again after restore
+brightness level. According to the discussion with upstream developer in below link.
+This behavior already violate eDP spec. But it is necessary to light on this panel successful.
+(https://patchwork.freedesktop.org/patch/314060/?series=62494&rev=2).
+
+This CL refer to Manufacturer ID and Manufacturer product code from EDID to recognize this panel.
+If both of them are matching. Driver will set backlight_enable (DPCD 0x720, bit 0) again.
+It is specific for this panel and would not impact the other panel to manage backlight via eDP AUX.
+
+Signed-off-by: Lee Shawn C <shawn.c.lee@intel.com>
+
+BUG=b:131376214
+TEST=Old display can be turn on successful after boot into CROS.
+
+Change-Id: I344901fd51d9fe71e51477f849722c96fcb5bdea
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1692182
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Tested-by: Jongpil Jung <jongpil19.jung@samsung.com>
+Commit-Queue: Rajat Jain <rajatja@google.com>
+---
+ drivers/gpu/drm/i915/intel_dp_aux_backlight.c | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/gpu/drm/i915/intel_dp_aux_backlight.c b/drivers/gpu/drm/i915/intel_dp_aux_backlight.c
+index e500e8c5b031..d55ba67dc8fd 100644
+--- a/drivers/gpu/drm/i915/intel_dp_aux_backlight.c
++++ b/drivers/gpu/drm/i915/intel_dp_aux_backlight.c
+@@ -146,6 +146,24 @@ static bool intel_dp_aux_set_pwm_freq(struct intel_connector *connector)
+ 	return true;
+ }
+ 
++/*
++ * Some panels require the backlight to be enabled _after_ the
++ * level is set. This function returns true if the connected panel
++ * requires this out-of-spec behavior
++ */
++static bool intel_dp_enable_backlight_after_set(struct intel_connector *intel_connector)
++{
++	/* old display */
++	if (intel_connector->detect_edid &&
++	    (intel_connector->detect_edid->mfg_id[0] == 0x4c &&
++	     intel_connector->detect_edid->mfg_id[1] == 0x83 &&
++	     intel_connector->detect_edid->prod_code[0] == 0x42 &&
++	     intel_connector->detect_edid->prod_code[1] == 0x41))
++		return true;
++
++	return false;
++}
++
+ static void intel_dp_aux_enable_backlight(const struct intel_crtc_state *crtc_state,
+ 					  const struct drm_connector_state *conn_state)
+ {
+@@ -190,6 +208,9 @@ static void intel_dp_aux_enable_backlight(const struct intel_crtc_state *crtc_st
+ 
+ 	set_aux_backlight_enable(intel_dp, true);
+ 	intel_dp_aux_set_backlight(conn_state, connector->panel.backlight.level);
++
++	if (intel_dp_enable_backlight_after_set(connector))
++		set_aux_backlight_enable(intel_dp, true);
+ }
+ 
+ static void intel_dp_aux_disable_backlight(const struct drm_connector_state *old_conn_state)
+-- 
+2.23.0.187.g17f5b7556c-goog
+

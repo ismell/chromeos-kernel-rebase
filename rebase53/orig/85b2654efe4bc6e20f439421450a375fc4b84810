@@ -1,0 +1,392 @@
+From 85b2654efe4bc6e20f439421450a375fc4b84810 Mon Sep 17 00:00:00 2001
+From: Gwendal Grignou <gwendal@chromium.org>
+Date: Fri, 7 Jun 2019 14:57:56 -0700
+Subject: [PATCH] CHROMIUM: mfd / platform: cros_ec: Move pd update sysfs to
+ its own driver
+
+Create a new driver cros-ec-pd-sysfs to present pd_update sysfs
+attribute and set pd_ec global variable which will be used by the PD
+updater driver.
+
+BUG=chromium:965213,chromium:972644
+TEST=Check on samus-kernelnext the driver is present:
+/sys/devices/pci0000:00/0000:00:1f.0/PNP0C09:00/GOOG0004:00/cros-ec-dev.1.auto/chromeos/cros_ec/pd_update
+/sys/devices/pci0000:00/0000:00:1f.0/PNP0C09:00/GOOG0004:00/cros-ec-dev.6.auto/chromeos/cros_pd/pd_update
+Only the last one has information:
+cat /sys/.../G0004:00/cros-ec-dev.6.auto/chromeos/cros_pd/pd_update/firmware_images
+0: 1.1 cros-pd/zinger_v1.7.539-91a0fa2.bin
+...
+4: 4.1 cros-pd/hoho_v1.7.684-69498dd.bin
+
+Check real pd driver is loaded:
+ls -l /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0A08:00/device:1d/PNP0C09:00/GOOG0003:00
+total 0
+--w-------. 1 root root 4096 Jun  7 14:54 disable
+...
+
+Change-Id: Ia7b56eb26eb7cc9bd04d89d892444bf694c84474
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1652004
+Reviewed-by: Benson Leung <bleung@google.com>
+---
+ ...sfs-class-chromeos-driver-cros-ec-pd-sysfs |  10 +
+ drivers/mfd/Kconfig                           |  11 --
+ drivers/mfd/Makefile                          |   1 -
+ drivers/mfd/cros_ec_dev.c                     |   4 +-
+ drivers/platform/chrome/Kconfig               |  11 ++
+ drivers/platform/chrome/Makefile              |   1 +
+ .../chrome}/cros_ec_pd_update.c               | 173 +++++++++++-------
+ include/linux/mfd/cros_ec.h                   |   1 -
+ .../cros_ec_pd_update.h                       |   6 +-
+ 9 files changed, 134 insertions(+), 84 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs
+ rename drivers/{mfd => platform/chrome}/cros_ec_pd_update.c (95%)
+ rename include/linux/{mfd => platform_data}/cros_ec_pd_update.h (93%)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs b/Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs
+new file mode 100644
+index 000000000000..41a490d83f4a
+--- /dev/null
++++ b/Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs
+@@ -0,0 +1,10 @@
++What:		/sys/class/chromeos/<ec-device-name>/pd_update/firmware_images
++Date:		August 2015
++KernelVersion:	4.2
++Description:
++		List the names of the available firmware images for USB PD
++    that use cros_ec OS.
++    Each line contains a slot, PD major/minor and firmware name:
++    0: 1.1 cros-pd/zinger_v1.7.539-91a0fa2.bin
++
++    The images are in the kernel firmware images directory.
+diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+index 53981d992669..11841f4b7b2b 100644
+--- a/drivers/mfd/Kconfig
++++ b/drivers/mfd/Kconfig
+@@ -202,17 +202,6 @@ config MFD_CROS_EC
+ 	  You also need to enable the driver for the bus you are using. The
+ 	  protocol for talking to the EC is defined by the bus driver.
+ 
+-config MFD_CROS_EC_PD_UPDATE
+-	tristate "ChromeOS Embedded Controller PD device update driver"
+-	depends on MFD_CROS_EC
+-
+-	help
+-	  If you say Y here, you get support for updating ChromeOS
+-	  PD device firmware.
+-
+-	  To compile this driver as a module, choose M here: the module will be
+-	  called cros_ec_pd_update.
+-
+ config MFD_CROS_EC_CHARDEV
+         tristate "Chrome OS Embedded Controller userspace device interface"
+         depends on MFD_CROS_EC
+diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+index 9f215b28e48d..3bef131593c3 100644
+--- a/drivers/mfd/Makefile
++++ b/drivers/mfd/Makefile
+@@ -14,7 +14,6 @@ obj-$(CONFIG_MFD_BCM590XX)	+= bcm590xx.o
+ obj-$(CONFIG_MFD_BD9571MWV)	+= bd9571mwv.o
+ cros_ec_core-objs		:= cros_ec.o
+ obj-$(CONFIG_MFD_CROS_EC)	+= cros_ec_core.o
+-obj-$(CONFIG_MFD_CROS_EC_PD_UPDATE)	+= cros_ec_pd_update.o
+ obj-$(CONFIG_MFD_CROS_EC_CHARDEV) += cros_ec_dev.o
+ obj-$(CONFIG_MFD_EXYNOS_LPASS)	+= exynos-lpass.o
+ 
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index ee99ae5db4b9..2d7638fb4f6f 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -38,9 +38,6 @@ static int ec_major;
+ 
+ static const struct attribute_group *cros_ec_groups[] = {
+ 	&cros_ec_attr_group,
+-#if IS_ENABLED(CONFIG_MFD_CROS_EC_PD_UPDATE)
+-	&cros_ec_pd_attr_group,
+-#endif
+ 	NULL,
+ };
+ 
+@@ -624,6 +621,7 @@ static const struct mfd_cell cros_usbpd_charger_cells[] = {
+ static const struct mfd_cell cros_ec_platform_cells[] = {
+ 	{ .name = "cros-ec-debugfs" },
+ 	{ .name = "cros-ec-lightbar" },
++	{ .name = "cros-ec-pd-sysfs" },
+ 	{ .name = "cros-ec-vbc" },
+ };
+ 
+diff --git a/drivers/platform/chrome/Kconfig b/drivers/platform/chrome/Kconfig
+index ef03b6725e57..3beae802366c 100644
+--- a/drivers/platform/chrome/Kconfig
++++ b/drivers/platform/chrome/Kconfig
+@@ -178,6 +178,17 @@ config CROS_EC_DEBUGFS
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called cros_ec_debugfs.
+ 
++config CROS_EC_PD_UPDATE
++	tristate "ChromeOS Embedded Controller PD device update driver"
++	depends on MFD_CROS_EC
++
++	help
++	  If you say Y here, you get support for updating ChromeOS
++	  PD device firmware.
++
++	  To compile this driver as a module, choose M here: the module will be
++	  called cros_ec_pd_update.
++
+ config CROS_USBPD_LOGGER
+ 	tristate "Logging driver for USB PD charger"
+ 	depends on CHARGER_CROS_USBPD
+diff --git a/drivers/platform/chrome/Makefile b/drivers/platform/chrome/Makefile
+index e95b3327c4d9..b9a8827920f4 100644
+--- a/drivers/platform/chrome/Makefile
++++ b/drivers/platform/chrome/Makefile
+@@ -15,6 +15,7 @@ cros_ec_lpcs-$(CONFIG_CROS_EC_LPC_MEC)	+= cros_ec_lpc_mec.o
+ obj-$(CONFIG_CROS_EC_DEBUGFS)		+= cros_ec_debugfs.o
+ obj-$(CONFIG_CROS_EC_LIGHTBAR)		+= cros_ec_lightbar.o
+ obj-$(CONFIG_CROS_EC_LPC)		+= cros_ec_lpcs.o
++obj-$(CONFIG_CROS_EC_PD_UPDATE)		+= cros_ec_pd_update.o
+ obj-$(CONFIG_CROS_EC_PROTO)		+= cros_ec_proto.o
+ obj-$(CONFIG_CROS_EC_VBC)		+= cros_ec_vbc.o
+ obj-$(CONFIG_CROS_KBD_LED_BACKLIGHT)	+= cros_kbd_led_backlight.o
+diff --git a/drivers/mfd/cros_ec_pd_update.c b/drivers/platform/chrome/cros_ec_pd_update.c
+similarity index 95%
+rename from drivers/mfd/cros_ec_pd_update.c
+rename to drivers/platform/chrome/cros_ec_pd_update.c
+index dfc6c9c0b0da..56a95ada5318 100644
+--- a/drivers/mfd/cros_ec_pd_update.c
++++ b/drivers/platform/chrome/cros_ec_pd_update.c
+@@ -23,10 +23,11 @@
+ #include <linux/kobject.h>
+ #include <linux/mfd/cros_ec.h>
+ #include <linux/mfd/cros_ec_commands.h>
+-#include <linux/mfd/cros_ec_pd_update.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/platform_data/cros_ec_pd_update.h>
+ #include <linux/platform_device.h>
++#include <linux/power_supply.h>
+ 
+ /* Store our PD device pointer so we can send update-related commands. */
+ static struct cros_ec_dev *pd_ec;
+@@ -842,70 +843,6 @@ static int cros_ec_pd_suspend(struct device *dev)
+ 	return 0;
+ }
+ 
+-static umode_t cros_ec_pd_attrs_are_visible(struct kobject *kobj,
+-					    struct attribute *a, int n)
+-{
+-	struct device *dev = container_of(kobj, struct device, kobj);
+-	struct cros_ec_dev *ec = container_of(dev, struct cros_ec_dev,
+-					      class_dev);
+-	struct ec_params_usb_pd_rw_hash_entry hash_entry;
+-	struct ec_params_usb_pd_discovery_entry discovery_entry;
+-
+-	/* Check if a PD MCU is present */
+-	if (cros_ec_pd_get_status(dev,
+-				  ec,
+-				  0,
+-				  &hash_entry,
+-				  &discovery_entry) == EC_RES_SUCCESS) {
+-		/*
+-		 * Save our ec pointer so we can conduct transactions.
+-		 * TODO(shawnn): Find a better way to access the ec pointer.
+-		 */
+-		if (!pd_ec)
+-			pd_ec = ec;
+-		return a->mode;
+-	}
+-
+-	return 0;
+-}
+-
+-static ssize_t show_firmware_images(struct device *dev,
+-				    struct device_attribute *attr, char *buf) {
+-	int size = 0;
+-	int i;
+-
+-	for (i = 0; i < firmware_image_count; ++i) {
+-		if (firmware_images[i].filename == NULL)
+-			size += scnprintf(buf + size, PAGE_SIZE,
+-					  "%d: %d.%d NONE\n", i,
+-					  firmware_images[i].id_major,
+-					  firmware_images[i].id_minor);
+-		else
+-			size += scnprintf(buf + size, PAGE_SIZE,
+-					  "%d: %d.%d %s\n", i,
+-					  firmware_images[i].id_major,
+-					  firmware_images[i].id_minor,
+-					  firmware_images[i].filename);
+-	}
+-
+-	return size;
+-}
+-
+-
+-static DEVICE_ATTR(firmware_images, 0444, show_firmware_images, NULL);
+-
+-static struct attribute *__pd_attrs[] = {
+-	&dev_attr_firmware_images.attr,
+-	NULL,
+-};
+-
+-struct attribute_group cros_ec_pd_attr_group = {
+-	.name = "pd_update",
+-	.attrs = __pd_attrs,
+-	.is_visible = cros_ec_pd_attrs_are_visible,
+-};
+-EXPORT_SYMBOL(cros_ec_pd_attr_group);
+-
+ static SIMPLE_DEV_PM_OPS(cros_ec_pd_pm,
+ 	cros_ec_pd_suspend, cros_ec_pd_resume);
+ 
+@@ -1023,5 +960,111 @@ module_platform_driver(cros_ec_pd_driver);
+ 
+ #endif /* CONFIG_ACPI */
+ 
++/*
++ * Driver loaded on top of the EC object.
++ *
++ * It exposes a sysfs interface, but most importantly, set global pd_ec to
++ * let the real driver knows which pd_ec device to talk to.
++ */
++#define DRV_NAME "cros-ec-pd-sysfs"
++
++static umode_t cros_ec_pd_attrs_are_visible(struct kobject *kobj,
++					    struct attribute *a, int n)
++{
++	struct device *dev = container_of(kobj, struct device, kobj);
++	struct cros_ec_dev *ec = container_of(dev, struct cros_ec_dev,
++					      class_dev);
++	struct ec_params_usb_pd_rw_hash_entry hash_entry;
++	struct ec_params_usb_pd_discovery_entry discovery_entry;
++
++	/* Check if a PD MCU is present */
++	if (cros_ec_pd_get_status(dev,
++				  ec,
++				  0,
++				  &hash_entry,
++				  &discovery_entry) == EC_RES_SUCCESS) {
++		/*
++		 * Save our ec pointer so we can conduct transactions.
++		 * TODO(shawnn): Find a better way to access the ec pointer.
++		 */
++		if (!pd_ec)
++			pd_ec = ec;
++		return a->mode;
++	}
++
++	return 0;
++}
++
++static ssize_t firmware_images_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	int size = 0;
++	int i;
++
++	for (i = 0; i < firmware_image_count; ++i) {
++		if (firmware_images[i].filename == NULL)
++			size += scnprintf(buf + size, PAGE_SIZE,
++					  "%d: %d.%d NONE\n", i,
++					  firmware_images[i].id_major,
++					  firmware_images[i].id_minor);
++		else
++			size += scnprintf(buf + size, PAGE_SIZE,
++					  "%d: %d.%d %s\n", i,
++					  firmware_images[i].id_major,
++					  firmware_images[i].id_minor,
++					  firmware_images[i].filename);
++	}
++
++	return size;
++}
++
++static DEVICE_ATTR_RO(firmware_images);
++
++static struct attribute *__pd_attrs[] = {
++	&dev_attr_firmware_images.attr,
++	NULL,
++};
++
++static struct attribute_group cros_ec_pd_attr_group = {
++	.name = "pd_update",
++	.attrs = __pd_attrs,
++	.is_visible = cros_ec_pd_attrs_are_visible,
++};
++
++
++static int cros_ec_pd_sysfs_probe(struct platform_device *pd)
++{
++	struct cros_ec_dev *ec_dev = dev_get_drvdata(pd->dev.parent);
++	struct device *dev = &pd->dev;
++	int ret;
++
++	ret = sysfs_create_group(&ec_dev->class_dev.kobj,
++			&cros_ec_pd_attr_group);
++	if (ret < 0)
++		dev_err(dev, "failed to create attributes. err=%d\n", ret);
++
++	return ret;
++}
++
++static int cros_ec_pd_sysfs_remove(struct platform_device *pd)
++{
++	struct cros_ec_dev *ec_dev = dev_get_drvdata(pd->dev.parent);
++
++	sysfs_remove_group(&ec_dev->class_dev.kobj, &cros_ec_pd_attr_group);
++
++	return 0;
++}
++
++static struct platform_driver cros_ec_pd_sysfs_driver = {
++	.driver = {
++		.name = DRV_NAME,
++	},
++	.probe = cros_ec_pd_sysfs_probe,
++	.remove = cros_ec_pd_sysfs_remove,
++};
++
++module_platform_driver(cros_ec_pd_sysfs_driver);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("ChromeOS power device FW update driver");
++MODULE_ALIAS("platform:" DRV_NAME);
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index c3e75a46aae2..4659e5830744 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -385,6 +385,5 @@ bool cros_ec_handle_event(struct cros_ec_device *ec_dev);
+ 
+ /* sysfs stuff */
+ extern struct attribute_group cros_ec_attr_group;
+-extern struct attribute_group cros_ec_pd_attr_group;
+ 
+ #endif /* __LINUX_MFD_CROS_EC_H */
+diff --git a/include/linux/mfd/cros_ec_pd_update.h b/include/linux/platform_data/cros_ec_pd_update.h
+similarity index 93%
+rename from include/linux/mfd/cros_ec_pd_update.h
+rename to include/linux/platform_data/cros_ec_pd_update.h
+index 88d177fe15ab..53366789e4b2 100644
+--- a/include/linux/mfd/cros_ec_pd_update.h
++++ b/include/linux/platform_data/cros_ec_pd_update.h
+@@ -13,8 +13,8 @@
+  * GNU General Public License for more details.
+  */
+ 
+-#ifndef __LINUX_MFD_CROS_EC_PD_H
+-#define __LINUX_MFD_CROS_EC_PD_H
++#ifndef __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H
++#define __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H
+ 
+ #include <linux/mfd/cros_ec_commands.h>
+ 
+@@ -82,4 +82,4 @@ enum cros_ec_pd_find_update_firmware_result {
+  */
+ #define PD_UPDATE_CHECK_DELAY msecs_to_jiffies(2000)
+ 
+-#endif /* __LINUX_MFD_CROS_EC_H */
++#endif  /* __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H */
+-- 
+2.23.0.187.g17f5b7556c-goog
+

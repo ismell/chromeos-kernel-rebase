@@ -1,0 +1,146 @@
+From 01f5a0cf0b7367b211276cc6c19e1f6057058083 Mon Sep 17 00:00:00 2001
+From: Sameer Nanda <snanda@chromium.org>
+Date: Mon, 6 Aug 2012 09:16:21 -0700
+Subject: [PATCH] CHROMIUM: sysrq: Added Chrome OS specific 'x' key
+
+On Chrome OS systems the magic sysrq x key will cause the following to
+happen:
+- show processes in blocked state
+- emergency file sync
+- crash the system
+
+This key combination can be used in the field by users to cause the
+system to crash so that crash dumps can be collected to help debug UI
+freeze issues.
+
+BUG=chromium-os:33249
+TEST=First "echo 0x1000 > /proc/sys/kernel/sysrq", then do the two tests
+below:
+1. Alt-F10-x should cause the system to crash. Looks for kcrash logs
+under /var/spool/crash when the system reboots.
+2. All other magic sysrq operation aside from alt-F10-x should be
+ineffective.
+
+This is a squash of the following commits:
+  CHROMIUM: sysrq: Added Chrome OS specific 'x' key
+  CHROMIUM: sysrq: fix Chrome OS specific 'x' key handler to work on ARM
+  CHROMIUM: sysrq: add ability for sysrq-x to signal chrome/X
+  CHROMIUM: sysrq: Stop trying to kill X server for 'X' key
+
+Change-Id: I62d0a7f0028c072928be0125da4e069bafa5d88c
+Signed-off-by: Sameer Nanda <snanda@chromium.org>
+Reviewed-on: https://gerrit.chromium.org/gerrit/29316
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Olof Johansson <olofj@chromium.org>
+
+[rebase419(groeck): Squashed all 'x' key commits together,
+	removed old context]
+
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+---
+ drivers/tty/sysrq.c   | 62 ++++++++++++++++++++++++++++++++++++++++++-
+ include/linux/sysrq.h |  1 +
+ 2 files changed, 62 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/tty/sysrq.c b/drivers/tty/sysrq.c
+index 06ed20dd01ba..0aa3da575925 100644
+--- a/drivers/tty/sysrq.c
++++ b/drivers/tty/sysrq.c
+@@ -50,6 +50,7 @@
+ #include <linux/syscalls.h>
+ #include <linux/of.h>
+ #include <linux/rcupdate.h>
++#include <linux/delay.h>
+ 
+ #include <asm/ptrace.h>
+ #include <asm/irq_regs.h>
+@@ -431,6 +432,64 @@ static struct sysrq_key_op sysrq_unrt_op = {
+ 	.enable_mask	= SYSRQ_ENABLE_RTNICE,
+ };
+ 
++/* send a signal to a process named comm if it has a certain parent */
++/* if parent is NULL, send to the first matching process */
++static void sysrq_x_cros_signal_process(char *comm, char *parent, int sig)
++{
++	struct task_struct *p;
++
++	read_lock(&tasklist_lock);
++	for_each_process(p) {
++		if (p->flags & (PF_KTHREAD | PF_EXITING))
++			continue;
++		if (is_global_init(p))
++			continue;
++		if (strncmp(p->comm, comm, TASK_COMM_LEN))
++			continue;
++		if (parent && strncmp(p->parent->comm, parent, TASK_COMM_LEN))
++			continue;
++
++		printk(KERN_INFO "%s: signal %d %s pid %u tgid %u\n",
++		       __func__, sig, comm, p->pid, p->tgid);
++		do_send_sig_info(sig, SEND_SIG_FORCED, p, true);
++	}
++	read_unlock(&tasklist_lock);
++}
++
++/* how many seconds do we wait for subsequent keypresses after the first */
++#define CROS_SYSRQ_WAIT 20
++
++static void sysrq_handle_cros_xkey(int key)
++{
++	static unsigned long first_jiffies = INITIAL_JIFFIES - CROS_SYSRQ_WAIT * HZ;
++	static unsigned int xkey_iteration;
++
++	if (time_after(jiffies, first_jiffies + CROS_SYSRQ_WAIT * HZ)) {
++		first_jiffies = jiffies;
++		xkey_iteration = 0;
++	} else {
++		xkey_iteration++;
++	}
++
++	if (!xkey_iteration) {
++		sysrq_x_cros_signal_process("chrome", "session_manager",
++					    SIGABRT);
++	} else {
++		sysrq_handle_showstate_blocked(key);
++		sysrq_handle_sync(key);
++		/* Delay for a bit to give time for sync to complete */
++		mdelay(1000);
++		panic("ChromeOS X Key");
++	}
++}
++
++static struct sysrq_key_op sysrq_cros_xkey = {
++	.handler	= sysrq_handle_cros_xkey,
++	.help_msg	= "Cros-dump-and-crash",
++	.action_msg	= "Cros dump and crash",
++	.enable_mask	= SYSRQ_ENABLE_CROS_XKEY,
++};
++
+ /* Key Operations table and lock */
+ static DEFINE_SPINLOCK(sysrq_key_table_lock);
+ 
+@@ -487,7 +546,8 @@ static struct sysrq_key_op *sysrq_key_table[36] = {
+ 	/* x: May be registered on mips for TLB dump */
+ 	/* x: May be registered on ppc/powerpc for xmon */
+ 	/* x: May be registered on sparc64 for global PMU dump */
+-	NULL,				/* x */
++	/* x: On Chrome OS, this is the dump and crash key */
++	&sysrq_cros_xkey,		/* x */
+ 	/* y: May be registered on sparc64 for global register dump */
+ 	NULL,				/* y */
+ 	&sysrq_ftrace_dump_op,		/* z */
+diff --git a/include/linux/sysrq.h b/include/linux/sysrq.h
+index 8c71874e8485..4b938169f5a1 100644
+--- a/include/linux/sysrq.h
++++ b/include/linux/sysrq.h
+@@ -28,6 +28,7 @@
+ #define SYSRQ_ENABLE_SIGNAL	0x0040
+ #define SYSRQ_ENABLE_BOOT	0x0080
+ #define SYSRQ_ENABLE_RTNICE	0x0100
++#define SYSRQ_ENABLE_CROS_XKEY	0x1000
+ 
+ struct sysrq_key_op {
+ 	void (*handler)(int);
+-- 
+2.23.0.187.g17f5b7556c-goog
+

@@ -1,0 +1,65 @@
+From 0eadc61a338afe7e9815bb384e253dfdca5aeb6a Mon Sep 17 00:00:00 2001
+From: Zhiyong Tao <zhiyong.tao@mediatek.com>
+Date: Mon, 22 Apr 2019 19:54:17 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: arm64: dts: mt8183: Add auxadc device
+ node
+
+Add auxadc device node for MT8183
+
+Signed-off-by: Zhiyong Tao <zhiyong.tao@mediatek.com>
+
+(am from https://patchwork.kernel.org/patch/10910973/)
+[eddie.huang: fix context conflicts]
+
+BUG=b:126008306
+TEST=build and boot to shell
+
+Change-Id: Ie2ad08a00465513f7f497d630357acfe1c60eaa3
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1317194
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+---
+ arch/arm64/boot/dts/mediatek/mt8183-evb.dts |  4 ++++
+ arch/arm64/boot/dts/mediatek/mt8183.dtsi    | 10 ++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+index 50dc1e1a6881..d9980051f9b6 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+@@ -38,6 +38,10 @@
+ 	};
+ };
+ 
++&auxadc {
++	status = "okay";
++};
++
+ &gpu {
+ 	supply-names = "mali","mali_sram";
+ 	mali-supply = <&mt6358_vgpu_reg>;
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+index 9d91e1660889..b560512272b4 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+@@ -333,6 +333,16 @@
+ 			#iommu-cells = <1>;
+ 		};
+ 
++		auxadc: auxadc@11001000 {
++			compatible = "mediatek,mt8183-auxadc",
++				     "mediatek,mt8173-auxadc";
++			reg = <0 0x11001000 0 0x1000>;
++			clocks = <&infracfg CLK_INFRA_AUXADC>;
++			clock-names = "main";
++			#io-channel-cells = <1>;
++			status = "disabled";
++		};
++
+ 		uart0: serial@11002000 {
+ 			compatible = "mediatek,mt8183-uart",
+ 				     "mediatek,mt6577-uart";
+-- 
+2.23.0.187.g17f5b7556c-goog
+

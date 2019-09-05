@@ -1,0 +1,85 @@
+From 68ae969232ab62b0d886a6aa081a881a9da39b86 Mon Sep 17 00:00:00 2001
+From: Dmitry Torokhov <dtor@chromium.org>
+Date: Mon, 27 Apr 2015 15:48:02 -0700
+Subject: [PATCH] CHROMIUM: Input: elants_i2c - keep regulators on when
+ unbinding
+
+Until we come up with a good story for controlling regulators from
+userspace let's keep them on when unbinding drivers so that factory
+test utilities can continue accessing devices via i2c-dev on ARM in the
+same fashion as they do that on X86.
+
+BUG=chrome-os-partner:39363
+TEST=Build and boot Minnie with Elan touchscreen, unbind the touchscreen
+via sysfs and use i2cdetect to verify that device is still powered up
+and responding to queries.
+
+Change-Id: I061af63d0c91dc5c5a90df6d43ff021e4ad51ce7
+Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/267582
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+Trybot-Ready: Douglas Anderson <dianders@chromium.org>
+Tested-by: Jiazi Yang <Tomato_Yang@asus.com>
+Commit-Queue: Douglas Anderson <dianders@chromium.org>
+(cherry picked from commit 7213eb4731dbbb77317494a0b0fcdda162969157)
+Reviewed-on: https://chromium-review.googlesource.com/354085
+---
+ drivers/input/touchscreen/elants_i2c.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/input/touchscreen/elants_i2c.c b/drivers/input/touchscreen/elants_i2c.c
+index d21ca39b0fdb..b5c4783ea224 100644
+--- a/drivers/input/touchscreen/elants_i2c.c
++++ b/drivers/input/touchscreen/elants_i2c.c
+@@ -151,6 +151,7 @@ struct elants_data {
+ 
+ 	bool wake_irq_enabled;
+ 	bool keep_power_in_suspend;
++	bool unbinding;
+ };
+ 
+ static int elants_i2c_send(struct i2c_client *client,
+@@ -1120,6 +1121,12 @@ static void elants_i2c_power_off(void *_data)
+ {
+ 	struct elants_data *ts = _data;
+ 
++	if (ts->unbinding) {
++		dev_info(&ts->client->dev,
++			 "Not disabling regulators to continue allowing userspace i2c-dev access\n");
++		return;
++	}
++
+ 	if (!IS_ERR_OR_NULL(ts->reset_gpio)) {
+ 		/*
+ 		 * Activate reset gpio to prevent leakage through the
+@@ -1295,6 +1302,19 @@ static int elants_i2c_probe(struct i2c_client *client,
+ 	return 0;
+ }
+ 
++static int elants_i2c_remove(struct i2c_client *client)
++{
++	struct elants_data *ts = i2c_get_clientdata(client);
++
++	/*
++	 * Let elants_i2c_power_off know that it needs to keep
++	 * regulators on.
++	 */
++	ts->unbinding = true;
++
++	return 0;
++}
++
+ static int __maybe_unused elants_i2c_suspend(struct device *dev)
+ {
+ 	struct i2c_client *client = to_i2c_client(dev);
+@@ -1392,6 +1412,7 @@ MODULE_DEVICE_TABLE(of, elants_of_match);
+ 
+ static struct i2c_driver elants_i2c_driver = {
+ 	.probe = elants_i2c_probe,
++	.remove = elants_i2c_remove,
+ 	.id_table = elants_i2c_id,
+ 	.driver = {
+ 		.name = DEVICE_NAME,
+-- 
+2.23.0.187.g17f5b7556c-goog
+

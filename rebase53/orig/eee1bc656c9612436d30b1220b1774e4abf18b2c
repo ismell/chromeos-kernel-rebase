@@ -1,0 +1,138 @@
+From eee1bc656c9612436d30b1220b1774e4abf18b2c Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Thu, 14 Mar 2019 09:21:08 +0100
+Subject: [PATCH] BACKPORT: ALSA: hda/realtek: merge alc_fixup_headset_jack to
+ alc295_fixup_chromebook
+
+The ALC225_FIXUP_HEADSET_JACK fixup can be merged to alc295_fixup_chromebook.
+There are no other users for ALC225_FIXUP_HEADSET_JACK other than
+the chromebook hardware.
+
+Fixes: 10f5b1b85ed1 ("ALSA: hda/realtek - Fixed Headset Mic JD not stable")
+Cc: Kailang Yang <kailang@realtek.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+(cherry picked from commit c8a9afa632f0fd45731d3353525faf1fdb362c89
+Link: git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound.git)
+
+Conflicts:
+	sound/pci/hda/patch_realtek.c
+(Resolve conflicts in hda_fixup_alc269_fixups[] struct: delete
+ALC225_FIXUP_HEADSET_JACK and create new ALC295_FIXUP_CHROME_BOOK)
+
+BUG=b:128595102
+TEST="cold-plug headset, boot up device, and check if mic jack is detected"
+
+Change-Id: I7e9b881629b6c63493cd23a95f4f55efd26e15d7
+Signed-off-by: Joyce Toh <joyce.toh@intel.com>
+Reviewed-on: https://chromium-review.googlesource.com/1564581
+Commit-Ready: Dylan Reid <dgreid@chromium.org>
+Reviewed-by: Hsinyu Chao <hychao@chromium.org>
+Reviewed-by: Sathyanarayana Nujella <sathyanarayana.nujella@intel.com>
+---
+ sound/pci/hda/patch_realtek.c | 47 +++++++++++------------------------
+ 1 file changed, 15 insertions(+), 32 deletions(-)
+
+diff --git a/sound/pci/hda/patch_realtek.c b/sound/pci/hda/patch_realtek.c
+index 80a7ea748f51..4ac0dcf55516 100644
+--- a/sound/pci/hda/patch_realtek.c
++++ b/sound/pci/hda/patch_realtek.c
+@@ -5490,7 +5490,7 @@ static void alc_headset_btn_callback(struct hda_codec *codec,
+ 	jack->jack->button_state = report;
+ }
+ 
+-static void alc_fixup_headset_jack(struct hda_codec *codec,
++static void alc295_fixup_chromebook(struct hda_codec *codec,
+ 				    const struct hda_fixup *fix, int action)
+ {
+ 
+@@ -5500,6 +5500,16 @@ static void alc_fixup_headset_jack(struct hda_codec *codec,
+ 						    alc_headset_btn_callback);
+ 		snd_hda_jack_add_kctl(codec, 0x55, "Headset Jack", false,
+ 				      SND_JACK_HEADSET, alc_headset_btn_keymap);
++		switch (codec->core.vendor_id) {
++		case 0x10ec0295:
++			alc_update_coef_idx(codec, 0x4a, 0x8000, 1 << 15); /* Reset HP JD */
++			alc_update_coef_idx(codec, 0x4a, 0x8000, 0 << 15);
++			break;
++		case 0x10ec0236:
++			alc_update_coef_idx(codec, 0x1b, 0x8000, 1 << 15); /* Reset HP JD */
++			alc_update_coef_idx(codec, 0x1b, 0x8000, 0 << 15);
++			break;
++		}
+ 		break;
+ 	case HDA_FIXUP_ACT_INIT:
+ 		switch (codec->core.vendor_id) {
+@@ -5520,26 +5530,6 @@ static void alc_fixup_headset_jack(struct hda_codec *codec,
+ 	}
+ }
+ 
+-static void alc295_fixup_chromebook(struct hda_codec *codec,
+-				    const struct hda_fixup *fix, int action)
+-{
+-
+-	switch (action) {
+-	case HDA_FIXUP_ACT_PRE_PROBE:
+-		switch (codec->core.vendor_id) {
+-		case 0x10ec0295:
+-			alc_update_coef_idx(codec, 0x4a, 0x8000, 1 << 15); /* Reset HP JD */
+-			alc_update_coef_idx(codec, 0x4a, 0x8000, 0 << 15);
+-			break;
+-		case 0x10ec0236:
+-			alc_update_coef_idx(codec, 0x1b, 0x8000, 1 << 15); /* Reset HP JD */
+-			alc_update_coef_idx(codec, 0x1b, 0x8000, 0 << 15);
+-			break;
+-		}
+-		break;
+-	}
+-}
+-
+ static void alc_fixup_disable_mic_vref(struct hda_codec *codec,
+ 				  const struct hda_fixup *fix, int action)
+ {
+@@ -5689,7 +5679,6 @@ enum {
+ 	ALC221_FIXUP_HP_HEADSET_MIC,
+ 	ALC285_FIXUP_LENOVO_HEADPHONE_NOISE,
+ 	ALC295_FIXUP_HP_AUTO_MUTE,
+-	ALC225_FIXUP_HEADSET_JACK,
+ 	ALC286_FIXUP_ACER_AIO_MIC_NO_PRESENCE,
+ 	ALC294_FIXUP_ASUS_MIC,
+ 	ALC294_FIXUP_ASUS_HEADSET_MIC,
+@@ -6615,10 +6604,6 @@ static const struct hda_fixup alc269_fixups[] = {
+ 		.type = HDA_FIXUP_FUNC,
+ 		.v.func = alc_fixup_auto_mute_via_amp,
+ 	},
+-	[ALC225_FIXUP_HEADSET_JACK] = {
+-		.type = HDA_FIXUP_FUNC,
+-		.v.func = alc_fixup_headset_jack,
+-	},
+ 	[ALC286_FIXUP_ACER_AIO_MIC_NO_PRESENCE] = {
+ 		.type = HDA_FIXUP_PINS,
+ 		.v.pins = (const struct hda_pintbl[]) {
+@@ -6658,6 +6643,10 @@ static const struct hda_fixup alc269_fixups[] = {
+ 		.chained = true,
+ 		.chain_id = ALC294_FIXUP_ASUS_HEADSET_MIC
+ 	},
++	[ALC295_FIXUP_CHROME_BOOK] = {
++		.type = HDA_FIXUP_FUNC,
++		.v.func = alc295_fixup_chromebook,
++	},
+ 	[ALC293_FIXUP_SYSTEM76_MIC_NO_PRESENCE] = {
+ 		.type = HDA_FIXUP_PINS,
+ 		.v.pins = (const struct hda_pintbl[]) {
+@@ -6736,12 +6725,6 @@ static const struct hda_fixup alc269_fixups[] = {
+ 			{ }
+ 		}
+ 	},
+-	[ALC295_FIXUP_CHROME_BOOK] = {
+-		.type = HDA_FIXUP_FUNC,
+-		.v.func = alc295_fixup_chromebook,
+-		.chained = true,
+-		.chain_id = ALC225_FIXUP_HEADSET_JACK
+-	},
+ };
+ 
+ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
+-- 
+2.23.0.187.g17f5b7556c-goog
+

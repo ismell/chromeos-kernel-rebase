@@ -1,0 +1,40 @@
+From 01313c6e8cb9c3317773d713274864021a2c33e4 Mon Sep 17 00:00:00 2001
+From: Jordan Crouse <jcrouse@codeaurora.org>
+Date: Thu, 20 Dec 2018 10:30:26 -0700
+Subject: [PATCH] FROMLIST: arm64: dts: sdm845: Add interconnect for GPU
+
+Define an interconnect port for the GPU to set bus
+capabilities.
+
+Signed-off-by: Jordan Crouse <jcrouse@codeaurora.org>
+(am from https://patchwork.kernel.org/patch/10739231/)
+(also found at https://lkml.kernel.org/r/20181220173026.3857-4-jcrouse@codeaurora.org)
+
+BUG=b:118132718
+TEST=GPU works and Jordan is happy
+
+Change-Id: I0a0dec6858860e50d0b6f5db664fb799e06ffae2
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1422488
+Commit-Ready: Evan Green <evgreen@chromium.org>
+Reviewed-by: Evan Green <evgreen@chromium.org>
+---
+ arch/arm64/boot/dts/qcom/sdm845.dtsi | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/sdm845.dtsi b/arch/arm64/boot/dts/qcom/sdm845.dtsi
+index b66e75a5bc33..b8272f29b4e0 100644
+--- a/arch/arm64/boot/dts/qcom/sdm845.dtsi
++++ b/arch/arm64/boot/dts/qcom/sdm845.dtsi
+@@ -1550,6 +1550,8 @@
+ 
+ 			operating-points-v2 = <&gpu_opp_table>;
+ 
++			interconnects = <&rsc_hlos MASTER_GFX3D &rsc_hlos SLAVE_EBI1>;
++
+ 			qcom,gmu = <&gmu>;
+ 
+ 			gpu_opp_table: opp-table {
+-- 
+2.23.0.187.g17f5b7556c-goog
+

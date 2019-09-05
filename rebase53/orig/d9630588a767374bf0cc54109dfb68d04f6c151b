@@ -1,0 +1,184 @@
+From d9630588a767374bf0cc54109dfb68d04f6c151b Mon Sep 17 00:00:00 2001
+From: Nick Crews <ncrews@chromium.org>
+Date: Mon, 8 Apr 2019 16:15:51 -0600
+Subject: [PATCH] FROMLIST: wilco_ec: Add USB PowerShare Policy control
+
+USB PowerShare is a policy which affects charging via the special
+USB PowerShare port (marked with a small lightning bolt or battery icon)
+when in low power states:
+- In S0, the port will always provide power.
+- In S0ix, if power_share is enabled, then power will be supplied to
+  the port when on AC or if battery is > 50%. Else no power is supplied.
+- In S5, if power_share is enabled, then power will be supplied to
+  the port when on AC. Else no power is supplied.
+
+v3 changes:
+- Drop a silly blank line
+- Use val > 1 instead of val != 0 && val != 1
+v2 changes:
+- Move documentation to Documentation/ABI/testing/sysfs-platform-wilco-ec
+- Zero out reserved bytes in requests.
+
+Signed-off-by: Nick Crews <ncrews@chromium.org>
+
+(am from https://lore.kernel.org/patchwork/patch/1062995/)
+
+BUG=b:128528059
+TEST=on device, you can try:
+localhost ~ # cat /sys/bus/platform/devices/GOOG00C\:00/usb_power_share
+0
+localhost ~ # echo 1 >
+/sys/bus/platform/devices/GOOG00C\:00/usb_power_share
+At this point changing this policy only affects behavior in S3 and S5,
+not in S0ix. The EC still needs some work for this.
+
+Change-Id: I25daac79be1379472917de8bc0d1d50bb7440bbd
+Reviewed-on: https://chromium-review.googlesource.com/1562791
+Commit-Ready: Nick Crews <ncrews@chromium.org>
+Tested-by: Nick Crews <ncrews@chromium.org>
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Reviewed-by: Nick Crews <ncrews@chromium.org>
+---
+ .../ABI/testing/sysfs-platform-wilco-ec       | 16 ++++
+ drivers/platform/chrome/wilco_ec/sysfs.c      | 92 +++++++++++++++++++
+ 2 files changed, 108 insertions(+)
+
+diff --git a/Documentation/ABI/testing/sysfs-platform-wilco-ec b/Documentation/ABI/testing/sysfs-platform-wilco-ec
+index e074c203cd32..0c07d5e0b737 100644
+--- a/Documentation/ABI/testing/sysfs-platform-wilco-ec
++++ b/Documentation/ABI/testing/sysfs-platform-wilco-ec
+@@ -9,3 +9,19 @@ Description:
+ 		Input should be parseable by kstrtou8() to 0 or 1.
+ 		Output will be either "0\n" or "1\n".
+ 
++What:		/sys/bus/platform/devices/GOOG000C\:00/usb_power_share
++Date:		April 2019
++KernelVersion:	5.2
++Description:
++		Control the USB PowerShare Policy. USB PowerShare is a policy
++		which affects charging via the special USB PowerShare port
++		(marked with a small lightning bolt or battery icon) when in
++		low power states:
++		- In S0, the port will always provide power.
++		- In S0ix, if power_share is enabled, then power will be
++		  supplied to the port when on AC or if battery is > 50%.
++		  Else no power is supplied.
++		- In S5, if power_share is enabled, then power will be supplied
++		  to the port when on AC. Else no power is supplied.
++
++		Input should be either "0" or "1".
+diff --git a/drivers/platform/chrome/wilco_ec/sysfs.c b/drivers/platform/chrome/wilco_ec/sysfs.c
+index 959b5da2eb16..14e1eee95d42 100644
+--- a/drivers/platform/chrome/wilco_ec/sysfs.c
++++ b/drivers/platform/chrome/wilco_ec/sysfs.c
+@@ -23,6 +23,26 @@ struct boot_on_ac_request {
+ 	u8 reserved7;
+ } __packed;
+ 
++#define CMD_USB_POWER_SHARE 0x39
++
++enum usb_power_share_op {
++	POWER_SHARE_GET = 0,
++	POWER_SHARE_SET = 1,
++};
++
++struct usb_power_share_request {
++	u8 cmd;		/* Always CMD_USB_POWER_SHARE */
++	u8 reserved;
++	u8 op;		/* One of enum usb_power_share_op */
++	u8 val;		/* When setting, either 0 or 1 */
++} __packed;
++
++struct usb_power_share_response {
++	u8 reserved;
++	u8 status;	/* Set by EC to 0 on success, other value on failure */
++	u8 val;		/* When getting, set by EC to either 0 or 1 */
++} __packed;
++
+ static ssize_t boot_on_ac_store(struct device *dev,
+ 				struct device_attribute *attr,
+ 				const char *buf, size_t count)
+@@ -57,8 +77,80 @@ static ssize_t boot_on_ac_store(struct device *dev,
+ 
+ static DEVICE_ATTR_WO(boot_on_ac);
+ 
++static int send_usb_power_share(struct wilco_ec_device *ec,
++				struct usb_power_share_request *rq,
++				struct usb_power_share_response *rs)
++{
++	struct wilco_ec_message msg;
++	int ret;
++
++	memset(&msg, 0, sizeof(msg));
++	msg.type = WILCO_EC_MSG_LEGACY;
++	msg.request_data = rq;
++	msg.request_size = sizeof(*rq);
++	msg.response_data = rs;
++	msg.response_size = sizeof(*rs);
++	ret = wilco_ec_mailbox(ec, &msg);
++	if (ret < 0)
++		return ret;
++	if (rs->status)
++		return -EIO;
++
++	return 0;
++}
++
++static ssize_t usb_power_share_show(struct device *dev,
++				    struct device_attribute *attr, char *buf)
++{
++	struct wilco_ec_device *ec = dev_get_drvdata(dev);
++	struct usb_power_share_request rq;
++	struct usb_power_share_response rs;
++	int ret;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.cmd = CMD_USB_POWER_SHARE;
++	rq.op = POWER_SHARE_GET;
++
++	ret = send_usb_power_share(ec, &rq, &rs);
++	if (ret < 0)
++		return ret;
++
++	return sprintf(buf, "%d\n", rs.val);
++}
++
++static ssize_t usb_power_share_store(struct device *dev,
++				     struct device_attribute *attr,
++				     const char *buf, size_t count)
++{
++	struct wilco_ec_device *ec = dev_get_drvdata(dev);
++	struct usb_power_share_request rq;
++	struct usb_power_share_response rs;
++	int ret;
++	u8 val;
++
++	ret = kstrtou8(buf, 10, &val);
++	if (ret < 0)
++		return ret;
++	if (val > 1)
++		return -EINVAL;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.cmd = CMD_USB_POWER_SHARE;
++	rq.op = POWER_SHARE_SET;
++	rq.val = val;
++
++	ret = send_usb_power_share(ec, &rq, &rs);
++	if (ret < 0)
++		return ret;
++
++	return count;
++}
++
++static DEVICE_ATTR_RW(usb_power_share);
++
+ static struct attribute *wilco_dev_attrs[] = {
+ 	&dev_attr_boot_on_ac.attr,
++	&dev_attr_usb_power_share.attr,
+ 	NULL,
+ };
+ 
+-- 
+2.23.0.187.g17f5b7556c-goog
+

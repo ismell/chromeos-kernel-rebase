@@ -1,0 +1,62 @@
+From 8911c6a7d3c9c91e52db1b6bb59dad0bd1f7f3f8 Mon Sep 17 00:00:00 2001
+From: Gwendal Grignou <gwendal@chromium.org>
+Date: Tue, 8 Sep 2015 09:46:08 -0700
+Subject: [PATCH] CHROMIUM: iio: core: Add double tap gesture
+
+Add double tap as possible gesture.
+This is an inteface change: however, the sysfs entry is based on string,
+so if other gestures are added on the trunk in the meantime, we will
+still be able to merge this change.
+
+BUG=chrome-os-partner:44754
+TEST=compile. Check with cros_iio_activity driver.
+
+Change-Id: I7700b02a8172b59975f8c1eda3e4e3b6d1b93508
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/297838
+Reviewed-by: Dmitry Torokhov <dtor@chromium.org>
+Conflicts:
+	drivers/iio/industrialio-core.c
+	include/linux/iio/types.h
+[rebase44(groeck): Resolved conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+Conflicts:
+	include/linux/iio/types.h
+[rebase49(groeck): Resolved conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+Conflicts:
+	include/uapi/linux/iio/types.h
+[rebase419(groeck): Resolved conflicts]
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+---
+ drivers/iio/industrialio-core.c | 1 +
+ include/uapi/linux/iio/types.h  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/iio/industrialio-core.c b/drivers/iio/industrialio-core.c
+index a062cfddc5af..7881124edcc5 100644
+--- a/drivers/iio/industrialio-core.c
++++ b/drivers/iio/industrialio-core.c
+@@ -127,6 +127,7 @@ static const char * const iio_modifier_names[] = {
+ 	[IIO_MOD_Q] = "q",
+ 	[IIO_MOD_CO2] = "co2",
+ 	[IIO_MOD_VOC] = "voc",
++	[IIO_MOD_DOUBLE_TAP] = "double_tap",
+ };
+ 
+ /* relies on pairs of these shared then separate */
+diff --git a/include/uapi/linux/iio/types.h b/include/uapi/linux/iio/types.h
+index 92baabc103ac..19137924bb51 100644
+--- a/include/uapi/linux/iio/types.h
++++ b/include/uapi/linux/iio/types.h
+@@ -87,6 +87,7 @@ enum iio_modifier {
+ 	IIO_MOD_VOC,
+ 	IIO_MOD_LIGHT_UV,
+ 	IIO_MOD_LIGHT_DUV,
++	IIO_MOD_DOUBLE_TAP,
+ };
+ 
+ enum iio_event_type {
+-- 
+2.23.0.187.g17f5b7556c-goog
+

@@ -1,0 +1,94 @@
+From d7c7d441b3b8e0f3011f7691ecb3951c96dad49a Mon Sep 17 00:00:00 2001
+From: Enrico Granata <egranata@chromium.org>
+Date: Fri, 1 Feb 2019 17:22:36 -0800
+Subject: [PATCH] CHROMIUM: cros_ec: use ODR events to clear the spreading
+ history
+
+This uses the ODR flag introduced in CL:1450288 to clear
+the last batch data used by the spreading algorithm.
+
+The spreading code relies on accurately measuring the effective
+interval between batches of samples. An ODR change means that the
+previous batches may no longer represent the behavior of the EC.
+If an ODR change is immediately followed by a batch, the AP
+will attempt to spread based on the previous interval, which
+can easily lead to "spreading into the future", leading to
+subsequent timestamp mismatch errors.
+
+This patch solves that problem by having ODR events be breaking
+points for the spreading code. The tradeoff is that this can
+cause samples to be lost immediately after an ODR change.
+
+This problem can't effectively be solved without either:
+- storing those samples in a side queue and spreading them once
+  updated information becomes available to do so;
+- communicating the ODR to the AP as part of the ODR event.
+
+BUG=b:123700100, chromium:944342
+TEST=running with CL:1450791, observe the
+ring not using stale batch information
+
+(Cherry-picked from 4.14)
+Also squashed in Idd5d508f344948b353167db60363317b596efb60
+
+Change-Id: Ic73d1bf0e7f659210052c56fe8d265f82f7f4b58
+Signed-off-by: Enrico Granata <egranata@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1450743
+Tested-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Signed-off-by: Alexandru M Stan <amstan@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1533349
+---
+ .../common/cros_ec_sensors/cros_ec_sensors_ring.c | 15 ++++++++++++++-
+ include/linux/mfd/cros_ec_commands.h              |  1 +
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+index 84acdc1370df..fec44ea49cae 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+@@ -445,8 +445,11 @@ static bool cros_ec_ring_process_event(
+ 				struct cros_ec_sensors_ring_sample *out)
+ {
+ 	int axis;
++	/* Do not populate the filter based on asynchronous events. */
++	const int async_flags = in->flags &
++		(MOTIONSENSE_SENSOR_FLAG_ODR | MOTIONSENSE_SENSOR_FLAG_FLUSH);
+ 
+-	if (in->flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP) {
++	if (in->flags & MOTIONSENSE_SENSOR_FLAG_TIMESTAMP && !async_flags) {
+ 		s64 a = in->timestamp;
+ 		s64 b = fifo_info->info.timestamp;
+ 		s64 c = fifo_timestamp;
+@@ -475,6 +478,16 @@ static bool cros_ec_ring_process_event(
+ 		}
+ 	}
+ 
++	if (in->flags & MOTIONSENSE_SENSOR_FLAG_ODR) {
++		state->last_batch_len[in->sensor_num] =
++			state->penultimate_batch_len[in->sensor_num] = 0;
++		/*
++		 * ODR change is only useful for the sensor_ring, it does not
++		 * convey information to clients.
++		 */
++		return false;
++	}
++
+ 	if (in->flags & MOTIONSENSE_SENSOR_FLAG_FLUSH) {
+ 		out->sensor_id = in->sensor_num;
+ 		out->timestamp = *current_timestamp;
+diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+index 6bd1ecc0eb42..cacab37af812 100644
+--- a/include/linux/mfd/cros_ec_commands.h
++++ b/include/linux/mfd/cros_ec_commands.h
+@@ -2443,6 +2443,7 @@ struct __ec_todo_unpacked ec_motion_sense_activity {
+ #define MOTIONSENSE_SENSOR_FLAG_TIMESTAMP (1<<1)
+ #define MOTIONSENSE_SENSOR_FLAG_WAKEUP (1<<2)
+ #define MOTIONSENSE_SENSOR_FLAG_TABLET_MODE (1<<3)
++#define MOTIONSENSE_SENSOR_FLAG_ODR (1<<4)
+ 
+ /*
+  * Send this value for the data element to only perform a read. If you
+-- 
+2.23.0.187.g17f5b7556c-goog
+

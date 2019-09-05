@@ -1,0 +1,56 @@
+From 51d1285ed7cde10c45713259f30b305074664f71 Mon Sep 17 00:00:00 2001
+From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date: Wed, 8 May 2019 11:19:54 +0200
+Subject: [PATCH] BACKPORT: FROMGIT: mfd: cros_ec: Update the EC feature codes
+
+Update the feature enum for the Chromebook Embedded Controller to the
+latest version. Some of these enums are still not used in the kernel but
+we might be also interested on have these enums up to date. Userspace
+can use them to query the features to the EC via the cros-ec character
+device.
+
+While here, also fix a typo in one comment in the enum.
+
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+
+(cherry picked from commit 81888d8ab1532e65dbed24feb5896a87d6df00a3
+ git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git for-mfd-next)
+[pihsun: remove constants already in chromeos-4.19 CHROMIUM: patches.]
+
+BUG=b:109911488
+TEST=build and boot to shell
+
+Change-Id: If74a0f46b7912b8dcd0c7b3c8f823c275b15f40d
+Signed-off-by: Pi-Hsun Shih <pihsun@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1565757
+Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+---
+ include/linux/mfd/cros_ec_commands.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+index 41cb61a17fb8..552583cc40c7 100644
+--- a/include/linux/mfd/cros_ec_commands.h
++++ b/include/linux/mfd/cros_ec_commands.h
+@@ -1299,6 +1299,16 @@ enum ec_feature_code {
+ 	EC_FEATURE_CEC = 35,
+ 	/* EC supports tight sensor timestamping. */
+ 	EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS = 36,
++	/*
++	 * EC supports tablet mode detection aligned to Chrome and allows
++	 * setting of threshold by host command using
++	 * MOTIONSENSE_CMD_TABLET_MODE_LID_ANGLE.
++	 */
++	EC_FEATURE_REFINED_TABLET_MODE_HYSTERESIS = 37,
++	/* EC supports audio codec. */
++	EC_FEATURE_AUDIO_CODEC = 38,
++	/* EC Supports SCP. */
++	EC_FEATURE_SCP = 39,
+ 	/* The MCU is an Integrated Sensor Hub */
+ 	EC_FEATURE_ISH = 40,
+ };
+-- 
+2.23.0.187.g17f5b7556c-goog
+

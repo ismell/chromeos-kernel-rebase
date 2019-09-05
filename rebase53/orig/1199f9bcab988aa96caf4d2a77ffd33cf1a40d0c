@@ -1,0 +1,42 @@
+From 1199f9bcab988aa96caf4d2a77ffd33cf1a40d0c Mon Sep 17 00:00:00 2001
+From: "yong.liang" <yong.liang@mediatek.com>
+Date: Mon, 22 Apr 2019 14:08:03 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: dt-bindings: mt8183: Add watchdog
+ dt-binding
+
+This patch add watchdog binding documentation for
+watchdog on MTK Socs.
+
+Signed-off-by: yong.liang <yong.liang@mediatek.com>
+Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
+
+(am from https://patchwork.kernel.org/patch/10910689/)
+[eddie.huang: fix context conflict]
+
+BUG=b:119927771
+TEST=build pass and boot to shell
+
+Change-Id: If1430b8c121b8114a75751b941954c35cbf5e134
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1592895
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+---
+ Documentation/devicetree/bindings/watchdog/mtk-wdt.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt b/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
+index 859dee167b91..92181b648f52 100644
+--- a/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
++++ b/Documentation/devicetree/bindings/watchdog/mtk-wdt.txt
+@@ -8,6 +8,7 @@ Required properties:
+ 	"mediatek,mt6797-wdt", "mediatek,mt6589-wdt": for MT6797
+ 	"mediatek,mt7622-wdt", "mediatek,mt6589-wdt": for MT7622
+ 	"mediatek,mt7623-wdt", "mediatek,mt6589-wdt": for MT7623
++	"mediatek,mt8183-wdt", "mediatek,mt6589-wdt": for MT8183
+ 
+ - reg : Specifies base physical address and size of the registers.
+ 
+-- 
+2.23.0.187.g17f5b7556c-goog
+

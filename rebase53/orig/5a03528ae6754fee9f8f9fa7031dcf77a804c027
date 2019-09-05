@@ -1,0 +1,56 @@
+From 5a03528ae6754fee9f8f9fa7031dcf77a804c027 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <groeck@chromium.org>
+Date: Mon, 29 Oct 2018 10:25:25 -0700
+Subject: [PATCH] CHROMIUM: Restrict ALT_SYSCALL code to 64 bit builds
+
+0day reports that 32 bit builds (i386) fail.
+
+>> init/init_task.c:65:69: error: initialization from incompatible pointer type [-Werror=incompatible-pointer-types]
+     .thread_info = INIT_THREAD_INFO(init_task),
+                                                                        ^
+init/init_task.c:65:69: note: (near initialization for 'init_task.thread_info.sys_call_table')
+
+Since we don't support 32-bit builds (the syscall API is different), limit
+ALT_SYSCALL support to 64-bit builds. Do it using ARCH_HAS_ALT_SYSCALL to make
+sure it does not pop up again.
+
+BUG=chromium:899792
+TEST=Build i386:allmodconfig
+
+Change-Id: Ibf5323b15a00ca3a8d27e0f16e225e7e6e278869
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1305534
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ arch/x86/Kconfig            | 2 +-
+ security/chromiumos/Kconfig | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 774f9c613e82..c60c440756c5 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -204,7 +204,7 @@ config X86
+ 	select USER_STACKTRACE_SUPPORT
+ 	select VIRT_TO_BUS
+ 	select X86_FEATURE_NAMES		if PROC_FS
+-	select ARCH_HAS_ALT_SYSCALL
++	select ARCH_HAS_ALT_SYSCALL		if X86_64
+ 
+ config INSTRUCTION_DECODER
+ 	def_bool y
+diff --git a/security/chromiumos/Kconfig b/security/chromiumos/Kconfig
+index 16495a39d6b4..a4ffa9303ef4 100644
+--- a/security/chromiumos/Kconfig
++++ b/security/chromiumos/Kconfig
+@@ -38,7 +38,6 @@ config SECURITY_CHROMIUMOS_DEVICE_JAIL
+ config ALT_SYSCALL_CHROMIUMOS
+ 	bool "Chromium OS Alt-Syscall Tables"
+ 	depends on ALT_SYSCALL
+-	depends on X86_64 || ARM64
+ 	help
+ 	  Register restricted, alternate syscall tables used by Chromium OS
+ 	  using the alt-syscall infrastructure.  Alternate syscall tables
+-- 
+2.23.0.187.g17f5b7556c-goog
+

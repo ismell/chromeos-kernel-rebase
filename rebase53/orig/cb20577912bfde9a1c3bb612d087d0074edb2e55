@@ -1,0 +1,121 @@
+From cb20577912bfde9a1c3bb612d087d0074edb2e55 Mon Sep 17 00:00:00 2001
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Wed, 22 Aug 2018 10:54:02 +0200
+Subject: [PATCH] BACKPORT: fbdev: Drop FBINFO_CAN_FORCE_OUTPUT flag
+
+This was only added for the drm's fbdev emulation support, so that it
+would try harder to show the Oops.
+
+Unfortunately this never really worked reliably, and in practice ended
+up pushing the real Oops off the screen due to plentyfull locking,
+sleep-while-atomic and other issues. So we removed all that support
+from the fbdev emulation a while back. Aside: We've also removed the
+kgdb support, for similar reasons.
+
+Since it's such a small patch I figured I don't split this up into the
+usual 3-phase removal.
+
+Acked-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Cc: Ben Skeggs <bskeggs@redhat.com>
+Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Hans de Goede <hdegoede@redhat.com>
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc: Alexander Kapshuk <alexander.kapshuk@gmail.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Thierry Reding <treding@nvidia.com>
+Cc: David Lechner <david@lechnology.com>
+Cc: nouveau@lists.freedesktop.org
+Cc: linux-fbdev@vger.kernel.org
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Link: https://patchwork.freedesktop.org/patch/msgid/20180822085405.10787-1-daniel.vetter@ffwll.ch
+
+(cherry picked from commit 04cfcc7ab358e331b32cabde1e853a125f3f8735)
+
+Downstream changes:
+- Added evdi_fb.c to this patchset
+
+BUG=None
+TEST=Tested on cheza, build tested everything else
+
+Signed-off-by: Sean Paul <seanpaul@chromium.org>
+Change-Id: Ie60c1937eec48c2b64e87863ece1a1fc4d239841
+Reviewed-on: https://chromium-review.googlesource.com/1314825
+Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+---
+ drivers/gpu/drm/evdi/evdi_fb.c          | 2 +-
+ drivers/gpu/drm/nouveau/nouveau_fbcon.c | 1 -
+ drivers/staging/vboxvideo/vbox_fb.c     | 3 +--
+ drivers/video/fbdev/core/fbcon.c        | 1 -
+ include/linux/fb.h                      | 4 ----
+ 5 files changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/gpu/drm/evdi/evdi_fb.c b/drivers/gpu/drm/evdi/evdi_fb.c
+index 10ca393d798a..e39883b6174b 100644
+--- a/drivers/gpu/drm/evdi/evdi_fb.c
++++ b/drivers/gpu/drm/evdi/evdi_fb.c
+@@ -357,7 +357,7 @@ static int evdifb_create(struct drm_fb_helper *helper,
+ 	info->fix.smem_len = size;
+ 	info->fix.smem_start = (unsigned long)ufbdev->ufb.obj->vmapping;
+ 
+-	info->flags = FBINFO_DEFAULT | FBINFO_CAN_FORCE_OUTPUT;
++	info->flags = FBINFO_DEFAULT;
+ 	info->fbops = &evdifb_ops;
+ 	drm_fb_helper_fill_fix(info, fb->pitches[0], fb->format->depth);
+ 	drm_fb_helper_fill_var(info, &ufbdev->helper, sizes->fb_width,
+diff --git a/drivers/gpu/drm/nouveau/nouveau_fbcon.c b/drivers/gpu/drm/nouveau/nouveau_fbcon.c
+index 0f64c0a1d4b3..032317c81bf0 100644
+--- a/drivers/gpu/drm/nouveau/nouveau_fbcon.c
++++ b/drivers/gpu/drm/nouveau/nouveau_fbcon.c
+@@ -379,7 +379,6 @@ nouveau_fbcon_create(struct drm_fb_helper *helper,
+ 		info->flags = FBINFO_DEFAULT | FBINFO_HWACCEL_COPYAREA |
+ 			      FBINFO_HWACCEL_FILLRECT |
+ 			      FBINFO_HWACCEL_IMAGEBLIT;
+-	info->flags |= FBINFO_CAN_FORCE_OUTPUT;
+ 	info->fbops = &nouveau_fbcon_sw_ops;
+ 	info->fix.smem_start = fb->nvbo->bo.mem.bus.base +
+ 			       fb->nvbo->bo.mem.bus.offset;
+diff --git a/drivers/staging/vboxvideo/vbox_fb.c b/drivers/staging/vboxvideo/vbox_fb.c
+index 43c39eca4ae1..034f8ffa8f20 100644
+--- a/drivers/staging/vboxvideo/vbox_fb.c
++++ b/drivers/staging/vboxvideo/vbox_fb.c
+@@ -155,8 +155,7 @@ static int vboxfb_create(struct drm_fb_helper *helper,
+ 	 * The last flag forces a mode set on VT switches even if the kernel
+ 	 * does not think it is needed.
+ 	 */
+-	info->flags = FBINFO_DEFAULT | FBINFO_CAN_FORCE_OUTPUT |
+-		      FBINFO_MISC_ALWAYS_SETPAR;
++	info->flags = FBINFO_DEFAULT | FBINFO_MISC_ALWAYS_SETPAR;
+ 	info->fbops = &vboxfb_ops;
+ 
+ 	/*
+diff --git a/drivers/video/fbdev/core/fbcon.c b/drivers/video/fbdev/core/fbcon.c
+index 75ebbbf0a1fb..9fd99681a7f2 100644
+--- a/drivers/video/fbdev/core/fbcon.c
++++ b/drivers/video/fbdev/core/fbcon.c
+@@ -1104,7 +1104,6 @@ static void fbcon_init(struct vc_data *vc, int init)
+ 	if (p->userfont)
+ 		charcnt = FNTCHARCNT(p->fontdata);
+ 
+-	vc->vc_panic_force_write = !!(info->flags & FBINFO_CAN_FORCE_OUTPUT);
+ 	vc->vc_can_do_color = (fb_get_color_depth(&info->var, &info->fix)!=1);
+ 	vc->vc_complement_mask = vc->vc_can_do_color ? 0x7700 : 0x0800;
+ 	if (charcnt == 256) {
+diff --git a/include/linux/fb.h b/include/linux/fb.h
+index 3cd375dafd0e..b1db5c5eb671 100644
+--- a/include/linux/fb.h
++++ b/include/linux/fb.h
+@@ -457,10 +457,6 @@ struct fb_tile_ops {
+  */
+ #define FBINFO_BE_MATH  0x100000
+ 
+-/* report to the VT layer that this fb driver can accept forced console
+-   output like oopses */
+-#define FBINFO_CAN_FORCE_OUTPUT     0x200000
+-
+ struct fb_info {
+ 	atomic_t count;
+ 	int node;
+-- 
+2.23.0.187.g17f5b7556c-goog
+
