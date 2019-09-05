@@ -25,8 +25,6 @@ TEST=Test Audio use cases for CML with full SOF patch series applied.
 Signed-off-by: Ap, Kamal <kamal.ap@intel.corp-partner.google.com>
 
 [rebase53(rrangel): Context conflict]
-
-Change-Id: I03da05c843bf8cdd27f85260c307bc2a86257591
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/sof/Kconfig    |  8 ++++++++
