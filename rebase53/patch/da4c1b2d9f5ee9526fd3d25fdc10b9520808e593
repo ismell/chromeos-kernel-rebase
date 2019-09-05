@@ -36,7 +36,7 @@ Signed-off-by: Evan Green <evgreen@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1355866
 Reviewed-by: Douglas Anderson <dianders@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Documentation/interconnect/interconnect.rst |  94 ++++

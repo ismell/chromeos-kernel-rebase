@@ -32,7 +32,7 @@ Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Commit-Queue: Thomas Garnier <thgarnie@chromium.org>
 Tested-by: Thomas Garnier <thgarnie@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  chromeos/check/smatch_errors.log             |   17 +

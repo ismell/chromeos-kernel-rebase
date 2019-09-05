@@ -43,7 +43,7 @@ Change-Id: Ie60c1937eec48c2b64e87863ece1a1fc4d239841
 Reviewed-on: https://chromium-review.googlesource.com/1314825
 Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
 
-[rebase419(rrangel): Removed evdi_fb.c from patchset. It belongs in a
+[rebase53(rrangel): Removed evdi_fb.c from patchset. It belongs in a
 CHROMIUM commit]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---

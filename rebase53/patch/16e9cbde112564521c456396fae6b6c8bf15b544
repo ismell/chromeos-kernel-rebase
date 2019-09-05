@@ -41,7 +41,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1354762
 Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
 Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
 
-[rebase52(rrangel): SPDX header conflict]
+[rebase53(rrangel): SPDX header conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/soc/mediatek/Makefile           |   2 +-

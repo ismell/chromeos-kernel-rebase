@@ -23,7 +23,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 Conflicts:
 	drivers/base/devtmpfs.c
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/base/Kconfig    | 9 +++++++++

@@ -41,7 +41,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1505082
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Reviewed-by: Alexandre Courbot <acourbot@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/media/common/videobuf2/videobuf2-core.c | 11 +++--------

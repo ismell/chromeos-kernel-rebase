@@ -31,7 +31,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1369681
 Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
 Reviewed-by: Stephen Boyd <swboyd@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/base/power/domain.c | 48 -------------------------------------

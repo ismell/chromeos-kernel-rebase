@@ -38,7 +38,7 @@ Tested-by: Luigi Semenzato <semenzato@chromium.org>
 Reviewed-by: Brian Geffon <bgeffon@chromium.org>
 Reviewed-by: Sonny Rao <sonnyrao@chromium.org>
 
-[rebase52(rrangel): applied change to moved function]
+[rebase53(rrangel): applied change to moved function]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/s390/appldata/appldata_mem.c | 9 ++++++++-

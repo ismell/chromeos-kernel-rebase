@@ -53,7 +53,7 @@ Change-Id: Ie2fd63d82f604f34bcbc7e1ca9b5af1bdcc037e0
 (cherry picked from commit 41fee2f2ce63e2acd65c9357bbc3856a3f3a37cc)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Documentation/scheduler/sched-tune.txt | 413 ++++++++++++++++

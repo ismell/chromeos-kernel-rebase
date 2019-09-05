@@ -16,7 +16,7 @@ Reviewed-by: Dmitry Torokhov <dtor@chromium.org>
 
 Change-Id: I4ec4a13668c5d69c0e3a27960b5c9792d78d2479
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/input/keyboard/cros_ec_keyb.c | 59 ++++++++++++++++++---------

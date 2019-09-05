@@ -16,7 +16,7 @@ Conflicts:
 [rebase419(groeck): Context conflicts; improved alignment with chromeos-4.14]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Most everything was already applied.]
+[rebase53(rrangel): Most everything was already applied.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/linux/mfd/cros_ec_commands.h | 8 ++++++++

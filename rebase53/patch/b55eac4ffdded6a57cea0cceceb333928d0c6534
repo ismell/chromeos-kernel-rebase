@@ -21,7 +21,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1662628
 Reviewed-by: Furquan Shaikh <furquan@chromium.org>
 
-[rebase52(rrangel): File was renamed]
+[rebase53(rrangel): File was renamed]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/display/intel_dp_aux_backlight.c | 1 -

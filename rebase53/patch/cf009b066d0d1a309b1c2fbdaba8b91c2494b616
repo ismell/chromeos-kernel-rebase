@@ -28,7 +28,7 @@ Conflicts:
 [rebase419(groeck): Conflict resolution]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): sysfs entries have been removed upstream. Need
+[rebase53(rrangel): sysfs entries have been removed upstream. Need
 85b2654efe4bc6e20f439421450a375fc4b84810 to make this fully functional]
 ---
  drivers/mfd/Kconfig                   |   11 +

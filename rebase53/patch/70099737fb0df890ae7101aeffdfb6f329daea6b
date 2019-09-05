@@ -40,7 +40,7 @@ Commit-Ready: Ben Zhang <benzh@chromium.org>
 Tested-by: Ben Zhang <benzh@chromium.org>
 Reviewed-by: Ben Zhang <benzh@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/intel/boards/Kconfig     |  13 ++

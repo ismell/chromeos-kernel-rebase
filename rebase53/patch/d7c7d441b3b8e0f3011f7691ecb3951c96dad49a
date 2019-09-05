@@ -39,7 +39,7 @@ Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
 Signed-off-by: Alexandru M Stan <amstan@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1533349
 
-[rebase419(rrangel): MOTIONSENSE_SENSOR_FLAG_ODR already existed]
+[rebase53(rrangel): MOTIONSENSE_SENSOR_FLAG_ODR already existed]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  .../common/cros_ec_sensors/cros_ec_sensors_ring.c | 15 ++++++++++++++-

@@ -25,7 +25,7 @@ Conflicts:
 	kernel API change: sys_close -> ksys_close]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/virtio/Kconfig          |    8 +

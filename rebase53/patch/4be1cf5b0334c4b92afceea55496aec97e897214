@@ -32,7 +32,7 @@ Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
 Commit-Queue: Gwendal Grignou <gwendal@chromium.org>
 Tested-by: Gwendal Grignou <gwendal@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec_dev.c             | 18 ++++++++++++++++++

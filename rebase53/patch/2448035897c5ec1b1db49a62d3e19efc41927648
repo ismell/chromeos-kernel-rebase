@@ -35,7 +35,7 @@ Signed-off-by: Akshu Agrawal <akshu.agrawal@amd.com>
 Reviewed-on: https://chromium-review.googlesource.com/831770
 Reviewed-by: Jason Clinton <jclinton@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/amd/acp-rt5645.c | 49 +++++++++++++++++++++++++++++++++++---

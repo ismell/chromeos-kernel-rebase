@@ -21,7 +21,7 @@ Tested-by: CK Hu <ck.hu@mediatek.corp-partner.google.com>
 Reviewed-by: CK Hu <ck.hu@mediatek.corp-partner.google.com>
 Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/mediatek/mtk_drm_drv.c | 1 +

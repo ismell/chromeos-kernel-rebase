@@ -87,7 +87,7 @@ Signed-off-by: Quentin Perret <quentin.perret@arm.com>
 (cherry picked from commit fb9c6b1a23a4ede134a3cec2a60e3db4154af6c6)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/linux/energy_model.h | 185 +++++++++++++++++++++++++++++++++

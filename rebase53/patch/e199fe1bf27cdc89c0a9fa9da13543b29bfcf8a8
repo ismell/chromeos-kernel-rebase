@@ -49,7 +49,7 @@ Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserv
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Reviewed-by: Hsin-Yi Wang <hsinyi@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  kernel/sched/fair.c  | 14 +++++++++-----

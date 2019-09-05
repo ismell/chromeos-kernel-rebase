@@ -14,7 +14,7 @@ Signed-off-by: Daniel Rosenberg <drosen@google.com>
 (cherry picked from commit 56fa0782078e236f3034a10b14ca4aa7ca581cf1)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  fs/attr.c          | 12 ++++++++++--

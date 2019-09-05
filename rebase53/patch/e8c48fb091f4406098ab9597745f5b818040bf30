@@ -21,7 +21,7 @@ Commit-Ready: Douglas Anderson <dianders@chromium.org>
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Douglas Anderson <dianders@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  arch/arm/boot/dts/rk3288-veyron-mickey.dts | 12 ++++++++++++

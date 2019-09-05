@@ -38,7 +38,7 @@ Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Tested-by: Thomas Garnier <thgarnie@chromium.org>
 Commit-Queue: Thomas Garnier <thgarnie@chromium.org>
 
-[rebase52(rrangel): This was kind of a gnarly backport. Some methods had
+[rebase53(rrangel): This was kind of a gnarly backport. Some methods had
 been moved to different files and things were already using
 audit_context().]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>

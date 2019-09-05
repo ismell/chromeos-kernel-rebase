@@ -29,10 +29,10 @@ Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1652004
 Reviewed-by: Benson Leung <bleung@google.com>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  ...sfs-class-chromeos-driver-cros-ec-pd-sysfs |  10 +

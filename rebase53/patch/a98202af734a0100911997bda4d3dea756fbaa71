@@ -22,7 +22,7 @@ Reviewed-on: https://chromium-review.googlesource.com/553422
 Commit-Ready: Mattias Nissler <mnissler@chromium.org>
 Reviewed-by: Mattias Nissler <mnissler@chromium.org>
 
-[rebase52(rrangel): tpm1_auto_startup moved into a different file]
+[rebase53(rrangel): tpm1_auto_startup moved into a different file]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/char/tpm/tpm1-cmd.c | 7 ++-----

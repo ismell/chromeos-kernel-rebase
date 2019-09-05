@@ -24,7 +24,7 @@ Reviewed-by: Dylan Reid <dgreid@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/425786
 Reviewed-by: Luis Hector Chavez <lhchavez@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  security/selinux/Kconfig | 10 ++++++++++

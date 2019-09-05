@@ -28,7 +28,7 @@ Signed-off-by: Alexandre Courbot <acourbot@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/1325770
 Reviewed-by: Tomasz Figa <tfiga@chromium.org>
 
-[rebase419(rrangel): Added synced to vb2_buffer_done since that's where
+[rebase53(rrangel): Added synced to vb2_buffer_done since that's where
 it goes on the upstream patch]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

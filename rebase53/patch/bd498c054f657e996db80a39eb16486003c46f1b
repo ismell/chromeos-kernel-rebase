@@ -18,7 +18,7 @@ Reviewed-by: Tomasz Figa <tfiga@chromium.org>
 Reviewed-by: Zach Reizner <zachr@chromium.org>
 Reviewed-by: Gurchetan Singh <gurchetansingh@chromium.org>
 
-[rebase419(rrangel): Context Conflict]
+[rebase53(rrangel): Context Conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/virtio/virtgpu_drv.h   |  9 ++++-

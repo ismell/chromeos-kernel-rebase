@@ -33,7 +33,7 @@ Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 Tested-by: Chintan M Patel <chintan.m.patel@intel.com>
 Commit-Queue: Chintan M Patel <chintan.m.patel@intel.com>
 
-[rebase52(rrangel): Cherry picked original commit94e35ce221732497f939713640816ae0a42a71c1]
+[rebase53(rrangel): Cherry picked original commit94e35ce221732497f939713640816ae0a42a71c1]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/display/intel_display.c | 4 ++--

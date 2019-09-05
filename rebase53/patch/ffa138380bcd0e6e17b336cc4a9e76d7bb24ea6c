@@ -46,7 +46,7 @@ Conflicts:
 [rebase419(groeck): Context conflicts]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec_dev.c | 163 +++++++++++++++++++++++++++++++++++++-

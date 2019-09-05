@@ -38,7 +38,7 @@ Tested-by: Furquan Shaikh <furquan@chromium.org>
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 
-[rebase52(rrangel): File was moved]
+[rebase53(rrangel): File was moved]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../drm/i915/display/intel_dp_aux_backlight.c | 132 ++++++++++++------

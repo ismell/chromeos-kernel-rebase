@@ -26,7 +26,7 @@ Tested-by: Gurchetan Singh <gurchetansingh@chromium.org>
 Reviewed-by: Gurchetan Singh <gurchetansingh@chromium.org>
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/uapi/linux/virtio_gpu.h | 18 ++++++++++++++++++

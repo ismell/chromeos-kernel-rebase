@@ -35,7 +35,7 @@ Signed-off-by: Stephen Boyd <swboyd@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1549541
 Reviewed-by: Ravi Chandra Sadineni <ravisadineni@chromium.org>
 
-[rebase419(rrangel): There was a CHROMIUM patch that made one of
+[rebase53(rrangel): There was a CHROMIUM patch that made one of
 the pr_debug into a pr_info. It was reverted in a merge. This patch
 is realy just UPSTREAM now.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>

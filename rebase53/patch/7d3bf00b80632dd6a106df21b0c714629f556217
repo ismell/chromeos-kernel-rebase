@@ -24,7 +24,7 @@ Reviewed-on: https://chromium-review.googlesource.com/784056
 [rebase419(groeck): Context conflicts]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Make sure the lock is unlocked]
+[rebase53(rrangel): Make sure the lock is unlocked]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  net/vmw_vsock/virtio_transport.c | 21 ++++++---------------

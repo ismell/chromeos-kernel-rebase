@@ -33,7 +33,7 @@ Change-Id: Ibf0c9f5bd57e737a8642199448a6e4535e7ac03c
 Reviewed-on: https://chromium-review.googlesource.com/1330525
 Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c | 2 +-

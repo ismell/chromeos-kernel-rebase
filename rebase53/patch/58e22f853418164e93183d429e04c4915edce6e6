@@ -33,7 +33,7 @@ Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1418082
 Reviewed-by: Evan Green <evgreen@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/linux/energy_model.h     |   4 +-

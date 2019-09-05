@@ -20,7 +20,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
 Change-Id: I6d0b2ac541616c24920c0906a01186eb2cf3106f
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/chrome/Kconfig    |   9 ++-

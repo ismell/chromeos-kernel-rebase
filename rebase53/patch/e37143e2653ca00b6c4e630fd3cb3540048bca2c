@@ -39,7 +39,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1315127
 Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/intel_csr.c | 19 ++++++++++++++++---

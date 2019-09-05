@@ -55,10 +55,10 @@ Signed-off-by: Lann Martin <lannm@chromium.org>
 	Clear planes data in modified code]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../media/common/videobuf2/videobuf2-core.c   | 60 ++++++++-----------

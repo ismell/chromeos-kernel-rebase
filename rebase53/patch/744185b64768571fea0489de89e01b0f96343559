@@ -66,7 +66,7 @@ Tested-by: Nick Crews <ncrews@chromium.org>
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/chrome/wilco_ec/Kconfig     |   7 +

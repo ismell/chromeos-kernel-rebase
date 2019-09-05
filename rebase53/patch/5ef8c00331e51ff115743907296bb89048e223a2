@@ -24,7 +24,7 @@ Reviewed-by: Hsinyu Chao <hychao@chromium.org>
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Reviewed-by: Sathyanarayana Nujella <sathyanarayana.nujella@intel.com>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/pci/hda/patch_realtek.c | 29 ++++++++++++++++++++++++++++-

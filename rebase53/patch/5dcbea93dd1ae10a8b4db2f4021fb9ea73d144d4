@@ -25,7 +25,7 @@ Change-Id: Ifc4b96806a8d94a2c5a5d5eb1115330cc37eb131
 Reviewed-on: https://chromium-review.googlesource.com/1330485
 Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
 
-[rebase419(rrangel): Added missing line from
+[rebase53(rrangel): Added missing line from
 fe16e58c302d949ea067efb6ed8329836a4592af]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---

@@ -44,7 +44,7 @@ Signed-off-by: Douglas Anderson <dianders@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1570555
 Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/arm/mach-rockchip/Makefile               |   4 +-

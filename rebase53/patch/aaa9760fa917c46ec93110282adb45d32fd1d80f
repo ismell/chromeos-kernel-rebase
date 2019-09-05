@@ -32,7 +32,7 @@ Commit-Ready: Furquan Shaikh <furquan@chromium.org>
 Tested-by: Furquan Shaikh <furquan@chromium.org>
 Reviewed-by: Aaron Durbin <adurbin@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/firmware/google/gsmi.c | 16 ++++++++++++++++

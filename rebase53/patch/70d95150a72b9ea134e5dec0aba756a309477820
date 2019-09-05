@@ -36,7 +36,7 @@ Signed-off-by: Filipe Brandenburger <filbranden@chromium.org>
 [rebase419(groeck): Context conflicts]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Incorperated changes to add_smaps_sum from
+[rebase53(rrangel): Incorperated changes to add_smaps_sum from
 9607a4f7c8396d44270fcaaddeb449ca355a80a2]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

@@ -27,7 +27,7 @@ Signed-off-by: Ap, Kamal <kamal.ap@intel.corp-partner.google.com>
 
 Change-Id: I58d26440bd6b2939e71510aa9e07a0033e597844
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/intel/boards/Kconfig                |  16 +

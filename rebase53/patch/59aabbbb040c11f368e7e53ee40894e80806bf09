@@ -38,7 +38,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1704776
 Reviewed-by: Evan Green <evgreen@chromium.org>
 
-[rebase419(rrangel): Fix Conflicts]
+[rebase53(rrangel): Fix Conflicts]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  drivers/md/Kconfig             |  38 --

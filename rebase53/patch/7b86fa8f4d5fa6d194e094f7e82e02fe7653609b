@@ -32,7 +32,7 @@ Commit-Ready: Micah Morton <mortonm@chromium.org>
 Tested-by: Micah Morton <mortonm@chromium.org>
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Documentation/admin-guide/LSM/SafeSetID.rst | 107 ++++++++

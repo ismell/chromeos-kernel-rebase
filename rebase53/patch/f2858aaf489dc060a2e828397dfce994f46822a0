@@ -36,7 +36,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 [rebase419(groeck): Context conflicts against EAS changes form Android]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/thermal/cpu_cooling.c     | 18 ++++++++++++++----

@@ -24,7 +24,7 @@ Commit-Queue: Douglas Anderson <dianders@chromium.org>
 (cherry picked from commit 7213eb4731dbbb77317494a0b0fcdda162969157)
 Reviewed-on: https://chromium-review.googlesource.com/354085
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/input/touchscreen/elants_i2c.c | 21 +++++++++++++++++++++

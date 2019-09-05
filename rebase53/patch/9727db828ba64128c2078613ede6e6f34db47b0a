@@ -30,7 +30,7 @@ Tested-by: Enrico Granata <egranata@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1532969
 Reviewed-by: Enrico Granata <egranata@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  .../cros_ec_sensors/cros_ec_sensors_ring.c    | 10 +---------

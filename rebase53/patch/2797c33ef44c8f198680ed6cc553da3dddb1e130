@@ -18,10 +18,10 @@ TEST=build for caroline
 Change-Id: I3fe180efa92104a580008f4b67b2bd8d511fa2af
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/x86/include/asm/cpufeature.h | 15 ---------------

@@ -20,7 +20,7 @@ Signed-off-by: Zhuohao Lee <zhuohao@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1531627
 Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mtd/mtdcore.c   | 84 ++++++++++++++++++++++++++++++++++++-----

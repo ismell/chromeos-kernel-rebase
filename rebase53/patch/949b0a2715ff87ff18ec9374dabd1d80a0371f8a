@@ -54,7 +54,7 @@ Signed-off-by: Douglas Anderson <dianders@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1415598
 Reviewed-by: Evan Green <evgreen@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  arch/arm64/boot/dts/qcom/sdm845-cheza.dtsi |  4 ++--

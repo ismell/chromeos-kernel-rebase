@@ -34,7 +34,7 @@ Conflicts:
 [rebase414(groeck): Resolve context conflict]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Merged in 1e1c777f11ad023c3eaf179f57d3902e414a1999]
+[rebase53(rrangel): Merged in 1e1c777f11ad023c3eaf179f57d3902e414a1999]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/x86/intel_pmc_ipc.c | 31 +++++++++++++++++++++++-----

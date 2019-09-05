@@ -24,7 +24,7 @@ Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1633251
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../devicetree/bindings/gpu/arm,mali-midgard.txt    | 13 +++++++++++++

@@ -27,7 +27,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1610555
 Commit-Ready: Douglas Anderson <dianders@chromium.org>
 Reviewed-by: Douglas Anderson <dianders@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/arm/boot/dts/rk3288-veyron-speedy.dts | 4 ++++

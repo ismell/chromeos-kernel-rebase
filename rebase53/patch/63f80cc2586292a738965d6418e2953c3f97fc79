@@ -15,7 +15,7 @@ Change-Id: I66694a8a1a6fc63196ffca9374d48ccfb7d7f869
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1137347
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
-[rebase419(rrangel): Converted to raw flag to match upstream]
+[rebase53(rrangel): Converted to raw flag to match upstream]
 ---
  Makefile | 1 +
  1 file changed, 1 insertion(+)

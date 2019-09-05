@@ -23,7 +23,7 @@ Signed-off-by: Alexandre Courbot <acourbot@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/1325774
 Reviewed-by: Tomasz Figa <tfiga@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../media/common/videobuf2/videobuf2-core.c   | 134 +++++++++++++++++-

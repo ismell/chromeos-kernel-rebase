@@ -25,7 +25,7 @@ Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Tested-by: Jongpil Jung <jongpil19.jung@samsung.com>
 Commit-Queue: Rajat Jain <rajatja@google.com>
 
-[rebase52(rrangel): file moved]
+[rebase53(rrangel): file moved]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../drm/i915/display/intel_dp_aux_backlight.c | 21 +++++++++++++++++++

@@ -22,7 +22,7 @@ TEST=Test Audio use cases for CML with full SOF patch series applied.
 Signed-off-by: Ap, Kamal <kamal.ap@intel.corp-partner.google.com>
 
 Change-Id: I5a224d10baf290aacdaf570ada9d78ce44064214
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/intel/common/soc-acpi-intel-cnl-match.c | 10 +++++-----

@@ -24,7 +24,7 @@ Change-Id: I4f525dfb45113ba63f01aaf8e1e809ae6b34dd52
 (cherry picked from commit c5cb3e32886a3a6ae7f4fff5505f110efc70d60b)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/Kconfig                     |   2 +

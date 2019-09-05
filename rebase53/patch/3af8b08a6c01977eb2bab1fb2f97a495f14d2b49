@@ -22,7 +22,7 @@ Tested-by: David Riley <davidriley@chromium.org>
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Gurchetan Singh <gurchetansingh@chromium.org>
 
-[rebase419(rrangel): Match changes from a BACKPORT.]
+[rebase53(rrangel): Match changes from a BACKPORT.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/virtio/virtgpu_ioctl.c | 3 +--

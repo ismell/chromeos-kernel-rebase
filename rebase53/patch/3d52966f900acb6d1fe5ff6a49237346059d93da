@@ -23,7 +23,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1372571
 Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
 Reviewed-by: Dylan Reid <dgreid@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/pci/hda/patch_realtek.c | 66 +++++++++++++++++++++++++++++++++++

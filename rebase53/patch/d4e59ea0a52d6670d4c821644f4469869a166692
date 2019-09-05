@@ -57,7 +57,7 @@ Conflicts:
 
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/net/bluetooth/hci.h      |  1 +

@@ -40,7 +40,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1369460
 Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
 Reviewed-by: Pi-Hsun Shih <pihsun@chromium.org>
 
-[rebase52(rrangel): Applied changes from drivers/iommu/io-pgtable.h
+[rebase53(rrangel): Applied changes from drivers/iommu/io-pgtable.h
 to include/linux/io-pgtable.h]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

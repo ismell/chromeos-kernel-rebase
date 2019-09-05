@@ -35,7 +35,7 @@ Commit-Ready: Micah Morton <mortonm@chromium.org>
 Tested-by: Micah Morton <mortonm@chromium.org>
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Removed the security/chromiumos/lsm.c changes. They
+[rebase53(rrangel): Removed the security/chromiumos/lsm.c changes. They
 are CHROMIUM specific and belong in a CHROMIUM cl.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

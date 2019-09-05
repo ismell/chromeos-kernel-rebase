@@ -19,7 +19,7 @@ Reviewed-by: Alexandru M Stan <amstan@chromium.org>
 [rebase419(groeck): Kernel API changes]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): drivers/iio/counter has been moved to
+[rebase53(rrangel): drivers/iio/counter has been moved to
 drivers/counter]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

@@ -36,7 +36,7 @@ Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/k
 Commit-Queue: Shyh-In Hwang <josephsih@chromium.org>
 Tested-by: Shyh-In Hwang <josephsih@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/bluetooth/btusb.c   | 145 +++++++++++++++++++++++++-----------

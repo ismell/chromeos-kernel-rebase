@@ -24,7 +24,7 @@ Tested-by: Wen Gong <wgong@qti-qualcomm.corp-partner.google.com>
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Reviewed-by: Grant Grundler <grundler@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/net/mac80211.h |  5 +++++

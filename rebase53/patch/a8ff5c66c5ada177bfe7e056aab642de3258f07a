@@ -23,7 +23,7 @@ Signed-off-by: Tomasz Figa <tfiga@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1710264
 Reviewed-by: Alexandre Courbot <acourbot@chromium.org>
 
-[rebase52(rrangel): Added back V4L2_CTRL_TYPE_FWHT_PARAMS]
+[rebase53(rrangel): Added back V4L2_CTRL_TYPE_FWHT_PARAMS]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/media/v4l2-core/v4l2-ctrls.c | 126 +++++++++++++++------------

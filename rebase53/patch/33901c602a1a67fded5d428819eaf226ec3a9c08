@@ -20,7 +20,7 @@ Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserv
 Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Benson Leung <bleung@google.com>
 
-[rebase419(rrangel): Most things were already changed. Ther were only 3
+[rebase53(rrangel): Most things were already changed. Ther were only 3
 changes that needed to come fro this  patch.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

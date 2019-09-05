@@ -32,7 +32,7 @@ Commit-Ready: Gurchetan Singh <gurchetansingh@chromium.org>
 Tested-by: Gurchetan Singh <gurchetansingh@chromium.org>
 Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 
-[rebase419(rrangel): Skipped the CHROMIUM specific changes. They will be
+[rebase53(rrangel): Skipped the CHROMIUM specific changes. They will be
 applied later.]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---

@@ -29,7 +29,7 @@ Tested-by: Shirish S <shirish.s@amd.com>
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c | 3 ++-

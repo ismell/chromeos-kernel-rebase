@@ -48,7 +48,7 @@ Reviewed-by: Benson Leung <bleung@chromium.org>
 [rebase419(groeck): _wait_for() has an additional parameter]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/intel_csr.c | 8 ++++++++

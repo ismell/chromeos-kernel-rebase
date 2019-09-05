@@ -30,7 +30,7 @@ Conflicts:
 [rebase419(groeck): Resolved conflicts (context changes)]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): tpm1_pm_suspend was moved into tpm1-cmd.c.]
+[rebase53(rrangel): tpm1_pm_suspend was moved into tpm1-cmd.c.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/char/tpm/tpm-interface.c | 7 +++++++

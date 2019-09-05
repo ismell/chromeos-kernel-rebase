@@ -22,7 +22,7 @@ Reviewed-by: Douglas Anderson <dianders@chromium.org>
 Commit-Queue: Douglas Anderson <dianders@chromium.org>
 Tested-by: Douglas Anderson <dianders@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c | 4 ++++

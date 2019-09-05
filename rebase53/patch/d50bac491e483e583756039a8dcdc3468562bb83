@@ -35,10 +35,10 @@ Signed-off-by: Jett Rink <jettrink@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1551940
 Reviewed-by: Enrico Granata <egranata@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec.c                   | 35 +++++++++++------

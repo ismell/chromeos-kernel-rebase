@@ -35,7 +35,7 @@ Tested-by: Rajat Jain <rajatja@google.com>
 Reviewed-by: Nick Crews <ncrews@chromium.org>
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): This commit was messy. The CHROMIUM patch should
+[rebase53(rrangel): This commit was messy. The CHROMIUM patch should
 have been reverted first then the new ones cherry picked. I manually
 resolved the conflicts.]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>

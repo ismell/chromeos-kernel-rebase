@@ -25,7 +25,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1501718
 Commit-Ready: ChromeOS CL Exonerator Bot <chromiumos-cl-exonerator@appspot.gserviceaccount.com>
 Reviewed-by: Xiaoyong Zhou <xzhou@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  net/bluetooth/hci_core.c  |  7 +++++++

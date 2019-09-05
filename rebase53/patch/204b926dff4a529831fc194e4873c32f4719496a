@@ -23,7 +23,7 @@ Signed-off-by: Ryan Case <ryandcase@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1308053
 Reviewed-by: Stephen Boyd <swboyd@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/input/touchscreen/elants_i2c.c | 7 ++++---

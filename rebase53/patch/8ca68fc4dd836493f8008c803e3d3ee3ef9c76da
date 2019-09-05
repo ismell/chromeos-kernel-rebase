@@ -9,7 +9,7 @@ TEST=Boot with alt-syscall enabled
 Change-Id: I4a6fd929d46f0cd1ae2aca748e8befb87affabac
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/x86/Kconfig                   |  1 +

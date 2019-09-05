@@ -17,7 +17,7 @@ Signed-off-by: Keun-young Park <keunyoung@google.com>
 (cherry picked from commit 2c27d20e6f7947be49c2a445afa2c63add8ccd11)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): DM_ANDROID_VERITY no longer exists. It was
+[rebase53(rrangel): DM_ANDROID_VERITY no longer exists. It was
 reverted. So we don't set the default to 128.]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---

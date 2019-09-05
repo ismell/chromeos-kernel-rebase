@@ -24,7 +24,7 @@ Reviewed-by: Jack Rosenthal <jrosenth@chromium.org>
 Commit-Queue: Douglas Anderson <dianders@chromium.org>
 Tested-by: Douglas Anderson <dianders@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec_dev.c | 70 ++++++++++++++++++++++++++++++---------

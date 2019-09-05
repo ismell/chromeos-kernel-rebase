@@ -19,7 +19,7 @@ Signed-off-by: Derek Basehore <dbasehore@chromium.org>
 Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1687291
 
-[rebase52(rrangel): intel_dp.c and vlv_dsi.c were moved into display/]
+[rebase53(rrangel): intel_dp.c and vlv_dsi.c were moved into display/]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/drm_connector.c         | 45 ++++++++++++++++++-------

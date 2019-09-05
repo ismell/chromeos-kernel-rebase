@@ -24,7 +24,7 @@ Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
 Change-Id: I4b208bef8954b096da2f8e1e1ea19cfa2bd84c97
 
-[rebase419(rrangel): Context conflict + Drop cros_ec_commands.h changes.
+[rebase53(rrangel): Context conflict + Drop cros_ec_commands.h changes.
 They are applied already.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

@@ -42,7 +42,7 @@ Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Tested-by: Jongpil Jung <jongpil19.jung@samsung.com>
 Commit-Queue: Rajat Jain <rajatja@google.com>
 
-[rebase52(rrangel): Cherry picked original commit]
+[rebase53(rrangel): Cherry picked original commit]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/display/intel_bios.h             | 1 +

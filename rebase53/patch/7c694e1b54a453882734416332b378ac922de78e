@@ -14,10 +14,10 @@ TEST=build for caroline
 Change-Id: Iab421ebdb58ab5063e1f2b3f9553c0a347bd76b6
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Makefile | 5 ++---

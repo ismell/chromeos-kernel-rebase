@@ -15,7 +15,7 @@ Change-Id: I2ee9e9501b4a54a1e8a936af65e91e261f6f0347
 Signed-off-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1521812
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  net/bluetooth/hci_event.c | 22 ++++++++++++++++++++--

@@ -39,7 +39,7 @@ Tested-by: Nick Crews <ncrews@chromium.org>
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 Reviewed-by: Nick Crews <ncrews@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  .../ABI/testing/sysfs-platform-wilco-ec       | 17 ++++

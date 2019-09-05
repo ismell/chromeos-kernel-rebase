@@ -37,7 +37,7 @@ Commit-Ready: Furquan Shaikh <furquan@chromium.org>
 Tested-by: Furquan Shaikh <furquan@chromium.org>
 Reviewed-by: Aaron Durbin <adurbin@chromium.org>
 
-[rebase52(rrangel): Context conflicts and included a revert of
+[rebase53(rrangel): Context conflicts and included a revert of
 5be52fccaf3d218b278320b0d183aa36aab48add so the trip_type was available]
 ---
  drivers/thermal/thermal_core.c | 43 ++++++++++++++++++++++++++++++++--

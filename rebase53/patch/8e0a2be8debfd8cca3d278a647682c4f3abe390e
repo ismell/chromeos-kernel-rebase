@@ -33,7 +33,7 @@ Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
 Reviewed-by: Benson Leung <bleung@google.com>
 Reviewed-by: Sean Paul <seanpaul@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  include/linux/mfd/cros_ec_commands.h | 440 +++++++++++++++------------

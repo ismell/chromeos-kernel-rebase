@@ -42,7 +42,7 @@ Conflicts:
 	drivers/scsi/ufs/Kconfig
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Documentation/ABI/testing/configfs-driver-ufs |  12 +

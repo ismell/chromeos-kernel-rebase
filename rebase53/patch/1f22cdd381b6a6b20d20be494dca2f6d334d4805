@@ -43,7 +43,7 @@ Commit-Ready: Gurchetan Singh <gurchetansingh@chromium.org>
 Tested-by: Gurchetan Singh <gurchetansingh@chromium.org>
 Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/virtio/virtgpu_drv.h    | 18 +++++--

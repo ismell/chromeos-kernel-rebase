@@ -28,7 +28,7 @@ Signed-off-by: Brian Norris <briannorris@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1330054
 Reviewed-by: Benson Leung <bleung@chromium.org>
 
-[rebase419(rrangel): Just cherry-picked the upstream patch
+[rebase53(rrangel): Just cherry-picked the upstream patch
 The backport is not necessary anymore.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

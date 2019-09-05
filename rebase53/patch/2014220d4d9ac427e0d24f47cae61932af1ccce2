@@ -35,7 +35,7 @@ Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
 Tested-by: Chintan M Patel <chintan.m.patel@intel.com>
 Commit-Queue: Chintan M Patel <chintan.m.patel@intel.com>
 
-[rebase52(rrangel): Cherry picked original commit423ee8e99aa5ee7ee5133616366099b8379870dc]
+[rebase53(rrangel): Cherry picked original commit423ee8e99aa5ee7ee5133616366099b8379870dc]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/display/intel_sprite.c | 2 ++

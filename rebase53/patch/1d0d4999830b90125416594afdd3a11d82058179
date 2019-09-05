@@ -39,7 +39,7 @@ Reviewed-on: https://chromium-review.googlesource.com/1226732
 Reviewed-by: Aaron Durbin <adurbin@chromium.org>
 Reviewed-by: Justin TerAvest <teravest@chromium.org>
 
-[rebase52(rrangel): Applied to correct file]
+[rebase53(rrangel): Applied to correct file]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/gpu/drm/i915/display/intel_panel.c | 1 -

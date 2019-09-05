@@ -29,7 +29,7 @@ Commit-Ready: Douglas Anderson <dianders@chromium.org>
 Reviewed-by: Douglas Anderson <dianders@chromium.org>
 Reviewed-by: Curtis Malainey <cujomalainey@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  sound/soc/intel/boards/Kconfig               |   8 ++

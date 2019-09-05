@@ -27,7 +27,7 @@ TEST=Build AMD image
 Change-Id: I93cd1ed7198db9d125131ba58071ee6c3f89fb51
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): dropped the gmc changes since those have been fixed
+[rebase53(rrangel): dropped the gmc changes since those have been fixed
 upstream]
 Signed-off-by: Raul Rangel <rrangel@chromium.org>
 ---

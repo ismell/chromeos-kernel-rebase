@@ -25,7 +25,7 @@ Signed-off-by: Tomasz Figa <tfiga@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1712725
 Reviewed-by: Alexandre Courbot <acourbot@chromium.org>
 
-[rebase52(rrangel): Context conflict. Pretty sure this is identical to
+[rebase53(rrangel): Context conflict. Pretty sure this is identical to
 the list version.]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

@@ -15,7 +15,7 @@ TEST=Build kernel for Cheza
 Change-Id: If771d871246e6bc0598821c07a81a05e4c6f1349
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Match existing style]
+[rebase53(rrangel): Match existing style]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/scsi/ufs/Makefile | 2 +-

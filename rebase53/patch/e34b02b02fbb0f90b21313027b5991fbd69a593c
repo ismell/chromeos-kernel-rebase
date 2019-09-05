@@ -19,7 +19,7 @@ Signed-off-by: Rushikesh S Kadam <rushikesh.s.kadam@intel.corp-partner.google.co
 Reviewed-on: https://chromium-review.googlesource.com/1443573
 Reviewed-by: Jett Rink <jettrink@chromium.org>
 
-[rebase419(rrangel): Context conflict]
+[rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec_dev.c            | 13 +++++++++++++

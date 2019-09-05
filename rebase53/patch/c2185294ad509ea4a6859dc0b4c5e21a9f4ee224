@@ -14,7 +14,7 @@ TEST=Build and run on any target or in qemu
 Change-Id: Ia0846a1e2a8c168c75046e24fd170d8a952cb46d
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase52(rrangel):
+[rebase53(rrangel):
 	replace compat_timex with old_timex32 (4d5f007eedb74d71a7bde2bff69b6a31ad8ab427)
 	replace timex with __kernel_timex (ead25417f82ed7f8a21da4dcefc768169f7da884)
 	compat_ksys_adjtimex was renamed to ksys_adjtimex_time32 (3a4d44b6162555070194e486ff6b3799a8d323a2, 8dabe7245bbc134f2cfcc12cde75c019dab924cc)

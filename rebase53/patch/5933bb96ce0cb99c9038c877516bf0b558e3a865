@@ -16,7 +16,7 @@ Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 (cherry picked from commit 59005ae20b903e0715de7a5dce379288e647ec15)
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase419(rrangel): Fix conflicts with UPSTREAM changes]
+[rebase53(rrangel): Fix conflicts with UPSTREAM changes]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  Makefile | 1 +
