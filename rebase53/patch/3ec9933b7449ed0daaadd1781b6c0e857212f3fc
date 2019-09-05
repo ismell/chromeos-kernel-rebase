@@ -1,0 +1,78 @@
+From 0d5ad5cbfd6a942ebf1dae604b767ced28018e1b Mon Sep 17 00:00:00 2001
+From: Luis Hector Chavez <lhchavez@google.com>
+Date: Thu, 5 Jan 2017 16:39:59 -0800
+Subject: [PATCH] CHROMIUM: Add CONFIG_SECURITY_SELINUX_PERMISSIVE_DONTAUDIT
+
+It's still useful to have SECURITY_SELINUX_DEVELOP=y by default so that
+external developers can set their machines to developer mode and set
+permissive SELinux without having to re-build their kernels, but it's
+still useful to have it not spam the logs by default due to Chrome OS'
+large number of permissive rules.  This change adds a new flag that lets
+the user control whether or not to log permissive "denials".
+
+Signed-off-by: Luis Hector Chavez <lhchavez@google.com>
+
+BUG=b:33437013
+TEST=build with USE=selinux_develop, see lots of logs
+
+Change-Id: I53a877ba99ebc4eb040cd7b8c916b0bc3ba48a73
+Reviewed-on: https://chromium-review.googlesource.com/424948
+Commit-Ready: Luis Hector Chavez <lhchavez@chromium.org>
+Tested-by: Luis Hector Chavez <lhchavez@chromium.org>
+Reviewed-by: Dylan Reid <dgreid@chromium.org>
+(cherry picked from commit fceee0e3f5cb71f40ccda379bbc2dc6265123fb4)
+Reviewed-on: https://chromium-review.googlesource.com/425786
+Reviewed-by: Luis Hector Chavez <lhchavez@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ security/selinux/Kconfig | 10 ++++++++++
+ security/selinux/avc.c   |  9 +++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/security/selinux/Kconfig b/security/selinux/Kconfig
+index 5711689deb6a..32617728eafc 100644
+--- a/security/selinux/Kconfig
++++ b/security/selinux/Kconfig
+@@ -57,6 +57,16 @@ config SECURITY_SELINUX_DEVELOP
+ 	  can interactively toggle the kernel between enforcing mode and
+ 	  permissive mode (if permitted by the policy) via /selinux/enforce.
+ 
++config SECURITY_SELINUX_PERMISSIVE_DONTAUDIT
++	bool "NSA SELinux don't audit permissive"
++	depends on SECURITY_SELINUX
++	default n
++	help
++	  This prevents logging when permissive=1.  If unsure, say N.  With
++	  this option enabled, any avc logs that would occur on a permissive
++	  domain won't be logged.  This can prevent a significant amount of
++	  logspam.
++
+ config SECURITY_SELINUX_AVC_STATS
+ 	bool "NSA SELinux AVC Statistics"
+ 	depends on SECURITY_SELINUX
+diff --git a/security/selinux/avc.c b/security/selinux/avc.c
+index 92df40bcf397..f0a632c60839 100644
+--- a/security/selinux/avc.c
++++ b/security/selinux/avc.c
+@@ -767,9 +767,14 @@ noinline int slow_avc_audit(struct selinux_state *state,
+ 	if (WARN_ON(!tclass || tclass >= ARRAY_SIZE(secclass_map)))
+ 		return -EINVAL;
+ 
+-	/* Only log permissive=1 messages for SECURITY_SELINUX_DEVELOP */
+-	if (!IS_ENABLED(CONFIG_SECURITY_SELINUX_DEVELOP) && denied && !result)
++	/*
++	 * Avoid logging permissive=1 messages for
++	 * SECURITY_SELINUX_PERMISSIVE_DONTAUDIT.
++	 */
++	if (IS_ENABLED(CONFIG_SECURITY_SELINUX_PERMISSIVE_DONTAUDIT) && denied
++	    && !result) {
+ 		return 0;
++	}
+ 
+ 	if (!a) {
+ 		a = &stack_data;
+-- 
+2.23.0.187.g17f5b7556c-goog
+

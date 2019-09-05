@@ -1,0 +1,96 @@
+From b202e7c27e4407ea2928bab5a20231a2804a490f Mon Sep 17 00:00:00 2001
+From: Ricky Liang <jcliang@chromium.org>
+Date: Fri, 26 Aug 2016 10:55:43 +0800
+Subject: [PATCH] CHROMIUM: thermal: add thermal logs in devfreq_cooling and
+ cpu_cooling
+
+Also adds a log in power_allocator which logs the power info when
+it starts to control power.
+
+BUG=chrome-os-partner:56732
+TEST=Manually tested on my device.
+
+Signed-off-by: Ricky Liang <jcliang@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/372558
+Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
+
+(cherry picked from commit eea88d0a7b15fd05b832ad08f00e02368d70f221)
+Signed-off-by: Stephen Barber <smbarber@chromium.org>
+Change-Id: I0bee83cd0f56a037923ea7aad98154ee45379d48
+Reviewed-on: https://chromium-review.googlesource.com/377400
+Reviewed-by: Ricky Liang <jcliang@chromium.org>
+Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
+
+Conflicts:
+	drivers/thermal/cpu_cooling.c
+[rebase414(teravest): Fixed rename and cpu_dev access]
+Signed-off-by: Justin TerAvest <teravest@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/thermal/cpu_cooling.c     | 6 ++++++
+ drivers/thermal/devfreq_cooling.c | 3 +++
+ drivers/thermal/power_allocator.c | 8 ++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/drivers/thermal/cpu_cooling.c b/drivers/thermal/cpu_cooling.c
+index 83486775e593..ee10ffba000d 100644
+--- a/drivers/thermal/cpu_cooling.c
++++ b/drivers/thermal/cpu_cooling.c
+@@ -486,6 +486,7 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ {
+ 	struct cpufreq_cooling_device *cpufreq_cdev = cdev->devdata;
+ 	unsigned int clip_freq;
++	struct device *cpu_dev;
+ 
+ 	/* Request state should be less than max_level */
+ 	if (WARN_ON(state > cpufreq_cdev->max_level))
+@@ -501,6 +502,11 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ 	cpufreq_update_policy(cpufreq_cdev->policy->cpu);
+ 
++	cpu_dev = get_cpu_device(cpufreq_cdev->policy->cpu);
++	dev_info(cpu_dev,
++		 "Cooling state set to %lu. New max freq = %u\n",
++		 state, clip_freq);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/thermal/devfreq_cooling.c b/drivers/thermal/devfreq_cooling.c
+index ef59256887ff..e3f564b51c37 100644
+--- a/drivers/thermal/devfreq_cooling.c
++++ b/drivers/thermal/devfreq_cooling.c
+@@ -150,6 +150,9 @@ static int devfreq_cooling_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ 	dfc->cooling_state = state;
+ 
++	dev_info(dev, "Cooling state set to %lu. New max freq = %u\n",
++		 state, dfc->freq_table[state]);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/thermal/power_allocator.c b/drivers/thermal/power_allocator.c
+index 44636475b2a3..85f212c4f760 100644
+--- a/drivers/thermal/power_allocator.c
++++ b/drivers/thermal/power_allocator.c
+@@ -443,6 +443,14 @@ static int allocate_power(struct thermal_zone_device *tz,
+ 				      max_allocatable_power, tz->temperature,
+ 				      control_temp - tz->temperature);
+ 
++	if (total_granted_power < total_req_power) {
++		dev_info(&tz->device, "Controlling power: control_temp=%d "
++			 "last_temp=%d, curr_temp=%d total_requested_power=%d "
++			 "total_granted_power=%d\n", control_temp,
++			 tz->last_temperature, tz->temperature,
++			 total_req_power, total_granted_power);
++	}
++
+ 	kfree(req_power);
+ unlock:
+ 	mutex_unlock(&tz->lock);
+-- 
+2.23.0.187.g17f5b7556c-goog
+

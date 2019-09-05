@@ -1,0 +1,73 @@
+From a79db2a239e3a4c54ce4d76082d9066f2a671812 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Thu, 16 May 2019 09:29:41 -0700
+Subject: [PATCH] BACKPORT: FROMLIST: ARM: dts: rockchip: raise GPU trip point
+ temperatures for veyron
+
+The values match those used by the downstream Chrome OS 3.14
+kernel, the 'official' kernel for veyron devices. Keep the critical
+trip point for speedy at 90C as in the downstream configuration.
+
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+(am from https://lore.kernel.org/patchwork/patch/1074994/)
+(also found at https://lkml.kernel.org/r/20190516162942.154823-2-mka@chromium.org)
+
+Conflicts:
+  arch/arm/boot/dts/rk3288-veyron.dtsi
+    context delta from node 'gpu_opp_table' being present in CrOS but
+    not in upstream.
+
+BUG=chromium:941638
+TEST=build for minnie
+
+Change-Id: If4cd3a58a32c6bba6f9b1f3194894b60def996b1
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1610555
+Commit-Ready: Douglas Anderson <dianders@chromium.org>
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm/boot/dts/rk3288-veyron-speedy.dts | 4 ++++
+ arch/arm/boot/dts/rk3288-veyron.dtsi       | 8 ++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/arch/arm/boot/dts/rk3288-veyron-speedy.dts b/arch/arm/boot/dts/rk3288-veyron-speedy.dts
+index ab2a66aa337e6..3d2769f1bef23 100644
+--- a/arch/arm/boot/dts/rk3288-veyron-speedy.dts
++++ b/arch/arm/boot/dts/rk3288-veyron-speedy.dts
+@@ -75,6 +75,10 @@
+ 	force-hpd;
+ };
+ 
++&gpu_crit {
++	temperature = <90000>;
++};
++
+ &panel {
+ 	power-supply= <&panel_regulator>;
+ };
+diff --git a/arch/arm/boot/dts/rk3288-veyron.dtsi b/arch/arm/boot/dts/rk3288-veyron.dtsi
+index 660c5bec5948b..d075d32f87444 100644
+--- a/arch/arm/boot/dts/rk3288-veyron.dtsi
++++ b/arch/arm/boot/dts/rk3288-veyron.dtsi
+@@ -162,6 +162,14 @@
+ 	status = "okay";
+ };
+ 
++&gpu_alert0 {
++	temperature = <72500>;
++};
++
++&gpu_crit {
++	temperature = <100000>;
++};
++
+ &hdmi {
+ 	ddc-i2c-bus = <&i2c5>;
+ 	status = "okay";
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

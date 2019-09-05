@@ -1,0 +1,102 @@
+From ad6aecd6a3d4bff0973846e50779d28edf7556e1 Mon Sep 17 00:00:00 2001
+From: Wen Gong <wgong@qti-qualcomm.corp-partner.google.com>
+Date: Mon, 10 Sep 2018 15:36:06 +0800
+Subject: [PATCH] BACKPORT: UPSTREAM: mac80211: Store sk_pacing_shift in
+ ieee80211_hw
+
+Make it possibly for drivers to adjust the default skb_pacing_shift
+by storing it in the hardware struct.
+
+Signed-off-by: Wen Gong <wgong@codeaurora.org>
+[adjust commit log, move & adjust comment]
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+
+(cherry picked from commit 70e53669c4c41b0fc043cb0bcb518b53428edf64)
+
+BUG=b:73972012
+TEST=Do tx traffic test
+
+Change-Id: I6f304d90b866554b8a15b06823cef7ff49078bb2
+Signed-off-by: Wen Gong <wgong@codeaurora.org>
+Reviewed-on: https://chromium-review.googlesource.com/1477448
+Commit-Ready: Brian Norris <briannorris@chromium.org>
+Tested-by: Wen Gong <wgong@qti-qualcomm.corp-partner.google.com>
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Reviewed-by: Grant Grundler <grundler@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ include/net/mac80211.h |  5 +++++
+ net/mac80211/main.c    | 12 ++++++++++++
+ net/mac80211/tx.c      |  8 +-------
+ 3 files changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+index e248f5fe5b194..854908e3adb77 100644
+--- a/include/net/mac80211.h
++++ b/include/net/mac80211.h
+@@ -2294,6 +2294,10 @@ enum ieee80211_hw_flags {
+  *	supported by HW.
+  * @max_nan_de_entries: maximum number of NAN DE functions supported by the
+  *	device.
++ *
++ * @tx_sk_pacing_shift: Pacing shift to set on TCP sockets when frames from
++ *	them are encountered. The default should typically not be changed,
++ *	unless the driver has good reasons for needing more buffers.
+  */
+ struct ieee80211_hw {
+ 	struct ieee80211_conf conf;
+@@ -2329,6 +2333,7 @@ struct ieee80211_hw {
+ 	u8 n_cipher_schemes;
+ 	const struct ieee80211_cipher_scheme *cipher_schemes;
+ 	u8 max_nan_de_entries;
++	u8 tx_sk_pacing_shift;
+ };
+ 
+ static inline bool _ieee80211_hw_check(struct ieee80211_hw *hw,
+diff --git a/net/mac80211/main.c b/net/mac80211/main.c
+index 81303be51e117..b4b3e5363d3d4 100644
+--- a/net/mac80211/main.c
++++ b/net/mac80211/main.c
+@@ -610,6 +610,18 @@ struct ieee80211_hw *ieee80211_alloc_hw_nm(size_t priv_data_len,
+ 	local->ops = ops;
+ 	local->use_chanctx = use_chanctx;
+ 
++	/*
++	 * We need a bit of data queued to build aggregates properly, so
++	 * instruct the TCP stack to allow more than a single ms of data
++	 * to be queued in the stack. The value is a bit-shift of 1
++	 * second, so 8 is ~4ms of queued data. Only affects local TCP
++	 * sockets.
++	 * This is the default, anyhow - drivers may need to override it
++	 * for local reasons (longer buffers, longer completion time, or
++	 * similar).
++	 */
++	local->hw.tx_sk_pacing_shift = 8;
++
+ 	/* set up some defaults */
+ 	local->hw.queues = 1;
+ 	local->hw.max_rates = 1;
+diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
+index 8ce06008bac8f..478355524a313 100644
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -3621,13 +3621,7 @@ void __ieee80211_subif_start_xmit(struct sk_buff *skb,
+ 	if (!IS_ERR_OR_NULL(sta)) {
+ 		struct ieee80211_fast_tx *fast_tx;
+ 
+-		/* We need a bit of data queued to build aggregates properly, so
+-		 * instruct the TCP stack to allow more than a single ms of data
+-		 * to be queued in the stack. The value is a bit-shift of 1
+-		 * second, so 7 is ~8ms of queued data. Only affects local TCP
+-		 * sockets.
+-		 */
+-		sk_pacing_shift_update(skb->sk, 7);
++		sk_pacing_shift_update(skb->sk, sdata->local->hw.tx_sk_pacing_shift);
+ 
+ 		fast_tx = rcu_dereference(sta->fast_tx);
+ 
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

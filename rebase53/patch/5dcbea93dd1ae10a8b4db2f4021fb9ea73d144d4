@@ -1,0 +1,3444 @@
+From 14c516db5b6f87552f93a1d64a2b70e29133fb16 Mon Sep 17 00:00:00 2001
+From: Sean Paul <seanpaul@chromium.org>
+Date: Wed, 31 Oct 2018 14:36:04 -0400
+Subject: [PATCH] BACKPORT: UPSTREAM: drm/amd/display: Refactor FreeSync module
+
+Remove dependency on internal sink map and instead
+use existing stream and plane state
+
+Signed-off-by: Anthony Koo <Anthony.Koo@amd.com>
+Signed-off-by: Harry Wentland <harry.wentland@amd.com>
+Reviewed-by: Tony Cheng <Tony.Cheng@amd.com>
+Acked-by: Harry Wentland <harry.wentland@amd.com>
+Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
+(cherry picked from commit 98e6436d3af5f)
+
+Downstream changes:
+- downstream already has cec-over-dp-aux, so fix context error
+  drm_dp_cec_unset_edid() (made to match upstream)
+
+BUG=None
+TEST=Tested on cheza, build tested everything else
+
+Signed-off-by: Sean Paul <seanpaul@chromium.org>
+Change-Id: Ifc4b96806a8d94a2c5a5d5eb1115330cc37eb131
+Reviewed-on: https://chromium-review.googlesource.com/1330485
+Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+
+[rebase419(rrangel): Added missing line from
+fe16e58c302d949ea067efb6ed8329836a4592af]
+Signed-off-by: Raul Rangel <rrangel@chromium.org>
+---
+ .../gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c |  288 +--
+ .../gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h |   18 +-
+ .../display/amdgpu_dm/amdgpu_dm_mst_types.c   |   10 +-
+ drivers/gpu/drm/amd/display/dc/core/dc.c      |   60 +-
+ .../gpu/drm/amd/display/dc/core/dc_link_dp.c  |    3 +
+ .../gpu/drm/amd/display/dc/core/dc_resource.c |  110 +-
+ drivers/gpu/drm/amd/display/dc/dc_hw_types.h  |    6 -
+ drivers/gpu/drm/amd/display/dc/dc_stream.h    |   29 +-
+ drivers/gpu/drm/amd/display/dc/dc_types.h     |   22 +-
+ .../display/dc/dce110/dce110_hw_sequencer.c   |   34 +-
+ .../amd/display/dc/dcn10/dcn10_hw_sequencer.c |   27 +-
+ .../drm/amd/display/include/set_mode_types.h  |   12 -
+ .../amd/display/modules/freesync/freesync.c   | 1837 ++++++-----------
+ .../amd/display/modules/inc/mod_freesync.h    |  144 +-
+ 14 files changed, 929 insertions(+), 1671 deletions(-)
+
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+index cff6d12b3828..9a698f7bb43b 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+@@ -941,8 +941,7 @@ amdgpu_dm_update_connector_after_detect(struct amdgpu_dm_connector *aconnector)
+ 
+ 		if (sink) {
+ 			if (aconnector->dc_sink) {
+-				amdgpu_dm_remove_sink_from_freesync_module(
+-								connector);
++				amdgpu_dm_update_freesync_caps(connector, NULL);
+ 				/* retain and release bellow are used for
+ 				 * bump up refcount for sink because the link don't point
+ 				 * to it anymore after disconnect so on next crtc to connector
+@@ -952,10 +951,10 @@ amdgpu_dm_update_connector_after_detect(struct amdgpu_dm_connector *aconnector)
+ 					dc_sink_release(aconnector->dc_sink);
+ 			}
+ 			aconnector->dc_sink = sink;
+-			amdgpu_dm_add_sink_to_freesync_module(
+-						connector, aconnector->edid);
++			amdgpu_dm_update_freesync_caps(connector,
++					aconnector->edid);
+ 		} else {
+-			amdgpu_dm_remove_sink_from_freesync_module(connector);
++			amdgpu_dm_update_freesync_caps(connector, NULL);
+ 			if (!aconnector->dc_sink)
+ 				aconnector->dc_sink = aconnector->dc_em_sink;
+ 			else if (aconnector->dc_sink != aconnector->dc_em_sink)
+@@ -992,8 +991,7 @@ amdgpu_dm_update_connector_after_detect(struct amdgpu_dm_connector *aconnector)
+ 		/* TODO: check if we still need the S3 mode update workaround.
+ 		 * If yes, put it here. */
+ 		if (aconnector->dc_sink)
+-			amdgpu_dm_remove_sink_from_freesync_module(
+-							connector);
++			amdgpu_dm_update_freesync_caps(connector, NULL);
+ 
+ 		aconnector->dc_sink = sink;
+ 		if (sink->dc_edid.length == 0) {
+@@ -1009,11 +1007,11 @@ amdgpu_dm_update_connector_after_detect(struct amdgpu_dm_connector *aconnector)
+ 			drm_dp_cec_set_edid(&aconnector->dm_dp_aux.aux,
+ 					    aconnector->edid);
+ 		}
+-		amdgpu_dm_add_sink_to_freesync_module(connector, aconnector->edid);
++		amdgpu_dm_update_freesync_caps(connector, aconnector->edid);
+ 
+ 	} else {
+ 		drm_dp_cec_unset_edid(&aconnector->dm_dp_aux.aux);
+-		amdgpu_dm_remove_sink_from_freesync_module(connector);
++		amdgpu_dm_update_freesync_caps(connector, NULL);
+ 		drm_connector_update_edid_property(connector, NULL);
+ 		aconnector->num_modes = 0;
+ 		aconnector->dc_sink = NULL;
+@@ -1729,26 +1727,68 @@ static void dm_bandwidth_update(struct amdgpu_device *adev)
+ static int amdgpu_notify_freesync(struct drm_device *dev, void *data,
+ 				struct drm_file *filp)
+ {
+-	struct mod_freesync_params freesync_params;
+-	uint8_t num_streams;
++	struct drm_atomic_state *state;
++	struct drm_modeset_acquire_ctx ctx;
++	struct drm_crtc *crtc;
++	struct drm_connector *connector;
++	struct drm_connector_state *old_con_state, *new_con_state;
++	int ret = 0;
+ 	uint8_t i;
++	bool enable = false;
+ 
+-	struct amdgpu_device *adev = dev->dev_private;
+-	int r = 0;
++	drm_modeset_acquire_init(&ctx, 0);
++
++	state = drm_atomic_state_alloc(dev);
++	if (!state) {
++		ret = -ENOMEM;
++		goto out;
++	}
++	state->acquire_ctx = &ctx;
++
++retry:
++	drm_for_each_crtc(crtc, dev) {
++		ret = drm_atomic_add_affected_connectors(state, crtc);
++		if (ret)
++			goto fail;
++
++		/* TODO rework amdgpu_dm_commit_planes so we don't need this */
++		ret = drm_atomic_add_affected_planes(state, crtc);
++		if (ret)
++			goto fail;
++	}
+ 
+-	/* Get freesync enable flag from DRM */
++	for_each_oldnew_connector_in_state(state, connector, old_con_state, new_con_state, i) {
++		struct dm_connector_state *dm_new_con_state = to_dm_connector_state(new_con_state);
++		struct drm_crtc_state *new_crtc_state;
++		struct amdgpu_crtc *acrtc = to_amdgpu_crtc(dm_new_con_state->base.crtc);
++		struct dm_crtc_state *dm_new_crtc_state;
+ 
+-	num_streams = dc_get_current_stream_count(adev->dm.dc);
++		if (!acrtc) {
++			ASSERT(0);
++			continue;
++		}
+ 
+-	for (i = 0; i < num_streams; i++) {
+-		struct dc_stream_state *stream;
+-		stream = dc_get_stream_at_index(adev->dm.dc, i);
++		new_crtc_state = drm_atomic_get_new_crtc_state(state, &acrtc->base);
++		dm_new_crtc_state = to_dm_crtc_state(new_crtc_state);
+ 
+-		mod_freesync_update_state(adev->dm.freesync_module,
+-					  &stream, 1, &freesync_params);
++		dm_new_crtc_state->freesync_enabled = enable;
+ 	}
+ 
+-	return r;
++	ret = drm_atomic_commit(state);
++
++fail:
++	if (ret == -EDEADLK) {
++		drm_atomic_state_clear(state);
++		drm_modeset_backoff(&ctx);
++		goto retry;
++	}
++
++	drm_atomic_state_put(state);
++
++out:
++	drm_modeset_drop_locks(&ctx);
++	drm_modeset_acquire_fini(&ctx);
++	return ret;
+ }
+ 
+ static const struct amdgpu_display_funcs dm_display_funcs = {
+@@ -2719,6 +2759,10 @@ dm_crtc_duplicate_state(struct drm_crtc *crtc)
+ 		dc_stream_retain(state->stream);
+ 	}
+ 
++	state->adjust = cur->adjust;
++	state->vrr_infopacket = cur->vrr_infopacket;
++	state->freesync_enabled = cur->freesync_enabled;
++
+ 	/* TODO Duplicate dc_stream after objects are stream object is flattened */
+ 
+ 	return &state->base;
+@@ -2935,14 +2979,16 @@ amdgpu_dm_connector_atomic_duplicate_state(struct drm_connector *connector)
+ 	struct dm_connector_state *new_state =
+ 			kmemdup(state, sizeof(*state), GFP_KERNEL);
+ 
+-	if (new_state) {
+-		__drm_atomic_helper_connector_duplicate_state(connector,
+-							      &new_state->base);
+-		new_state->max_bpc = state->max_bpc;
+-		return &new_state->base;
+-	}
++	if (!new_state)
++		return NULL;
+ 
+-	return NULL;
++	__drm_atomic_helper_connector_duplicate_state(connector, &new_state->base);
++
++	new_state->freesync_capable = state->freesync_capable;
++	new_state->freesync_enable = state->freesync_enable;
++	new_state->max_bpc = state->max_bpc;
++
++	return &new_state->base;
+ }
+ 
+ static const struct drm_connector_funcs amdgpu_dm_connector_funcs = {
+@@ -3955,8 +4001,6 @@ static void remove_stream(struct amdgpu_device *adev,
+ 			  struct dc_stream_state *stream)
+ {
+ 	/* this is the update mode case */
+-	if (adev->dm.freesync_module)
+-		mod_freesync_remove_stream(adev->dm.freesync_module, stream);
+ 
+ 	acrtc->otg_inst = -1;
+ 	acrtc->enabled = false;
+@@ -4225,6 +4269,11 @@ static bool commit_planes_to_stream(
+ 	stream_update->dst = dc_stream->dst;
+ 	stream_update->out_transfer_func = dc_stream->out_transfer_func;
+ 
++	if (dm_new_crtc_state->freesync_enabled != dm_old_crtc_state->freesync_enabled) {
++		stream_update->vrr_infopacket = &dc_stream->vrr_infopacket;
++		stream_update->adjust = &dc_stream->adjust;
++	}
++
+ 	for (i = 0; i < new_plane_count; i++) {
+ 		updates[i].surface = plane_states[i];
+ 		updates[i].gamma =
+@@ -4360,6 +4409,8 @@ static void amdgpu_dm_commit_planes(struct drm_atomic_state *state,
+ 			spin_unlock_irqrestore(&pcrtc->dev->event_lock, flags);
+ 		}
+ 
++		dc_stream_attach->adjust = acrtc_state->adjust;
++		dc_stream_attach->vrr_infopacket = acrtc_state->vrr_infopacket;
+ 
+ 		if (false == commit_planes_to_stream(dm->dc,
+ 							plane_states_constructed,
+@@ -4521,62 +4572,6 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
+ 		}
+ 	} /* for_each_crtc_in_state() */
+ 
+-	/*
+-	 * Add streams after required streams from new and replaced streams
+-	 * are removed from freesync module
+-	 */
+-	if (adev->dm.freesync_module) {
+-		for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state,
+-					      new_crtc_state, i) {
+-			struct amdgpu_dm_connector *aconnector = NULL;
+-			struct dm_connector_state *dm_new_con_state = NULL;
+-			struct amdgpu_crtc *acrtc = NULL;
+-			bool modeset_needed;
+-
+-			dm_new_crtc_state = to_dm_crtc_state(new_crtc_state);
+-			dm_old_crtc_state = to_dm_crtc_state(old_crtc_state);
+-			modeset_needed = modeset_required(
+-					new_crtc_state,
+-					dm_new_crtc_state->stream,
+-					dm_old_crtc_state->stream);
+-			/* We add stream to freesync if:
+-			 * 1. Said stream is not null, and
+-			 * 2. A modeset is requested. This means that the
+-			 *    stream was removed previously, and needs to be
+-			 *    replaced.
+-			 */
+-			if (dm_new_crtc_state->stream == NULL ||
+-					!modeset_needed)
+-				continue;
+-
+-			acrtc = to_amdgpu_crtc(crtc);
+-
+-			aconnector =
+-				amdgpu_dm_find_first_crtc_matching_connector(
+-					state, crtc);
+-			if (!aconnector) {
+-				DRM_DEBUG_DRIVER("Atomic commit: Failed to "
+-						 "find connector for acrtc "
+-						 "id:%d skipping freesync "
+-						 "init\n",
+-						 acrtc->crtc_id);
+-				continue;
+-			}
+-
+-			mod_freesync_add_stream(adev->dm.freesync_module,
+-						dm_new_crtc_state->stream,
+-						&aconnector->caps);
+-			new_con_state = drm_atomic_get_new_connector_state(
+-					state, &aconnector->base);
+-			dm_new_con_state = to_dm_connector_state(new_con_state);
+-
+-			mod_freesync_set_user_enable(adev->dm.freesync_module,
+-						     &dm_new_crtc_state->stream,
+-						     1,
+-						     &dm_new_con_state->user_enable);
+-		}
+-	}
+-
+ 	if (dm_state->context) {
+ 		dm_enable_per_frame_crtc_master_sync(dm_state->context);
+ 		WARN_ON(!dc_commit_state(dm->dc, dm_state->context));
+@@ -4630,6 +4625,9 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
+ 		WARN_ON(!status);
+ 		WARN_ON(!status->plane_count);
+ 
++		dm_new_crtc_state->stream->adjust = dm_new_crtc_state->adjust;
++		dm_new_crtc_state->stream->vrr_infopacket = dm_new_crtc_state->vrr_infopacket;
++
+ 		/*TODO How it works with MPO ?*/
+ 		if (!commit_planes_to_stream(
+ 				dm->dc,
+@@ -4662,11 +4660,6 @@ static void amdgpu_dm_atomic_commit_tail(struct drm_atomic_state *state)
+ 		if (dm_new_crtc_state->stream == NULL || !modeset_needed)
+ 			continue;
+ 
+-		if (adev->dm.freesync_module)
+-			mod_freesync_notify_mode_change(
+-				adev->dm.freesync_module,
+-				&dm_new_crtc_state->stream, 1);
+-
+ 		manage_dm_interrupts(adev, acrtc, true);
+ 	}
+ 
+@@ -4855,7 +4848,42 @@ static int do_aquire_global_lock(struct drm_device *dev,
+ 	return ret < 0 ? ret : 0;
+ }
+ 
+-static int dm_update_crtcs_state(struct dc *dc,
++void set_freesync_on_stream(struct amdgpu_display_manager *dm,
++			    struct dm_crtc_state *new_crtc_state,
++			    struct dm_connector_state *new_con_state,
++			    struct dc_stream_state *new_stream)
++{
++	struct mod_freesync_config config = {0};
++	struct mod_vrr_params vrr = {0};
++	struct dc_info_packet vrr_infopacket = {0};
++	struct amdgpu_dm_connector *aconnector =
++			to_amdgpu_dm_connector(new_con_state->base.connector);
++
++	if (new_con_state->freesync_capable &&
++	    new_con_state->freesync_enable) {
++		config.state = new_crtc_state->freesync_enabled ?
++				VRR_STATE_ACTIVE_VARIABLE :
++				VRR_STATE_INACTIVE;
++		config.min_refresh_in_uhz =
++				aconnector->min_vfreq * 1000000;
++		config.max_refresh_in_uhz =
++				aconnector->max_vfreq * 1000000;
++	}
++
++	mod_freesync_build_vrr_params(dm->freesync_module,
++				      new_stream,
++				      &config, &vrr);
++
++	mod_freesync_build_vrr_infopacket(dm->freesync_module,
++					  new_stream,
++					  &vrr,
++					  &vrr_infopacket);
++
++	new_crtc_state->adjust = vrr.adjust;
++	new_crtc_state->vrr_infopacket = vrr_infopacket;
++}
++
++static int dm_update_crtcs_state(struct amdgpu_display_manager *dm,
+ 				 struct drm_atomic_state *state,
+ 				 bool enable,
+ 				 bool *lock_and_validation_needed)
+@@ -4925,6 +4953,9 @@ static int dm_update_crtcs_state(struct dc *dc,
+ 				break;
+ 			}
+ 
++			set_freesync_on_stream(dm, dm_new_crtc_state,
++					       dm_new_conn_state, new_stream);
++
+ 			if (dc_is_stream_unchanged(new_stream, dm_old_crtc_state->stream) &&
+ 			    dc_is_stream_scaling_unchanged(new_stream, dm_old_crtc_state->stream)) {
+ 				new_crtc_state->mode_changed = false;
+@@ -4933,6 +4964,9 @@ static int dm_update_crtcs_state(struct dc *dc,
+ 			}
+ 		}
+ 
++		if (dm_old_crtc_state->freesync_enabled != dm_new_crtc_state->freesync_enabled)
++			new_crtc_state->mode_changed = true;
++
+ 		if (!drm_atomic_crtc_needs_modeset(new_crtc_state))
+ 			goto next_crtc;
+ 
+@@ -4959,7 +4993,7 @@ static int dm_update_crtcs_state(struct dc *dc,
+ 
+ 			/* i.e. reset mode */
+ 			if (dc_remove_stream_from_ctx(
+-					dc,
++					dm->dc,
+ 					dm_state->context,
+ 					dm_old_crtc_state->stream) != DC_OK) {
+ 				ret = -EINVAL;
+@@ -4996,7 +5030,7 @@ static int dm_update_crtcs_state(struct dc *dc,
+ 							crtc->base.id);
+ 
+ 				if (dc_add_stream_to_ctx(
+-						dc,
++						dm->dc,
+ 						dm_state->context,
+ 						dm_new_crtc_state->stream) != DC_OK) {
+ 					ret = -EINVAL;
+@@ -5212,8 +5246,12 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
+ 		goto fail;
+ 
+ 	for_each_oldnew_crtc_in_state(state, crtc, old_crtc_state, new_crtc_state, i) {
++		struct dm_crtc_state *dm_new_crtc_state = to_dm_crtc_state(new_crtc_state);
++		struct dm_crtc_state *dm_old_crtc_state  = to_dm_crtc_state(old_crtc_state);
++
+ 		if (!drm_atomic_crtc_needs_modeset(new_crtc_state) &&
+-		    !new_crtc_state->color_mgmt_changed)
++		    !new_crtc_state->color_mgmt_changed &&
++		    (dm_old_crtc_state->freesync_enabled == dm_new_crtc_state->freesync_enabled))
+ 			continue;
+ 
+ 		if (!new_crtc_state->enable)
+@@ -5239,13 +5277,13 @@ static int amdgpu_dm_atomic_check(struct drm_device *dev,
+ 	}
+ 
+ 	/* Disable all crtcs which require disable */
+-	ret = dm_update_crtcs_state(dc, state, false, &lock_and_validation_needed);
++	ret = dm_update_crtcs_state(&adev->dm, state, false, &lock_and_validation_needed);
+ 	if (ret) {
+ 		goto fail;
+ 	}
+ 
+ 	/* Enable all crtcs which require enable */
+-	ret = dm_update_crtcs_state(dc, state, true, &lock_and_validation_needed);
++	ret = dm_update_crtcs_state(&adev->dm, state, true, &lock_and_validation_needed);
+ 	if (ret) {
+ 		goto fail;
+ 	}
+@@ -5338,8 +5376,8 @@ static bool is_dp_capable_without_timing_msa(struct dc *dc,
+ 
+ 	return capable;
+ }
+-void amdgpu_dm_add_sink_to_freesync_module(struct drm_connector *connector,
+-					   struct edid *edid)
++void amdgpu_dm_update_freesync_caps(struct drm_connector *connector,
++					struct edid *edid)
+ {
+ 	int i;
+ 	bool edid_check_required;
+@@ -5358,6 +5396,18 @@ void amdgpu_dm_add_sink_to_freesync_module(struct drm_connector *connector,
+ 		return;
+ 	}
+ 
++	if (!edid) {
++		dm_con_state = to_dm_connector_state(connector->state);
++
++		amdgpu_dm_connector->min_vfreq = 0;
++		amdgpu_dm_connector->max_vfreq = 0;
++		amdgpu_dm_connector->pixel_clock_mhz = 0;
++
++		dm_con_state->freesync_capable = false;
++		dm_con_state->freesync_enable = false;
++		return;
++	}
++
+ 	dm_con_state = to_dm_connector_state(connector->state);
+ 
+ 	edid_check_required = false;
+@@ -5408,46 +5458,10 @@ void amdgpu_dm_add_sink_to_freesync_module(struct drm_connector *connector,
+ 		}
+ 
+ 		if (amdgpu_dm_connector->max_vfreq -
+-				amdgpu_dm_connector->min_vfreq > 10) {
+-			amdgpu_dm_connector->caps.supported = true;
+-			amdgpu_dm_connector->caps.min_refresh_in_micro_hz =
+-					amdgpu_dm_connector->min_vfreq * 1000000;
+-			amdgpu_dm_connector->caps.max_refresh_in_micro_hz =
+-					amdgpu_dm_connector->max_vfreq * 1000000;
++		    amdgpu_dm_connector->min_vfreq > 10) {
++
+ 			dm_con_state->freesync_capable = true;
+ 		}
+ 	}
+ }
+ 
+-void amdgpu_dm_remove_sink_from_freesync_module(struct drm_connector *connector)
+-{
+-	struct amdgpu_dm_connector *amdgpu_dm_connector =
+-			to_amdgpu_dm_connector(connector);
+-	struct dm_connector_state *dm_con_state;
+-	struct drm_device *dev = connector->dev;
+-	struct amdgpu_device *adev = dev->dev_private;
+-
+-	if (!amdgpu_dm_connector->dc_sink || !adev->dm.freesync_module) {
+-		DRM_ERROR("dc_sink NULL or no free_sync module.\n");
+-		return;
+-	}
+-
+-	if (!connector->state) {
+-		DRM_ERROR("%s - Connector has no state", __func__);
+-		return;
+-	}
+-
+-	dm_con_state = to_dm_connector_state(connector->state);
+-
+-	amdgpu_dm_connector->min_vfreq = 0;
+-	amdgpu_dm_connector->max_vfreq = 0;
+-	amdgpu_dm_connector->pixel_clock_mhz = 0;
+-
+-	memset(&amdgpu_dm_connector->caps, 0, sizeof(amdgpu_dm_connector->caps));
+-
+-	dm_con_state->freesync_capable = false;
+-
+-	dm_con_state->user_enable.enable_for_gaming = false;
+-	dm_con_state->user_enable.enable_for_static = false;
+-	dm_con_state->user_enable.enable_for_video = false;
+-}
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
+index ba85a520deec..38445ad74e09 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h
+@@ -167,9 +167,6 @@ struct amdgpu_dm_connector {
+ 	int max_vfreq ;
+ 	int pixel_clock_mhz;
+ 
+-	/*freesync caps*/
+-	struct mod_freesync_caps caps;
+-
+ 	struct mutex hpd_lock;
+ 
+ 	bool fake_enable;
+@@ -195,9 +192,13 @@ struct dm_crtc_state {
+ 
+ 	int crc_skip_count;
+ 	bool crc_enabled;
++
++	bool freesync_enabled;
++	struct dc_crtc_timing_adjust adjust;
++	struct dc_info_packet vrr_infopacket;
+ };
+ 
+-#define to_dm_crtc_state(x)    container_of(x, struct dm_crtc_state, base)
++#define to_dm_crtc_state(x) container_of(x, struct dm_crtc_state, base)
+ 
+ struct dm_atomic_state {
+ 	struct drm_atomic_state base;
+@@ -215,7 +216,7 @@ struct dm_connector_state {
+ 	uint8_t underscan_hborder;
+ 	uint8_t max_bpc;
+ 	bool underscan_enable;
+-	struct mod_freesync_user_enable user_enable;
++	bool freesync_enable;
+ 	bool freesync_capable;
+ };
+ 
+@@ -249,11 +250,8 @@ enum drm_mode_status amdgpu_dm_connector_mode_valid(struct drm_connector *connec
+ void dm_restore_drm_connector_state(struct drm_device *dev,
+ 				    struct drm_connector *connector);
+ 
+-void amdgpu_dm_add_sink_to_freesync_module(struct drm_connector *connector,
+-					   struct edid *edid);
+-
+-void
+-amdgpu_dm_remove_sink_from_freesync_module(struct drm_connector *connector);
++void amdgpu_dm_update_freesync_caps(struct drm_connector *connector,
++					struct edid *edid);
+ 
+ /* amdgpu_dm_crc.c */
+ #ifdef CONFIG_DEBUG_FS
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_mst_types.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_mst_types.c
+index 1c28a7018679..a4bc29f83c4b 100644
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_mst_types.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_mst_types.c
+@@ -234,8 +234,9 @@ void dm_dp_mst_dc_sink_create(struct drm_connector *connector)
+ 	dc_sink->priv = aconnector;
+ 	aconnector->dc_sink = dc_sink;
+ 
+-	amdgpu_dm_add_sink_to_freesync_module(
+-			connector, aconnector->edid);
++	if (aconnector->dc_sink)
++		amdgpu_dm_update_freesync_caps(
++				connector, aconnector->edid);
+ }
+ 
+ static int dm_dp_mst_get_modes(struct drm_connector *connector)
+@@ -275,8 +276,9 @@ static int dm_dp_mst_get_modes(struct drm_connector *connector)
+ 		aconnector->dc_sink = dc_sink;
+ 
+ 		if (aconnector->dc_sink)
+-			amdgpu_dm_add_sink_to_freesync_module(
++			amdgpu_dm_update_freesync_caps(
+ 					connector, aconnector->edid);
++
+ 	}
+ 
+ 	drm_connector_update_edid_property(
+@@ -418,7 +420,7 @@ static void dm_dp_destroy_mst_connector(struct drm_dp_mst_topology_mgr *mgr,
+ 
+ 	aconnector->port = NULL;
+ 	if (aconnector->dc_sink) {
+-		amdgpu_dm_remove_sink_from_freesync_module(connector);
++		amdgpu_dm_update_freesync_caps(connector, NULL);
+ 		dc_link_remove_remote_sink(aconnector->dc_link, aconnector->dc_sink);
+ 		dc_sink_release(aconnector->dc_sink);
+ 		aconnector->dc_sink = NULL;
+diff --git a/drivers/gpu/drm/amd/display/dc/core/dc.c b/drivers/gpu/drm/amd/display/dc/core/dc.c
+index 16550517a126..a71747e4cb48 100644
+--- a/drivers/gpu/drm/amd/display/dc/core/dc.c
++++ b/drivers/gpu/drm/amd/display/dc/core/dc.c
+@@ -188,11 +188,9 @@ static bool create_links(
+  *****************************************************************************
+  */
+ bool dc_stream_adjust_vmin_vmax(struct dc *dc,
+-		struct dc_stream_state **streams, int num_streams,
+-		int vmin, int vmax)
++		struct dc_stream_state *stream,
++		struct dc_crtc_timing_adjust *adjust)
+ {
+-	/* TODO: Support multiple streams */
+-	struct dc_stream_state *stream = streams[0];
+ 	int i = 0;
+ 	bool ret = false;
+ 
+@@ -200,11 +198,11 @@ bool dc_stream_adjust_vmin_vmax(struct dc *dc,
+ 		struct pipe_ctx *pipe = &dc->current_state->res_ctx.pipe_ctx[i];
+ 
+ 		if (pipe->stream == stream && pipe->stream_res.stream_enc) {
+-			dc->hwss.set_drr(&pipe, 1, vmin, vmax);
+-
+-			/* build and update the info frame */
+-			resource_build_info_frame(pipe);
+-			dc->hwss.update_info_frame(pipe);
++			pipe->stream->adjust = *adjust;
++			dc->hwss.set_drr(&pipe,
++					1,
++					adjust->v_total_min,
++					adjust->v_total_max);
+ 
+ 			ret = true;
+ 		}
+@@ -217,7 +215,7 @@ bool dc_stream_get_crtc_position(struct dc *dc,
+ 		unsigned int *v_pos, unsigned int *nom_v_pos)
+ {
+ 	/* TODO: Support multiple streams */
+-	struct dc_stream_state *stream = streams[0];
++	const struct dc_stream_state *stream = streams[0];
+ 	int i = 0;
+ 	bool ret = false;
+ 	struct crtc_position position;
+@@ -1274,8 +1272,25 @@ static enum surface_update_type check_update_surfaces_for_stream(
+ 	if (stream_status == NULL || stream_status->plane_count != surface_count)
+ 		return UPDATE_TYPE_FULL;
+ 
+-	if (stream_update)
+-		return UPDATE_TYPE_FULL;
++	/* some stream updates require passive update */
++	if (stream_update) {
++		if ((stream_update->src.height != 0) &&
++				(stream_update->src.width != 0))
++			return UPDATE_TYPE_FULL;
++
++		if ((stream_update->dst.height != 0) &&
++				(stream_update->dst.width != 0))
++			return UPDATE_TYPE_FULL;
++
++		if (stream_update->out_transfer_func)
++			return UPDATE_TYPE_FULL;
++
++		if (stream_update->hdr_static_metadata)
++			return UPDATE_TYPE_FULL;
++
++		if (stream_update->abm_level)
++			return UPDATE_TYPE_FULL;
++	}
+ 
+ 	for (i = 0 ; i < surface_count; i++) {
+ 		enum surface_update_type type =
+@@ -1354,7 +1369,6 @@ static void commit_planes_for_stream(struct dc *dc,
+ 		return;
+ 	}
+ 
+-	/* Full fe update*/
+ 	for (j = 0; j < dc->res_pool->pipe_count; j++) {
+ 		struct pipe_ctx *pipe_ctx = &context->res_ctx.pipe_ctx[j];
+ 
+@@ -1365,11 +1379,22 @@ static void commit_planes_for_stream(struct dc *dc,
+ 
+ 			top_pipe_to_program = pipe_ctx;
+ 
+-			if (update_type == UPDATE_TYPE_FAST || !pipe_ctx->plane_state)
++			if (!pipe_ctx->plane_state)
++				continue;
++
++			/* Fast update*/
++			// VRR program can be done as part of FAST UPDATE
++			if (stream_update && stream_update->adjust)
++				dc->hwss.set_drr(&pipe_ctx, 1,
++					stream_update->adjust->v_total_min,
++					stream_update->adjust->v_total_max);
++
++			/* Full fe update*/
++			if (update_type == UPDATE_TYPE_FAST)
+ 				continue;
+ 
+ 			stream_status =
+-					stream_get_status(context, pipe_ctx->stream);
++				stream_get_status(context, pipe_ctx->stream);
+ 
+ 			dc->hwss.apply_ctx_for_surface(
+ 					dc, pipe_ctx->stream, stream_status->plane_count, context);
+@@ -1424,7 +1449,7 @@ static void commit_planes_for_stream(struct dc *dc,
+ 		dc->hwss.pipe_control_lock(dc, top_pipe_to_program, false);
+ 	}
+ 
+-	if (stream && stream_update && update_type > UPDATE_TYPE_FAST)
++	if (stream && stream_update)
+ 		for (j = 0; j < dc->res_pool->pipe_count; j++) {
+ 			struct pipe_ctx *pipe_ctx =
+ 					&context->res_ctx.pipe_ctx[j];
+@@ -1432,7 +1457,8 @@ static void commit_planes_for_stream(struct dc *dc,
+ 			if (pipe_ctx->stream != stream)
+ 				continue;
+ 
+-			if (stream_update->hdr_static_metadata) {
++			if (stream_update->hdr_static_metadata ||
++				(stream_update->vrr_infopacket)) {
+ 				resource_build_info_frame(pipe_ctx);
+ 				dc->hwss.update_info_frame(pipe_ctx);
+ 			}
+diff --git a/drivers/gpu/drm/amd/display/dc/core/dc_link_dp.c b/drivers/gpu/drm/amd/display/dc/core/dc_link_dp.c
+index 05840f5bddd5..d33a5ebe990b 100644
+--- a/drivers/gpu/drm/amd/display/dc/core/dc_link_dp.c
++++ b/drivers/gpu/drm/amd/display/dc/core/dc_link_dp.c
+@@ -2390,6 +2390,9 @@ static bool retrieve_link_cap(struct dc_link *link)
+ 
+ 	dp_wa_power_up_0010FA(link, dpcd_data, sizeof(dpcd_data));
+ 
++	down_strm_port_count.raw = dpcd_data[DP_DOWN_STREAM_PORT_COUNT -
++				 DP_DPCD_REV];
++
+ 	link->dpcd_caps.allow_invalid_MSA_timing_param =
+ 		down_strm_port_count.bits.IGNORE_MSA_TIMING_PARAM;
+ 
+diff --git a/drivers/gpu/drm/amd/display/dc/core/dc_resource.c b/drivers/gpu/drm/amd/display/dc/core/dc_resource.c
+index f11f268ed5b8..75367e7b61bf 100644
+--- a/drivers/gpu/drm/amd/display/dc/core/dc_resource.c
++++ b/drivers/gpu/drm/amd/display/dc/core/dc_resource.c
+@@ -2479,119 +2479,13 @@ static void set_spd_info_packet(
+ {
+ 	/* SPD info packet for FreeSync */
+ 
+-	unsigned char checksum = 0;
+-	unsigned int idx, payload_size = 0;
+-
+ 	/* Check if Freesync is supported. Return if false. If true,
+ 	 * set the corresponding bit in the info packet
+ 	 */
+-	if (stream->freesync_ctx.supported == false)
++	if (!stream->vrr_infopacket.valid)
+ 		return;
+ 
+-	if (dc_is_hdmi_signal(stream->signal)) {
+-
+-		/* HEADER */
+-
+-		/* HB0  = Packet Type = 0x83 (Source Product
+-		 *	  Descriptor InfoFrame)
+-		 */
+-		info_packet->hb0 = HDMI_INFOFRAME_TYPE_SPD;
+-
+-		/* HB1  = Version = 0x01 */
+-		info_packet->hb1 = 0x01;
+-
+-		/* HB2  = [Bits 7:5 = 0] [Bits 4:0 = Length = 0x08] */
+-		info_packet->hb2 = 0x08;
+-
+-		payload_size = 0x08;
+-
+-	} else if (dc_is_dp_signal(stream->signal)) {
+-
+-		/* HEADER */
+-
+-		/* HB0  = Secondary-data Packet ID = 0 - Only non-zero
+-		 *	  when used to associate audio related info packets
+-		 */
+-		info_packet->hb0 = 0x00;
+-
+-		/* HB1  = Packet Type = 0x83 (Source Product
+-		 *	  Descriptor InfoFrame)
+-		 */
+-		info_packet->hb1 = HDMI_INFOFRAME_TYPE_SPD;
+-
+-		/* HB2  = [Bits 7:0 = Least significant eight bits -
+-		 *	  For INFOFRAME, the value must be 1Bh]
+-		 */
+-		info_packet->hb2 = 0x1B;
+-
+-		/* HB3  = [Bits 7:2 = INFOFRAME SDP Version Number = 0x1]
+-		 *	  [Bits 1:0 = Most significant two bits = 0x00]
+-		 */
+-		info_packet->hb3 = 0x04;
+-
+-		payload_size = 0x1B;
+-	}
+-
+-	/* PB1 = 0x1A (24bit AMD IEEE OUI (0x00001A) - Byte 0) */
+-	info_packet->sb[1] = 0x1A;
+-
+-	/* PB2 = 0x00 (24bit AMD IEEE OUI (0x00001A) - Byte 1) */
+-	info_packet->sb[2] = 0x00;
+-
+-	/* PB3 = 0x00 (24bit AMD IEEE OUI (0x00001A) - Byte 2) */
+-	info_packet->sb[3] = 0x00;
+-
+-	/* PB4 = Reserved */
+-	info_packet->sb[4] = 0x00;
+-
+-	/* PB5 = Reserved */
+-	info_packet->sb[5] = 0x00;
+-
+-	/* PB6 = [Bits 7:3 = Reserved] */
+-	info_packet->sb[6] = 0x00;
+-
+-	if (stream->freesync_ctx.supported == true)
+-		/* PB6 = [Bit 0 = FreeSync Supported] */
+-		info_packet->sb[6] |= 0x01;
+-
+-	if (stream->freesync_ctx.enabled == true)
+-		/* PB6 = [Bit 1 = FreeSync Enabled] */
+-		info_packet->sb[6] |= 0x02;
+-
+-	if (stream->freesync_ctx.active == true)
+-		/* PB6 = [Bit 2 = FreeSync Active] */
+-		info_packet->sb[6] |= 0x04;
+-
+-	/* PB7 = FreeSync Minimum refresh rate (Hz) */
+-	info_packet->sb[7] = (unsigned char) (stream->freesync_ctx.
+-			min_refresh_in_micro_hz / 1000000);
+-
+-	/* PB8 = FreeSync Maximum refresh rate (Hz)
+-	 *
+-	 * Note: We do not use the maximum capable refresh rate
+-	 * of the panel, because we should never go above the field
+-	 * rate of the mode timing set.
+-	 */
+-	info_packet->sb[8] = (unsigned char) (stream->freesync_ctx.
+-			nominal_refresh_in_micro_hz / 1000000);
+-
+-	/* PB9 - PB27  = Reserved */
+-	for (idx = 9; idx <= 27; idx++)
+-		info_packet->sb[idx] = 0x00;
+-
+-	/* Calculate checksum */
+-	checksum += info_packet->hb0;
+-	checksum += info_packet->hb1;
+-	checksum += info_packet->hb2;
+-	checksum += info_packet->hb3;
+-
+-	for (idx = 1; idx <= payload_size; idx++)
+-		checksum += info_packet->sb[idx];
+-
+-	/* PB0 = Checksum (one byte complement) */
+-	info_packet->sb[0] = (unsigned char) (0x100 - checksum);
+-
+-	info_packet->valid = true;
++	*info_packet = stream->vrr_infopacket;
+ }
+ 
+ static void set_hdr_static_info_packet(
+diff --git a/drivers/gpu/drm/amd/display/dc/dc_hw_types.h b/drivers/gpu/drm/amd/display/dc/dc_hw_types.h
+index b789cb2b354b..57f57cf0fe2a 100644
+--- a/drivers/gpu/drm/amd/display/dc/dc_hw_types.h
++++ b/drivers/gpu/drm/amd/display/dc/dc_hw_types.h
+@@ -708,12 +708,6 @@ struct crtc_trigger_info {
+ 	enum trigger_delay delay;
+ };
+ 
+-enum vrr_state {
+-	VRR_STATE_OFF = 0,
+-	VRR_STATE_VARIABLE,
+-	VRR_STATE_FIXED,
+-};
+-
+ struct dc_crtc_timing_adjust {
+ 	uint32_t v_total_min;
+ 	uint32_t v_total_max;
+diff --git a/drivers/gpu/drm/amd/display/dc/dc_stream.h b/drivers/gpu/drm/amd/display/dc/dc_stream.h
+index cbfe418006cb..67101a525e3d 100644
+--- a/drivers/gpu/drm/amd/display/dc/dc_stream.h
++++ b/drivers/gpu/drm/amd/display/dc/dc_stream.h
+@@ -45,19 +45,25 @@ struct dc_stream_status {
+ 	struct dc_link *link;
+ };
+ 
++// TODO: References to this needs to be removed..
++struct freesync_context {
++	bool dummy;
++};
++
+ struct dc_stream_state {
+ 	struct dc_sink *sink;
+ 	struct dc_crtc_timing timing;
+-	struct dc_crtc_timing_adjust timing_adjust;
+-	struct vrr_params vrr_params;
++	struct dc_crtc_timing_adjust adjust;
++	struct dc_info_packet vrr_infopacket;
+ 
+ 	struct rect src; /* composition area */
+ 	struct rect dst; /* stream addressable area */
+ 
+-	struct audio_info audio_info;
+-
++	// TODO: References to this needs to be removed..
+ 	struct freesync_context freesync_ctx;
+ 
++	struct audio_info audio_info;
++
+ 	struct dc_info_packet hdr_static_metadata;
+ 	PHYSICAL_ADDRESS_LOC dmdata_address;
+ 	bool   use_dynamic_meta;
+@@ -120,6 +126,8 @@ struct dc_stream_update {
+ 	unsigned int *abm_level;
+ 
+ 	unsigned long long *periodic_fn_vsync_delta;
++	struct dc_crtc_timing_adjust *adjust;
++	struct dc_info_packet *vrr_infopacket;
+ };
+ 
+ bool dc_is_stream_unchanged(
+@@ -258,10 +266,8 @@ bool dc_stream_set_cursor_position(
+ 
+ 
+ bool dc_stream_adjust_vmin_vmax(struct dc *dc,
+-				struct dc_stream_state **stream,
+-				int num_streams,
+-				int vmin,
+-				int vmax);
++				struct dc_stream_state *stream,
++				struct dc_crtc_timing_adjust *adjust);
+ 
+ bool dc_stream_get_crtc_position(struct dc *dc,
+ 				 struct dc_stream_state **stream,
+@@ -288,13 +294,6 @@ void dc_stream_set_static_screen_events(struct dc *dc,
+ void dc_stream_set_dither_option(struct dc_stream_state *stream,
+ 				 enum dc_dither_option option);
+ 
+-
+-bool dc_stream_adjust_vmin_vmax(struct dc *dc,
+-				struct dc_stream_state **stream,
+-				int num_streams,
+-				int vmin,
+-				int vmax);
+-
+ bool dc_stream_get_crtc_position(struct dc *dc,
+ 				 struct dc_stream_state **stream,
+ 				 int num_streams,
+diff --git a/drivers/gpu/drm/amd/display/dc/dc_types.h b/drivers/gpu/drm/amd/display/dc/dc_types.h
+index 8c6eb78b0c3b..58a6ef80a60e 100644
+--- a/drivers/gpu/drm/amd/display/dc/dc_types.h
++++ b/drivers/gpu/drm/amd/display/dc/dc_types.h
+@@ -513,13 +513,11 @@ struct audio_info {
+ 	struct audio_mode modes[DC_MAX_AUDIO_DESC_COUNT];
+ };
+ 
+-struct vrr_params {
+-	enum vrr_state state;
+-	uint32_t window_min;
+-	uint32_t window_max;
+-	uint32_t inserted_frame_duration_in_us;
+-	uint32_t frames_to_insert;
+-	uint32_t frame_counter;
++enum dc_infoframe_type {
++	DC_HDMI_INFOFRAME_TYPE_VENDOR = 0x81,
++	DC_HDMI_INFOFRAME_TYPE_AVI = 0x82,
++	DC_HDMI_INFOFRAME_TYPE_SPD = 0x83,
++	DC_HDMI_INFOFRAME_TYPE_AUDIO = 0x84,
+ };
+ 
+ struct dc_info_packet {
+@@ -539,16 +537,6 @@ struct dc_plane_flip_time {
+ 	unsigned int prev_update_time_in_us;
+ };
+ 
+-// Will combine with vrr_params at some point.
+-struct freesync_context {
+-	bool supported;
+-	bool enabled;
+-	bool active;
+-
+-	unsigned int min_refresh_in_micro_hz;
+-	unsigned int nominal_refresh_in_micro_hz;
+-};
+-
+ struct psr_config {
+ 	unsigned char psr_version;
+ 	unsigned int psr_rfb_setup_time;
+diff --git a/drivers/gpu/drm/amd/display/dc/dce110/dce110_hw_sequencer.c b/drivers/gpu/drm/amd/display/dc/dce110/dce110_hw_sequencer.c
+index b87a98fd11ea..73da46c412df 100644
+--- a/drivers/gpu/drm/amd/display/dc/dce110/dce110_hw_sequencer.c
++++ b/drivers/gpu/drm/amd/display/dc/dce110/dce110_hw_sequencer.c
+@@ -1300,6 +1300,8 @@ static enum dc_status dce110_enable_stream_timing(
+ 	struct pipe_ctx *pipe_ctx_old = &dc->current_state->res_ctx.
+ 			pipe_ctx[pipe_ctx->pipe_idx];
+ 	struct tg_color black_color = {0};
++	struct drr_params params = {0};
++	unsigned int event_triggers = 0;
+ 
+ 	if (!pipe_ctx_old->stream) {
+ 
+@@ -1329,9 +1331,19 @@ static enum dc_status dce110_enable_stream_timing(
+ 				&stream->timing,
+ 				true);
+ 
+-		pipe_ctx->stream_res.tg->funcs->set_static_screen_control(
+-				pipe_ctx->stream_res.tg,
+-				0x182);
++		params.vertical_total_min = stream->adjust.v_total_min;
++		params.vertical_total_max = stream->adjust.v_total_max;
++		if (pipe_ctx->stream_res.tg->funcs->set_drr)
++			pipe_ctx->stream_res.tg->funcs->set_drr(
++				pipe_ctx->stream_res.tg, &params);
++
++		// DRR should set trigger event to monitor surface update event
++		if (stream->adjust.v_total_min != 0 &&
++				stream->adjust.v_total_max != 0)
++			event_triggers = 0x80;
++		if (pipe_ctx->stream_res.tg->funcs->set_static_screen_control)
++			pipe_ctx->stream_res.tg->funcs->set_static_screen_control(
++				pipe_ctx->stream_res.tg, event_triggers);
+ 	}
+ 
+ 	if (!pipe_ctx_old->stream) {
+@@ -1342,8 +1354,6 @@ static enum dc_status dce110_enable_stream_timing(
+ 		}
+ 	}
+ 
+-
+-
+ 	return DC_OK;
+ }
+ 
+@@ -1733,16 +1743,24 @@ static void set_drr(struct pipe_ctx **pipe_ctx,
+ {
+ 	int i = 0;
+ 	struct drr_params params = {0};
++	// DRR should set trigger event to monitor surface update event
++	unsigned int event_triggers = 0x80;
+ 
+ 	params.vertical_total_max = vmax;
+ 	params.vertical_total_min = vmin;
+ 
+ 	/* TODO: If multiple pipes are to be supported, you need
+-	 * some GSL stuff
++	 * some GSL stuff. Static screen triggers may be programmed differently
++	 * as well.
+ 	 */
+-
+ 	for (i = 0; i < num_pipes; i++) {
+-		pipe_ctx[i]->stream_res.tg->funcs->set_drr(pipe_ctx[i]->stream_res.tg, &params);
++		pipe_ctx[i]->stream_res.tg->funcs->set_drr(
++			pipe_ctx[i]->stream_res.tg, &params);
++
++		if (vmax != 0 && vmin != 0)
++			pipe_ctx[i]->stream_res.tg->funcs->set_static_screen_control(
++					pipe_ctx[i]->stream_res.tg,
++					event_triggers);
+ 	}
+ }
+ 
+diff --git a/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c b/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
+index e05c29bacc3f..8ab164d9941a 100644
+--- a/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
++++ b/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
+@@ -631,6 +631,8 @@ static enum dc_status dcn10_enable_stream_timing(
+ 	struct dc_stream_state *stream = pipe_ctx->stream;
+ 	enum dc_color_space color_space;
+ 	struct tg_color black_color = {0};
++	struct drr_params params = {0};
++	unsigned int event_triggers = 0;
+ 
+ 	/* by upper caller loop, pipe0 is parent pipe and be called first.
+ 	 * back end is set up by for pipe0. Other children pipe share back end
+@@ -698,6 +700,19 @@ static enum dc_status dcn10_enable_stream_timing(
+ 		return DC_ERROR_UNEXPECTED;
+ 	}
+ 
++	params.vertical_total_min = stream->adjust.v_total_min;
++	params.vertical_total_max = stream->adjust.v_total_max;
++	if (pipe_ctx->stream_res.tg->funcs->set_drr)
++		pipe_ctx->stream_res.tg->funcs->set_drr(
++			pipe_ctx->stream_res.tg, &params);
++
++	// DRR should set trigger event to monitor surface update event
++	if (stream->adjust.v_total_min != 0 && stream->adjust.v_total_max != 0)
++		event_triggers = 0x80;
++	if (pipe_ctx->stream_res.tg->funcs->set_static_screen_control)
++		pipe_ctx->stream_res.tg->funcs->set_static_screen_control(
++				pipe_ctx->stream_res.tg, event_triggers);
++
+ 	/* TODO program crtc source select for non-virtual signal*/
+ 	/* TODO program FMT */
+ 	/* TODO setup link_enc */
+@@ -2410,15 +2425,23 @@ static void set_drr(struct pipe_ctx **pipe_ctx,
+ {
+ 	int i = 0;
+ 	struct drr_params params = {0};
++	// DRR should set trigger event to monitor surface update event
++	unsigned int event_triggers = 0x80;
+ 
+ 	params.vertical_total_max = vmax;
+ 	params.vertical_total_min = vmin;
+ 
+ 	/* TODO: If multiple pipes are to be supported, you need
+-	 * some GSL stuff
++	 * some GSL stuff. Static screen triggers may be programmed differently
++	 * as well.
+ 	 */
+ 	for (i = 0; i < num_pipes; i++) {
+-		pipe_ctx[i]->stream_res.tg->funcs->set_drr(pipe_ctx[i]->stream_res.tg, &params);
++		pipe_ctx[i]->stream_res.tg->funcs->set_drr(
++			pipe_ctx[i]->stream_res.tg, &params);
++		if (vmax != 0 && vmin != 0)
++			pipe_ctx[i]->stream_res.tg->funcs->set_static_screen_control(
++					pipe_ctx[i]->stream_res.tg,
++					event_triggers);
+ 	}
+ }
+ 
+diff --git a/drivers/gpu/drm/amd/display/include/set_mode_types.h b/drivers/gpu/drm/amd/display/include/set_mode_types.h
+index fee2b6ffcfc1..2b836e582c08 100644
+--- a/drivers/gpu/drm/amd/display/include/set_mode_types.h
++++ b/drivers/gpu/drm/amd/display/include/set_mode_types.h
+@@ -90,18 +90,6 @@ union hdmi_info_packet {
+ 	struct info_packet_raw_data packet_raw_data;
+ };
+ 
+-struct info_packet {
+-	enum info_frame_flag flags;
+-	union hdmi_info_packet info_packet_hdmi;
+-};
+-
+-struct info_frame {
+-	struct info_packet avi_info_packet;
+-	struct info_packet gamut_packet;
+-	struct info_packet vendor_info_packet;
+-	struct info_packet spd_info_packet;
+-};
+-
+ #pragma pack(pop)
+ 
+ #endif /* __DAL_SET_MODE_TYPES_H__ */
+diff --git a/drivers/gpu/drm/amd/display/modules/freesync/freesync.c b/drivers/gpu/drm/amd/display/modules/freesync/freesync.c
+index fa344ceafc17..5e12e463c06a 100644
+--- a/drivers/gpu/drm/amd/display/modules/freesync/freesync.c
++++ b/drivers/gpu/drm/amd/display/modules/freesync/freesync.c
+@@ -30,6 +30,7 @@
+ 
+ #define MOD_FREESYNC_MAX_CONCURRENT_STREAMS  32
+ 
++#define MIN_REFRESH_RANGE_IN_US 10000000
+ /* Refresh rate ramp at a fixed rate of 65 Hz/second */
+ #define STATIC_SCREEN_RAMP_DELTA_REFRESH_RATE_PER_FRAME ((1000 / 60) * 65)
+ /* Number of elements in the render times cache array */
+@@ -40,103 +41,9 @@
+ #define FIXED_REFRESH_ENTER_FRAME_COUNT 5
+ #define FIXED_REFRESH_EXIT_FRAME_COUNT 5
+ 
+-#define FREESYNC_REGISTRY_NAME "freesync_v1"
+-
+-#define FREESYNC_NO_STATIC_FOR_EXTERNAL_DP_REGKEY "DalFreeSyncNoStaticForExternalDp"
+-
+-#define FREESYNC_NO_STATIC_FOR_INTERNAL_REGKEY "DalFreeSyncNoStaticForInternal"
+-
+-#define FREESYNC_DEFAULT_REGKEY "LCDFreeSyncDefault"
+-
+-struct gradual_static_ramp {
+-	bool ramp_is_active;
+-	bool ramp_direction_is_up;
+-	unsigned int ramp_current_frame_duration_in_ns;
+-};
+-
+-struct freesync_time {
+-	/* video (48Hz feature) related */
+-	unsigned int update_duration_in_ns;
+-
+-	/* BTR/fixed refresh related */
+-	unsigned int prev_time_stamp_in_us;
+-
+-	unsigned int min_render_time_in_us;
+-	unsigned int max_render_time_in_us;
+-
+-	unsigned int render_times_index;
+-	unsigned int render_times[RENDER_TIMES_MAX_COUNT];
+-
+-	unsigned int min_window;
+-	unsigned int max_window;
+-};
+-
+-struct below_the_range {
+-	bool btr_active;
+-	bool program_btr;
+-
+-	unsigned int mid_point_in_us;
+-
+-	unsigned int inserted_frame_duration_in_us;
+-	unsigned int frames_to_insert;
+-	unsigned int frame_counter;
+-};
+-
+-struct fixed_refresh {
+-	bool fixed_active;
+-	bool program_fixed;
+-	unsigned int frame_counter;
+-};
+-
+-struct freesync_range {
+-	unsigned int min_refresh;
+-	unsigned int max_frame_duration;
+-	unsigned int vmax;
+-
+-	unsigned int max_refresh;
+-	unsigned int min_frame_duration;
+-	unsigned int vmin;
+-};
+-
+-struct freesync_state {
+-	bool fullscreen;
+-	bool static_screen;
+-	bool video;
+-
+-	unsigned int vmin;
+-	unsigned int vmax;
+-
+-	struct freesync_time time;
+-
+-	unsigned int nominal_refresh_rate_in_micro_hz;
+-	bool windowed_fullscreen;
+-
+-	struct gradual_static_ramp static_ramp;
+-	struct below_the_range btr;
+-	struct fixed_refresh fixed_refresh;
+-	struct freesync_range freesync_range;
+-};
+-
+-struct freesync_entity {
+-	struct dc_stream_state *stream;
+-	struct mod_freesync_caps *caps;
+-	struct freesync_state state;
+-	struct mod_freesync_user_enable user_enable;
+-};
+-
+-struct freesync_registry_options {
+-	bool drr_external_supported;
+-	bool drr_internal_supported;
+-	bool lcd_freesync_default_set;
+-	int lcd_freesync_default_value;
+-};
+-
+ struct core_freesync {
+ 	struct mod_freesync public;
+ 	struct dc *dc;
+-	struct freesync_registry_options opts;
+-	struct freesync_entity *map;
+-	int num_entities;
+ };
+ 
+ #define MOD_FREESYNC_TO_CORE(mod_freesync)\
+@@ -147,69 +54,16 @@ struct mod_freesync *mod_freesync_create(struct dc *dc)
+ 	struct core_freesync *core_freesync =
+ 			kzalloc(sizeof(struct core_freesync), GFP_KERNEL);
+ 
+-
+-	struct persistent_data_flag flag;
+-
+-	int i, data = 0;
+-
+ 	if (core_freesync == NULL)
+ 		goto fail_alloc_context;
+ 
+-	core_freesync->map = kcalloc(MOD_FREESYNC_MAX_CONCURRENT_STREAMS,
+-					sizeof(struct freesync_entity),
+-					GFP_KERNEL);
+-
+-	if (core_freesync->map == NULL)
+-		goto fail_alloc_map;
+-
+-	for (i = 0; i < MOD_FREESYNC_MAX_CONCURRENT_STREAMS; i++)
+-		core_freesync->map[i].stream = NULL;
+-
+-	core_freesync->num_entities = 0;
+-
+ 	if (dc == NULL)
+ 		goto fail_construct;
+ 
+ 	core_freesync->dc = dc;
+-
+-	/* Create initial module folder in registry for freesync enable data */
+-	flag.save_per_edid = true;
+-	flag.save_per_link = false;
+-	dm_write_persistent_data(dc->ctx, NULL, FREESYNC_REGISTRY_NAME,
+-			NULL, NULL, 0, &flag);
+-	flag.save_per_edid = false;
+-	flag.save_per_link = false;
+-
+-	if (dm_read_persistent_data(dc->ctx, NULL, NULL,
+-			FREESYNC_NO_STATIC_FOR_INTERNAL_REGKEY,
+-			&data, sizeof(data), &flag)) {
+-		core_freesync->opts.drr_internal_supported =
+-			(data & 1) ? false : true;
+-	}
+-
+-	if (dm_read_persistent_data(dc->ctx, NULL, NULL,
+-			FREESYNC_NO_STATIC_FOR_EXTERNAL_DP_REGKEY,
+-			&data, sizeof(data), &flag)) {
+-		core_freesync->opts.drr_external_supported =
+-				(data & 1) ? false : true;
+-	}
+-
+-	if (dm_read_persistent_data(dc->ctx, NULL, NULL,
+-			FREESYNC_DEFAULT_REGKEY,
+-			&data, sizeof(data), &flag)) {
+-		core_freesync->opts.lcd_freesync_default_set = true;
+-		core_freesync->opts.lcd_freesync_default_value = data;
+-	} else {
+-		core_freesync->opts.lcd_freesync_default_set = false;
+-		core_freesync->opts.lcd_freesync_default_value = 0;
+-	}
+-
+ 	return &core_freesync->public;
+ 
+ fail_construct:
+-	kfree(core_freesync->map);
+-
+-fail_alloc_map:
+ 	kfree(core_freesync);
+ 
+ fail_alloc_context:
+@@ -218,968 +72,396 @@ struct mod_freesync *mod_freesync_create(struct dc *dc)
+ 
+ void mod_freesync_destroy(struct mod_freesync *mod_freesync)
+ {
+-	if (mod_freesync != NULL) {
+-		int i;
+-		struct core_freesync *core_freesync =
+-				MOD_FREESYNC_TO_CORE(mod_freesync);
+-
+-		for (i = 0; i < core_freesync->num_entities; i++)
+-			if (core_freesync->map[i].stream)
+-				dc_stream_release(core_freesync->map[i].stream);
+-
+-		kfree(core_freesync->map);
+-
+-		kfree(core_freesync);
+-	}
+-}
+-
+-/* Given a specific dc_stream* this function finds its equivalent
+- * on the core_freesync->map and returns the corresponding index
+- */
+-static unsigned int map_index_from_stream(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream)
+-{
+-	unsigned int index = 0;
+-
+-	for (index = 0; index < core_freesync->num_entities; index++) {
+-		if (core_freesync->map[index].stream == stream) {
+-			return index;
+-		}
+-	}
+-	/* Could not find stream requested */
+-	ASSERT(false);
+-	return index;
+-}
+-
+-bool mod_freesync_add_stream(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream, struct mod_freesync_caps *caps)
+-{
+-	struct dc  *dc = NULL;
+ 	struct core_freesync *core_freesync = NULL;
+-	int persistent_freesync_enable = 0;
+-	struct persistent_data_flag flag;
+-	unsigned int nom_refresh_rate_uhz;
+-	unsigned long long temp;
+-
+ 	if (mod_freesync == NULL)
+-		return false;
+-
++		return;
+ 	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	dc = core_freesync->dc;
+-
+-	flag.save_per_edid = true;
+-	flag.save_per_link = false;
+-
+-	if (core_freesync->num_entities < MOD_FREESYNC_MAX_CONCURRENT_STREAMS) {
+-
+-		dc_stream_retain(stream);
+-
+-		temp = stream->timing.pix_clk_khz;
+-		temp *= 1000ULL * 1000ULL * 1000ULL;
+-		temp = div_u64(temp, stream->timing.h_total);
+-		temp = div_u64(temp, stream->timing.v_total);
+-
+-		nom_refresh_rate_uhz = (unsigned int) temp;
+-
+-		core_freesync->map[core_freesync->num_entities].stream = stream;
+-		core_freesync->map[core_freesync->num_entities].caps = caps;
+-
+-		core_freesync->map[core_freesync->num_entities].state.
+-			fullscreen = false;
+-		core_freesync->map[core_freesync->num_entities].state.
+-			static_screen = false;
+-		core_freesync->map[core_freesync->num_entities].state.
+-			video = false;
+-		core_freesync->map[core_freesync->num_entities].state.time.
+-			update_duration_in_ns = 0;
+-		core_freesync->map[core_freesync->num_entities].state.
+-			static_ramp.ramp_is_active = false;
+-
+-		/* get persistent data from registry */
+-		if (dm_read_persistent_data(dc->ctx, stream->sink,
+-					FREESYNC_REGISTRY_NAME,
+-					"userenable", &persistent_freesync_enable,
+-					sizeof(int), &flag)) {
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-				enable_for_gaming =
+-				(persistent_freesync_enable & 1) ? true : false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-				enable_for_static =
+-				(persistent_freesync_enable & 2) ? true : false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-				enable_for_video =
+-				(persistent_freesync_enable & 4) ? true : false;
+-		/* If FreeSync display and LCDFreeSyncDefault is set, use as default values write back to userenable */
+-		} else if (caps->supported && (core_freesync->opts.lcd_freesync_default_set)) {
+-			core_freesync->map[core_freesync->num_entities].user_enable.enable_for_gaming =
+-				(core_freesync->opts.lcd_freesync_default_value & 1) ? true : false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.enable_for_static =
+-				(core_freesync->opts.lcd_freesync_default_value & 2) ? true : false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.enable_for_video =
+-				(core_freesync->opts.lcd_freesync_default_value & 4) ? true : false;
+-			dm_write_persistent_data(dc->ctx, stream->sink,
+-						FREESYNC_REGISTRY_NAME,
+-						"userenable", &core_freesync->opts.lcd_freesync_default_value,
+-						sizeof(int), &flag);
+-		} else {
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-					enable_for_gaming = false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-					enable_for_static = false;
+-			core_freesync->map[core_freesync->num_entities].user_enable.
+-					enable_for_video = false;
+-		}
+-
+-		if (caps->supported &&
+-			nom_refresh_rate_uhz >= caps->min_refresh_in_micro_hz &&
+-			nom_refresh_rate_uhz <= caps->max_refresh_in_micro_hz)
+-			stream->ignore_msa_timing_param = 1;
+-
+-		core_freesync->num_entities++;
+-		return true;
+-	}
+-	return false;
++	kfree(core_freesync);
+ }
+ 
+-bool mod_freesync_remove_stream(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream)
++#if 0 /* unused currently */
++static unsigned int calc_refresh_in_uhz_from_duration(
++		unsigned int duration_in_ns)
+ {
+-	int i = 0;
+-	struct core_freesync *core_freesync = NULL;
+-	unsigned int index = 0;
+-
+-	if (mod_freesync == NULL)
+-		return false;
++	unsigned int refresh_in_uhz =
++			((unsigned int)(div64_u64((1000000000ULL * 1000000),
++					duration_in_ns)));
++	return refresh_in_uhz;
++}
++#endif
+ 
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	dc_stream_release(core_freesync->map[index].stream);
+-	core_freesync->map[index].stream = NULL;
+-	/* To remove this entity, shift everything after down */
+-	for (i = index; i < core_freesync->num_entities - 1; i++)
+-		core_freesync->map[i] = core_freesync->map[i + 1];
+-	core_freesync->num_entities--;
+-	return true;
++static unsigned int calc_duration_in_us_from_refresh_in_uhz(
++		unsigned int refresh_in_uhz)
++{
++	unsigned int duration_in_us =
++			((unsigned int)(div64_u64((1000000000ULL * 1000),
++					refresh_in_uhz)));
++	return duration_in_us;
+ }
+ 
+-static void adjust_vmin_vmax(struct core_freesync *core_freesync,
+-				struct dc_stream_state **streams,
+-				int num_streams,
+-				int map_index,
+-				unsigned int v_total_min,
+-				unsigned int v_total_max)
++static unsigned int calc_duration_in_us_from_v_total(
++		const struct dc_stream_state *stream,
++		const struct mod_vrr_params *in_vrr,
++		unsigned int v_total)
+ {
+-	if (num_streams == 0 || streams == NULL || num_streams > 1)
+-		return;
++	unsigned int duration_in_us =
++			(unsigned int)(div64_u64(((unsigned long long)(v_total)
++				* 1000) * stream->timing.h_total,
++					stream->timing.pix_clk_khz));
+ 
+-	core_freesync->map[map_index].state.vmin = v_total_min;
+-	core_freesync->map[map_index].state.vmax = v_total_max;
++	if (duration_in_us < in_vrr->min_duration_in_us)
++		duration_in_us = in_vrr->min_duration_in_us;
+ 
+-	dc_stream_adjust_vmin_vmax(core_freesync->dc, streams,
+-				num_streams, v_total_min,
+-				v_total_max);
+-}
++	if (duration_in_us > in_vrr->max_duration_in_us)
++		duration_in_us = in_vrr->max_duration_in_us;
+ 
++	return duration_in_us;
++}
+ 
+-static void update_stream_freesync_context(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream)
++static unsigned int calc_v_total_from_refresh(
++		const struct dc_stream_state *stream,
++		unsigned int refresh_in_uhz)
+ {
+-	unsigned int index;
+-	struct freesync_context *ctx;
++	unsigned int v_total = stream->timing.v_total;
++	unsigned int frame_duration_in_ns;
+ 
+-	ctx = &stream->freesync_ctx;
++	frame_duration_in_ns =
++			((unsigned int)(div64_u64((1000000000ULL * 1000000),
++					refresh_in_uhz)));
+ 
+-	index = map_index_from_stream(core_freesync, stream);
++	v_total = div64_u64(div64_u64(((unsigned long long)(
++			frame_duration_in_ns) * stream->timing.pix_clk_khz),
++			stream->timing.h_total), 1000000);
+ 
+-	ctx->supported = core_freesync->map[index].caps->supported;
+-	ctx->enabled = (core_freesync->map[index].user_enable.enable_for_gaming ||
+-		core_freesync->map[index].user_enable.enable_for_video ||
+-		core_freesync->map[index].user_enable.enable_for_static);
+-	ctx->active = (core_freesync->map[index].state.fullscreen ||
+-		core_freesync->map[index].state.video ||
+-		core_freesync->map[index].state.static_ramp.ramp_is_active);
+-	ctx->min_refresh_in_micro_hz =
+-			core_freesync->map[index].caps->min_refresh_in_micro_hz;
+-	ctx->nominal_refresh_in_micro_hz = core_freesync->
+-		map[index].state.nominal_refresh_rate_in_micro_hz;
++	/* v_total cannot be less than nominal */
++	if (v_total < stream->timing.v_total) {
++		ASSERT(v_total < stream->timing.v_total);
++		v_total = stream->timing.v_total;
++	}
+ 
++	return v_total;
+ }
+ 
+-static void update_stream(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream)
++static unsigned int calc_v_total_from_duration(
++		const struct dc_stream_state *stream,
++		const struct mod_vrr_params *vrr,
++		unsigned int duration_in_us)
+ {
+-	unsigned int index = map_index_from_stream(core_freesync, stream);
+-	if (core_freesync->map[index].caps->supported) {
+-		stream->ignore_msa_timing_param = 1;
+-		update_stream_freesync_context(core_freesync, stream);
+-	}
+-}
++	unsigned int v_total = 0;
+ 
+-static void calc_freesync_range(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream,
+-		struct freesync_state *state,
+-		unsigned int min_refresh_in_uhz,
+-		unsigned int max_refresh_in_uhz)
+-{
+-	unsigned int min_frame_duration_in_ns = 0, max_frame_duration_in_ns = 0;
+-	unsigned int index = map_index_from_stream(core_freesync, stream);
+-	uint32_t vtotal = stream->timing.v_total;
+-
+-	if ((min_refresh_in_uhz == 0) || (max_refresh_in_uhz == 0)) {
+-		state->freesync_range.min_refresh =
+-				state->nominal_refresh_rate_in_micro_hz;
+-		state->freesync_range.max_refresh =
+-				state->nominal_refresh_rate_in_micro_hz;
++	if (duration_in_us < vrr->min_duration_in_us)
++		duration_in_us = vrr->min_duration_in_us;
+ 
+-		state->freesync_range.max_frame_duration = 0;
+-		state->freesync_range.min_frame_duration = 0;
++	if (duration_in_us > vrr->max_duration_in_us)
++		duration_in_us = vrr->max_duration_in_us;
+ 
+-		state->freesync_range.vmax = vtotal;
+-		state->freesync_range.vmin = vtotal;
+-
+-		return;
+-	}
++	v_total = div64_u64(div64_u64(((unsigned long long)(
++				duration_in_us) * stream->timing.pix_clk_khz),
++				stream->timing.h_total), 1000);
+ 
+-	min_frame_duration_in_ns = ((unsigned int) (div64_u64(
+-					(1000000000ULL * 1000000),
+-					max_refresh_in_uhz)));
+-	max_frame_duration_in_ns = ((unsigned int) (div64_u64(
+-		(1000000000ULL * 1000000),
+-		min_refresh_in_uhz)));
+-
+-	state->freesync_range.min_refresh = min_refresh_in_uhz;
+-	state->freesync_range.max_refresh = max_refresh_in_uhz;
+-
+-	state->freesync_range.max_frame_duration = max_frame_duration_in_ns;
+-	state->freesync_range.min_frame_duration = min_frame_duration_in_ns;
+-
+-	state->freesync_range.vmax = div64_u64(div64_u64(((unsigned long long)(
+-		max_frame_duration_in_ns) * stream->timing.pix_clk_khz),
+-		stream->timing.h_total), 1000000);
+-	state->freesync_range.vmin = div64_u64(div64_u64(((unsigned long long)(
+-		min_frame_duration_in_ns) * stream->timing.pix_clk_khz),
+-		stream->timing.h_total), 1000000);
+-
+-	/* vmin/vmax cannot be less than vtotal */
+-	if (state->freesync_range.vmin < vtotal) {
+-		/* Error of 1 is permissible */
+-		ASSERT((state->freesync_range.vmin + 1) >= vtotal);
+-		state->freesync_range.vmin = vtotal;
++	/* v_total cannot be less than nominal */
++	if (v_total < stream->timing.v_total) {
++		ASSERT(v_total < stream->timing.v_total);
++		v_total = stream->timing.v_total;
+ 	}
+ 
+-	if (state->freesync_range.vmax < vtotal) {
+-		/* Error of 1 is permissible */
+-		ASSERT((state->freesync_range.vmax + 1) >= vtotal);
+-		state->freesync_range.vmax = vtotal;
+-	}
+-
+-	/* Determine whether BTR can be supported */
+-	if (max_frame_duration_in_ns >=
+-			2 * min_frame_duration_in_ns)
+-		core_freesync->map[index].caps->btr_supported = true;
+-	else
+-		core_freesync->map[index].caps->btr_supported = false;
+-
+-	/* Cache the time variables */
+-	state->time.max_render_time_in_us =
+-		max_frame_duration_in_ns / 1000;
+-	state->time.min_render_time_in_us =
+-		min_frame_duration_in_ns / 1000;
+-	state->btr.mid_point_in_us =
+-		(max_frame_duration_in_ns +
+-		min_frame_duration_in_ns) / 2000;
++	return v_total;
+ }
+ 
+-static void calc_v_total_from_duration(struct dc_stream_state *stream,
+-		unsigned int duration_in_ns, int *v_total_nominal)
++static void update_v_total_for_static_ramp(
++		struct core_freesync *core_freesync,
++		const struct dc_stream_state *stream,
++		struct mod_vrr_params *in_out_vrr)
+ {
+-	*v_total_nominal = div64_u64(div64_u64(((unsigned long long)(
+-				duration_in_ns) * stream->timing.pix_clk_khz),
+-				stream->timing.h_total), 1000000);
+-}
+-
+-static void calc_v_total_for_static_ramp(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream,
+-		unsigned int index, int *v_total)
+-{
+-	unsigned int frame_duration = 0;
+-
+-	struct gradual_static_ramp *static_ramp_variables =
+-				&core_freesync->map[index].state.static_ramp;
++	unsigned int v_total = 0;
++	unsigned int current_duration_in_us =
++			calc_duration_in_us_from_v_total(
++				stream, in_out_vrr,
++				in_out_vrr->adjust.v_total_max);
++	unsigned int target_duration_in_us =
++			calc_duration_in_us_from_refresh_in_uhz(
++				in_out_vrr->fixed.target_refresh_in_uhz);
++	bool ramp_direction_is_up = (current_duration_in_us >
++				target_duration_in_us) ? true : false;
+ 
+ 	/* Calc ratio between new and current frame duration with 3 digit */
+ 	unsigned int frame_duration_ratio = div64_u64(1000000,
+ 		(1000 +  div64_u64(((unsigned long long)(
+ 		STATIC_SCREEN_RAMP_DELTA_REFRESH_RATE_PER_FRAME) *
+-		static_ramp_variables->ramp_current_frame_duration_in_ns),
+-		1000000000)));
++		current_duration_in_us),
++		1000000)));
+ 
+-	/* Calculate delta between new and current frame duration in ns */
++	/* Calculate delta between new and current frame duration in us */
+ 	unsigned int frame_duration_delta = div64_u64(((unsigned long long)(
+-		static_ramp_variables->ramp_current_frame_duration_in_ns) *
++		current_duration_in_us) *
+ 		(1000 - frame_duration_ratio)), 1000);
+ 
+ 	/* Adjust frame duration delta based on ratio between current and
+ 	 * standard frame duration (frame duration at 60 Hz refresh rate).
+ 	 */
+ 	unsigned int ramp_rate_interpolated = div64_u64(((unsigned long long)(
+-		frame_duration_delta) * static_ramp_variables->
+-		ramp_current_frame_duration_in_ns), 16666666);
++		frame_duration_delta) * current_duration_in_us), 16666);
+ 
+ 	/* Going to a higher refresh rate (lower frame duration) */
+-	if (static_ramp_variables->ramp_direction_is_up) {
++	if (ramp_direction_is_up) {
+ 		/* reduce frame duration */
+-		static_ramp_variables->ramp_current_frame_duration_in_ns -=
+-			ramp_rate_interpolated;
+-
+-		/* min frame duration */
+-		frame_duration = ((unsigned int) (div64_u64(
+-			(1000000000ULL * 1000000),
+-			core_freesync->map[index].state.
+-			nominal_refresh_rate_in_micro_hz)));
++		current_duration_in_us -= ramp_rate_interpolated;
+ 
+ 		/* adjust for frame duration below min */
+-		if (static_ramp_variables->ramp_current_frame_duration_in_ns <=
+-			frame_duration) {
+-
+-			static_ramp_variables->ramp_is_active = false;
+-			static_ramp_variables->
+-				ramp_current_frame_duration_in_ns =
+-				frame_duration;
++		if (current_duration_in_us <= target_duration_in_us) {
++			in_out_vrr->fixed.ramping_active = false;
++			in_out_vrr->fixed.ramping_done = true;
++			current_duration_in_us =
++				calc_duration_in_us_from_refresh_in_uhz(
++				in_out_vrr->fixed.target_refresh_in_uhz);
+ 		}
+ 	/* Going to a lower refresh rate (larger frame duration) */
+ 	} else {
+ 		/* increase frame duration */
+-		static_ramp_variables->ramp_current_frame_duration_in_ns +=
+-			ramp_rate_interpolated;
+-
+-		/* max frame duration */
+-		frame_duration = ((unsigned int) (div64_u64(
+-			(1000000000ULL * 1000000),
+-			core_freesync->map[index].caps->min_refresh_in_micro_hz)));
++		current_duration_in_us += ramp_rate_interpolated;
+ 
+ 		/* adjust for frame duration above max */
+-		if (static_ramp_variables->ramp_current_frame_duration_in_ns >=
+-			frame_duration) {
+-
+-			static_ramp_variables->ramp_is_active = false;
+-			static_ramp_variables->
+-				ramp_current_frame_duration_in_ns =
+-				frame_duration;
++		if (current_duration_in_us >= target_duration_in_us) {
++			in_out_vrr->fixed.ramping_active = false;
++			in_out_vrr->fixed.ramping_done = true;
++			current_duration_in_us =
++				calc_duration_in_us_from_refresh_in_uhz(
++				in_out_vrr->fixed.target_refresh_in_uhz);
+ 		}
+ 	}
+ 
+-	calc_v_total_from_duration(stream, static_ramp_variables->
+-		ramp_current_frame_duration_in_ns, v_total);
+-}
+-
+-static void reset_freesync_state_variables(struct freesync_state* state)
+-{
+-	state->static_ramp.ramp_is_active = false;
+-	if (state->nominal_refresh_rate_in_micro_hz)
+-		state->static_ramp.ramp_current_frame_duration_in_ns =
+-			((unsigned int) (div64_u64(
+-			(1000000000ULL * 1000000),
+-			state->nominal_refresh_rate_in_micro_hz)));
+-
+-	state->btr.btr_active = false;
+-	state->btr.frame_counter = 0;
+-	state->btr.frames_to_insert = 0;
+-	state->btr.inserted_frame_duration_in_us = 0;
+-	state->btr.program_btr = false;
+-
+-	state->fixed_refresh.fixed_active = false;
+-	state->fixed_refresh.program_fixed = false;
+-}
+-/*
+- * Sets freesync mode on a stream depending on current freesync state.
+- */
+-static bool set_freesync_on_streams(struct core_freesync *core_freesync,
+-		struct dc_stream_state **streams, int num_streams)
+-{
+-	int v_total_nominal = 0, v_total_min = 0, v_total_max = 0;
+-	unsigned int stream_idx, map_index = 0;
+-	struct freesync_state *state;
++	v_total = calc_v_total_from_duration(stream,
++			in_out_vrr,
++			current_duration_in_us);
+ 
+-	if (num_streams == 0 || streams == NULL || num_streams > 1)
+-		return false;
+ 
+-	for (stream_idx = 0; stream_idx < num_streams; stream_idx++) {
+-
+-		map_index = map_index_from_stream(core_freesync,
+-				streams[stream_idx]);
+-
+-		state = &core_freesync->map[map_index].state;
+-
+-		if (core_freesync->map[map_index].caps->supported) {
+-
+-			/* Fullscreen has the topmost priority. If the
+-			 * fullscreen bit is set, we are in a fullscreen
+-			 * application where it should not matter if it is
+-			 * static screen. We should not check the static_screen
+-			 * or video bit.
+-			 *
+-			 * Special cases of fullscreen include btr and fixed
+-			 * refresh. We program btr on every flip and involves
+-			 * programming full range right before the last inserted frame.
+-			 * However, we do not want to program the full freesync range
+-			 * when fixed refresh is active, because we only program
+-			 * that logic once and this will override it.
+-			 */
+-			if (core_freesync->map[map_index].user_enable.
+-				enable_for_gaming == true &&
+-				state->fullscreen == true &&
+-				state->fixed_refresh.fixed_active == false) {
+-				/* Enable freesync */
+-
+-				v_total_min = state->freesync_range.vmin;
+-				v_total_max = state->freesync_range.vmax;
+-
+-				/* Update the freesync context for the stream */
+-				update_stream_freesync_context(core_freesync,
+-						streams[stream_idx]);
+-
+-				adjust_vmin_vmax(core_freesync, streams,
+-						num_streams, map_index,
+-						v_total_min,
+-						v_total_max);
+-
+-				return true;
+-
+-			} else if (core_freesync->map[map_index].user_enable.
+-				enable_for_video && state->video == true) {
+-				/* Enable 48Hz feature */
+-
+-				calc_v_total_from_duration(streams[stream_idx],
+-					state->time.update_duration_in_ns,
+-					&v_total_nominal);
+-
+-				/* Program only if v_total_nominal is in range*/
+-				if (v_total_nominal >=
+-					streams[stream_idx]->timing.v_total) {
+-
+-					/* Update the freesync context for
+-					 * the stream
+-					 */
+-					update_stream_freesync_context(
+-						core_freesync,
+-						streams[stream_idx]);
+-
+-					adjust_vmin_vmax(
+-						core_freesync, streams,
+-						num_streams, map_index,
+-						v_total_nominal,
+-						v_total_nominal);
+-				}
+-				return true;
+-
+-			} else {
+-				/* Disable freesync */
+-				v_total_nominal = streams[stream_idx]->
+-					timing.v_total;
+-
+-				/* Update the freesync context for
+-				 * the stream
+-				 */
+-				update_stream_freesync_context(
+-					core_freesync,
+-					streams[stream_idx]);
+-
+-				adjust_vmin_vmax(core_freesync, streams,
+-						num_streams, map_index,
+-						v_total_nominal,
+-						v_total_nominal);
+-
+-				/* Reset the cached variables */
+-				reset_freesync_state_variables(state);
+-
+-				return true;
+-			}
+-		} else {
+-			/* Disable freesync */
+-			v_total_nominal = streams[stream_idx]->
+-				timing.v_total;
+-			/*
+-			 * we have to reset drr always even sink does
+-			 * not support freesync because a former stream has
+-			 * be programmed
+-			 */
+-			adjust_vmin_vmax(core_freesync, streams,
+-						num_streams, map_index,
+-						v_total_nominal,
+-						v_total_nominal);
+-			/* Reset the cached variables */
+-			reset_freesync_state_variables(state);
+-		}
+-
+-	}
+-
+-	return false;
++	in_out_vrr->adjust.v_total_min = v_total;
++	in_out_vrr->adjust.v_total_max = v_total;
+ }
+ 
+-static void set_static_ramp_variables(struct core_freesync *core_freesync,
+-		unsigned int index, bool enable_static_screen)
+-{
+-	unsigned int frame_duration = 0;
+-	unsigned int nominal_refresh_rate = core_freesync->map[index].state.
+-			nominal_refresh_rate_in_micro_hz;
+-	unsigned int min_refresh_rate= core_freesync->map[index].caps->
+-			min_refresh_in_micro_hz;
+-	struct gradual_static_ramp *static_ramp_variables =
+-			&core_freesync->map[index].state.static_ramp;
+-
+-	/* If we are ENABLING static screen, refresh rate should go DOWN.
+-	 * If we are DISABLING static screen, refresh rate should go UP.
+-	 */
+-	if (enable_static_screen)
+-		static_ramp_variables->ramp_direction_is_up = false;
+-	else
+-		static_ramp_variables->ramp_direction_is_up = true;
+-
+-	/* If ramp is not active, set initial frame duration depending on
+-	 * whether we are enabling/disabling static screen mode. If the ramp is
+-	 * already active, ramp should continue in the opposite direction
+-	 * starting with the current frame duration
+-	 */
+-	if (!static_ramp_variables->ramp_is_active) {
+-		if (enable_static_screen == true) {
+-			/* Going to lower refresh rate, so start from max
+-			 * refresh rate (min frame duration)
+-			 */
+-			frame_duration = ((unsigned int) (div64_u64(
+-				(1000000000ULL * 1000000),
+-				nominal_refresh_rate)));
+-		} else {
+-			/* Going to higher refresh rate, so start from min
+-			 * refresh rate (max frame duration)
+-			 */
+-			frame_duration = ((unsigned int) (div64_u64(
+-				(1000000000ULL * 1000000),
+-				min_refresh_rate)));
+-		}
+-		static_ramp_variables->
+-			ramp_current_frame_duration_in_ns = frame_duration;
+-
+-		static_ramp_variables->ramp_is_active = true;
+-	}
+-}
+-
+-void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams)
++static void apply_below_the_range(struct core_freesync *core_freesync,
++		const struct dc_stream_state *stream,
++		unsigned int last_render_time_in_us,
++		struct mod_vrr_params *in_out_vrr)
+ {
+-	unsigned int index, v_total, inserted_frame_v_total = 0;
+-	unsigned int min_frame_duration_in_ns, vmax, vmin = 0;
+-	struct freesync_state *state;
+-	struct core_freesync *core_freesync = NULL;
+-	struct dc_static_screen_events triggers = {0};
+-
+-	if (mod_freesync == NULL)
+-		return;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-
+-	if (core_freesync->num_entities == 0)
+-		return;
+-
+-	index = map_index_from_stream(core_freesync,
+-		streams[0]);
+-
+-	if (core_freesync->map[index].caps->supported == false)
+-		return;
+-
+-	state = &core_freesync->map[index].state;
+-
+-	/* Below the Range Logic */
+-
+-	/* Only execute if in fullscreen mode */
+-	if (state->fullscreen == true &&
+-		core_freesync->map[index].user_enable.enable_for_gaming &&
+-		core_freesync->map[index].caps->btr_supported &&
+-		state->btr.btr_active) {
++	unsigned int inserted_frame_duration_in_us = 0;
++	unsigned int mid_point_frames_ceil = 0;
++	unsigned int mid_point_frames_floor = 0;
++	unsigned int frame_time_in_us = 0;
++	unsigned int delta_from_mid_point_in_us_1 = 0xFFFFFFFF;
++	unsigned int delta_from_mid_point_in_us_2 = 0xFFFFFFFF;
++	unsigned int frames_to_insert = 0;
++	unsigned int min_frame_duration_in_ns = 0;
++	unsigned int max_render_time_in_us = in_out_vrr->max_duration_in_us;
+ 
+-		/* TODO: pass in flag for Pre-DCE12 ASIC
+-		 * in order for frame variable duration to take affect,
+-		 * it needs to be done one VSYNC early, which is at
+-		 * frameCounter == 1.
+-		 * For DCE12 and newer updates to V_TOTAL_MIN/MAX
+-		 * will take affect on current frame
+-		 */
+-		if (state->btr.frames_to_insert == state->btr.frame_counter) {
++	min_frame_duration_in_ns = ((unsigned int) (div64_u64(
++		(1000000000ULL * 1000000),
++		in_out_vrr->max_refresh_in_uhz)));
+ 
+-			min_frame_duration_in_ns = ((unsigned int) (div64_u64(
+-					(1000000000ULL * 1000000),
+-					state->nominal_refresh_rate_in_micro_hz)));
++	/* Program BTR */
++	if (last_render_time_in_us + BTR_EXIT_MARGIN < max_render_time_in_us) {
++		/* Exit Below the Range */
++		if (in_out_vrr->btr.btr_active) {
++			in_out_vrr->btr.frame_counter = 0;
++			in_out_vrr->btr.btr_active = false;
+ 
+-			vmin = state->freesync_range.vmin;
++		/* Exit Fixed Refresh mode */
++		} else if (in_out_vrr->fixed.fixed_active) {
+ 
+-			inserted_frame_v_total = vmin;
++			in_out_vrr->fixed.frame_counter++;
+ 
+-			if (min_frame_duration_in_ns / 1000)
+-				inserted_frame_v_total =
+-					state->btr.inserted_frame_duration_in_us *
+-					vmin / (min_frame_duration_in_ns / 1000);
++			if (in_out_vrr->fixed.frame_counter >
++					FIXED_REFRESH_EXIT_FRAME_COUNT) {
++				in_out_vrr->fixed.frame_counter = 0;
++				in_out_vrr->fixed.fixed_active = false;
++			}
++		}
++	} else if (last_render_time_in_us > max_render_time_in_us) {
++		/* Enter Below the Range */
++		if (!in_out_vrr->btr.btr_active &&
++				in_out_vrr->btr.btr_enabled) {
++			in_out_vrr->btr.btr_active = true;
+ 
+-			/* Set length of inserted frames as v_total_max*/
+-			vmax = inserted_frame_v_total;
+-			vmin = inserted_frame_v_total;
++		/* Enter Fixed Refresh mode */
++		} else if (!in_out_vrr->fixed.fixed_active &&
++				!in_out_vrr->btr.btr_enabled) {
++			in_out_vrr->fixed.frame_counter++;
+ 
+-			/* Program V_TOTAL */
+-			adjust_vmin_vmax(core_freesync, streams,
+-						num_streams, index,
+-						vmin, vmax);
++			if (in_out_vrr->fixed.frame_counter >
++					FIXED_REFRESH_ENTER_FRAME_COUNT) {
++				in_out_vrr->fixed.frame_counter = 0;
++				in_out_vrr->fixed.fixed_active = true;
++			}
+ 		}
++	}
+ 
+-		if (state->btr.frame_counter > 0)
+-			state->btr.frame_counter--;
++	/* BTR set to "not active" so disengage */
++	if (!in_out_vrr->btr.btr_active) {
++		in_out_vrr->btr.btr_active = false;
++		in_out_vrr->btr.inserted_duration_in_us = 0;
++		in_out_vrr->btr.frames_to_insert = 0;
++		in_out_vrr->btr.frame_counter = 0;
+ 
+ 		/* Restore FreeSync */
+-		if (state->btr.frame_counter == 0)
+-			set_freesync_on_streams(core_freesync, streams, num_streams);
+-	}
+-
+-	/* If in fullscreen freesync mode or in video, do not program
+-	 * static screen ramp values
+-	 */
+-	if (state->fullscreen == true || state->video == true) {
++		in_out_vrr->adjust.v_total_min =
++			calc_v_total_from_refresh(stream,
++				in_out_vrr->max_refresh_in_uhz);
++		in_out_vrr->adjust.v_total_max =
++			calc_v_total_from_refresh(stream,
++				in_out_vrr->min_refresh_in_uhz);
++	/* BTR set to "active" so engage */
++	} else {
+ 
+-		state->static_ramp.ramp_is_active = false;
++		/* Calculate number of midPoint frames that could fit within
++		 * the render time interval- take ceil of this value
++		 */
++		mid_point_frames_ceil = (last_render_time_in_us +
++				in_out_vrr->btr.mid_point_in_us - 1) /
++					in_out_vrr->btr.mid_point_in_us;
+ 
+-		return;
+-	}
++		if (mid_point_frames_ceil > 0) {
++			frame_time_in_us = last_render_time_in_us /
++				mid_point_frames_ceil;
++			delta_from_mid_point_in_us_1 =
++				(in_out_vrr->btr.mid_point_in_us >
++				frame_time_in_us) ?
++				(in_out_vrr->btr.mid_point_in_us - frame_time_in_us) :
++				(frame_time_in_us - in_out_vrr->btr.mid_point_in_us);
++		}
+ 
+-	/* Gradual Static Screen Ramping Logic */
++		/* Calculate number of midPoint frames that could fit within
++		 * the render time interval- take floor of this value
++		 */
++		mid_point_frames_floor = last_render_time_in_us /
++				in_out_vrr->btr.mid_point_in_us;
+ 
+-	/* Execute if ramp is active and user enabled freesync static screen*/
+-	if (state->static_ramp.ramp_is_active &&
+-		core_freesync->map[index].user_enable.enable_for_static) {
++		if (mid_point_frames_floor > 0) {
+ 
+-		calc_v_total_for_static_ramp(core_freesync, streams[0],
+-				index, &v_total);
++			frame_time_in_us = last_render_time_in_us /
++				mid_point_frames_floor;
++			delta_from_mid_point_in_us_2 =
++				(in_out_vrr->btr.mid_point_in_us >
++				frame_time_in_us) ?
++				(in_out_vrr->btr.mid_point_in_us - frame_time_in_us) :
++				(frame_time_in_us - in_out_vrr->btr.mid_point_in_us);
++		}
+ 
+-		/* Update the freesync context for the stream */
+-		update_stream_freesync_context(core_freesync, streams[0]);
++		/* Choose number of frames to insert based on how close it
++		 * can get to the mid point of the variable range.
++		 */
++		if (delta_from_mid_point_in_us_1 < delta_from_mid_point_in_us_2)
++			frames_to_insert = mid_point_frames_ceil;
++		else
++			frames_to_insert = mid_point_frames_floor;
+ 
+-		/* Program static screen ramp values */
+-		adjust_vmin_vmax(core_freesync, streams,
+-					num_streams, index,
+-					v_total,
+-					v_total);
++		/* Either we've calculated the number of frames to insert,
++		 * or we need to insert min duration frames
++		 */
++		if (frames_to_insert > 0)
++			inserted_frame_duration_in_us = last_render_time_in_us /
++							frames_to_insert;
+ 
+-		triggers.overlay_update = true;
+-		triggers.surface_update = true;
++		if (inserted_frame_duration_in_us <
++			(1000000 / in_out_vrr->max_refresh_in_uhz))
++			inserted_frame_duration_in_us =
++				(1000000 / in_out_vrr->max_refresh_in_uhz);
+ 
+-		dc_stream_set_static_screen_events(core_freesync->dc, streams,
+-						   num_streams, &triggers);
++		/* Cache the calculated variables */
++		in_out_vrr->btr.inserted_duration_in_us =
++			inserted_frame_duration_in_us;
++		in_out_vrr->btr.frames_to_insert = frames_to_insert;
++		in_out_vrr->btr.frame_counter = frames_to_insert;
++
++		in_out_vrr->adjust.v_total_min =
++			calc_v_total_from_duration(stream, in_out_vrr,
++				in_out_vrr->btr.inserted_duration_in_us);
++		in_out_vrr->adjust.v_total_max =
++				in_out_vrr->adjust.v_total_min;
+ 	}
+ }
+ 
+-void mod_freesync_update_state(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		struct mod_freesync_params *freesync_params)
++static void apply_fixed_refresh(struct core_freesync *core_freesync,
++		const struct dc_stream_state *stream,
++		unsigned int last_render_time_in_us,
++		struct mod_vrr_params *in_out_vrr)
+ {
+-	bool freesync_program_required = false;
+-	unsigned int stream_index;
+-	struct freesync_state *state;
+-	struct core_freesync *core_freesync = NULL;
+-	struct dc_static_screen_events triggers = {0};
++	bool update = false;
++	unsigned int max_render_time_in_us = in_out_vrr->max_duration_in_us;
+ 
+-	if (mod_freesync == NULL)
+-		return;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-
+-	if (core_freesync->num_entities == 0)
+-		return;
++	if (last_render_time_in_us + BTR_EXIT_MARGIN < max_render_time_in_us) {
++		/* Exit Fixed Refresh mode */
++		if (in_out_vrr->fixed.fixed_active) {
++			in_out_vrr->fixed.frame_counter++;
+ 
+-	for(stream_index = 0; stream_index < num_streams; stream_index++) {
+-
+-		unsigned int map_index = map_index_from_stream(core_freesync,
+-				streams[stream_index]);
+-
+-		bool is_embedded = dc_is_embedded_signal(
+-				streams[stream_index]->sink->sink_signal);
+-
+-		struct freesync_registry_options *opts = &core_freesync->opts;
+-
+-		state = &core_freesync->map[map_index].state;
+-
+-		switch (freesync_params->state){
+-		case FREESYNC_STATE_FULLSCREEN:
+-			state->fullscreen = freesync_params->enable;
+-			freesync_program_required = true;
+-			state->windowed_fullscreen =
+-					freesync_params->windowed_fullscreen;
+-			break;
+-		case FREESYNC_STATE_STATIC_SCREEN:
+-			/* Static screen ramp is disabled by default, but can
+-			 * be enabled through regkey.
+-			 */
+-			if ((is_embedded && opts->drr_internal_supported) ||
+-				(!is_embedded && opts->drr_external_supported))
+-
+-				if (state->static_screen !=
+-						freesync_params->enable) {
+-
+-					/* Change the state flag */
+-					state->static_screen =
+-							freesync_params->enable;
+-
+-					/* Update static screen ramp */
+-					set_static_ramp_variables(core_freesync,
+-						map_index,
+-						freesync_params->enable);
+-				}
+-			/* We program the ramp starting next VUpdate */
+-			break;
+-		case FREESYNC_STATE_VIDEO:
+-			/* Change core variables only if there is a change*/
+-			if(freesync_params->update_duration_in_ns !=
+-				state->time.update_duration_in_ns) {
+-
+-				state->video = freesync_params->enable;
+-				state->time.update_duration_in_ns =
+-					freesync_params->update_duration_in_ns;
+-
+-				freesync_program_required = true;
++			if (in_out_vrr->fixed.frame_counter >
++					FIXED_REFRESH_EXIT_FRAME_COUNT) {
++				in_out_vrr->fixed.frame_counter = 0;
++				in_out_vrr->fixed.fixed_active = false;
++				in_out_vrr->fixed.target_refresh_in_uhz = 0;
++				update = true;
+ 			}
+-			break;
+-		case FREESYNC_STATE_NONE:
+-			/* handle here to avoid warning */
+-			break;
+ 		}
+-	}
+-
+-	/* Update mask */
+-	triggers.overlay_update = true;
+-	triggers.surface_update = true;
+-
+-	dc_stream_set_static_screen_events(core_freesync->dc, streams,
+-					   num_streams, &triggers);
+-
+-	if (freesync_program_required)
+-		/* Program freesync according to current state*/
+-		set_freesync_on_streams(core_freesync, streams, num_streams);
+-}
+-
+-
+-bool mod_freesync_get_state(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		struct mod_freesync_params *freesync_params)
+-{
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
++	} else if (last_render_time_in_us > max_render_time_in_us) {
++		/* Enter Fixed Refresh mode */
++		if (!in_out_vrr->fixed.fixed_active) {
++			in_out_vrr->fixed.frame_counter++;
+ 
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	if (core_freesync->map[index].state.fullscreen) {
+-		freesync_params->state = FREESYNC_STATE_FULLSCREEN;
+-		freesync_params->enable = true;
+-	} else if (core_freesync->map[index].state.static_screen) {
+-		freesync_params->state = FREESYNC_STATE_STATIC_SCREEN;
+-		freesync_params->enable = true;
+-	} else if (core_freesync->map[index].state.video) {
+-		freesync_params->state = FREESYNC_STATE_VIDEO;
+-		freesync_params->enable = true;
+-	} else {
+-		freesync_params->state = FREESYNC_STATE_NONE;
+-		freesync_params->enable = false;
++			if (in_out_vrr->fixed.frame_counter >
++					FIXED_REFRESH_ENTER_FRAME_COUNT) {
++				in_out_vrr->fixed.frame_counter = 0;
++				in_out_vrr->fixed.fixed_active = true;
++				in_out_vrr->fixed.target_refresh_in_uhz =
++						in_out_vrr->max_refresh_in_uhz;
++				update = true;
++			}
++		}
+ 	}
+ 
+-	freesync_params->update_duration_in_ns =
+-		core_freesync->map[index].state.time.update_duration_in_ns;
+-
+-	freesync_params->windowed_fullscreen =
+-			core_freesync->map[index].state.windowed_fullscreen;
+-
+-	return true;
+-}
+-
+-bool mod_freesync_set_user_enable(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		struct mod_freesync_user_enable *user_enable)
+-{
+-	unsigned int stream_index, map_index;
+-	int persistent_data = 0;
+-	struct persistent_data_flag flag;
+-	struct dc  *dc = NULL;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	dc = core_freesync->dc;
+-
+-	flag.save_per_edid = true;
+-	flag.save_per_link = false;
+-
+-	for(stream_index = 0; stream_index < num_streams;
+-			stream_index++){
+-
+-		map_index = map_index_from_stream(core_freesync,
+-				streams[stream_index]);
+-
+-		core_freesync->map[map_index].user_enable = *user_enable;
+-
+-		/* Write persistent data in registry*/
+-		if (core_freesync->map[map_index].user_enable.
+-				enable_for_gaming)
+-			persistent_data = persistent_data | 1;
+-		if (core_freesync->map[map_index].user_enable.
+-				enable_for_static)
+-			persistent_data = persistent_data | 2;
+-		if (core_freesync->map[map_index].user_enable.
+-				enable_for_video)
+-			persistent_data = persistent_data | 4;
+-
+-		dm_write_persistent_data(dc->ctx,
+-					streams[stream_index]->sink,
+-					FREESYNC_REGISTRY_NAME,
+-					"userenable",
+-					&persistent_data,
+-					sizeof(int),
+-					&flag);
++	if (update) {
++		if (in_out_vrr->fixed.fixed_active) {
++			in_out_vrr->adjust.v_total_min =
++				calc_v_total_from_refresh(
++				stream, in_out_vrr->max_refresh_in_uhz);
++			in_out_vrr->adjust.v_total_max =
++					in_out_vrr->adjust.v_total_min;
++		} else {
++			in_out_vrr->adjust.v_total_min =
++				calc_v_total_from_refresh(
++				stream, in_out_vrr->max_refresh_in_uhz);
++			in_out_vrr->adjust.v_total_max =
++				in_out_vrr->adjust.v_total_min;
++		}
+ 	}
+-
+-	set_freesync_on_streams(core_freesync, streams, num_streams);
+-
+-	return true;
+ }
+ 
+-bool mod_freesync_get_user_enable(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		struct mod_freesync_user_enable *user_enable)
+-{
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	*user_enable = core_freesync->map[index].user_enable;
+-
+-	return true;
+-}
+-
+-bool mod_freesync_get_static_ramp_active(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		bool *is_ramp_active)
+-{
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	*is_ramp_active =
+-		core_freesync->map[index].state.static_ramp.ramp_is_active;
+-
+-	return true;
+-}
+-
+-bool mod_freesync_override_min_max(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *streams,
+-		unsigned int min_refresh,
+-		unsigned int max_refresh,
+-		struct mod_freesync_caps *caps)
++static bool vrr_settings_require_update(struct core_freesync *core_freesync,
++		struct mod_freesync_config *in_config,
++		unsigned int min_refresh_in_uhz,
++		unsigned int max_refresh_in_uhz,
++		struct mod_vrr_params *in_vrr)
+ {
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync;
+-	struct freesync_state *state;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, streams);
+-	state = &core_freesync->map[index].state;
+-
+-	if (max_refresh == 0)
+-		max_refresh = state->nominal_refresh_rate_in_micro_hz;
+-
+-	if (min_refresh == 0) {
+-		/* Restore defaults */
+-		calc_freesync_range(core_freesync, streams, state,
+-			core_freesync->map[index].caps->
+-			min_refresh_in_micro_hz,
+-			state->nominal_refresh_rate_in_micro_hz);
+-	} else {
+-		calc_freesync_range(core_freesync, streams,
+-				state,
+-				min_refresh,
+-				max_refresh);
+-
+-		/* Program vtotal min/max */
+-		adjust_vmin_vmax(core_freesync, &streams, 1, index,
+-				state->freesync_range.vmin,
+-				state->freesync_range.vmax);
+-	}
+-
+-	if (min_refresh != 0 &&
+-			dc_is_embedded_signal(streams->sink->sink_signal) &&
+-			(max_refresh - min_refresh >= 10000000)) {
+-		caps->supported = true;
+-		caps->min_refresh_in_micro_hz = min_refresh;
+-		caps->max_refresh_in_micro_hz = max_refresh;
++	if (in_vrr->state != in_config->state) {
++		return true;
++	} else if (in_vrr->state == VRR_STATE_ACTIVE_FIXED &&
++			in_vrr->fixed.target_refresh_in_uhz !=
++					in_config->min_refresh_in_uhz) {
++		return true;
++	} else if (in_vrr->min_refresh_in_uhz != min_refresh_in_uhz) {
++		return true;
++	} else if (in_vrr->max_refresh_in_uhz != max_refresh_in_uhz) {
++		return true;
+ 	}
+ 
+-	/* Update the stream */
+-	update_stream(core_freesync, streams);
+-
+-	return true;
+-}
+-
+-bool mod_freesync_get_min_max(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		unsigned int *min_refresh,
+-		unsigned int *max_refresh)
+-{
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	*min_refresh =
+-		core_freesync->map[index].state.freesync_range.min_refresh;
+-	*max_refresh =
+-		core_freesync->map[index].state.freesync_range.max_refresh;
+-
+-	return true;
++	return false;
+ }
+ 
+ bool mod_freesync_get_vmin_vmax(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
++		const struct dc_stream_state *stream,
+ 		unsigned int *vmin,
+ 		unsigned int *vmax)
+ {
+-	unsigned int index = 0;
+-	struct core_freesync *core_freesync = NULL;
+-
+-	if (mod_freesync == NULL)
+-		return false;
+-
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+-
+-	*vmin =
+-		core_freesync->map[index].state.freesync_range.vmin;
+-	*vmax =
+-		core_freesync->map[index].state.freesync_range.vmax;
++	*vmin = stream->adjust.v_total_min;
++	*vmax = stream->adjust.v_total_max;
+ 
+ 	return true;
+ }
+@@ -1189,7 +471,6 @@ bool mod_freesync_get_v_position(struct mod_freesync *mod_freesync,
+ 		unsigned int *nom_v_pos,
+ 		unsigned int *v_pos)
+ {
+-	unsigned int index = 0;
+ 	struct core_freesync *core_freesync = NULL;
+ 	struct crtc_position position;
+ 
+@@ -1197,7 +478,6 @@ bool mod_freesync_get_v_position(struct mod_freesync *mod_freesync,
+ 		return false;
+ 
+ 	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+-	index = map_index_from_stream(core_freesync, stream);
+ 
+ 	if (dc_stream_get_crtc_position(core_freesync->dc, &stream, 1,
+ 					&position.vertical_count,
+@@ -1212,310 +492,368 @@ bool mod_freesync_get_v_position(struct mod_freesync *mod_freesync,
+ 	return false;
+ }
+ 
+-void mod_freesync_notify_mode_change(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams)
++void mod_freesync_build_vrr_infopacket(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		const struct mod_vrr_params *vrr,
++		struct dc_info_packet *infopacket)
+ {
+-	unsigned int stream_index, map_index;
+-	struct freesync_state *state;
+-	struct core_freesync *core_freesync = NULL;
+-	struct dc_static_screen_events triggers = {0};
+-	unsigned long long temp = 0;
++	/* SPD info packet for FreeSync */
++	unsigned char checksum = 0;
++	unsigned int idx, payload_size = 0;
+ 
+-	if (mod_freesync == NULL)
++	/* Check if Freesync is supported. Return if false. If true,
++	 * set the corresponding bit in the info packet
++	 */
++	if (!vrr->supported)
+ 		return;
+ 
+-	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
++	if (dc_is_hdmi_signal(stream->signal)) {
+ 
+-	for (stream_index = 0; stream_index < num_streams; stream_index++) {
+-		map_index = map_index_from_stream(core_freesync,
+-				streams[stream_index]);
+-
+-		state = &core_freesync->map[map_index].state;
+-
+-		/* Update the field rate for new timing */
+-		temp = streams[stream_index]->timing.pix_clk_khz;
+-		temp *= 1000ULL * 1000ULL * 1000ULL;
+-		temp = div_u64(temp,
+-				streams[stream_index]->timing.h_total);
+-		temp = div_u64(temp,
+-				streams[stream_index]->timing.v_total);
+-		state->nominal_refresh_rate_in_micro_hz =
+-				(unsigned int) temp;
+-
+-		if (core_freesync->map[map_index].caps->supported) {
+-
+-			/* Update the stream */
+-			update_stream(core_freesync, streams[stream_index]);
+-
+-			/* Calculate vmin/vmax and refresh rate for
+-			 * current mode
+-			 */
+-			calc_freesync_range(core_freesync, *streams, state,
+-				core_freesync->map[map_index].caps->
+-				min_refresh_in_micro_hz,
+-				state->nominal_refresh_rate_in_micro_hz);
+-
+-			/* Update mask */
+-			triggers.overlay_update = true;
+-			triggers.surface_update = true;
+-
+-			dc_stream_set_static_screen_events(core_freesync->dc,
+-							   streams, num_streams,
+-							   &triggers);
+-		}
+-	}
++		/* HEADER */
+ 
+-	/* Program freesync according to current state*/
+-	set_freesync_on_streams(core_freesync, streams, num_streams);
+-}
++		/* HB0  = Packet Type = 0x83 (Source Product
++		 *	  Descriptor InfoFrame)
++		 */
++		infopacket->hb0 = DC_HDMI_INFOFRAME_TYPE_SPD;
+ 
+-/* Add the timestamps to the cache and determine whether BTR programming
+- * is required, depending on the times calculated
+- */
+-static void update_timestamps(struct core_freesync *core_freesync,
+-		const struct dc_stream_state *stream, unsigned int map_index,
+-		unsigned int last_render_time_in_us)
+-{
+-	struct freesync_state *state = &core_freesync->map[map_index].state;
++		/* HB1  = Version = 0x01 */
++		infopacket->hb1 = 0x01;
+ 
+-	state->time.render_times[state->time.render_times_index] =
+-			last_render_time_in_us;
+-	state->time.render_times_index++;
++		/* HB2  = [Bits 7:5 = 0] [Bits 4:0 = Length = 0x08] */
++		infopacket->hb2 = 0x08;
+ 
+-	if (state->time.render_times_index >= RENDER_TIMES_MAX_COUNT)
+-		state->time.render_times_index = 0;
++		payload_size = 0x08;
+ 
+-	if (last_render_time_in_us + BTR_EXIT_MARGIN <
+-		state->time.max_render_time_in_us) {
++	} else if (dc_is_dp_signal(stream->signal)) {
+ 
+-		/* Exit Below the Range */
+-		if (state->btr.btr_active) {
++		/* HEADER */
+ 
+-			state->btr.program_btr = true;
+-			state->btr.btr_active = false;
+-			state->btr.frame_counter = 0;
++		/* HB0  = Secondary-data Packet ID = 0 - Only non-zero
++		 *	  when used to associate audio related info packets
++		 */
++		infopacket->hb0 = 0x00;
+ 
+-		/* Exit Fixed Refresh mode */
+-		} else if (state->fixed_refresh.fixed_active) {
++		/* HB1  = Packet Type = 0x83 (Source Product
++		 *	  Descriptor InfoFrame)
++		 */
++		infopacket->hb1 = DC_HDMI_INFOFRAME_TYPE_SPD;
+ 
+-			state->fixed_refresh.frame_counter++;
++		/* HB2  = [Bits 7:0 = Least significant eight bits -
++		 *	  For INFOFRAME, the value must be 1Bh]
++		 */
++		infopacket->hb2 = 0x1B;
+ 
+-			if (state->fixed_refresh.frame_counter >
+-					FIXED_REFRESH_EXIT_FRAME_COUNT) {
+-				state->fixed_refresh.frame_counter = 0;
+-				state->fixed_refresh.program_fixed = true;
+-				state->fixed_refresh.fixed_active = false;
+-			}
+-		}
++		/* HB3  = [Bits 7:2 = INFOFRAME SDP Version Number = 0x1]
++		 *	  [Bits 1:0 = Most significant two bits = 0x00]
++		 */
++		infopacket->hb3 = 0x04;
+ 
+-	} else if (last_render_time_in_us > state->time.max_render_time_in_us) {
++		payload_size = 0x1B;
++	}
+ 
+-		/* Enter Below the Range */
+-		if (!state->btr.btr_active &&
+-			core_freesync->map[map_index].caps->btr_supported) {
++	/* PB1 = 0x1A (24bit AMD IEEE OUI (0x00001A) - Byte 0) */
++	infopacket->sb[1] = 0x1A;
+ 
+-			state->btr.program_btr = true;
+-			state->btr.btr_active = true;
++	/* PB2 = 0x00 (24bit AMD IEEE OUI (0x00001A) - Byte 1) */
++	infopacket->sb[2] = 0x00;
+ 
+-		/* Enter Fixed Refresh mode */
+-		} else if (!state->fixed_refresh.fixed_active &&
+-			!core_freesync->map[map_index].caps->btr_supported) {
++	/* PB3 = 0x00 (24bit AMD IEEE OUI (0x00001A) - Byte 2) */
++	infopacket->sb[3] = 0x00;
+ 
+-			state->fixed_refresh.frame_counter++;
++	/* PB4 = Reserved */
+ 
+-			if (state->fixed_refresh.frame_counter >
+-					FIXED_REFRESH_ENTER_FRAME_COUNT) {
+-				state->fixed_refresh.frame_counter = 0;
+-				state->fixed_refresh.program_fixed = true;
+-				state->fixed_refresh.fixed_active = true;
+-			}
+-		}
+-	}
++	/* PB5 = Reserved */
+ 
+-	/* When Below the Range is active, must react on every frame */
+-	if (state->btr.btr_active)
+-		state->btr.program_btr = true;
+-}
++	/* PB6 = [Bits 7:3 = Reserved] */
+ 
+-static void apply_below_the_range(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream, unsigned int map_index,
+-		unsigned int last_render_time_in_us)
+-{
+-	unsigned int inserted_frame_duration_in_us = 0;
+-	unsigned int mid_point_frames_ceil = 0;
+-	unsigned int mid_point_frames_floor = 0;
+-	unsigned int frame_time_in_us = 0;
+-	unsigned int delta_from_mid_point_in_us_1 = 0xFFFFFFFF;
+-	unsigned int delta_from_mid_point_in_us_2 = 0xFFFFFFFF;
+-	unsigned int frames_to_insert = 0;
+-	unsigned int min_frame_duration_in_ns = 0;
+-	struct freesync_state *state = &core_freesync->map[map_index].state;
++	/* PB6 = [Bit 0 = FreeSync Supported] */
++	if (vrr->state != VRR_STATE_UNSUPPORTED)
++		infopacket->sb[6] |= 0x01;
+ 
+-	if (!state->btr.program_btr)
+-		return;
++	/* PB6 = [Bit 1 = FreeSync Enabled] */
++	if (vrr->state != VRR_STATE_DISABLED &&
++			vrr->state != VRR_STATE_UNSUPPORTED)
++		infopacket->sb[6] |= 0x02;
+ 
+-	state->btr.program_btr = false;
++	/* PB6 = [Bit 2 = FreeSync Active] */
++	if (vrr->state == VRR_STATE_ACTIVE_VARIABLE ||
++			vrr->state == VRR_STATE_ACTIVE_FIXED)
++		infopacket->sb[6] |= 0x04;
+ 
+-	min_frame_duration_in_ns = ((unsigned int) (div64_u64(
+-		(1000000000ULL * 1000000),
+-		state->nominal_refresh_rate_in_micro_hz)));
++	/* PB7 = FreeSync Minimum refresh rate (Hz) */
++	infopacket->sb[7] = (unsigned char)(vrr->min_refresh_in_uhz / 1000000);
+ 
+-	/* Program BTR */
++	/* PB8 = FreeSync Maximum refresh rate (Hz)
++	 * Note: We should never go above the field rate of the mode timing set.
++	 */
++	infopacket->sb[8] = (unsigned char)(vrr->max_refresh_in_uhz / 1000000);
+ 
+-	/* BTR set to "not active" so disengage */
+-	if (!state->btr.btr_active)
++	/* PB9 - PB27  = Reserved */
+ 
+-		/* Restore FreeSync */
+-		set_freesync_on_streams(core_freesync, &stream, 1);
++	/* Calculate checksum */
++	checksum += infopacket->hb0;
++	checksum += infopacket->hb1;
++	checksum += infopacket->hb2;
++	checksum += infopacket->hb3;
+ 
+-	/* BTR set to "active" so engage */
+-	else {
++	for (idx = 1; idx <= payload_size; idx++)
++		checksum += infopacket->sb[idx];
+ 
+-		/* Calculate number of midPoint frames that could fit within
+-		 * the render time interval- take ceil of this value
+-		 */
+-		mid_point_frames_ceil = (last_render_time_in_us +
+-			state->btr.mid_point_in_us- 1) /
+-			state->btr.mid_point_in_us;
++	/* PB0 = Checksum (one byte complement) */
++	infopacket->sb[0] = (unsigned char)(0x100 - checksum);
+ 
+-		if (mid_point_frames_ceil > 0) {
++	infopacket->valid = true;
++}
+ 
+-			frame_time_in_us = last_render_time_in_us /
+-				mid_point_frames_ceil;
+-			delta_from_mid_point_in_us_1 =
+-				(state->btr.mid_point_in_us >
+-				frame_time_in_us) ?
+-				(state->btr.mid_point_in_us - frame_time_in_us):
+-				(frame_time_in_us - state->btr.mid_point_in_us);
+-		}
++void mod_freesync_build_vrr_params(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		struct mod_freesync_config *in_config,
++		struct mod_vrr_params *in_out_vrr)
++{
++	struct core_freesync *core_freesync = NULL;
++	unsigned long long nominal_field_rate_in_uhz = 0;
++	bool nominal_field_rate_in_range = true;
++	unsigned int refresh_range = 0;
++	unsigned int min_refresh_in_uhz = 0;
++	unsigned int max_refresh_in_uhz = 0;
+ 
+-		/* Calculate number of midPoint frames that could fit within
+-		 * the render time interval- take floor of this value
+-		 */
+-		mid_point_frames_floor = last_render_time_in_us /
+-			state->btr.mid_point_in_us;
++	if (mod_freesync == NULL)
++		return;
+ 
+-		if (mid_point_frames_floor > 0) {
++	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+ 
+-			frame_time_in_us = last_render_time_in_us /
+-				mid_point_frames_floor;
+-			delta_from_mid_point_in_us_2 =
+-				(state->btr.mid_point_in_us >
+-				frame_time_in_us) ?
+-				(state->btr.mid_point_in_us - frame_time_in_us):
+-				(frame_time_in_us - state->btr.mid_point_in_us);
+-		}
++	/* Calculate nominal field rate for stream */
++	nominal_field_rate_in_uhz = stream->timing.pix_clk_khz;
++	nominal_field_rate_in_uhz *= 1000ULL * 1000ULL * 1000ULL;
++	nominal_field_rate_in_uhz = div_u64(nominal_field_rate_in_uhz,
++						stream->timing.h_total);
++	nominal_field_rate_in_uhz = div_u64(nominal_field_rate_in_uhz,
++						stream->timing.v_total);
++
++	min_refresh_in_uhz = in_config->min_refresh_in_uhz;
++	max_refresh_in_uhz = in_config->max_refresh_in_uhz;
++
++	// Don't allow min > max
++	if (min_refresh_in_uhz > max_refresh_in_uhz)
++		min_refresh_in_uhz = max_refresh_in_uhz;
++
++	// Full range may be larger than current video timing, so cap at nominal
++	if (max_refresh_in_uhz > nominal_field_rate_in_uhz)
++		max_refresh_in_uhz = nominal_field_rate_in_uhz;
++
++	/* Allow for some rounding error of actual video timing by taking ceil.
++	 * For example, 144 Hz mode timing may actually be 143.xxx Hz when
++	 * calculated from pixel rate and vertical/horizontal totals, but
++	 * this should be allowed instead of blocking FreeSync.
++	 */
++	if ((min_refresh_in_uhz / 1000000) >
++			((nominal_field_rate_in_uhz + 1000000 - 1) / 1000000))
++		nominal_field_rate_in_range = false;
+ 
+-		/* Choose number of frames to insert based on how close it
+-		 * can get to the mid point of the variable range.
+-		 */
+-		if (delta_from_mid_point_in_us_1 < delta_from_mid_point_in_us_2)
+-			frames_to_insert = mid_point_frames_ceil;
+-		else
+-			frames_to_insert = mid_point_frames_floor;
++	// Full range may be larger than current video timing, so cap at nominal
++	if (min_refresh_in_uhz > nominal_field_rate_in_uhz)
++		min_refresh_in_uhz = nominal_field_rate_in_uhz;
+ 
+-		/* Either we've calculated the number of frames to insert,
+-		 * or we need to insert min duration frames
+-		 */
+-		if (frames_to_insert > 0)
+-			inserted_frame_duration_in_us = last_render_time_in_us /
+-							frames_to_insert;
++	if (!vrr_settings_require_update(core_freesync,
++			in_config, min_refresh_in_uhz, max_refresh_in_uhz,
++			in_out_vrr))
++		return;
+ 
+-		if (inserted_frame_duration_in_us <
+-			state->time.min_render_time_in_us)
++	in_out_vrr->state = in_config->state;
+ 
+-			inserted_frame_duration_in_us =
+-				state->time.min_render_time_in_us;
++	if ((in_config->state == VRR_STATE_UNSUPPORTED) ||
++				(!nominal_field_rate_in_range)) {
++		in_out_vrr->state = VRR_STATE_UNSUPPORTED;
++		in_out_vrr->supported = false;
++	} else {
++		in_out_vrr->min_refresh_in_uhz = min_refresh_in_uhz;
++		in_out_vrr->max_duration_in_us =
++				calc_duration_in_us_from_refresh_in_uhz(
++						min_refresh_in_uhz);
+ 
+-		/* Cache the calculated variables */
+-		state->btr.inserted_frame_duration_in_us =
+-			inserted_frame_duration_in_us;
+-		state->btr.frames_to_insert = frames_to_insert;
+-		state->btr.frame_counter = frames_to_insert;
++		in_out_vrr->max_refresh_in_uhz = max_refresh_in_uhz;
++		in_out_vrr->min_duration_in_us =
++				calc_duration_in_us_from_refresh_in_uhz(
++						max_refresh_in_uhz);
+ 
++		refresh_range = in_out_vrr->max_refresh_in_uhz -
++				in_out_vrr->min_refresh_in_uhz;
++
++		in_out_vrr->supported = true;
++	}
++
++	in_out_vrr->fixed.ramping_active = in_config->ramping;
++
++	in_out_vrr->btr.btr_enabled = in_config->btr;
++	if (in_out_vrr->max_refresh_in_uhz <
++			2 * in_out_vrr->min_refresh_in_uhz)
++		in_out_vrr->btr.btr_enabled = false;
++	in_out_vrr->btr.btr_active = false;
++	in_out_vrr->btr.inserted_duration_in_us = 0;
++	in_out_vrr->btr.frames_to_insert = 0;
++	in_out_vrr->btr.frame_counter = 0;
++	in_out_vrr->btr.mid_point_in_us =
++			in_out_vrr->min_duration_in_us +
++				(in_out_vrr->max_duration_in_us -
++				in_out_vrr->min_duration_in_us) / 2;
++
++	if (in_out_vrr->state == VRR_STATE_UNSUPPORTED) {
++		in_out_vrr->adjust.v_total_min = stream->timing.v_total;
++		in_out_vrr->adjust.v_total_max = stream->timing.v_total;
++	} else if (in_out_vrr->state == VRR_STATE_DISABLED) {
++		in_out_vrr->adjust.v_total_min = stream->timing.v_total;
++		in_out_vrr->adjust.v_total_max = stream->timing.v_total;
++	} else if (in_out_vrr->state == VRR_STATE_INACTIVE) {
++		in_out_vrr->adjust.v_total_min = stream->timing.v_total;
++		in_out_vrr->adjust.v_total_max = stream->timing.v_total;
++	} else if (in_out_vrr->state == VRR_STATE_ACTIVE_VARIABLE &&
++			refresh_range >= MIN_REFRESH_RANGE_IN_US) {
++		in_out_vrr->adjust.v_total_min =
++			calc_v_total_from_refresh(stream,
++				in_out_vrr->max_refresh_in_uhz);
++		in_out_vrr->adjust.v_total_max =
++			calc_v_total_from_refresh(stream,
++				in_out_vrr->min_refresh_in_uhz);
++	} else if (in_out_vrr->state == VRR_STATE_ACTIVE_FIXED) {
++		in_out_vrr->fixed.target_refresh_in_uhz =
++				in_out_vrr->min_refresh_in_uhz;
++		if (in_out_vrr->fixed.ramping_active) {
++			in_out_vrr->fixed.fixed_active = true;
++		} else {
++			in_out_vrr->fixed.fixed_active = true;
++			in_out_vrr->adjust.v_total_min =
++				calc_v_total_from_refresh(stream,
++					in_out_vrr->fixed.target_refresh_in_uhz);
++			in_out_vrr->adjust.v_total_max =
++				in_out_vrr->adjust.v_total_min;
++		}
++	} else {
++		in_out_vrr->state = VRR_STATE_INACTIVE;
++		in_out_vrr->adjust.v_total_min = stream->timing.v_total;
++		in_out_vrr->adjust.v_total_max = stream->timing.v_total;
+ 	}
+ }
+ 
+-static void apply_fixed_refresh(struct core_freesync *core_freesync,
+-		struct dc_stream_state *stream, unsigned int map_index)
++void mod_freesync_handle_preflip(struct mod_freesync *mod_freesync,
++		const struct dc_plane_state *plane,
++		const struct dc_stream_state *stream,
++		unsigned int curr_time_stamp_in_us,
++		struct mod_vrr_params *in_out_vrr)
+ {
+-	unsigned int vmin = 0, vmax = 0;
+-	struct freesync_state *state = &core_freesync->map[map_index].state;
++	struct core_freesync *core_freesync = NULL;
++	unsigned int last_render_time_in_us = 0;
++	unsigned int average_render_time_in_us = 0;
+ 
+-	if (!state->fixed_refresh.program_fixed)
++	if (mod_freesync == NULL)
+ 		return;
+ 
+-	state->fixed_refresh.program_fixed = false;
++	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+ 
+-	/* Program Fixed Refresh */
++	if (in_out_vrr->supported &&
++			in_out_vrr->state == VRR_STATE_ACTIVE_VARIABLE) {
++		unsigned int i = 0;
++		unsigned int oldest_index = plane->time.index + 1;
+ 
+-	/* Fixed Refresh set to "not active" so disengage */
+-	if (!state->fixed_refresh.fixed_active) {
+-		set_freesync_on_streams(core_freesync, &stream, 1);
++		if (oldest_index >= DC_PLANE_UPDATE_TIMES_MAX)
++			oldest_index = 0;
+ 
+-	/* Fixed Refresh set to "active" so engage (fix to max) */
+-	} else {
++		last_render_time_in_us = curr_time_stamp_in_us -
++				plane->time.prev_update_time_in_us;
++
++		// Sum off all entries except oldest one
++		for (i = 0; i < DC_PLANE_UPDATE_TIMES_MAX; i++) {
++			average_render_time_in_us +=
++					plane->time.time_elapsed_in_us[i];
++		}
++		average_render_time_in_us -=
++				plane->time.time_elapsed_in_us[oldest_index];
++
++		// Add render time for current flip
++		average_render_time_in_us += last_render_time_in_us;
++		average_render_time_in_us /= DC_PLANE_UPDATE_TIMES_MAX;
++
++		if (in_out_vrr->btr.btr_enabled) {
++			apply_below_the_range(core_freesync,
++					stream,
++					last_render_time_in_us,
++					in_out_vrr);
++		} else {
++			apply_fixed_refresh(core_freesync,
++				stream,
++				last_render_time_in_us,
++				in_out_vrr);
++		}
+ 
+-		vmin = state->freesync_range.vmin;
+-		vmax = vmin;
+-		adjust_vmin_vmax(core_freesync, &stream, map_index,
+-					1, vmin, vmax);
+ 	}
+ }
+ 
+-void mod_freesync_pre_update_plane_addresses(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		unsigned int curr_time_stamp_in_us)
++void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		struct mod_vrr_params *in_out_vrr)
+ {
+-	unsigned int stream_index, map_index, last_render_time_in_us = 0;
+ 	struct core_freesync *core_freesync = NULL;
+ 
+-	if (mod_freesync == NULL)
++	if ((mod_freesync == NULL) || (stream == NULL) || (in_out_vrr == NULL))
+ 		return;
+ 
+ 	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+ 
+-	for (stream_index = 0; stream_index < num_streams; stream_index++) {
+-
+-		map_index = map_index_from_stream(core_freesync,
+-						streams[stream_index]);
+-
+-		if (core_freesync->map[map_index].caps->supported) {
+-
+-			last_render_time_in_us = curr_time_stamp_in_us -
+-					core_freesync->map[map_index].state.time.
+-					prev_time_stamp_in_us;
+-
+-			/* Add the timestamps to the cache and determine
+-			 * whether BTR program is required
+-			 */
+-			update_timestamps(core_freesync, streams[stream_index],
+-					map_index, last_render_time_in_us);
++	if (in_out_vrr->supported == false)
++		return;
+ 
+-			if (core_freesync->map[map_index].state.fullscreen &&
+-				core_freesync->map[map_index].user_enable.
+-				enable_for_gaming) {
++	/* Below the Range Logic */
+ 
+-				if (core_freesync->map[map_index].caps->btr_supported) {
++	/* Only execute if in fullscreen mode */
++	if (in_out_vrr->state == VRR_STATE_ACTIVE_VARIABLE &&
++					in_out_vrr->btr.btr_active) {
++		/* TODO: pass in flag for Pre-DCE12 ASIC
++		 * in order for frame variable duration to take affect,
++		 * it needs to be done one VSYNC early, which is at
++		 * frameCounter == 1.
++		 * For DCE12 and newer updates to V_TOTAL_MIN/MAX
++		 * will take affect on current frame
++		 */
++		if (in_out_vrr->btr.frames_to_insert ==
++				in_out_vrr->btr.frame_counter) {
++			in_out_vrr->adjust.v_total_min =
++				calc_v_total_from_duration(stream,
++				in_out_vrr,
++				in_out_vrr->btr.inserted_duration_in_us);
++			in_out_vrr->adjust.v_total_max =
++				in_out_vrr->adjust.v_total_min;
++		}
+ 
+-					apply_below_the_range(core_freesync,
+-						streams[stream_index], map_index,
+-						last_render_time_in_us);
+-				} else {
+-					apply_fixed_refresh(core_freesync,
+-						streams[stream_index], map_index);
+-				}
+-			}
++		if (in_out_vrr->btr.frame_counter > 0)
++			in_out_vrr->btr.frame_counter--;
+ 
+-			core_freesync->map[map_index].state.time.
+-				prev_time_stamp_in_us = curr_time_stamp_in_us;
++		/* Restore FreeSync */
++		if (in_out_vrr->btr.frame_counter == 0) {
++			in_out_vrr->adjust.v_total_min =
++				calc_v_total_from_refresh(stream,
++				in_out_vrr->max_refresh_in_uhz);
++			in_out_vrr->adjust.v_total_max =
++				calc_v_total_from_refresh(stream,
++				in_out_vrr->min_refresh_in_uhz);
+ 		}
++	}
++
++	/* If in fullscreen freesync mode or in video, do not program
++	 * static screen ramp values
++	 */
++	if (in_out_vrr->state == VRR_STATE_ACTIVE_VARIABLE)
++		in_out_vrr->fixed.ramping_active = false;
+ 
++	/* Gradual Static Screen Ramping Logic */
++	/* Execute if ramp is active and user enabled freesync static screen*/
++	if (in_out_vrr->state == VRR_STATE_ACTIVE_FIXED &&
++				in_out_vrr->fixed.ramping_active) {
++		update_v_total_for_static_ramp(
++				core_freesync, stream, in_out_vrr);
+ 	}
+ }
+ 
+ void mod_freesync_get_settings(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
++		const struct mod_vrr_params *vrr,
+ 		unsigned int *v_total_min, unsigned int *v_total_max,
+ 		unsigned int *event_triggers,
+ 		unsigned int *window_min, unsigned int *window_max,
+@@ -1523,7 +861,6 @@ void mod_freesync_get_settings(struct mod_freesync *mod_freesync,
+ 		unsigned int *inserted_frames,
+ 		unsigned int *inserted_duration_in_us)
+ {
+-	unsigned int stream_index, map_index;
+ 	struct core_freesync *core_freesync = NULL;
+ 
+ 	if (mod_freesync == NULL)
+@@ -1531,25 +868,13 @@ void mod_freesync_get_settings(struct mod_freesync *mod_freesync,
+ 
+ 	core_freesync = MOD_FREESYNC_TO_CORE(mod_freesync);
+ 
+-	for (stream_index = 0; stream_index < num_streams; stream_index++) {
+-
+-		map_index = map_index_from_stream(core_freesync,
+-						streams[stream_index]);
+-
+-		if (core_freesync->map[map_index].caps->supported) {
+-			struct freesync_state state =
+-					core_freesync->map[map_index].state;
+-			*v_total_min = state.vmin;
+-			*v_total_max = state.vmax;
+-			*event_triggers = 0;
+-			*window_min = state.time.min_window;
+-			*window_max = state.time.max_window;
+-			*lfc_mid_point_in_us = state.btr.mid_point_in_us;
+-			*inserted_frames = state.btr.frames_to_insert;
+-			*inserted_duration_in_us =
+-					state.btr.inserted_frame_duration_in_us;
+-		}
+-
++	if (vrr->supported) {
++		*v_total_min = vrr->adjust.v_total_min;
++		*v_total_max = vrr->adjust.v_total_max;
++		*event_triggers = 0;
++		*lfc_mid_point_in_us = vrr->btr.mid_point_in_us;
++		*inserted_frames = vrr->btr.frames_to_insert;
++		*inserted_duration_in_us = vrr->btr.inserted_duration_in_us;
+ 	}
+ }
+ 
+diff --git a/drivers/gpu/drm/amd/display/modules/inc/mod_freesync.h b/drivers/gpu/drm/amd/display/modules/inc/mod_freesync.h
+index f083e1619dbe..bd75ca5f1cd3 100644
+--- a/drivers/gpu/drm/amd/display/modules/inc/mod_freesync.h
++++ b/drivers/gpu/drm/amd/display/modules/inc/mod_freesync.h
+@@ -56,96 +56,72 @@
+ 
+ #include "dm_services.h"
+ 
+-struct mod_freesync *mod_freesync_create(struct dc *dc);
+-void mod_freesync_destroy(struct mod_freesync *mod_freesync);
+-
++// Access structures
+ struct mod_freesync {
+ 	int dummy;
+ };
+ 
+-enum mod_freesync_state {
+-	FREESYNC_STATE_NONE,
+-	FREESYNC_STATE_FULLSCREEN,
+-	FREESYNC_STATE_STATIC_SCREEN,
+-	FREESYNC_STATE_VIDEO
+-};
+-
+-enum mod_freesync_user_enable_mask {
+-	FREESYNC_USER_ENABLE_STATIC = 0x1,
+-	FREESYNC_USER_ENABLE_VIDEO = 0x2,
+-	FREESYNC_USER_ENABLE_GAMING = 0x4
+-};
+-
+-struct mod_freesync_user_enable {
+-	bool enable_for_static;
+-	bool enable_for_video;
+-	bool enable_for_gaming;
+-};
+-
++// TODO: References to this should be removed
+ struct mod_freesync_caps {
+ 	bool supported;
+ 	unsigned int min_refresh_in_micro_hz;
+ 	unsigned int max_refresh_in_micro_hz;
+-
+-	bool btr_supported;
+ };
+ 
+-struct mod_freesync_params {
+-	enum mod_freesync_state state;
+-	bool enable;
+-	unsigned int update_duration_in_ns;
+-	bool windowed_fullscreen;
++enum mod_vrr_state {
++	VRR_STATE_UNSUPPORTED = 0,
++	VRR_STATE_DISABLED,
++	VRR_STATE_INACTIVE,
++	VRR_STATE_ACTIVE_VARIABLE,
++	VRR_STATE_ACTIVE_FIXED
+ };
+ 
+-/*
+- * Add stream to be tracked by module
+- */
+-bool mod_freesync_add_stream(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream, struct mod_freesync_caps *caps);
++struct mod_freesync_config {
++	enum mod_vrr_state state;
++	bool ramping;
++	bool btr;
++	unsigned int min_refresh_in_uhz;
++	unsigned int max_refresh_in_uhz;
++};
+ 
+-/*
+- * Remove stream to be tracked by module
+- */
+-bool mod_freesync_remove_stream(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream);
++struct mod_vrr_params_btr {
++	bool btr_enabled;
++	bool btr_active;
++	uint32_t mid_point_in_us;
++	uint32_t inserted_duration_in_us;
++	uint32_t frames_to_insert;
++	uint32_t frame_counter;
++};
+ 
+-/*
+- * Update the freesync state flags for each display and program
+- * freesync accordingly
+- */
+-void mod_freesync_update_state(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		struct mod_freesync_params *freesync_params);
++struct mod_vrr_params_fixed_refresh {
++	bool fixed_active;
++	bool ramping_active;
++	bool ramping_done;
++	uint32_t target_refresh_in_uhz;
++	uint32_t frame_counter;
++};
+ 
+-bool mod_freesync_get_state(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		struct mod_freesync_params *freesync_params);
++struct mod_vrr_params {
++	bool supported;
++	enum mod_vrr_state state;
+ 
+-bool mod_freesync_set_user_enable(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		struct mod_freesync_user_enable *user_enable);
++	uint32_t min_refresh_in_uhz;
++	uint32_t max_duration_in_us;
++	uint32_t max_refresh_in_uhz;
++	uint32_t min_duration_in_us;
+ 
+-bool mod_freesync_get_user_enable(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		struct mod_freesync_user_enable *user_enable);
++	struct dc_crtc_timing_adjust adjust;
+ 
+-bool mod_freesync_get_static_ramp_active(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		bool *is_ramp_active);
++	struct mod_vrr_params_fixed_refresh fixed;
+ 
+-bool mod_freesync_override_min_max(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *streams,
+-		unsigned int min_refresh,
+-		unsigned int max_refresh,
+-		struct mod_freesync_caps *caps);
++	struct mod_vrr_params_btr btr;
++};
+ 
+-bool mod_freesync_get_min_max(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
+-		unsigned int *min_refresh,
+-		unsigned int *max_refresh);
++struct mod_freesync *mod_freesync_create(struct dc *dc);
++void mod_freesync_destroy(struct mod_freesync *mod_freesync);
+ 
+ bool mod_freesync_get_vmin_vmax(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state *stream,
++		const struct dc_stream_state *stream,
+ 		unsigned int *vmin,
+ 		unsigned int *vmax);
+ 
+@@ -154,18 +130,8 @@ bool mod_freesync_get_v_position(struct mod_freesync *mod_freesync,
+ 		unsigned int *nom_v_pos,
+ 		unsigned int *v_pos);
+ 
+-void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams);
+-
+-void mod_freesync_notify_mode_change(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams);
+-
+-void mod_freesync_pre_update_plane_addresses(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
+-		unsigned int curr_time_stamp);
+-
+ void mod_freesync_get_settings(struct mod_freesync *mod_freesync,
+-		struct dc_stream_state **streams, int num_streams,
++		const struct mod_vrr_params *vrr,
+ 		unsigned int *v_total_min, unsigned int *v_total_max,
+ 		unsigned int *event_triggers,
+ 		unsigned int *window_min, unsigned int *window_max,
+@@ -173,4 +139,24 @@ void mod_freesync_get_settings(struct mod_freesync *mod_freesync,
+ 		unsigned int *inserted_frames,
+ 		unsigned int *inserted_duration_in_us);
+ 
++void mod_freesync_build_vrr_infopacket(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		const struct mod_vrr_params *vrr,
++		struct dc_info_packet *infopacket);
++
++void mod_freesync_build_vrr_params(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		struct mod_freesync_config *in_config,
++		struct mod_vrr_params *in_out_vrr);
++
++void mod_freesync_handle_preflip(struct mod_freesync *mod_freesync,
++		const struct dc_plane_state *plane,
++		const struct dc_stream_state *stream,
++		unsigned int curr_time_stamp_in_us,
++		struct mod_vrr_params *in_out_vrr);
++
++void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
++		const struct dc_stream_state *stream,
++		struct mod_vrr_params *in_out_vrr);
++
+ #endif
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

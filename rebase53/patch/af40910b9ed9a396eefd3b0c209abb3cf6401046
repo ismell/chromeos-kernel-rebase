@@ -1,0 +1,52 @@
+From 013a7fe1a92b619b6b350febd7a75917a384e44e Mon Sep 17 00:00:00 2001
+From: Micah Morton <mortonm@chromium.org>
+Date: Thu, 13 Sep 2018 07:42:31 -0700
+Subject: [PATCH] CHROMIUM: stack chromiumos LSM before other LSMs
+
+As of 4.4, the chromiumos LSM is registered alongside SELinux in CrOS
+through LSM stacking functionality. Previously, hooks for the
+chromiumos LSM were called directly in security.c instead of using the
+generic stacking mechanism. The chromiumos LSM hooks will not get
+called before other LSM hooks unless it is listed as the first LSM in
+this makefile. The chromiumos LSM should have first access to LSM hooks
+on CrOS in case other LSMs use the same hooks and mangle parameters
+before the chromiumos LSM can intervene.
+
+BUG=chromium:867807
+TEST=kernel print statements verifying order in which chromiumos LSM vs
+SELinux LSM hooks are called.
+
+Change-Id: I63d7835519078721e581429a598ccb8ea814d025
+Signed-off-by: Micah Morton <mortonm@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1224830
+Reviewed-by: Mattias Nissler <mnissler@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ security/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/security/Makefile b/security/Makefile
+index 93ba9c8e442b..18ae673d8783 100644
+--- a/security/Makefile
++++ b/security/Makefile
+@@ -20,6 +20,7 @@ obj-$(CONFIG_MMU)			+= min_addr.o
+ # Object file lists
+ obj-$(CONFIG_SECURITY)			+= security.o
+ obj-$(CONFIG_SECURITYFS)		+= inode.o
++obj-$(CONFIG_SECURITY_CHROMIUMOS)	+= chromiumos/
+ obj-$(CONFIG_SECURITY_SELINUX)		+= selinux/
+ obj-$(CONFIG_SECURITY_SMACK)		+= smack/
+ obj-$(CONFIG_AUDIT)			+= lsm_audit.o
+@@ -28,7 +29,6 @@ obj-$(CONFIG_SECURITY_APPARMOR)		+= apparmor/
+ obj-$(CONFIG_SECURITY_YAMA)		+= yama/
+ obj-$(CONFIG_SECURITY_LOADPIN)		+= loadpin/
+ obj-$(CONFIG_SECURITY_SAFESETID)	+= safesetid/
+-obj-$(CONFIG_SECURITY_CHROMIUMOS)	+= chromiumos/
+ obj-$(CONFIG_CGROUP_DEVICE)		+= device_cgroup.o
+ 
+ # Object integrity file lists
+-- 
+2.23.0.187.g17f5b7556c-goog
+

@@ -1,0 +1,227 @@
+From a7e346a3675087f2c6d0c387ce5ebd8675c1c4a1 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Fri, 19 Apr 2019 15:32:15 -0700
+Subject: [PATCH] BACKPORT: FROMLIST: drm: rockchip: Add DDR devfreq support
+
+Add support for devfreq to dynamically control the DDR frequency. It
+will activate when there is one CRTC active, and disable if more than
+one becomes active (to avoid flickering on one of the screens).
+
+Signed-off-by: Sean Paul <seanpaul@chromium.org>
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+(am from https://lore.kernel.org/patchwork/patch/968869/)
+
+Differences with respect to the FROMLIST patch:
+
+- adapted to API differences with dmc-sync
+- no need to obtain devfreq device with dmc-sync
+- in rockchip_atomic_helper_commit_tail_rpm() only check the VBLANK
+  interval on mode changes
+- for the VOP calculate the VBLANK interval in vop_crtc_atomic_enable()
+  and not repeatedly in dmc_notify(). Skipping the calculation and call
+  overhead allows for more time for the DDR frequency change, which
+  significantly reduces the number of aborted changes on rk3288
+- removed unnecessary check for vop->is_enabled from dmc_notify(), this
+  check is already done in rockchip_drm_wait_vact_end(), which is called
+  immediately after
+
+BUG=chromium:941638
+TEST=no display jank on veyron with CONFIG_ARM_RK3288_DMC_DEVFREQ=y
+
+Change-Id: Ia48760f06fdde17fa18a2ac73a75880dc6168c37
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1574236
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/rockchip/rockchip_drm_drv.h |  5 +++
+ drivers/gpu/drm/rockchip/rockchip_drm_fb.c  | 35 +++++++++++++++++++++
+ drivers/gpu/drm/rockchip/rockchip_drm_vop.c | 30 ++++++++++++++++++
+ 3 files changed, 70 insertions(+)
+
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_drv.h b/drivers/gpu/drm/rockchip/rockchip_drm_drv.h
+index c5b06048124e..6485a1d7a4ad 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_drv.h
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_drv.h
+@@ -14,6 +14,7 @@
+ #include <drm/drm_gem.h>
+ 
+ #include <linux/module.h>
++#include <linux/clk.h>
+ #include <linux/component.h>
+ 
+ #define ROCKCHIP_MAX_FB_BUFFER	3
+@@ -49,6 +50,8 @@ struct rockchip_drm_private {
+ 	struct drm_mm mm;
+ 	struct list_head psr_list;
+ 	struct mutex psr_list_lock;
++
++	bool dmc_disable_flag;
+ };
+ 
+ int rockchip_drm_dma_attach_device(struct drm_device *drm_dev,
+@@ -57,6 +60,8 @@ void rockchip_drm_dma_detach_device(struct drm_device *drm_dev,
+ 				    struct device *dev);
+ int rockchip_drm_wait_vact_end(struct drm_crtc *crtc, unsigned int mstimeout);
+ 
++uint32_t rockchip_drm_get_vblank_ns(struct drm_display_mode *mode);
++
+ int rockchip_drm_endpoint_is_subdriver(struct device_node *ep);
+ extern struct platform_driver cdn_dp_driver;
+ extern struct platform_driver dw_hdmi_rockchip_pltfm_driver;
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_fb.c b/drivers/gpu/drm/rockchip/rockchip_drm_fb.c
+index 64ca87cf6d50..9f3f02d1eb9b 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_fb.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_fb.c
+@@ -12,6 +12,7 @@
+ #include <drm/drm_fb_helper.h>
+ #include <drm/drm_gem_framebuffer_helper.h>
+ #include <drm/drm_probe_helper.h>
++#include <soc/rockchip/dmc-sync.h>
+ 
+ #include "rockchip_drm_drv.h"
+ #include "rockchip_drm_fb.h"
+@@ -105,13 +106,42 @@ rockchip_user_fb_create(struct drm_device *dev, struct drm_file *file_priv,
+ 	return ERR_PTR(ret);
+ }
+ 
++uint32_t rockchip_drm_get_vblank_ns(struct drm_display_mode *mode)
++{
++	uint64_t vblank_time = mode->vtotal - mode->vdisplay;
++
++	vblank_time *= (uint64_t)NSEC_PER_SEC * mode->htotal;
++	do_div(vblank_time, mode->clock * 1000);
++
++	return vblank_time;
++}
++
+ static void
+ rockchip_atomic_helper_commit_tail_rpm(struct drm_atomic_state *old_state)
+ {
+ 	struct drm_device *dev = old_state->dev;
++	struct rockchip_drm_private *priv = dev->dev_private;
++	struct drm_crtc *crtc;
++	struct drm_display_mode *mode;
++	bool force_dmc_off = false;
++
++	drm_for_each_crtc(crtc, dev) {
++		if (crtc->state->active && crtc->state->mode_changed) {
++			mode = &crtc->state->adjusted_mode;
++			if (rockchip_drm_get_vblank_ns(mode) <
++			    DMC_MIN_VBLANK_NS)
++				force_dmc_off = true;
++		}
++	}
+ 
+ 	rockchip_drm_psr_inhibit_get_state(old_state);
+ 
++	/* If disabling dmc, disable it before committing mode set changes. */
++	if (force_dmc_off && !priv->dmc_disable_flag) {
++		rockchip_dmc_disable();
++		priv->dmc_disable_flag = true;
++	}
++
+ 	drm_atomic_helper_commit_modeset_disables(dev, old_state);
+ 
+ 	drm_atomic_helper_commit_modeset_enables(dev, old_state);
+@@ -126,6 +156,11 @@ rockchip_atomic_helper_commit_tail_rpm(struct drm_atomic_state *old_state)
+ 	drm_atomic_helper_wait_for_vblanks(dev, old_state);
+ 
+ 	drm_atomic_helper_cleanup_planes(dev, old_state);
++
++	if (!force_dmc_off && priv->dmc_disable_flag) {
++		rockchip_dmc_enable();
++		priv->dmc_disable_flag = false;
++	}
+ }
+ 
+ static const struct drm_mode_config_helper_funcs rockchip_mode_config_helpers = {
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+index 09a790c2f3a1..23ddeb5e4c29 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_vop.c
+@@ -30,6 +30,7 @@
+ 
+ #include <linux/reset.h>
+ #include <linux/delay.h>
++#include <soc/rockchip/dmc-sync.h>
+ 
+ #include "rockchip_drm_drv.h"
+ #include "rockchip_drm_gem.h"
+@@ -131,7 +132,10 @@ struct vop {
+ 	struct drm_flip_work fb_unref_work;
+ 	unsigned long pending;
+ 
++	ktime_t line_flag_timestamp;
+ 	struct completion line_flag_completion;
++	uint32_t vblank_time;
++	struct notifier_block dmc_nb;
+ 
+ 	const struct vop_data *data;
+ 
+@@ -622,6 +626,7 @@ static void vop_crtc_atomic_disable(struct drm_crtc *crtc,
+ 
+ 	WARN_ON(vop->event);
+ 
++	rockchip_dmc_put(&vop->dmc_nb);
+ 	mutex_lock(&vop->vop_lock);
+ 	drm_crtc_vblank_off(crtc);
+ 
+@@ -1033,6 +1038,8 @@ static void vop_crtc_atomic_enable(struct drm_crtc *crtc,
+ 	int dither_bpc = s->output_bpc ? s->output_bpc : 10;
+ 	int ret;
+ 
++	vop->vblank_time = rockchip_drm_get_vblank_ns(adjusted_mode);
++
+ 	mutex_lock(&vop->vop_lock);
+ 
+ 	WARN_ON(vop->event);
+@@ -1121,6 +1128,27 @@ static void vop_crtc_atomic_enable(struct drm_crtc *crtc,
+ 
+ 	VOP_REG_SET(vop, common, standby, 0);
+ 	mutex_unlock(&vop->vop_lock);
++	rockchip_dmc_get(&vop->dmc_nb);
++}
++
++static int dmc_notify(struct notifier_block *nb,
++		      unsigned long action,
++		      void *data)
++{
++	struct vop *vop = container_of(nb, struct vop, dmc_nb);
++	struct drm_crtc *crtc = &vop->crtc;
++	ktime_t *timeout = data;
++	int ret;
++
++	ret = rockchip_drm_wait_vact_end(crtc, 100);
++	*timeout = ktime_add_ns(vop->line_flag_timestamp, vop->vblank_time);
++	if (ret) {
++		dev_err(vop->dev, "%s: Line flag interrupt did not arrive\n",
++			__func__);
++		return NOTIFY_BAD;
++	}
++
++	return NOTIFY_STOP;
+ }
+ 
+ static bool vop_fs_irq_is_pending(struct vop *vop)
+@@ -1390,6 +1418,7 @@ static irqreturn_t vop_isr(int irq, void *data)
+ 	}
+ 
+ 	if (active_irqs & LINE_FLAG_INTR) {
++		vop->line_flag_timestamp = ktime_get();
+ 		complete(&vop->line_flag_completion);
+ 		active_irqs &= ~LINE_FLAG_INTR;
+ 		ret = IRQ_HANDLED;
+@@ -1786,6 +1815,7 @@ static int vop_bind(struct device *dev, struct device *master, void *data)
+ 	spin_lock_init(&vop->reg_lock);
+ 	spin_lock_init(&vop->irq_lock);
+ 	mutex_init(&vop->vop_lock);
++	vop->dmc_nb.notifier_call = dmc_notify;
+ 
+ 	ret = vop_create_crtc(vop);
+ 	if (ret)
+-- 
+2.23.0.187.g17f5b7556c-goog
+

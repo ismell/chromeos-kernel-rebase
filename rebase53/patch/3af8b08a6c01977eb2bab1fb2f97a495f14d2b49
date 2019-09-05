@@ -1,0 +1,61 @@
+From cdad62964645dd74e65d84246bc56922954f6375 Mon Sep 17 00:00:00 2001
+From: David Riley <davidriley@chromium.org>
+Date: Fri, 24 May 2019 14:58:26 -0700
+Subject: [PATCH] CHROMIUM: drm/virtio: Ensure cached capset entries are valid
+ before copying.
+
+virtio_gpu_get_caps_ioctl could return success with invalid data if a
+second caller to the function occurred after the entry was created in
+virtio_gpu_cmd_get_capset but prior to the virtio_gpu_cmd_capset_cb
+callback being called.  This could leak contents of memory as well
+since the caps_cache allocation is done without zeroing.
+
+Signed-off-by: David Riley <davidriley@chromium.org>
+
+BUG=chromium:923211
+TEST=repeatedly startvm and check glxinfo -B | grep Device
+
+Change-Id: I9038a584e87aebcab49976161019a0f68ff805eb
+Reviewed-on: https://chromium-review.googlesource.com/1629036
+Commit-Ready: David Riley <davidriley@chromium.org>
+Tested-by: David Riley <davidriley@chromium.org>
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Gurchetan Singh <gurchetansingh@chromium.org>
+
+[rebase419(rrangel): Match changes from a BACKPORT.]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/virtio/virtgpu_ioctl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/virtio/virtgpu_ioctl.c b/drivers/gpu/drm/virtio/virtgpu_ioctl.c
+index 76a9aa0e4570..e640077f4639 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_ioctl.c
++++ b/drivers/gpu/drm/virtio/virtgpu_ioctl.c
+@@ -546,7 +546,6 @@ static int virtio_gpu_get_caps_ioctl(struct drm_device *dev,
+ 	list_for_each_entry(cache_ent, &vgdev->cap_cache, head) {
+ 		if (cache_ent->id == args->cap_set_id &&
+ 		    cache_ent->version == args->cap_set_ver) {
+-			ptr = cache_ent->caps_cache;
+ 			spin_unlock(&vgdev->display_info_lock);
+ 			goto copy_exit;
+ 		}
+@@ -557,6 +556,7 @@ static int virtio_gpu_get_caps_ioctl(struct drm_device *dev,
+ 	virtio_gpu_cmd_get_capset(vgdev, found_valid, args->cap_set_ver,
+ 				  &cache_ent);
+ 
++copy_exit:
+ 	ret = wait_event_timeout(vgdev->resp_wq,
+ 				 atomic_read(&cache_ent->is_valid), 5 * HZ);
+ 	if (!ret)
+@@ -564,7 +564,6 @@ static int virtio_gpu_get_caps_ioctl(struct drm_device *dev,
+ 
+ 	ptr = cache_ent->caps_cache;
+ 
+-copy_exit:
+ 	if (copy_to_user(u64_to_user_ptr(args->addr), ptr, size))
+ 		return -EFAULT;
+ 
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

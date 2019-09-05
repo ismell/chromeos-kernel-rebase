@@ -1,0 +1,37 @@
+From fe7eaf10bea1a52eb0b19d22952995da38133ea5 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Fri, 13 Jul 2018 16:12:46 -0700
+Subject: [PATCH] CHROMIUM: Disable 'constant-conversion' warning for clang
+
+There are only a few instances of this warning upstream, however there is
+some resistance against fixing them. Disable the warning in our tree since
+we treat warnings as errors.
+
+BUG=chromium:809829
+TEST=build for grunt with clang
+  => no 'constant-conversion' warnings
+
+Change-Id: I66694a8a1a6fc63196ffca9374d48ccfb7d7f869
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1137347
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+[rebase419(rrangel): Converted to raw flag to match upstream]
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 905f6ff8735b..27eeb13eae19 100644
+--- a/Makefile
++++ b/Makefile
+@@ -755,6 +755,7 @@ KBUILD_CFLAGS += -Wno-gnu
+ KBUILD_CFLAGS += -Wno-duplicate-decl-specifier
+ # Quiet clang warning: comparison of unsigned expression < 0 is always false
+ KBUILD_CFLAGS += -Wno-tautological-compare
++KBUILD_CFLAGS += -Wno-constant-conversion
+ # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+ # See modpost pattern 2
+-- 
+2.23.0.187.g17f5b7556c-goog
+

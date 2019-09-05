@@ -1,0 +1,225 @@
+From f5a804a08cf2b390793fff36df5d235b5c0580b5 Mon Sep 17 00:00:00 2001
+From: jjian zhou <jjian.zhou@mediatek.com>
+Date: Wed, 10 Apr 2019 17:25:41 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: arm64: dts: mt8183: add mmc node
+
+Add mmc DTS node to the mt8183 and mt8183-evb.
+
+Signed-off-by: Jjian Zhou <jjian.zhou@mediatek.com>
+
+(am from https://patchwork.kernel.org/patch/10893519/)
+[eddie.huang: fix mt8183-evb.dts context conflicts]
+
+BUG=b:109911488
+TEST=build and boot to shell
+
+Change-Id: Ib4e901ac9d0426db8a1b0baa3e7460634958ce07
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Signed-off-by: CK HU <ck.hu@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1312743
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm64/boot/dts/mediatek/mt8183-evb.dts | 146 ++++++++++++++++++++
+ arch/arm64/boot/dts/mediatek/mt8183.dtsi    |  24 ++++
+ 2 files changed, 170 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+index d8e555cbb5d3..1d13bd05d484 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
++++ b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
+@@ -30,7 +30,153 @@
+ 	status = "okay";
+ };
+ 
++&mmc0 {
++	status = "okay";
++	pinctrl-names = "default", "state_uhs";
++	pinctrl-0 = <&mmc0_pins_default>;
++	pinctrl-1 = <&mmc0_pins_uhs>;
++	bus-width = <8>;
++	max-frequency = <200000000>;
++	cap-mmc-highspeed;
++	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
++	cap-mmc-hw-reset;
++	no-sdio;
++	no-sd;
++	hs400-ds-delay = <0x12814>;
++	vmmc-supply = <&mt6358_vemc_reg>;
++	vqmmc-supply = <&mt6358_vio18_reg>;
++	assigned-clocks = <&topckgen CLK_TOP_MUX_MSDC50_0>;
++	assigned-clock-parents = <&topckgen CLK_TOP_MSDCPLL_CK>;
++	non-removable;
++};
++
++&mmc1 {
++	status = "okay";
++	pinctrl-names = "default", "state_uhs";
++	pinctrl-0 = <&mmc1_pins_default>;
++	pinctrl-1 = <&mmc1_pins_uhs>;
++	bus-width = <4>;
++	max-frequency = <200000000>;
++	cap-sd-highspeed;
++	sd-uhs-sdr50;
++	sd-uhs-sdr104;
++	cap-sdio-irq;
++	no-mmc;
++	no-sd;
++	vmmc-supply = <&mt6358_vmch_reg>;
++	vqmmc-supply = <&mt6358_vmc_reg>;
++	keep-power-in-suspend;
++	enable-sdio-wakeup;
++	non-removable;
++};
++
+ &pio {
++	mmc0_pins_default: mmc0default {
++		pins_cmd_dat {
++			pinmux = <PINMUX_GPIO123__FUNC_MSDC0_DAT0>,
++				 <PINMUX_GPIO128__FUNC_MSDC0_DAT1>,
++				 <PINMUX_GPIO125__FUNC_MSDC0_DAT2>,
++				 <PINMUX_GPIO132__FUNC_MSDC0_DAT3>,
++				 <PINMUX_GPIO126__FUNC_MSDC0_DAT4>,
++				 <PINMUX_GPIO129__FUNC_MSDC0_DAT5>,
++				 <PINMUX_GPIO127__FUNC_MSDC0_DAT6>,
++				 <PINMUX_GPIO130__FUNC_MSDC0_DAT7>,
++				 <PINMUX_GPIO122__FUNC_MSDC0_CMD>;
++			input-enable;
++			bias-pull-up;
++		};
++
++		pins_clk {
++			pinmux = <PINMUX_GPIO124__FUNC_MSDC0_CLK>;
++			bias-pull-down;
++		};
++
++		pins_rst {
++			pinmux = <PINMUX_GPIO133__FUNC_MSDC0_RSTB>;
++			bias-pull-up;
++		};
++	};
++
++	mmc0_pins_uhs: mmc0@0{
++		pins_cmd_dat {
++			pinmux = <PINMUX_GPIO123__FUNC_MSDC0_DAT0>,
++				 <PINMUX_GPIO128__FUNC_MSDC0_DAT1>,
++				 <PINMUX_GPIO125__FUNC_MSDC0_DAT2>,
++				 <PINMUX_GPIO132__FUNC_MSDC0_DAT3>,
++				 <PINMUX_GPIO126__FUNC_MSDC0_DAT4>,
++				 <PINMUX_GPIO129__FUNC_MSDC0_DAT5>,
++				 <PINMUX_GPIO127__FUNC_MSDC0_DAT6>,
++				 <PINMUX_GPIO130__FUNC_MSDC0_DAT7>,
++				 <PINMUX_GPIO122__FUNC_MSDC0_CMD>;
++			input-enable;
++			drive-strength = <MTK_DRIVE_10mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
++		};
++
++		pins_clk {
++			pinmux = <PINMUX_GPIO124__FUNC_MSDC0_CLK>;
++			drive-strength = <MTK_DRIVE_10mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
++		};
++
++		pins_ds {
++			pinmux = <PINMUX_GPIO131__FUNC_MSDC0_DSL>;
++			drive-strength = <MTK_DRIVE_10mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
++		};
++
++		pins_rst {
++			pinmux = <PINMUX_GPIO133__FUNC_MSDC0_RSTB>;
++			drive-strength = <MTK_DRIVE_10mA>;
++			bias-pull-up;
++		};
++	};
++
++	mmc1_pins_default: mmc1default {
++		pins_cmd_dat {
++			pinmux = <PINMUX_GPIO31__FUNC_MSDC1_CMD>,
++				   <PINMUX_GPIO32__FUNC_MSDC1_DAT0>,
++				   <PINMUX_GPIO34__FUNC_MSDC1_DAT1>,
++				   <PINMUX_GPIO33__FUNC_MSDC1_DAT2>,
++				   <PINMUX_GPIO30__FUNC_MSDC1_DAT3>;
++			input-enable;
++			bias-pull-up;
++		};
++
++		pins_clk {
++			pinmux = <PINMUX_GPIO29__FUNC_MSDC1_CLK>;
++			input-enable;
++			bias-pull-down;
++		};
++
++		pins_pmu {
++			pinmux = <PINMUX_GPIO178__FUNC_GPIO178>,
++				   <PINMUX_GPIO166__FUNC_GPIO166>;
++			output-high;
++		};
++	};
++
++	mmc1_pins_uhs: mmc1@0{
++		pins_cmd_dat {
++			pinmux = <PINMUX_GPIO31__FUNC_MSDC1_CMD>,
++				   <PINMUX_GPIO32__FUNC_MSDC1_DAT0>,
++				   <PINMUX_GPIO34__FUNC_MSDC1_DAT1>,
++				   <PINMUX_GPIO33__FUNC_MSDC1_DAT2>,
++				   <PINMUX_GPIO30__FUNC_MSDC1_DAT3>;
++			drive-strength = <MTK_DRIVE_6mA>;
++			input-enable;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
++		};
++
++		pins_clk {
++			pinmux = <PINMUX_GPIO29__FUNC_MSDC1_CLK>;
++			drive-strength = <MTK_DRIVE_6mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
++			input-enable;
++		};
++	};
++
+ 	spi_pins_0: spi0{
+ 		pins_spi{
+ 			pinmux = <PINMUX_GPIO85__FUNC_SPI0_MI>,
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+index a3725c44b58f..2c31a05062e8 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+@@ -635,6 +635,30 @@
+ 			#clock-cells = <1>;
+ 		};
+ 
++		mmc0: mmc@11230000 {
++			compatible = "mediatek,mt8183-mmc";
++			reg = <0 0x11230000 0 0x1000>,
++			      <0 0x11f50000 0 0x1000>;
++			interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_LOW>;
++			clocks = <&topckgen CLK_TOP_MUX_MSDC50_0>,
++				 <&infracfg CLK_INFRA_MSDC0>,
++				 <&infracfg CLK_INFRA_MSDC0_SCK>;
++			clock-names = "source", "hclk", "source_cg";
++			status = "disabled";
++		};
++
++		mmc1: mmc@11240000 {
++			compatible = "mediatek,mt8183-mmc";
++			reg = <0 0x11240000 0 0x1000>,
++			      <0 0x11e10000 0 0x1000>;
++			interrupts = <GIC_SPI 78 IRQ_TYPE_LEVEL_LOW>;
++			clocks = <&topckgen CLK_TOP_MUX_MSDC30_1>,
++				 <&infracfg CLK_INFRA_MSDC1>,
++				 <&infracfg CLK_INFRA_MSDC1_SCK>;
++			clock-names = "source", "hclk", "source_cg";
++			status = "disabled";
++		};
++
+ 		efuse: efuse@11f10000 {
+ 			compatible = "mediatek,mt8183-efuse",
+ 				     "mediatek,efuse";
+-- 
+2.23.0.187.g17f5b7556c-goog
+

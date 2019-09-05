@@ -1,0 +1,102 @@
+From 0bdbe71d38fd97a7c203749467b9f379db7536e4 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 10 Jan 2019 12:15:45 +0100
+Subject: [PATCH] BACKPORT: drm/virtio: drop prime import/export callbacks
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Also set prime_handle_to_fd and prime_fd_to_handle to NULL,
+so drm will not advertive DRM_PRIME_CAP_{IMPORT,EXPORT} to
+userspace.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>
+Reviewed-by: Dave Airlie <airlied@redhat.com>
+Link: http://patchwork.freedesktop.org/patch/msgid/20190110111545.26768-1-kraxel@redhat.com
+(cherry picked from commit b318e3ff7ca065d6b107e424c85a63d7a6798a69)
+Signed-off-by: Gurchetan Singh <gurchetansingh@chromium.org>
+
+BUG=chromium:924405
+TEST=run on Tatl
+Cq-Depend:chromium:1576305
+
+ Conflicts:
+	drivers/gpu/drm/virtio/virtgpu_drv.c
+
+Change-Id: Idc6be526a2f44f0ba5fa0bf903576f695a0aa205
+Reviewed-on: https://chromium-review.googlesource.com/1576190
+Commit-Ready: Gurchetan Singh <gurchetansingh@chromium.org>
+Tested-by: Gurchetan Singh <gurchetansingh@chromium.org>
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/virtio/virtgpu_drv.c   |  4 ----
+ drivers/gpu/drm/virtio/virtgpu_drv.h   |  4 ----
+ drivers/gpu/drm/virtio/virtgpu_prime.c | 14 --------------
+ 3 files changed, 22 deletions(-)
+
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.c b/drivers/gpu/drm/virtio/virtgpu_drv.c
+index af92964b6889d..b996ac1d4fcc9 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.c
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.c
+@@ -205,14 +205,10 @@ static struct drm_driver driver = {
+ #if defined(CONFIG_DEBUG_FS)
+ 	.debugfs_init = virtio_gpu_debugfs_init,
+ #endif
+-	.prime_handle_to_fd = drm_gem_prime_handle_to_fd,
+-	.prime_fd_to_handle = drm_gem_prime_fd_to_handle,
+ 	.gem_prime_export = drm_gem_prime_export,
+ 	.gem_prime_import = drm_gem_prime_import,
+ 	.gem_prime_pin = virtgpu_gem_prime_pin,
+ 	.gem_prime_unpin = virtgpu_gem_prime_unpin,
+-	.gem_prime_get_sg_table = virtgpu_gem_prime_get_sg_table,
+-	.gem_prime_import_sg_table = virtgpu_gem_prime_import_sg_table,
+ 	.gem_prime_vmap = virtgpu_gem_prime_vmap,
+ 	.gem_prime_vunmap = virtgpu_gem_prime_vunmap,
+ 	.gem_prime_mmap = virtgpu_gem_prime_mmap,
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.h b/drivers/gpu/drm/virtio/virtgpu_drv.h
+index cf896d879382f..4f2f3c43a411a 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.h
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.h
+@@ -354,10 +354,6 @@ int virtio_gpu_object_wait(struct virtio_gpu_object *bo, bool no_wait);
+ /* virtgpu_prime.c */
+ int virtgpu_gem_prime_pin(struct drm_gem_object *obj);
+ void virtgpu_gem_prime_unpin(struct drm_gem_object *obj);
+-struct sg_table *virtgpu_gem_prime_get_sg_table(struct drm_gem_object *obj);
+-struct drm_gem_object *virtgpu_gem_prime_import_sg_table(
+-	struct drm_device *dev, struct dma_buf_attachment *attach,
+-	struct sg_table *sgt);
+ void *virtgpu_gem_prime_vmap(struct drm_gem_object *obj);
+ void virtgpu_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr);
+ int virtgpu_gem_prime_mmap(struct drm_gem_object *obj,
+diff --git a/drivers/gpu/drm/virtio/virtgpu_prime.c b/drivers/gpu/drm/virtio/virtgpu_prime.c
+index 86ce0ae93f595..c59ec34c80a5d 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_prime.c
++++ b/drivers/gpu/drm/virtio/virtgpu_prime.c
+@@ -39,20 +39,6 @@ void virtgpu_gem_prime_unpin(struct drm_gem_object *obj)
+ 	WARN_ONCE(1, "not implemented");
+ }
+ 
+-struct sg_table *virtgpu_gem_prime_get_sg_table(struct drm_gem_object *obj)
+-{
+-	WARN_ONCE(1, "not implemented");
+-	return ERR_PTR(-ENODEV);
+-}
+-
+-struct drm_gem_object *virtgpu_gem_prime_import_sg_table(
+-	struct drm_device *dev, struct dma_buf_attachment *attach,
+-	struct sg_table *table)
+-{
+-	WARN_ONCE(1, "not implemented");
+-	return ERR_PTR(-ENODEV);
+-}
+-
+ void *virtgpu_gem_prime_vmap(struct drm_gem_object *obj)
+ {
+ 	struct virtio_gpu_object *bo = gem_to_virtio_gpu_obj(obj);
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

@@ -1,0 +1,43 @@
+From f54c8c6f66a80a6d4de0dd4f21afa0464bf5eab6 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Mon, 11 Feb 2019 16:47:50 -0800
+Subject: [PATCH] FIXUP: FROMLIST: scsi: ufs: set the device reference clock
+ setting
+
+Resolve the delta with the patch that landed upstream (9e1e8a757080
+"scsi: ufs: set the device reference clock setting").
+
+Also remove the now unnecessary export of
+ufshcd_parse_dev_ref_clk_freq() which was added by fdc32e207490
+("FIXUP: FROMLIST: scsi: ufs: Add configfs support for UFS
+provisioning").
+
+BUG=b:124248516
+TEST=boot on cheza
+
+Change-Id: I4e8b120f71ad863bc40876b9a838b1da8a2fce00
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1467002
+Reviewed-by: Evan Green <evgreen@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul Rangel <rrangel@chromium.org>
+---
+ drivers/scsi/ufs/ufshcd.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+index 176bbd5ae8c5..447bbb0d776d 100644
+--- a/drivers/scsi/ufs/ufshcd.c
++++ b/drivers/scsi/ufs/ufshcd.c
+@@ -6778,7 +6778,6 @@ void ufshcd_parse_dev_ref_clk_freq(struct ufs_hba *hba, struct clk *refclk)
+ 		dev_err(hba->dev,
+ 		"invalid ref_clk setting = %ld\n", freq);
+ }
+-EXPORT_SYMBOL(ufshcd_parse_dev_ref_clk_freq);
+ 
+ static int ufshcd_set_dev_ref_clk(struct ufs_hba *hba)
+ {
+-- 
+2.23.0.187.g17f5b7556c-goog
+

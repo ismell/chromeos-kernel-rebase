@@ -1,0 +1,77 @@
+From 38b897dd2dc755f20a1ef1d7a0566f2ac84c9cbb Mon Sep 17 00:00:00 2001
+From: Jitao Shi <jitao.shi@mediatek.com>
+Date: Sun, 5 May 2019 19:05:16 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: arm64: dts: mt8183: add dsi node
+
+Add dsi and mipitx nodes to the mt8183
+
+Signed-off-by: Jitao Shi <jitao.shi@mediatek.com>
+
+(am from https://patchwork.kernel.org/patch/10930115/)
+[eddie.huang: fix context conflicts]
+
+BUG=b:109911488
+TEST=Display UI
+
+Change-Id: I152b9c079e414ca5cbb3a4b225041d0b8d30d404
+Signed-off-by: CK Hu <ck.hu@mediatek.com>
+Signed-off-by: Eddie Huang <eddie.huang@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/1317206
+Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
+Tested-by: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+
+[rebase52(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm64/boot/dts/mediatek/mt8183.dtsi | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+index b17298f28b46..6bb936e3a031 100644
+--- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
+@@ -706,6 +706,16 @@
+ 			status = "disabled";
+ 		};
+ 
++		mipi_tx0: mipi-dphy@11e50000 {
++			compatible = "mediatek,mt8183-mipi-tx";
++			reg = <0 0x11e50000 0 0x1000>;
++			clocks = <&apmixedsys CLK_APMIXED_MIPID0_26M>;
++			clock-names = "ref_clk";
++			#clock-cells = <0>;
++			#phy-cells = <0>;
++			clock-output-names = "mipi_tx0_pll";
++		};
++
+ 		efuse: efuse@11f10000 {
+ 			compatible = "mediatek,mt8183-efuse",
+ 				     "mediatek,efuse";
+@@ -748,6 +758,20 @@
+ 			#clock-cells = <1>;
+ 		};
+ 
++		dsi0: dsi@14014000 {
++			compatible = "mediatek,mt8183-dsi";
++			reg = <0 0x14014000 0 0x1000>;
++			interrupts = <GIC_SPI 236 IRQ_TYPE_LEVEL_LOW>;
++			power-domains = <&scpsys MT8183_POWER_DOMAIN_DISP>;
++			mediatek,syscon-dsi = <&mmsys 0x140>;
++			clocks = <&mmsys CLK_MM_DSI0_MM>,
++				<&mmsys CLK_MM_DSI0_IF>,
++				<&mipi_tx0>;
++			clock-names = "engine", "digital", "hs";
++			phys = <&mipi_tx0>;
++			phy-names = "dphy";
++		};
++
+ 		larb0: larb@14017000 {
+ 			compatible = "mediatek,mt8183-smi-larb";
+ 			reg = <0 0x14017000 0 0x1000>;
+-- 
+2.23.0.187.g17f5b7556c-goog
+

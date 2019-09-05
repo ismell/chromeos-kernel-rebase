@@ -1,0 +1,60 @@
+From 8a24b38aa57b10430799ae4916035692717b87b5 Mon Sep 17 00:00:00 2001
+From: Sathya Prakash M R <sathya.prakash.m.r@intel.com>
+Date: Sat, 18 May 2019 13:30:08 -0500
+Subject: [PATCH] BACKPORT: FROMGIT: ASoC: Intel: soc-acpi: Fix machine
+ selection order
+
+The selection order of m/c in match table is corrected
+to use common codec as last in the list.
+
+Signed-off-by: Sathya Prakash M R <sathya.prakash.m.r@intel.com>
+Signed-off-by: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
+(cherry picked from commit 30d9d4ff53532087bc13ed29d7715df868794b5e
+ git://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next)
+
+Conflicts:
+   sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+
+BUG=b:134688240
+TEST=Test Audio use cases for CML with full SOF patch series applied.
+
+Signed-off-by: Ap, Kamal <kamal.ap@intel.corp-partner.google.com>
+
+Change-Id: I5a224d10baf290aacdaf570ada9d78ce44064214
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ sound/soc/intel/common/soc-acpi-intel-cnl-match.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+index df7c52cad5c3f..c36c0aa4f6832 100644
+--- a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
++++ b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+@@ -29,17 +29,17 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_cnl_machines[] = {
+ 		.sof_tplg_filename = "sof-cnl-rt274.tplg",
+ 	},
+ 	{
+-		.id = "10EC5682",
++		.id = "MX98357A",
+ 		.drv_name = "sof_rt5682",
++		.quirk_data = &cml_codecs,
+ 		.sof_fw_filename = "sof-cnl.ri",
+-		.sof_tplg_filename = "sof-cml-rt5682.tplg",
++		.sof_tplg_filename = "sof-cml-rt5682-max98357a.tplg",
+ 	},
+ 	{
+-		.id = "MX98357A",
++		.id = "10EC5682",
+ 		.drv_name = "sof_rt5682",
+-		.quirk_data = &cml_codecs,
+ 		.sof_fw_filename = "sof-cnl.ri",
+-		.sof_tplg_filename = "sof-cml-rt5682-max98357a.tplg",
++		.sof_tplg_filename = "sof-cml-rt5682.tplg",
+ 	},
+ 
+ 	{},
+-- 
+2.22.0.770.g0f2c4a37fd-goog
+

@@ -1,0 +1,82 @@
+From 120ebf7bb2b8f94a3903681f4c216984152b4636 Mon Sep 17 00:00:00 2001
+From: Jordan Crouse <jcrouse@codeaurora.org>
+Date: Tue, 19 Jun 2018 16:30:02 -0600
+Subject: [PATCH] BACKPORT: FROMLIST: drm/msm: Remove pm_runtime operations
+ from msm_iommu
+
+Now that the IOMMU is the master of it's own power we don't need to bring
+up the GPU to do IOMMU operations. This is good because bringing up a6xx
+requires the GMU so calling pm_runtime_get_sync() too early in the process
+gets us into some nasty circular dependency situations.
+
+Signed-off-by: Jordan Crouse <jcrouse@codeaurora.org>
+Reviewed-by: Vivek Gautam <vivek.gautam@codeaurora.org>
+(am from https://patchwork.kernel.org/patch/10475611/)
+
+BUG=b:72483556
+TEST=Build and boot
+
+Change-Id: I293c1c82e413eeadd4cf74707e8159a2c088b703
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1096345
+Tested-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+Reviewed-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+
+[rebase419(rrangel): Context conflict]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/msm/msm_iommu.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/msm_iommu.c b/drivers/gpu/drm/msm/msm_iommu.c
+index 2a90aa4caec08..8289e6e28cf67 100644
+--- a/drivers/gpu/drm/msm/msm_iommu.c
++++ b/drivers/gpu/drm/msm/msm_iommu.c
+@@ -38,13 +38,8 @@ static int msm_iommu_attach(struct msm_mmu *mmu, const char * const *names,
+ 			    int cnt)
+ {
+ 	struct msm_iommu *iommu = to_msm_iommu(mmu);
+-	int ret;
+ 
+-	pm_runtime_get_sync(mmu->dev);
+-	ret = iommu_attach_device(iommu->domain, mmu->dev);
+-	pm_runtime_put_sync(mmu->dev);
+-
+-	return ret;
++	return iommu_attach_device(iommu->domain, mmu->dev);
+ }
+ 
+ static void msm_iommu_detach(struct msm_mmu *mmu, const char * const *names,
+@@ -52,9 +47,7 @@ static void msm_iommu_detach(struct msm_mmu *mmu, const char * const *names,
+ {
+ 	struct msm_iommu *iommu = to_msm_iommu(mmu);
+ 
+-	pm_runtime_get_sync(mmu->dev);
+ 	iommu_detach_device(iommu->domain, mmu->dev);
+-	pm_runtime_put_sync(mmu->dev);
+ }
+ 
+ static int msm_iommu_map(struct msm_mmu *mmu, uint64_t iova,
+@@ -63,9 +56,7 @@ static int msm_iommu_map(struct msm_mmu *mmu, uint64_t iova,
+ 	struct msm_iommu *iommu = to_msm_iommu(mmu);
+ 	size_t ret;
+ 
+-//	pm_runtime_get_sync(mmu->dev);
+ 	ret = iommu_map_sg(iommu->domain, iova, sgt->sgl, sgt->nents, prot);
+-//	pm_runtime_put_sync(mmu->dev);
+ 	WARN_ON(!ret);
+ 
+ 	return (ret == len) ? 0 : -EINVAL;
+@@ -76,9 +67,7 @@ static int msm_iommu_unmap(struct msm_mmu *mmu, uint64_t iova,
+ {
+ 	struct msm_iommu *iommu = to_msm_iommu(mmu);
+ 
+-	pm_runtime_get_sync(mmu->dev);
+ 	iommu_unmap(iommu->domain, iova, len);
+-	pm_runtime_put_sync(mmu->dev);
+ 
+ 	return 0;
+ }
+-- 
+2.22.0.709.g102302147b-goog
+

@@ -1,0 +1,54 @@
+From 318c5b4edbfd47de5aabda0d510f5764171b6788 Mon Sep 17 00:00:00 2001
+From: Guenter Roeck <groeck@chromium.org>
+Date: Fri, 14 Sep 2018 18:05:52 +0800
+Subject: [PATCH] CHROMIUM: amdgpu/gmc: fix compile warnings/errors
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c:
+	In function ‘gmc_v8_0_process_interrupt’:
+drivers/gpu/drm/amd/amdgpu/gmc_v8_0.c:1447:10:
+	error: missing braces around initializer
+
+and similar errors.
+
+Also see:
+  https://lore.kernel.org/patchwork/patch/985843/
+  https://lkml.kernel.org/r/1536919552-116245-1-git-send-email-peng.hao2@zte.com.cn
+
+The suggested patch was rejected and is incomplete. Rejection is odd because there
+are around 50 instances with the same initialization pattern in amd gpu code,
+but that is life. For the time being, carry our own fix.
+
+BUG=chromium:885330
+TEST=Build AMD image
+
+Change-Id: I93cd1ed7198db9d125131ba58071ee6c3f89fb51
+Signed-off-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase419(rrangel): dropped the gmc changes since those have been fixed
+upstream]
+Signed-off-by: Raul Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c b/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
+index 2118ea21d7e9..9321ce48cab0 100644
+--- a/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
++++ b/drivers/gpu/drm/amd/display/dc/dcn10/dcn10_hw_sequencer.c
+@@ -1707,8 +1707,8 @@ static void mmhub_read_vm_context0_settings(struct dcn10_hubp *hubp1,
+ void dcn10_program_pte_vm(struct dce_hwseq *hws, struct hubp *hubp)
+ {
+ 	struct dcn10_hubp *hubp1 = TO_DCN10_HUBP(hubp);
+-	struct vm_system_aperture_param apt = { {{ 0 } } };
+-	struct vm_context0_param vm0 = { { { 0 } } };
++	struct vm_system_aperture_param apt = { };
++	struct vm_context0_param vm0 = { };
+ 
+ 	mmhub_read_vm_system_aperture_settings(hubp1, &apt, hws);
+ 	mmhub_read_vm_context0_settings(hubp1, &vm0, hws);
+-- 
+2.23.0.187.g17f5b7556c-goog
+
