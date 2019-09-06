@@ -18,6 +18,8 @@ Conflicts:
 [rebase414(groeck): Context conflicts against license identifier]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
+Change-Id: I6d0b2ac541616c24920c0906a01186eb2cf3106f
+
 [rebase53(rrangel): Context conflict]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---

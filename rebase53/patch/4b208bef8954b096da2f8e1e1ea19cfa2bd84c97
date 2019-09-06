@@ -22,6 +22,8 @@ Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
 	]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
+Change-Id: I4b208bef8954b096da2f8e1e1ea19cfa2bd84c97
+
 [rebase53(rrangel):
 	* Context conflict
 	* Drop cros_ec_commands.h changes. They are applied already.

@@ -13,6 +13,8 @@ Signed-off-by: Olof Johansson <olof@lixom.net>
 (Squashed related commits bc14076e8807 .. 6addb52fb680)
 Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
 
+Change-Id: I29b21088e384788a66c4e7fca4ec7a69465de1c2
+
 [rebase53(rrangel):
 	* ACPI_NAME_SIZE => ACPI_NAMESEG_SIZE
 ]

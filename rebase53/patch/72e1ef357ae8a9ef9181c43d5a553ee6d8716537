@@ -19,6 +19,8 @@ Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
     ]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
+Change-Id: I72e1ef357ae8a9ef9181c43d5a553ee6d8716537
+
 [rebase53(rrangel):
 	* Context conflicts
 	* cros_ec_sensors_id already exists

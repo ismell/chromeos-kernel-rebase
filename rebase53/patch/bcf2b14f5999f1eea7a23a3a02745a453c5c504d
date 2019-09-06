@@ -15,6 +15,8 @@ TEST=Test Audio use cases for CML with full SOF patch series applied.
 
 Signed-off-by: Ap, Kamal <kamal.ap@intel.corp-partner.google.com>
 
+Change-Id: Ia858ee6655ca2f0fc6e2e5d426446bd898c92272
+
 [rebase53(rrangel):
 	* Fixed conflict caused by removing
 	  56f8d5efea72877cc5951f8c7cb2d51a3ac3ae4a.
