@@ -1,0 +1,389 @@
+From ece83dbd765c9005d93883a7a6c5b7e9a55954b4 Mon Sep 17 00:00:00 2001
+From: Imre Deak <imre.deak@intel.com>
+Date: Thu, 11 Jul 2019 17:53:42 -0700
+Subject: [PATCH] BACKPORT: FROMGIT: drm/i915: Add support for retrying hotplug
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There is some scenarios that we are aware that sink probe can fail,
+so lets add the infrastructure to let hotplug() hook to request
+another probe after some time.
+
+v2: Handle shared HPD pins (Imre)
+v3: Rebased
+v4: Renamed INTEL_HOTPLUG_NOCHANGE to INTEL_HOTPLUG_UNCHANGED to keep
+it consistent(Rodrigo)
+v5: Making the working queue used explicit through all the callers to
+hotplug_work (Ville)
+
+Tested-by: Timo Aaltonen <tjaalton@ubuntu.com>
+Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+Signed-off-by: José Roberto de Souza <jose.souza@intel.com>
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+Signed-off-by: Imre Deak <imre.deak@intel.com>
+Link:
+https://patchwork.freedesktop.org/patch/msgid/20190712005343.24571-1-jose.souza@intel.com
+
+BUG=b:124844631
+TEST=Connect to an HDMI display. Slowly wiggle the HDMI plug out. Ensure
+that sound plays from internal speakers and that the monitor has
+disappeared from the display settings page.
+
+Conflicts:
+    drivers/gpu/drm/i915/display/intel_hotplug.h - This file does not
+        exist in 4.19. Changed the intel_encoder_hotplug function
+        signature in intel_drv.h instead.
+
+(cherry picked from commit 3944709df8e9298225fc2b29e53ee8e6f4b26618
+https://anongit.freedesktop.org/git/drm-intel.git drm-intel-next)
+Signed-off-by: Shane McKee <shane.mckee@intel.com>
+
+Change-Id: I5d80128ceafcbb78e0ba659eec0687c86fc3390a
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1714212
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+Tested-by: Lucien Kao <lucien_kao@compal.corp-partner.google.com>
+Commit-Queue: Shane Mckee <shane.mckee@intel.com>
+---
+ drivers/gpu/drm/i915/i915_debugfs.c  |  2 +-
+ drivers/gpu/drm/i915/i915_drv.h      |  3 +-
+ drivers/gpu/drm/i915/intel_ddi.c     | 12 +++---
+ drivers/gpu/drm/i915/intel_dp.c      | 12 +++---
+ drivers/gpu/drm/i915/intel_drv.h     | 17 ++++++--
+ drivers/gpu/drm/i915/intel_hotplug.c | 59 ++++++++++++++++++++++------
+ drivers/gpu/drm/i915/intel_sdvo.c    |  8 ++--
+ 7 files changed, 81 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/gpu/drm/i915/i915_debugfs.c b/drivers/gpu/drm/i915/i915_debugfs.c
+index 9db0001261c7..af35f3f23aa4 100644
+--- a/drivers/gpu/drm/i915/i915_debugfs.c
++++ b/drivers/gpu/drm/i915/i915_debugfs.c
+@@ -4587,7 +4587,7 @@ static int i915_hpd_storm_ctl_show(struct seq_file *m, void *data)
+ 	 */
+ 	synchronize_irq(dev_priv->drm.irq);
+ 	flush_work(&dev_priv->hotplug.dig_port_work);
+-	flush_work(&dev_priv->hotplug.hotplug_work);
++	flush_delayed_work(&dev_priv->hotplug.hotplug_work);
+ 
+ 	seq_printf(m, "Threshold: %d\n", hotplug->hpd_storm_threshold);
+ 	seq_printf(m, "Detected: %s\n",
+diff --git a/drivers/gpu/drm/i915/i915_drv.h b/drivers/gpu/drm/i915/i915_drv.h
+index 6970f86d74f3..4358df38f89a 100644
+--- a/drivers/gpu/drm/i915/i915_drv.h
++++ b/drivers/gpu/drm/i915/i915_drv.h
+@@ -287,7 +287,7 @@ enum hpd_pin {
+ #define HPD_STORM_DEFAULT_THRESHOLD 5
+ 
+ struct i915_hotplug {
+-	struct work_struct hotplug_work;
++	struct delayed_work hotplug_work;
+ 
+ 	struct {
+ 		unsigned long last_jiffies;
+@@ -299,6 +299,7 @@ struct i915_hotplug {
+ 		} state;
+ 	} stats[HPD_NUM_PINS];
+ 	u32 event_bits;
++	u32 retry_bits;
+ 	struct delayed_work reenable_work;
+ 
+ 	u32 long_port_mask;
+diff --git a/drivers/gpu/drm/i915/intel_ddi.c b/drivers/gpu/drm/i915/intel_ddi.c
+index 8555f9244d63..b4d6e7bbd6cf 100644
+--- a/drivers/gpu/drm/i915/intel_ddi.c
++++ b/drivers/gpu/drm/i915/intel_ddi.c
+@@ -3685,14 +3685,16 @@ static int intel_hdmi_reset_link(struct intel_encoder *encoder,
+ 	return modeset_pipe(&crtc->base, ctx);
+ }
+ 
+-static bool intel_ddi_hotplug(struct intel_encoder *encoder,
+-			      struct intel_connector *connector)
++static enum intel_hotplug_state
++intel_ddi_hotplug(struct intel_encoder *encoder,
++		  struct intel_connector *connector,
++		  bool irq_received)
+ {
+ 	struct drm_modeset_acquire_ctx ctx;
+-	bool changed;
++	enum intel_hotplug_state state;
+ 	int ret;
+ 
+-	changed = intel_encoder_hotplug(encoder, connector);
++	state = intel_encoder_hotplug(encoder, connector, irq_received);
+ 
+ 	drm_modeset_acquire_init(&ctx, 0);
+ 
+@@ -3714,7 +3716,7 @@ static bool intel_ddi_hotplug(struct intel_encoder *encoder,
+ 	drm_modeset_acquire_fini(&ctx);
+ 	WARN(ret, "Acquiring modeset locks failed with %i\n", ret);
+ 
+-	return changed;
++	return state;
+ }
+ 
+ static struct intel_connector *
+diff --git a/drivers/gpu/drm/i915/intel_dp.c b/drivers/gpu/drm/i915/intel_dp.c
+index c8debeb3c378..0abd51f35aa2 100644
+--- a/drivers/gpu/drm/i915/intel_dp.c
++++ b/drivers/gpu/drm/i915/intel_dp.c
+@@ -4445,14 +4445,16 @@ int intel_dp_retrain_link(struct intel_encoder *encoder,
+  * retrain the link to get a picture. That's in case no
+  * userspace component reacted to intermittent HPD dip.
+  */
+-static bool intel_dp_hotplug(struct intel_encoder *encoder,
+-			     struct intel_connector *connector)
++static enum intel_hotplug_state
++intel_dp_hotplug(struct intel_encoder *encoder,
++		 struct intel_connector *connector,
++		 bool irq_received)
+ {
+ 	struct drm_modeset_acquire_ctx ctx;
+-	bool changed;
++	enum intel_hotplug_state state;
+ 	int ret;
+ 
+-	changed = intel_encoder_hotplug(encoder, connector);
++	state = intel_encoder_hotplug(encoder, connector, irq_received);
+ 
+ 	drm_modeset_acquire_init(&ctx, 0);
+ 
+@@ -4471,7 +4473,7 @@ static bool intel_dp_hotplug(struct intel_encoder *encoder,
+ 	drm_modeset_acquire_fini(&ctx);
+ 	WARN(ret, "Acquiring modeset locks failed with %i\n", ret);
+ 
+-	return changed;
++	return state;
+ }
+ 
+ /*
+diff --git a/drivers/gpu/drm/i915/intel_drv.h b/drivers/gpu/drm/i915/intel_drv.h
+index 1d5a3dfaf814..6e1a1966256c 100644
+--- a/drivers/gpu/drm/i915/intel_drv.h
++++ b/drivers/gpu/drm/i915/intel_drv.h
+@@ -221,14 +221,21 @@ struct intel_fbdev {
+ 	struct mutex hpd_lock;
+ };
+ 
++enum intel_hotplug_state {
++	INTEL_HOTPLUG_UNCHANGED,
++	INTEL_HOTPLUG_CHANGED,
++	INTEL_HOTPLUG_RETRY,
++};
++
+ struct intel_encoder {
+ 	struct drm_encoder base;
+ 
+ 	enum intel_output_type type;
+ 	enum port port;
+ 	unsigned int cloneable;
+-	bool (*hotplug)(struct intel_encoder *encoder,
+-			struct intel_connector *connector);
++	enum intel_hotplug_state (*hotplug)(struct intel_encoder *encoder,
++					    struct intel_connector *connector,
++					    bool irq_received);
+ 	enum intel_output_type (*compute_output_type)(struct intel_encoder *,
+ 						      struct intel_crtc_state *,
+ 						      struct drm_connector_state *);
+@@ -1790,8 +1797,10 @@ int intel_dsi_dcs_init_backlight_funcs(struct intel_connector *intel_connector);
+ void intel_dvo_init(struct drm_i915_private *dev_priv);
+ /* intel_hotplug.c */
+ void intel_hpd_poll_init(struct drm_i915_private *dev_priv);
+-bool intel_encoder_hotplug(struct intel_encoder *encoder,
+-			   struct intel_connector *connector);
++enum intel_hotplug_state
++intel_encoder_hotplug(struct intel_encoder *encoder,
++				struct intel_connector *connector,
++				bool irq_received);
+ 
+ /* legacy fbdev emulation in intel_fbdev.c */
+ #ifdef CONFIG_DRM_FBDEV_EMULATION
+diff --git a/drivers/gpu/drm/i915/intel_hotplug.c b/drivers/gpu/drm/i915/intel_hotplug.c
+index 9a8018130237..27577b23d500 100644
+--- a/drivers/gpu/drm/i915/intel_hotplug.c
++++ b/drivers/gpu/drm/i915/intel_hotplug.c
+@@ -112,6 +112,7 @@ enum hpd_pin intel_hpd_pin_default(struct drm_i915_private *dev_priv,
+ 
+ #define HPD_STORM_DETECT_PERIOD		1000
+ #define HPD_STORM_REENABLE_DELAY	(2 * 60 * 1000)
++#define HPD_RETRY_DELAY			1000
+ 
+ /**
+  * intel_hpd_irq_storm_detect - gather stats and detect HPD irq storm on a pin
+@@ -248,8 +249,10 @@ static void intel_hpd_irq_storm_reenable_work(struct work_struct *work)
+ 	intel_runtime_pm_put(dev_priv);
+ }
+ 
+-bool intel_encoder_hotplug(struct intel_encoder *encoder,
+-			   struct intel_connector *connector)
++enum intel_hotplug_state
++intel_encoder_hotplug(struct intel_encoder *encoder,
++		      struct intel_connector *connector,
++		      bool irq_received)
+ {
+ 	struct drm_device *dev = connector->base.dev;
+ 	enum drm_connector_status old_status;
+@@ -261,7 +264,7 @@ bool intel_encoder_hotplug(struct intel_encoder *encoder,
+ 		drm_helper_probe_detect(&connector->base, NULL, false);
+ 
+ 	if (old_status == connector->base.status)
+-		return false;
++		return INTEL_HOTPLUG_UNCHANGED;
+ 
+ 	DRM_DEBUG_KMS("[CONNECTOR:%d:%s] status updated from %s to %s\n",
+ 		      connector->base.base.id,
+@@ -269,7 +272,7 @@ bool intel_encoder_hotplug(struct intel_encoder *encoder,
+ 		      drm_get_connector_status_name(old_status),
+ 		      drm_get_connector_status_name(connector->base.status));
+ 
+-	return true;
++	return INTEL_HOTPLUG_CHANGED;
+ }
+ 
+ static bool intel_encoder_has_hpd_pulse(struct intel_encoder *encoder)
+@@ -321,7 +324,7 @@ static void i915_digport_work_func(struct work_struct *work)
+ 		spin_lock_irq(&dev_priv->irq_lock);
+ 		dev_priv->hotplug.event_bits |= old_bits;
+ 		spin_unlock_irq(&dev_priv->irq_lock);
+-		schedule_work(&dev_priv->hotplug.hotplug_work);
++		queue_delayed_work(system_wq, &dev_priv->hotplug.hotplug_work, 0);
+ 	}
+ }
+ 
+@@ -331,14 +334,16 @@ static void i915_digport_work_func(struct work_struct *work)
+ static void i915_hotplug_work_func(struct work_struct *work)
+ {
+ 	struct drm_i915_private *dev_priv =
+-		container_of(work, struct drm_i915_private, hotplug.hotplug_work);
++		container_of(work, struct drm_i915_private,
++			     hotplug.hotplug_work.work);
+ 	struct drm_device *dev = &dev_priv->drm;
+ 	struct intel_connector *intel_connector;
+ 	struct intel_encoder *intel_encoder;
+ 	struct drm_connector *connector;
+ 	struct drm_connector_list_iter conn_iter;
+-	bool changed = false;
++	u32 changed = 0, retry = 0;
+ 	u32 hpd_event_bits;
++	u32 hpd_retry_bits;
+ 
+ 	mutex_lock(&dev->mode_config.mutex);
+ 	DRM_DEBUG_KMS("running encoder hotplug functions\n");
+@@ -347,6 +352,8 @@ static void i915_hotplug_work_func(struct work_struct *work)
+ 
+ 	hpd_event_bits = dev_priv->hotplug.event_bits;
+ 	dev_priv->hotplug.event_bits = 0;
++	hpd_retry_bits = dev_priv->hotplug.retry_bits;
++	dev_priv->hotplug.retry_bits = 0;
+ 
+ 	/* Disable hotplug on connectors that hit an irq storm. */
+ 	intel_hpd_irq_storm_disable(dev_priv);
+@@ -355,16 +362,29 @@ static void i915_hotplug_work_func(struct work_struct *work)
+ 
+ 	drm_connector_list_iter_begin(dev, &conn_iter);
+ 	drm_for_each_connector_iter(connector, &conn_iter) {
++		u32 hpd_bit;
++
+ 		intel_connector = to_intel_connector(connector);
+ 		if (!intel_connector->encoder)
+ 			continue;
+ 		intel_encoder = intel_connector->encoder;
+-		if (hpd_event_bits & (1 << intel_encoder->hpd_pin)) {
++		hpd_bit = BIT(intel_encoder->hpd_pin);
++		if ((hpd_event_bits | hpd_retry_bits) & hpd_bit) {
+ 			DRM_DEBUG_KMS("Connector %s (pin %i) received hotplug event.\n",
+ 				      connector->name, intel_encoder->hpd_pin);
+ 
+-			changed |= intel_encoder->hotplug(intel_encoder,
+-							  intel_connector);
++			switch (intel_encoder->hotplug(intel_encoder,
++						       intel_connector,
++						       hpd_event_bits & hpd_bit)) {
++			case INTEL_HOTPLUG_UNCHANGED:
++				break;
++			case INTEL_HOTPLUG_CHANGED:
++				changed |= hpd_bit;
++				break;
++			case INTEL_HOTPLUG_RETRY:
++				retry |= hpd_bit;
++				break;
++			}
+ 		}
+ 	}
+ 	drm_connector_list_iter_end(&conn_iter);
+@@ -372,6 +392,17 @@ static void i915_hotplug_work_func(struct work_struct *work)
+ 
+ 	if (changed)
+ 		drm_kms_helper_hotplug_event(dev);
++
++	/* Remove shared HPD pins that have changed */
++	retry &= ~changed;
++	if (retry) {
++		spin_lock_irq(&dev_priv->irq_lock);
++		dev_priv->hotplug.retry_bits |= retry;
++		spin_unlock_irq(&dev_priv->irq_lock);
++
++		mod_delayed_work(system_wq, &dev_priv->hotplug.hotplug_work,
++				 msecs_to_jiffies(HPD_RETRY_DELAY));
++	}
+ }
+ 
+ 
+@@ -496,7 +527,7 @@ void intel_hpd_irq_handler(struct drm_i915_private *dev_priv,
+ 	if (queue_dig)
+ 		queue_work(dev_priv->hotplug.dp_wq, &dev_priv->hotplug.dig_port_work);
+ 	if (queue_hp)
+-		schedule_work(&dev_priv->hotplug.hotplug_work);
++		queue_delayed_work(system_wq, &dev_priv->hotplug.hotplug_work, 0);
+ }
+ 
+ /**
+@@ -616,7 +647,8 @@ void intel_hpd_poll_init(struct drm_i915_private *dev_priv)
+ 
+ void intel_hpd_init_work(struct drm_i915_private *dev_priv)
+ {
+-	INIT_WORK(&dev_priv->hotplug.hotplug_work, i915_hotplug_work_func);
++	INIT_DELAYED_WORK(&dev_priv->hotplug.hotplug_work,
++			  i915_hotplug_work_func);
+ 	INIT_WORK(&dev_priv->hotplug.dig_port_work, i915_digport_work_func);
+ 	INIT_WORK(&dev_priv->hotplug.poll_init_work, i915_hpd_poll_init_work);
+ 	INIT_DELAYED_WORK(&dev_priv->hotplug.reenable_work,
+@@ -630,11 +662,12 @@ void intel_hpd_cancel_work(struct drm_i915_private *dev_priv)
+ 	dev_priv->hotplug.long_port_mask = 0;
+ 	dev_priv->hotplug.short_port_mask = 0;
+ 	dev_priv->hotplug.event_bits = 0;
++	dev_priv->hotplug.retry_bits = 0;
+ 
+ 	spin_unlock_irq(&dev_priv->irq_lock);
+ 
+ 	cancel_work_sync(&dev_priv->hotplug.dig_port_work);
+-	cancel_work_sync(&dev_priv->hotplug.hotplug_work);
++	cancel_delayed_work_sync(&dev_priv->hotplug.hotplug_work);
+ 	cancel_work_sync(&dev_priv->hotplug.poll_init_work);
+ 	cancel_delayed_work_sync(&dev_priv->hotplug.reenable_work);
+ }
+diff --git a/drivers/gpu/drm/i915/intel_sdvo.c b/drivers/gpu/drm/i915/intel_sdvo.c
+index 696bf082138d..fc47929508d3 100644
+--- a/drivers/gpu/drm/i915/intel_sdvo.c
++++ b/drivers/gpu/drm/i915/intel_sdvo.c
+@@ -1758,12 +1758,14 @@ static void intel_sdvo_enable_hotplug(struct intel_encoder *encoder)
+ 			     &intel_sdvo->hotplug_active, 2);
+ }
+ 
+-static bool intel_sdvo_hotplug(struct intel_encoder *encoder,
+-			       struct intel_connector *connector)
++static enum intel_hotplug_state
++intel_sdvo_hotplug(struct intel_encoder *encoder,
++		   struct intel_connector *connector,
++		   bool irq_received)
+ {
+ 	intel_sdvo_enable_hotplug(encoder);
+ 
+-	return intel_encoder_hotplug(encoder, connector);
++	return intel_encoder_hotplug(encoder, connector, irq_received);
+ }
+ 
+ static bool
+-- 
+2.23.0.162.g0b9fbb3734-goog
+

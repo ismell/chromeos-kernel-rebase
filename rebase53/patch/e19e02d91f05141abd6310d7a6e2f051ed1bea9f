@@ -1,0 +1,63 @@
+From 24389ff8b4e84be60128a84b20d452236e6adb23 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 25 Sep 2018 15:42:21 -0700
+Subject: [PATCH] CHROMIUM: Revert "x86: Force asm-goto"
+
+This reverts commit e501ce957a786ecd076ea0cfb10b114e6e4d0f40.
+
+This change enforces the use of 'asm goto', which currently is not
+supported by clang.
+
+BUG=chromium:891028
+TEST=build for caroline
+
+Conflicts:
+  Makefile
+    context conflict caused by 2e549b2ee0e3 ("x86/vdso: Fix vDSO build
+    if a retpoline is emitted")
+  arch/x86/Makefile
+    context conflict caused by 36bf9da29130 ("x86/build: Remove jump
+    label quirk for GCC older than 4.5.2")
+
+Change-Id: Id2889508550a670b8a36e3e0605eba5bc88e7a32
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ Makefile          | 6 ++++++
+ arch/x86/Makefile | 4 ----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a749cfdae96f..da9aaf753f43 100644
+--- a/Makefile
++++ b/Makefile
+@@ -719,6 +719,12 @@ endif
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ 
++# check for 'asm goto'
++ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
++	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
++	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
++endif
++
+ include scripts/Makefile.kcov
+ include scripts/Makefile.gcc-plugins
+ 
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index b2e8b18a38b8..e95946b2d215 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -171,10 +171,6 @@ ifdef CONFIG_FUNCTION_GRAPH_TRACER
+   endif
+ endif
+ 
+-ifndef CC_HAVE_ASM_GOTO
+-  $(error Compiler lacks asm-goto support.)
+-endif
+-
+ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ 	# This compiler flag is not supported by Clang:
+ 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
+-- 
+2.23.0.162.g0b9fbb3734-goog
+

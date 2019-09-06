@@ -1,0 +1,43 @@
+From e3e29c0f833fe67dcbef8c660bbe97c1e13da6d0 Mon Sep 17 00:00:00 2001
+From: Naveen Manohar <naveen.m@intel.com>
+Date: Sun, 26 May 2019 10:45:06 +0530
+Subject: [PATCH] CHROMIUM: ASoC: Intel: Add acpi match cml_rt1011 m/c driver
+
+Add match for RT1011 and RT5682
+
+BUG=b:134996363
+TEST=With the patch series merged check for audio
+
+Change-Id: I8775a34400423b98f86b876125d2a40bcd812fa5
+Signed-off-by: Naveen Manohar <naveen.m@intel.com>
+Signed-off-by: Sathya Prakash M R <sathya.prakash.m.r@intel.com>
+Reviewed-on: https://chromium-review.googlesource.com/1670758
+Tested-by: Ben Zhang <benzh@chromium.org>
+Commit-Ready: Ben Zhang <benzh@chromium.org>
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Ben Zhang <benzh@chromium.org>
+---
+ sound/soc/intel/common/soc-acpi-intel-cnl-match.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+index 92c1a3731c6d..580cb629d364 100644
+--- a/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
++++ b/sound/soc/intel/common/soc-acpi-intel-cnl-match.c
+@@ -46,6 +46,13 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_cnl_machines[] = {
+ 		.sof_fw_filename = "sof-cnl.ri",
+ 		.sof_tplg_filename = "sof-cml-da7219-max98357a.tplg",
+ 	},
++	{
++		.id = "10EC1011",
++		.drv_name = "cml_rt1011_rt5682",
++		.quirk_data = &cml_codecs,
++		.sof_fw_filename = "sof-cnl.ri",
++		.sof_tplg_filename = "sof-cml-rt1011-rt5682.tplg",
++	},
+ 	{
+ 		.id = "MX98357A",
+ 		.drv_name = "sof_rt5682",
+-- 
+2.23.0.162.g0b9fbb3734-goog
+

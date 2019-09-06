@@ -1,0 +1,82 @@
+From 54c14819a84b3190515ccecfe708f204dcac7b97 Mon Sep 17 00:00:00 2001
+From: "Kristian H. Kristensen" <hoegsberg@chromium.org>
+Date: Fri, 19 Jan 2018 17:06:40 -0800
+Subject: [PATCH] CHROMIUM: drm/i915: Wait for vblank after disabling cursor
+
+The cursor disable write is latched on vsync but if we do a modeset
+before that happens the write seems to be discarded and the cursor
+stays on. The CURCNTL register will still read back 0 as if the write
+took, but underlying hardware didn't change. We don't disable the
+cursor often, so we can just force the pre-GEN9 path for cursor
+that waits for vblank.
+
+BUG=b:138431568
+TEST=Toggle primary/extended display as described in bug
+
+Cherry-picked from chromeos-4.4
+
+Conflicts:
+	Nathan: adapted this from chromeos-4.4 in chromeos-4.19 context:
+	drivers/gpu/drm/i915/intel_display.c
+
+Change-Id: Ia9f8bddfe5c3b65ebe457dff1755547751ef0f47
+Signed-off-by: Kristian H. Kristensen <hoegsberg@chromium.org>
+Signed-off-by: Nathan Ciobanu <nathan.d.ciobanu@intel.com>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1721195
+Tested-by: Sushma Venkatesh Reddy <sushma.venkatesh.reddy@intel.com>
+Tested-by: Nelson Ye <nelson_ye@compal.corp-partner.google.com>
+Tested-by: Lucien Kao <lucien_kao@compal.corp-partner.google.com>
+Reviewed-by: Simon Glass <sjg@chromium.org>
+Commit-Queue: Simon Glass <sjg@chromium.org>
+
+Conflicts:
+	drivers/gpu/drm/i915/intel_display.c
+
+[rebase53(rrangel):
+	* File was moved into /display folder
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/i915/display/intel_display.c | 25 ++++++--------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/gpu/drm/i915/display/intel_display.c b/drivers/gpu/drm/i915/display/intel_display.c
+index ba70020d5c5a..fbdaf160e82f 100644
+--- a/drivers/gpu/drm/i915/display/intel_display.c
++++ b/drivers/gpu/drm/i915/display/intel_display.c
+@@ -14054,25 +14054,14 @@ static int intel_atomic_commit(struct drm_device *dev,
+ 	 * updates happen during the correct frames. Gen9+ have
+ 	 * double buffered watermarks and so shouldn't need this.
+ 	 *
+-	 * Unset state->legacy_cursor_update before the call to
+-	 * drm_atomic_helper_setup_commit() because otherwise
+-	 * drm_atomic_helper_wait_for_flip_done() is a noop and
+-	 * we get FIFO underruns because we didn't wait
+-	 * for vblank.
+-	 *
+-	 * FIXME doing watermarks and fb cleanup from a vblank worker
+-	 * (assuming we had any) would solve these problems.
++	 * Unfortunately, the GEN9+ double buffering seems to be buggy when it
++	 * races with a modeset. The result is that the register (CURCNTL)
++	 * appears to have been written (reads back as 0), but the cursor is
++	 * still on. This manifests itself as garbage in the upper-left corner
++	 * of the display (as we set position and base to 0).  We work around
++	 * that by always falling back to the vblank wait.
+ 	 */
+-	if (INTEL_GEN(dev_priv) < 9 && state->legacy_cursor_update) {
+-		struct intel_crtc_state *new_crtc_state;
+-		struct intel_crtc *crtc;
+-		int i;
+-
+-		for_each_new_intel_crtc_in_state(intel_state, crtc, new_crtc_state, i)
+-			if (new_crtc_state->wm.need_postvbl_update ||
+-			    new_crtc_state->update_wm_post)
+-				state->legacy_cursor_update = false;
+-	}
++	state->legacy_cursor_update = false;
+ 
+ 	ret = intel_atomic_prepare_commit(dev, state);
+ 	if (ret) {
+-- 
+2.23.0.162.g0b9fbb3734-goog
+

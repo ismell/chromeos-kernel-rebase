@@ -1,0 +1,77 @@
+From e19e02d91f05141abd6310d7a6e2f051ed1bea9f Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 25 Sep 2018 15:42:21 -0700
+Subject: [PATCH] CHROMIUM: Revert "x86: Force asm-goto"
+
+This reverts commit e501ce957a786ecd076ea0cfb10b114e6e4d0f40.
+
+This change enforces the use of 'asm goto', which currently is not
+supported by clang.
+
+BUG=chromium:891028
+TEST=build for caroline
+
+Conflicts:
+  Makefile
+    context conflict caused by 2e549b2ee0e3 ("x86/vdso: Fix vDSO build
+    if a retpoline is emitted")
+  arch/x86/Makefile
+    context conflict caused by 36bf9da29130 ("x86/build: Remove jump
+    label quirk for GCC older than 4.5.2")
+
+Change-Id: Id2889508550a670b8a36e3e0605eba5bc88e7a32
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ Makefile          | 13 ++++++-------
+ arch/x86/Makefile |  4 ----
+ 2 files changed, 6 insertions(+), 11 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index aaab94e2c918..698149056377 100644
+--- a/Makefile
++++ b/Makefile
+@@ -505,13 +505,6 @@ RETPOLINE_VDSO_CFLAGS := $(call cc-option,$(RETPOLINE_VDSO_CFLAGS_GCC),$(call cc
+ export RETPOLINE_CFLAGS
+ export RETPOLINE_VDSO_CFLAGS
+ 
+-# check for 'asm goto'
+-ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
+-  CC_HAVE_ASM_GOTO := 1
+-  KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+-  KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+-endif
+-
+ # The expansion should be delayed until arch/$(SRCARCH)/Makefile is included.
+ # Some architectures define CROSS_COMPILE in arch/$(SRCARCH)/Makefile.
+ # CC_VERSION_TEXT is referenced from Kconfig (so it needs export),
+@@ -673,6 +666,12 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ 
++# check for 'asm goto'
++ifeq ($(call shell-cached,$(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
++	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
++	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
++endif
++
+ include scripts/Makefile.kcov
+ include scripts/Makefile.gcc-plugins
+ 
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 8fc8f94ef5f5..a1f88debc0e9 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -175,10 +175,6 @@ ifdef CONFIG_FUNCTION_GRAPH_TRACER
+   endif
+ endif
+ 
+-ifndef CC_HAVE_ASM_GOTO
+-  $(error Compiler lacks asm-goto support.)
+-endif
+-
+ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ 	# This compiler flag is not supported by Clang:
+ 	KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args,)
+-- 
+2.23.0.162.g0b9fbb3734-goog
+

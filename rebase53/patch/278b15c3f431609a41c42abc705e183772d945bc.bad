@@ -1,4 +1,4 @@
-From 580c49e0d53a1678b74926e1a0718be94d8a0dbd Mon Sep 17 00:00:00 2001
+From 24c99230d83f1bbd3c0f995db6d5a58334430f06 Mon Sep 17 00:00:00 2001
 From: Gwendal Grignou <gwendal@chromium.org>
 Date: Thu, 11 Jan 2018 22:43:39 -0800
 Subject: [PATCH] CHROMIUM: sensors: add extra sensor API
@@ -25,18 +25,18 @@ Conflicts:
 	]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel):
+[rebase53(rrangel): 
 	* Most of cros_ec_commands.h was already applied.
 	* Converted DEVICE_STATE_INT_ATTR to use snprintf
 ]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
- .../cros_ec_sensors/cros_ec_sensors_core.c    | 138 ++++++++++++++++--
+ .../cros_ec_sensors/cros_ec_sensors_core.c    | 137 ++++++++++++++++--
  .../linux/iio/common/cros_ec_sensors_core.h   |   7 +
- 2 files changed, 134 insertions(+), 11 deletions(-)
+ 2 files changed, 134 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-index ad80fed6bc03..dc3273bbfab4 100644
+index dc2880385681..ce24ac2fff60 100644
 --- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 @@ -19,12 +19,83 @@
@@ -123,17 +123,16 @@ index ad80fed6bc03..dc3273bbfab4 100644
  int cros_ec_sensors_core_init(struct platform_device *pdev,
  			      struct iio_dev *indio_dev,
  			      bool physical_device)
-@@ -33,7 +104,8 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
+@@ -33,6 +104,8 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
  	struct cros_ec_sensors_core_state *state = iio_priv(indio_dev);
  	struct cros_ec_dev *ec = dev_get_drvdata(pdev->dev.parent);
  	struct cros_ec_sensor_platform *sensor_platform = dev_get_platdata(dev);
--	int ret;
 +	u32 ver_mask = 0;
 +	int ret = 0;
  
  	platform_set_drvdata(pdev, indio_dev);
  
-@@ -49,8 +121,18 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
+@@ -48,8 +121,18 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
  
  	mutex_init(&state->cmd_lock);
  
@@ -153,7 +152,7 @@ index ad80fed6bc03..dc3273bbfab4 100644
  	state->msg->command = EC_CMD_MOTION_SENSE_CMD + ec->cmd_offset;
  	state->msg->outsize = sizeof(struct ec_params_motion_sense);
  
-@@ -69,6 +151,20 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
+@@ -67,6 +150,20 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
  		}
  		state->type = state->resp->info.type;
  		state->loc = state->resp->info.location;
@@ -174,7 +173,7 @@ index ad80fed6bc03..dc3273bbfab4 100644
  
  		/* Set sign vector, only used for backward compatibility. */
  		memset(state->sign, 1, CROS_EC_SENSOR_MAX_AXIS);
-@@ -155,15 +251,6 @@ static ssize_t cros_ec_sensors_calibrate(struct iio_dev *indio_dev,
+@@ -153,15 +250,6 @@ static ssize_t cros_ec_sensors_calibrate(struct iio_dev *indio_dev,
  	return ret ? ret : len;
  }
  
@@ -190,7 +189,7 @@ index ad80fed6bc03..dc3273bbfab4 100644
  static ssize_t cros_ec_sensors_loc(struct iio_dev *indio_dev,
  		uintptr_t private, const struct iio_chan_spec *chan,
  		char *buf)
-@@ -173,6 +260,20 @@ static ssize_t cros_ec_sensors_loc(struct iio_dev *indio_dev,
+@@ -171,6 +259,20 @@ static ssize_t cros_ec_sensors_loc(struct iio_dev *indio_dev,
  	return snprintf(buf, PAGE_SIZE, "%s\n", cros_ec_loc[st->loc]);
  }
  
@@ -211,7 +210,7 @@ index ad80fed6bc03..dc3273bbfab4 100644
  const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
  #if IS_ENABLED(CONFIG_IIO_CROS_EC_SENSORS_RING)
  	{
-@@ -196,6 +297,21 @@ const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
+@@ -194,6 +296,21 @@ const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
  		.shared = IIO_SHARED_BY_ALL,
  		.read = cros_ec_sensors_loc
  	},
@@ -234,10 +233,10 @@ index ad80fed6bc03..dc3273bbfab4 100644
  };
  EXPORT_SYMBOL_GPL(cros_ec_sensors_ext_info);
 diff --git a/include/linux/iio/common/cros_ec_sensors_core.h b/include/linux/iio/common/cros_ec_sensors_core.h
-index 543256282d4a..ffbaed6a38d0 100644
+index c97287d784fc..901abefef914 100644
 --- a/include/linux/iio/common/cros_ec_sensors_core.h
 +++ b/include/linux/iio/common/cros_ec_sensors_core.h
-@@ -75,6 +75,13 @@ struct cros_ec_sensors_core_state {
+@@ -72,6 +72,13 @@ struct cros_ec_sensors_core_state {
  				    unsigned long scan_mask, s16 *data);
  
  	int curr_sampl_freq;
@@ -252,5 +251,5 @@ index 543256282d4a..ffbaed6a38d0 100644
  
  /**
 -- 
-2.23.0.162.g0b9fbb3734-goog
+2.23.0.187.g17f5b7556c-goog
 

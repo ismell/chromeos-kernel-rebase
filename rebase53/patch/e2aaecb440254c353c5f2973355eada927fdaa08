@@ -1,0 +1,46 @@
+From d57ad899d4a18e6d0c8cc14cbc138f3f11350a23 Mon Sep 17 00:00:00 2001
+From: Luigi Semenzato <semenzato@chromium.org>
+Date: Tue, 28 May 2019 11:44:10 -0700
+Subject: [PATCH] CHROMIUM: fix pgmajfault names in dfl_cftypes
+
+BUG=none
+TEST=none
+
+Change-Id: Ia070c0cad50ec16c40b1e9ce66041264c19bc8fa
+Signed-off-by: Luigi Semenzato <semenzato@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1630718
+Legacy-Commit-Queue: Commit Bot <commit-bot@chromium.org>
+Reviewed-by: Brian Geffon <bgeffon@chromium.org>
+Reviewed-by: Sonny Rao <sonnyrao@chromium.org>
+
+Conflicts:
+	mm/memcontrol.c
+
+[rebase53(rrangel):
+	* Context Conflicts
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ mm/memcontrol.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index bc1661b45fa8..4254690f69f4 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -1457,9 +1457,9 @@ static char *memory_stat_format(struct mem_cgroup *memcg)
+ 
+ 	seq_buf_printf(&s, "pgfault %lu\n", memcg_events(memcg, PGFAULT));
+ 	seq_buf_printf(&s, "pgmajfault %lu\n", memcg_events(memcg, PGMAJFAULT));
+-	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_S]);
+-	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_A]);
+-	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_F]);
++	seq_buf_printf(&s, "pgmajfault_s %lu\n", acc.events[PGMAJFAULT_S]);
++	seq_buf_printf(&s, "pgmajfault_a %lu\n", acc.events[PGMAJFAULT_A]);
++	seq_buf_printf(&s, "pgmajfault_f %lu\n", acc.events[PGMAJFAULT_F]);
+ 
+ 	seq_buf_printf(&s, "workingset_refault %lu\n",
+ 		       memcg_page_state(memcg, WORKINGSET_REFAULT));
+-- 
+2.23.0.162.g0b9fbb3734-goog
+
