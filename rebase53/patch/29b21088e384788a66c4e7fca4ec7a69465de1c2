@@ -1,4 +1,4 @@
-From 29b21088e384788a66c4e7fca4ec7a69465de1c2 Mon Sep 17 00:00:00 2001
+From 75ef3166beb660112dab5fd3f3dfa14035916d48 Mon Sep 17 00:00:00 2001
 From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
 Date: Mon, 19 Jun 2017 11:23:12 +0200
 Subject: [PATCH] CHROMIUM: platform: x86: add ACPI driver for ChromeOS.
@@ -27,10 +27,10 @@ Signed-off-by: Raul E Rangel <rrangel@chromium.org>
  create mode 100644 drivers/platform/x86/chromeos_acpi.c
 
 diff --git a/drivers/platform/x86/Kconfig b/drivers/platform/x86/Kconfig
-index 0c1aa6c314f5..3b77c9fa5d66 100644
+index 1b67bb578f9f..7ac853d9170a 100644
 --- a/drivers/platform/x86/Kconfig
 +++ b/drivers/platform/x86/Kconfig
-@@ -966,6 +966,16 @@ config INTEL_IPS
+@@ -1025,6 +1025,16 @@ config INTEL_IPS
  	  functionality.  If in doubt, say Y here; it will only load on
  	  supported platforms.
  
@@ -48,20 +48,20 @@ index 0c1aa6c314f5..3b77c9fa5d66 100644
  	bool "Intel Isolated Memory Region support"
  	depends on X86_INTEL_QUARK && IOSF_MBI
 diff --git a/drivers/platform/x86/Makefile b/drivers/platform/x86/Makefile
-index e6d1becf81ce..3c337d9c0cd1 100644
+index 415104033060..18c83f400942 100644
 --- a/drivers/platform/x86/Makefile
 +++ b/drivers/platform/x86/Makefile
-@@ -74,6 +74,7 @@ obj-$(CONFIG_SAMSUNG_Q10)	+= samsung-q10.o
+@@ -79,6 +79,7 @@ obj-$(CONFIG_SAMSUNG_Q10)	+= samsung-q10.o
  obj-$(CONFIG_APPLE_GMUX)	+= apple-gmux.o
  obj-$(CONFIG_INTEL_RST)		+= intel-rst.o
  obj-$(CONFIG_INTEL_SMARTCONNECT)	+= intel-smartconnect.o
 +obj-$(CONFIG_ACPI_CHROMEOS)	+= chromeos_acpi.o
  
- obj-$(CONFIG_PVPANIC)           += pvpanic.o
  obj-$(CONFIG_ALIENWARE_WMI)	+= alienware-wmi.o
+ obj-$(CONFIG_INTEL_PMC_IPC)	+= intel_pmc_ipc.o
 diff --git a/drivers/platform/x86/chromeos_acpi.c b/drivers/platform/x86/chromeos_acpi.c
 new file mode 100644
-index 000000000000..7288882f8151
+index 000000000000..2486c5c1817b
 --- /dev/null
 +++ b/drivers/platform/x86/chromeos_acpi.c
 @@ -0,0 +1,800 @@
