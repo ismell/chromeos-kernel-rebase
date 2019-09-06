@@ -35,7 +35,10 @@ Signed-off-by: Jett Rink <jettrink@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1551940
 Reviewed-by: Enrico Granata <egranata@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel): 
+	* Removed all changes to include/linux/mfd/cros_ec_commands.h
+	  as they are upstream already.
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/mfd/cros_ec.c                   | 35 +++++++++++------
@@ -231,24 +234,6 @@ index 77805c3f2de7..b95d3658bef2 100644
 +	u8 mkbp_event_supported;
  	bool host_sleep_v1;
  	struct blocking_notifier_head event_notifier;
- 
-diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
-index 7ccb8757b79d..8f14a65f4828 100644
---- a/include/linux/mfd/cros_ec_commands.h
-+++ b/include/linux/mfd/cros_ec_commands.h
-@@ -3375,6 +3375,13 @@ enum ec_mkbp_event {
- 
- 	/* Number of MKBP events */
- 	EC_MKBP_EVENT_COUNT,
-+
-+	/*
-+	 * Maximum possible event type
-+	 * The most significant bit of event type is used to indicate that
-+	 * the EC has multiple events for the AP to serve
-+	 */
-+	EC_MKBP_EVENT_MAX_TYPE = EC_MKBP_EVENT_TYPE_MASK,
- };
- BUILD_ASSERT(EC_MKBP_EVENT_COUNT <= EC_MKBP_EVENT_TYPE_MASK);
  
 -- 
 2.23.0.187.g17f5b7556c-goog
