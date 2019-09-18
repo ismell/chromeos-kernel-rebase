@@ -1,4 +1,4 @@
-From 48b58e33fb14c7bfc8ab2e1b4cb14f2b1b8d47fb Mon Sep 17 00:00:00 2001
+From 2fda932aebaab5bb0b1c2570af4544d3ea63b298 Mon Sep 17 00:00:00 2001
 From: Gwendal Grignou <gwendal@chromium.org>
 Date: Mon, 24 Jun 2019 11:29:44 -0700
 Subject: [PATCH] CHROMIUM: split cros_ec_pd_update driver in two
@@ -34,14 +34,17 @@ Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Tested-by: Guenter Roeck <groeck@chromium.org>
 Commit-Queue: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+	* Context conflict
+	* Added missing include
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/platform/chrome/Makefile              |   2 +-
  drivers/platform/chrome/cros_ec_pd_sysfs.c    | 131 ++++++++++++
  drivers/platform/chrome/cros_ec_pd_update.c   | 196 ++++--------------
- .../linux/platform_data/cros_ec_pd_update.h   |  31 +++
- 4 files changed, 206 insertions(+), 154 deletions(-)
+ .../linux/platform_data/cros_ec_pd_update.h   |  32 +++
+ 4 files changed, 207 insertions(+), 154 deletions(-)
  create mode 100644 drivers/platform/chrome/cros_ec_pd_sysfs.c
 
 diff --git a/drivers/platform/chrome/Makefile b/drivers/platform/chrome/Makefile
@@ -535,10 +538,18 @@ index 56a95ada5318..5d0e1fe6e805 100644
  MODULE_DESCRIPTION("ChromeOS power device FW update driver");
  MODULE_ALIAS("platform:" DRV_NAME);
 diff --git a/include/linux/platform_data/cros_ec_pd_update.h b/include/linux/platform_data/cros_ec_pd_update.h
-index 53366789e4b2..a2f6acc68ffc 100644
+index dce39e2752b8..6eebe13f4fc2 100644
 --- a/include/linux/platform_data/cros_ec_pd_update.h
 +++ b/include/linux/platform_data/cros_ec_pd_update.h
-@@ -82,4 +82,35 @@ enum cros_ec_pd_find_update_firmware_result {
+@@ -16,6 +16,7 @@
+ #ifndef __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H
+ #define __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H
+ 
++#include <linux/mfd/cros_ec.h>
+ #include <linux/mfd/cros_ec_commands.h>
+ #include <linux/workqueue.h>
+ #include <linux/notifier.h>
+@@ -84,4 +85,35 @@ enum cros_ec_pd_find_update_firmware_result {
   */
  #define PD_UPDATE_CHECK_DELAY msecs_to_jiffies(2000)
  
@@ -575,5 +586,5 @@ index 53366789e4b2..a2f6acc68ffc 100644
 +
  #endif  /* __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 
