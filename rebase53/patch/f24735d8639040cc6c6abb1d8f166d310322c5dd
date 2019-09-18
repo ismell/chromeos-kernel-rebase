@@ -1,4 +1,4 @@
-From c12fa1259602ef7c8b7d37d8aec88393515e46d7 Mon Sep 17 00:00:00 2001
+From 5316981923fd2460826e6992752a27a588ada628 Mon Sep 17 00:00:00 2001
 From: Douglas Anderson <dianders@chromium.org>
 Date: Mon, 8 Apr 2019 13:28:51 -0700
 Subject: [PATCH] CHROMIUM: ARM: rockchip: pm: Support deep suspend
@@ -44,7 +44,11 @@ Signed-off-by: Douglas Anderson <dianders@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/1570555
 Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+	* Context conflict
+	* arch_counter_get_cntpct renamed in
+	  0ea415390cd345b7d09e8c9ebd4b68adfe873043
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  arch/arm/mach-rockchip/Makefile               |   4 +-
@@ -954,7 +958,7 @@ index 000000000000..8e87f4665090
 +#endif /* __MACH_ROCKCHIP_RK3288_RESUME_EMBEDDED_H */
 diff --git a/arch/arm/mach-rockchip/embedded/sram_delay.h b/arch/arm/mach-rockchip/embedded/sram_delay.h
 new file mode 100644
-index 000000000000..dd237e6bff1d
+index 000000000000..5bd0dc81012b
 --- /dev/null
 +++ b/arch/arm/mach-rockchip/embedded/sram_delay.h
 @@ -0,0 +1,38 @@
@@ -990,8 +994,8 @@ index 000000000000..dd237e6bff1d
 +	u32 to_wait = ARCH_TIMER_TICKS_PER_US * us;
 +
 +	/* Note: u32 math is way more than enough for our small delays */
-+	orig = (u32) arch_counter_get_cntpct();
-+	while ((u32) arch_counter_get_cntpct() - orig <= to_wait)
++	orig = (u32) __arch_counter_get_cntpct();
++	while ((u32) __arch_counter_get_cntpct() - orig <= to_wait)
 +		;
 +}
 +
@@ -1971,5 +1975,5 @@ index 000000000000..72d36dc789bc
 +};
 +#endif
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

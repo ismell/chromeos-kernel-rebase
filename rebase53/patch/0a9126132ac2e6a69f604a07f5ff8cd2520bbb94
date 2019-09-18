@@ -1,4 +1,4 @@
-From ea3781fb0739b6e4b4ffaab198835766764f44e4 Mon Sep 17 00:00:00 2001
+From bbee818b35009df745f2fc8669b31bfb8e50bcfd Mon Sep 17 00:00:00 2001
 From: Andrew Bresticker <abrestic@chromium.org>
 Date: Fri, 22 Jan 2016 13:28:27 -0800
 Subject: [PATCH] CHROMIUM: ARM64: Define compat syscall numbers
@@ -20,17 +20,22 @@ Commit-Ready: Douglas Anderson <dianders@chromium.org>
 Tested-by: Douglas Anderson <dianders@chromium.org>
 Reviewed-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+	* Context conflict
+	* __NR_compat_clock_getres was already defined by
+	  53c489e1dfeb6092b9fb14eb73c2cbcb07224798. It has a different
+	  syscall number though.
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
- arch/arm64/include/asm/unistd.h | 336 ++++++++++++++++++++++++++++++++
- 1 file changed, 336 insertions(+)
+ arch/arm64/include/asm/unistd.h | 335 ++++++++++++++++++++++++++++++++
+ 1 file changed, 335 insertions(+)
 
 diff --git a/arch/arm64/include/asm/unistd.h b/arch/arm64/include/asm/unistd.h
-index 2629a68b8724..13d55e82830c 100644
+index 2629a68b8724..552f876e476e 100644
 --- a/arch/arm64/include/asm/unistd.h
 +++ b/arch/arm64/include/asm/unistd.h
-@@ -20,13 +20,349 @@
+@@ -20,13 +20,348 @@
   */
  #define __NR_compat_restart_syscall	0
  #define __NR_compat_exit		1
@@ -251,7 +256,6 @@ index 2629a68b8724..13d55e82830c 100644
 +#define __NR_compat_timer_delete	261
 +#define __NR_compat_clock_settime	262
  #define __NR_compat_clock_gettime	263
-+#define __NR_compat_clock_getres	264
 +#define __NR_compat_clock_nanosleep	265
 +#define __NR_compat_statfs64		266
 +#define __NR_compat_fstatfs64		267
@@ -381,5 +385,5 @@ index 2629a68b8724..13d55e82830c 100644
  #define __NR_compat_clock_getres_time64	406
  
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

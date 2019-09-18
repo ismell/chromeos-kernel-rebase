@@ -1,0 +1,99 @@
+From cfff3f5bdf8a8a1f6c0406792fdcf6d42ce0c480 Mon Sep 17 00:00:00 2001
+From: Hsin-Yi Wang <hsinyi@chromium.org>
+Date: Thu, 18 Jul 2019 17:39:02 +0800
+Subject: [PATCH] FIXUP: FROMLIST: drm/bridge: Add I2C based driver for ps8640
+ bridge
+
+1. Add some fix (eg. change function name, return type), so it's compatible to 4.19 kernel.
+2. Make sure panel is not null and is in valid address.
+
+BUG=b:136688331
+TEST=test with ps8640 series
+
+Change-Id: Ic77bf7a8dda7b22a75000d4740c8084ea251d0cd
+Signed-off-by: Hsin-Yi Wang <hsinyi@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1714690
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase53(rrangel):
+	* drivers/gpu/drm/bridge/parade-ps8640.c:
+	  Added drm/drm_probe_helper.h
+]
+---
+ drivers/gpu/drm/bridge/parade-ps8640.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/gpu/drm/bridge/parade-ps8640.c b/drivers/gpu/drm/bridge/parade-ps8640.c
+index 2d9c337bee14..6e9a55435556 100644
+--- a/drivers/gpu/drm/bridge/parade-ps8640.c
++++ b/drivers/gpu/drm/bridge/parade-ps8640.c
+@@ -22,11 +22,12 @@
+ #include <asm/unaligned.h>
+ #include <drm/drm_panel.h>
+ 
+-#include <drmP.h>
+-#include <drm_atomic_helper.h>
+-#include <drm_crtc_helper.h>
+-#include <drm_edid.h>
+-#include <drm_mipi_dsi.h>
++#include <drm/drmP.h>
++#include <drm/drm_atomic_helper.h>
++#include <drm/drm_crtc_helper.h>
++#include <drm/drm_probe_helper.h>
++#include <drm/drm_edid.h>
++#include <drm/drm_mipi_dsi.h>
+ 
+ #define PAGE1_VSTART		0x6b
+ #define PAGE2_SPI_CFG3		0x82
+@@ -367,7 +368,7 @@ static int ps8640_get_modes(struct drm_connector *connector)
+ 		goto out;
+ 
+ 	ps_bridge->edid = edid;
+-	drm_mode_connector_update_edid_property(connector, ps_bridge->edid);
++	drm_connector_update_edid_property(connector, ps_bridge->edid);
+ 	num_modes = drm_add_edid_modes(connector, ps_bridge->edid);
+ 
+ out:
+@@ -388,7 +389,7 @@ static enum drm_connector_status ps8640_detect(struct drm_connector *connector,
+ }
+ 
+ static const struct drm_connector_funcs ps8640_connector_funcs = {
+-	.dpms = drm_atomic_helper_connector_dpms,
++	.dpms = drm_helper_connector_dpms,
+ 	.fill_modes = drm_helper_probe_single_connector_modes,
+ 	.detect = ps8640_detect,
+ 	.reset = drm_atomic_helper_connector_reset,
+@@ -422,7 +423,7 @@ int ps8640_bridge_attach(struct drm_bridge *bridge)
+ 				 &ps8640_connector_helper_funcs);
+ 
+ 	ps_bridge->connector.dpms = DRM_MODE_DPMS_ON;
+-	drm_mode_connector_attach_encoder(&ps_bridge->connector,
++	drm_connector_attach_encoder(&ps_bridge->connector,
+ 					  bridge->encoder);
+ 
+ 	if (ps_bridge->panel)
+@@ -939,7 +940,7 @@ static int ps8640_probe(struct i2c_client *client,
+ 	if (panel_node) {
+ 		ps_bridge->panel = of_drm_find_panel(panel_node);
+ 		of_node_put(panel_node);
+-		if (!ps_bridge->panel)
++		if (IS_ERR_OR_NULL(ps_bridge->panel))
+ 			return -EPROBE_DEFER;
+ 	}
+ 
+@@ -1022,11 +1023,7 @@ static int ps8640_probe(struct i2c_client *client,
+ 		goto exit_remove_sysfs;
+ 	}
+ 
+-	ret = drm_bridge_add(&ps_bridge->bridge);
+-	if (ret) {
+-		dev_err(dev, "Failed to add bridge: %d\n", ret);
+-		goto exit_remove_sysfs;
+-	}
++	drm_bridge_add(&ps_bridge->bridge);
+ 	return 0;
+ 
+ exit_remove_sysfs:
+-- 
+2.23.0.351.gc4317032e6-goog
+

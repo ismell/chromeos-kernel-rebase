@@ -1,4 +1,4 @@
-From d57ad899d4a18e6d0c8cc14cbc138f3f11350a23 Mon Sep 17 00:00:00 2001
+From 8432a6f5493cf6ef9f5118cb64fb62e701bd5360 Mon Sep 17 00:00:00 2001
 From: Luigi Semenzato <semenzato@chromium.org>
 Date: Tue, 28 May 2019 11:44:10 -0700
 Subject: [PATCH] CHROMIUM: fix pgmajfault names in dfl_cftypes
@@ -18,6 +18,7 @@ Conflicts:
 
 [rebase53(rrangel):
 	* Context Conflicts
+	* acc.events was replaced by memcg_events
 ]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
@@ -25,7 +26,7 @@ Signed-off-by: Raul E Rangel <rrangel@chromium.org>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index bc1661b45fa8..4254690f69f4 100644
+index bc1661b45fa8..19ce24c10191 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
 @@ -1457,9 +1457,9 @@ static char *memory_stat_format(struct mem_cgroup *memcg)
@@ -35,12 +36,12 @@ index bc1661b45fa8..4254690f69f4 100644
 -	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_S]);
 -	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_A]);
 -	seq_buf_printf(&s, "pgmajfault %lu\n", acc.events[PGMAJFAULT_F]);
-+	seq_buf_printf(&s, "pgmajfault_s %lu\n", acc.events[PGMAJFAULT_S]);
-+	seq_buf_printf(&s, "pgmajfault_a %lu\n", acc.events[PGMAJFAULT_A]);
-+	seq_buf_printf(&s, "pgmajfault_f %lu\n", acc.events[PGMAJFAULT_F]);
++	seq_buf_printf(&s, "pgmajfault_s %lu\n", memcg_events(memcg, PGMAJFAULT_S));
++	seq_buf_printf(&s, "pgmajfault_a %lu\n", memcg_events(memcg, PGMAJFAULT_A));
++	seq_buf_printf(&s, "pgmajfault_f %lu\n", memcg_events(memcg, PGMAJFAULT_F));
  
  	seq_buf_printf(&s, "workingset_refault %lu\n",
  		       memcg_page_state(memcg, WORKINGSET_REFAULT));
 -- 
-2.23.0.162.g0b9fbb3734-goog
+2.23.0.351.gc4317032e6-goog
 

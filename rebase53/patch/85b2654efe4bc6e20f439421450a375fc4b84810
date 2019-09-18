@@ -1,4 +1,4 @@
-From cfb466f6ed3a2558527e97ebefa27ff1413eefe5 Mon Sep 17 00:00:00 2001
+From fccda1bf8126ba77bc5354d7aa160f0e89437954 Mon Sep 17 00:00:00 2001
 From: Gwendal Grignou <gwendal@chromium.org>
 Date: Fri, 7 Jun 2019 14:57:56 -0700
 Subject: [PATCH] CHROMIUM: mfd / platform: cros_ec: Move pd update sysfs to
@@ -29,7 +29,10 @@ Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
 Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1652004
 Reviewed-by: Benson Leung <bleung@google.com>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+	* Context conflict
+	* Added missing include
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  ...sfs-class-chromeos-driver-cros-ec-pd-sysfs |  10 +
@@ -39,11 +42,11 @@ Signed-off-by: Raul E Rangel <rrangel@chromium.org>
  drivers/platform/chrome/Kconfig               |  11 ++
  drivers/platform/chrome/Makefile              |   1 +
  .../chrome}/cros_ec_pd_update.c               | 173 +++++++++++-------
- .../cros_ec_pd_update.h                       |   6 +-
- 8 files changed, 134 insertions(+), 80 deletions(-)
+ .../cros_ec_pd_update.h                       |   8 +-
+ 8 files changed, 136 insertions(+), 80 deletions(-)
  create mode 100644 Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs
  rename drivers/{mfd => platform/chrome}/cros_ec_pd_update.c (95%)
- rename include/linux/{mfd => platform_data}/cros_ec_pd_update.h (93%)
+ rename include/linux/{mfd => platform_data}/cros_ec_pd_update.h (91%)
 
 diff --git a/Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs b/Documentation/ABI/testing/sysfs-class-chromeos-driver-cros-ec-pd-sysfs
 new file mode 100644
@@ -345,13 +348,13 @@ index dfc6c9c0b0da..56a95ada5318 100644
  MODULE_DESCRIPTION("ChromeOS power device FW update driver");
 +MODULE_ALIAS("platform:" DRV_NAME);
 diff --git a/include/linux/mfd/cros_ec_pd_update.h b/include/linux/platform_data/cros_ec_pd_update.h
-similarity index 93%
+similarity index 91%
 rename from include/linux/mfd/cros_ec_pd_update.h
 rename to include/linux/platform_data/cros_ec_pd_update.h
-index 88d177fe15ab..53366789e4b2 100644
+index 88d177fe15ab..dce39e2752b8 100644
 --- a/include/linux/mfd/cros_ec_pd_update.h
 +++ b/include/linux/platform_data/cros_ec_pd_update.h
-@@ -13,8 +13,8 @@
+@@ -13,10 +13,12 @@
   * GNU General Public License for more details.
   */
  
@@ -361,13 +364,17 @@ index 88d177fe15ab..53366789e4b2 100644
 +#define __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H
  
  #include <linux/mfd/cros_ec_commands.h>
++#include <linux/workqueue.h>
++#include <linux/notifier.h>
  
-@@ -82,4 +82,4 @@ enum cros_ec_pd_find_update_firmware_result {
+ enum cros_ec_pd_device_type {
+ 	PD_DEVICE_TYPE_NONE = 0,
+@@ -82,4 +84,4 @@ enum cros_ec_pd_find_update_firmware_result {
   */
  #define PD_UPDATE_CHECK_DELAY msecs_to_jiffies(2000)
  
 -#endif /* __LINUX_MFD_CROS_EC_H */
 +#endif  /* __LINUX_PLATFORM_DATA_CROS_EC_SENSORHUB_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

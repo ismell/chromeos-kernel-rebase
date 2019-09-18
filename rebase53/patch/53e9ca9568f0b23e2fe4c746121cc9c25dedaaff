@@ -1,4 +1,4 @@
-From 0f79745257bc17e5527f044f5c928926381bf854 Mon Sep 17 00:00:00 2001
+From 7bc03156bbcfc2a952c6dcb2e477533fd90c4527 Mon Sep 17 00:00:00 2001
 From: Zach Reizner <zachr@google.com>
 Date: Mon, 14 Aug 2017 17:16:55 -0700
 Subject: [PATCH] CHROMIUM: virtwl: add virtwl driver
@@ -25,16 +25,19 @@ Conflicts:
 	kernel API change: sys_close -> ksys_close]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+	* Context conflict
+	* access_ok only takes 2 args now.
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/virtio/Kconfig          |    8 +
  drivers/virtio/Makefile         |    1 +
- drivers/virtio/virtio_wl.c      | 1208 +++++++++++++++++++++++++++++++
+ drivers/virtio/virtio_wl.c      | 1206 +++++++++++++++++++++++++++++++
  include/uapi/linux/virtio_ids.h |    1 +
  include/uapi/linux/virtio_wl.h  |   87 +++
  include/uapi/linux/virtwl.h     |   43 ++
- 6 files changed, 1348 insertions(+)
+ 6 files changed, 1346 insertions(+)
  create mode 100644 drivers/virtio/virtio_wl.c
  create mode 100644 include/uapi/linux/virtio_wl.h
  create mode 100644 include/uapi/linux/virtwl.h
@@ -67,10 +70,10 @@ index 3a2b5c5dcf46..d867b979485c 100644
 +obj-$(CONFIG_VIRTIO_WL) += virtio_wl.o
 diff --git a/drivers/virtio/virtio_wl.c b/drivers/virtio/virtio_wl.c
 new file mode 100644
-index 000000000000..1794f5b1ca15
+index 000000000000..b3545043657a
 --- /dev/null
 +++ b/drivers/virtio/virtio_wl.c
-@@ -0,0 +1,1208 @@
+@@ -0,0 +1,1206 @@
 +/*
 + *  Wayland Virtio Driver
 + *  Copyright (C) 2017 Google, Inc.
@@ -970,7 +973,7 @@ index 000000000000..1794f5b1ca15
 +		return -EFAULT;
 +
 +	/* Early check for user error; do_send still uses copy_from_user. */
-+	ret = !access_ok(VERIFY_READ, user_data, ioctl_send.len);
++	ret = !access_ok(user_data, ioctl_send.len);
 +	if (ret)
 +		return -EFAULT;
 +
@@ -1000,7 +1003,7 @@ index 000000000000..1794f5b1ca15
 +		return -EFAULT;
 +
 +	/* Early check for user error. */
-+	ret = !access_ok(VERIFY_WRITE, user_data, ioctl_recv.len);
++	ret = !access_ok(user_data, ioctl_recv.len);
 +	if (ret)
 +		return -EFAULT;
 +
@@ -1107,11 +1110,9 @@ index 000000000000..1794f5b1ca15
 +		return -ENOTTY;
 +
 +	if (_IOC_DIR(cmd) & _IOC_READ) {
-+		err = !access_ok(VERIFY_WRITE, (void __user *)arg,
-+				 _IOC_SIZE(cmd));
++		err = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
 +	} else if (_IOC_DIR(cmd) & _IOC_WRITE) {
-+		err = !access_ok(VERIFY_READ, (void __user *)arg,
-+				 _IOC_SIZE(cmd));
++		err = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
 +	}
 +
 +	if (err)
@@ -1433,5 +1434,5 @@ index 000000000000..cde61c081ccc
 +
 +#endif /* _LINUX_VIRTWL_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

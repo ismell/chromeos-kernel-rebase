@@ -1,4 +1,4 @@
-From 817b5638a54389eabeb4aee0f3a46c1a84feeabb Mon Sep 17 00:00:00 2001
+From 9e90ff1204a25a6b7ae30b79eac72cc26476675b Mon Sep 17 00:00:00 2001
 From: Owen Chen <owen.chen@mediatek.com>
 Date: Wed, 9 May 2018 16:22:51 +0800
 Subject: [PATCH] FROMLIST: soc: mediatek: add new flow for mtcmos power.
@@ -41,14 +41,17 @@ Reviewed-on: https://chromium-review.googlesource.com/1354762
 Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
 Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
 
-[rebase53(rrangel): SPDX header conflict]
+[rebase53(rrangel):
+	* SPDX header conflict.
+	* Add missing includes.
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/soc/mediatek/Makefile           |   2 +-
  drivers/soc/mediatek/mtk-scpsys-ext.c   |  99 +++++++
  drivers/soc/mediatek/mtk-scpsys.c       | 360 +++++++++++++++++++-----
- include/linux/soc/mediatek/scpsys-ext.h |  39 +++
- 4 files changed, 424 insertions(+), 76 deletions(-)
+ include/linux/soc/mediatek/scpsys-ext.h |  42 +++
+ 4 files changed, 427 insertions(+), 76 deletions(-)
  create mode 100644 drivers/soc/mediatek/mtk-scpsys-ext.c
  create mode 100644 include/linux/soc/mediatek/scpsys-ext.h
 
@@ -668,13 +671,16 @@ index 503222d0d0da..9cb78f6cce1b 100644
  		genpd->name = data->name;
 diff --git a/include/linux/soc/mediatek/scpsys-ext.h b/include/linux/soc/mediatek/scpsys-ext.h
 new file mode 100644
-index 000000000000..d0ed295c88a7
+index 000000000000..1b96833135d4
 --- /dev/null
 +++ b/include/linux/soc/mediatek/scpsys-ext.h
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,42 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +#ifndef __SOC_MEDIATEK_SCPSYS_EXT_H
 +#define __SOC_MEDIATEK_SCPSYS_EXT_H
++
++#include <linux/regmap.h>
++#include <linux/types.h>
 +
 +#define MAX_STEPS	4
 +
@@ -712,5 +718,5 @@ index 000000000000..d0ed295c88a7
 +
 +#endif /* __SOC_MEDIATEK_SCPSYS_EXT_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

@@ -38,7 +38,7 @@ new file mode 100644
 index 000000000000..44f459612690
 --- /dev/null
 +++ b/include/linux/selinux.h
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,37 @@
 +/*
 + * SELinux services exported to the rest of the kernel.
 + *

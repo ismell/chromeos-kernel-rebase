@@ -1,0 +1,222 @@
+From 69bc6fb31eceae7326563f457fb0eb5675efb07d Mon Sep 17 00:00:00 2001
+From: Mark Yao <yzq@rock-chips.com>
+Date: Wed, 8 Oct 2014 17:11:15 +0800
+Subject: [PATCH] CHROMIUM: drm/rockchip: Add GEM create ioctl support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Rockchip Socs have GPU, we need allocate GPU accelerated buffers.
+So add special ioctls GEM_CREATE/GEM_MAP_OFFSET to support
+accelerated buffers.
+
+Signed-off-by: Mark Yao <mark.yao@rock-chips.com>
+
+BUG=chromium:941638
+TEST=With rest of patch set, can boot to UI on eDP
+
+Reviewed-on: https://chromium-review.googlesource.com/222153
+Reviewed-by: Daniel Kurtz <djkurtz@chromium.org>
+Tested-by: Daniel Kurtz <djkurtz@chromium.org>
+Commit-Queue: Daniel Kurtz <djkurtz@chromium.org>
+Conflicts:
+	drivers/gpu/drm/rockchip/rockchip_drm_drv.c
+(cherry picked from cros/chromeos-3.14 commit c29c5a3037e18815937d8af664738e499ada94d1)
+Signed-off-by: ZhengShunQian <zhengsq@rock-chips.com>
+
+Reviewed-on: https://chromium-review.googlesource.com/346321
+Commit-Ready: Yakir Yang <ykk@rock-chips.com>
+Tested-by: Yakir Yang <ykk@rock-chips.com>
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+
+Change-Id: I2fb5a2011c973bbab16b47713754de44cfa0252f
+Conflicts:
+	drivers/gpu/drm/rockchip/rockchip_drm_gem.h
+[dianders: Fixed to account for commit 8cfd4f5de496 ("drm/rockchip:
+ Use .dumb_map_offset and .dumb_destroy defaults") upstream]; also
+ removed 2nd copy of rockchip_gem_map_offset_ioctl prototype; use SPDX
+ header now too]
+(cherry picked from commit a6c56450f406dc75a3be59724cefd6075244fb15)
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1538897
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+
+[rebase53(rrangel):
+	* Fixed license header.
+	* Add missing include
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/gpu/drm/rockchip/rockchip_drm_drv.c | 12 +++++
+ drivers/gpu/drm/rockchip/rockchip_drm_gem.c | 21 ++++++++
+ drivers/gpu/drm/rockchip/rockchip_drm_gem.h | 13 +++++
+ include/uapi/drm/rockchip_drm.h             | 59 +++++++++++++++++++++
+ 4 files changed, 105 insertions(+)
+ create mode 100644 include/uapi/drm/rockchip_drm.h
+
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_drv.c b/drivers/gpu/drm/rockchip/rockchip_drm_drv.c
+index 53d2c5bd61dc..7e5ceb585ffe 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_drv.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_drv.c
+@@ -21,6 +21,8 @@
+ #include <linux/console.h>
+ #include <linux/iommu.h>
+ 
++#include <drm/rockchip_drm.h>
++
+ #include "rockchip_drm_drv.h"
+ #include "rockchip_drm_fb.h"
+ #include "rockchip_drm_fbdev.h"
+@@ -200,6 +202,14 @@ static void rockchip_drm_unbind(struct device *dev)
+ 	drm_dev_put(drm_dev);
+ }
+ 
++static const struct drm_ioctl_desc rockchip_ioctls[] = {
++	DRM_IOCTL_DEF_DRV(ROCKCHIP_GEM_CREATE, rockchip_gem_create_ioctl,
++			  DRM_UNLOCKED | DRM_AUTH),
++	DRM_IOCTL_DEF_DRV(ROCKCHIP_GEM_MAP_OFFSET,
++			  rockchip_gem_map_offset_ioctl,
++			  DRM_UNLOCKED | DRM_AUTH),
++};
++
+ static const struct file_operations rockchip_drm_driver_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open = drm_open,
+@@ -227,6 +237,8 @@ static struct drm_driver rockchip_drm_driver = {
+ 	.gem_prime_vmap		= rockchip_gem_prime_vmap,
+ 	.gem_prime_vunmap	= rockchip_gem_prime_vunmap,
+ 	.gem_prime_mmap		= rockchip_gem_mmap_buf,
++	.ioctls			= rockchip_ioctls,
++	.num_ioctls		= ARRAY_SIZE(rockchip_ioctls),
+ 	.fops			= &rockchip_drm_driver_fops,
+ 	.name	= DRIVER_NAME,
+ 	.desc	= DRIVER_DESC,
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_gem.c b/drivers/gpu/drm/rockchip/rockchip_drm_gem.c
+index ba9e77acbe16..aabe05f04446 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_gem.c
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_gem.c
+@@ -8,6 +8,7 @@
+ #include <drm/drmP.h>
+ #include <drm/drm_gem.h>
+ #include <drm/drm_vma_manager.h>
++#include <drm/rockchip_drm.h>
+ 
+ #include <linux/dma-buf.h>
+ #include <linux/iommu.h>
+@@ -427,6 +428,26 @@ int rockchip_gem_dumb_create(struct drm_file *file_priv,
+ 	return PTR_ERR_OR_ZERO(rk_obj);
+ }
+ 
++int rockchip_gem_map_offset_ioctl(struct drm_device *drm, void *data,
++				  struct drm_file *file_priv)
++{
++	struct drm_rockchip_gem_map_off *args = data;
++
++	return drm_gem_dumb_map_offset(file_priv, drm, args->handle,
++				       &args->offset);
++}
++
++int rockchip_gem_create_ioctl(struct drm_device *dev, void *data,
++			      struct drm_file *file_priv)
++{
++	struct drm_rockchip_gem_create *args = data;
++	struct rockchip_gem_object *rk_obj;
++
++	rk_obj = rockchip_gem_create_with_handle(file_priv, dev, args->size,
++						 &args->handle);
++	return PTR_ERR_OR_ZERO(rk_obj);
++}
++
+ /*
+  * Allocate a sg_table for this GEM object.
+  * Note: Both the table's contents, and the sg_table itself must be freed by
+diff --git a/drivers/gpu/drm/rockchip/rockchip_drm_gem.h b/drivers/gpu/drm/rockchip/rockchip_drm_gem.h
+index 7ffc541bea07..87fe58b05bf6 100644
+--- a/drivers/gpu/drm/rockchip/rockchip_drm_gem.h
++++ b/drivers/gpu/drm/rockchip/rockchip_drm_gem.h
+@@ -50,4 +50,17 @@ void rockchip_gem_free_object(struct drm_gem_object *obj);
+ int rockchip_gem_dumb_create(struct drm_file *file_priv,
+ 			     struct drm_device *dev,
+ 			     struct drm_mode_create_dumb *args);
++
++/*
++ * request gem object creation and buffer allocation as the size
++ * that it is calculated with framebuffer information such as width,
++ * height and bpp.
++ */
++int rockchip_gem_create_ioctl(struct drm_device *dev, void *data,
++			      struct drm_file *file_priv);
++
++/* get buffer offset to map to user space. */
++int rockchip_gem_map_offset_ioctl(struct drm_device *dev, void *data,
++				  struct drm_file *file_priv);
++
+ #endif /* _ROCKCHIP_DRM_GEM_H */
+diff --git a/include/uapi/drm/rockchip_drm.h b/include/uapi/drm/rockchip_drm.h
+new file mode 100644
+index 000000000000..b42fad3a6739
+--- /dev/null
++++ b/include/uapi/drm/rockchip_drm.h
+@@ -0,0 +1,59 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++
++/*
++ * Copyright (c) Fuzhou Rockchip Electronics Co.Ltd
++ * Authors:
++ *       Mark Yao <yzq@rock-chips.com>
++ *
++ * base on exynos_drm.h
++ */
++
++#ifndef _UAPI_ROCKCHIP_DRM_H
++#define _UAPI_ROCKCHIP_DRM_H
++
++#include <drm/drm.h>
++
++#ifdef __KERNEL__
++#include <linux/types.h>
++#else
++#include <stdint.h>
++#endif
++
++/**
++ * User-desired buffer creation information structure.
++ *
++ * @size: user-desired memory allocation size.
++ * @flags: user request for setting memory type or cache attributes.
++ * @handle: returned a handle to created gem object.
++ *     - this handle will be set by gem module of kernel side.
++ */
++struct drm_rockchip_gem_create {
++	uint64_t size;
++	uint32_t flags;
++	uint32_t handle;
++};
++
++/**
++ * A structure for getting buffer offset.
++ *
++ * @handle: a pointer to gem object created.
++ * @pad: just padding to be 64-bit aligned.
++ * @offset: relatived offset value of the memory region allocated.
++ *     - this value should be set by user.
++ */
++struct drm_rockchip_gem_map_off {
++	uint32_t handle;
++	uint32_t pad;
++	uint64_t offset;
++};
++
++#define DRM_ROCKCHIP_GEM_CREATE		0x00
++#define DRM_ROCKCHIP_GEM_MAP_OFFSET	0x01
++
++#define DRM_IOCTL_ROCKCHIP_GEM_CREATE	DRM_IOWR(DRM_COMMAND_BASE + \
++		DRM_ROCKCHIP_GEM_CREATE, struct drm_rockchip_gem_create)
++
++#define DRM_IOCTL_ROCKCHIP_GEM_MAP_OFFSET	DRM_IOWR(DRM_COMMAND_BASE + \
++		DRM_ROCKCHIP_GEM_MAP_OFFSET, struct drm_rockchip_gem_map_off)
++
++#endif /* _UAPI_ROCKCHIP_DRM_H */
+-- 
+2.23.0.351.gc4317032e6-goog
+

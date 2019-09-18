@@ -1,4 +1,4 @@
-From 62177897bf456b08525070c40c74ff7313c86b25 Mon Sep 17 00:00:00 2001
+From 7f21658a23f8bb84c129f647d61cd89e001b60eb Mon Sep 17 00:00:00 2001
 From: CK Hu <ck.hu@mediatek.com>
 Date: Tue, 12 Jan 2016 16:15:50 +0100
 Subject: [PATCH] CHROMIUM: drm/mediatek: Add interface to allocate Mediatek
@@ -27,22 +27,31 @@ Commit-Ready: Nicolas Boichat <drinkcat@chromium.org>
 Tested-by: Pi-Hsun Shih <pihsun@chromium.org>
 
 [rebase53(rrangel):
-	drm_gem_object_unreference_unlocked was deprecated and replaced with drm_gem_object_put_unlocked
+	* drm_gem_object_unreference_unlocked was deprecated and replaced with drm_gem_object_put_unlocked
+	* Add missing includes
 ]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
- drivers/gpu/drm/mediatek/mtk_drm_drv.c | 12 +++++-
- drivers/gpu/drm/mediatek/mtk_drm_gem.c | 39 +++++++++++++++++
- drivers/gpu/drm/mediatek/mtk_drm_gem.h | 12 ++++++
- include/uapi/drm/mediatek_drm.h        | 59 ++++++++++++++++++++++++++
- 4 files changed, 121 insertions(+), 1 deletion(-)
+ drivers/gpu/drm/mediatek/mtk_drm_drv.c | 13 +++++-
+ drivers/gpu/drm/mediatek/mtk_drm_gem.c | 39 ++++++++++++++++
+ drivers/gpu/drm/mediatek/mtk_drm_gem.h | 12 +++++
+ include/uapi/drm/mediatek_drm.h        | 65 ++++++++++++++++++++++++++
+ 4 files changed, 128 insertions(+), 1 deletion(-)
  create mode 100644 include/uapi/drm/mediatek_drm.h
 
 diff --git a/drivers/gpu/drm/mediatek/mtk_drm_drv.c b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
-index f4ae858dd017..110aa5da241d 100644
+index 4397e3a4822d..1ce2943750e0 100644
 --- a/drivers/gpu/drm/mediatek/mtk_drm_drv.c
 +++ b/drivers/gpu/drm/mediatek/mtk_drm_drv.c
-@@ -338,6 +338,14 @@ static void mtk_drm_kms_deinit(struct drm_device *drm)
+@@ -12,6 +12,7 @@
+ #include <drm/drm_gem_cma_helper.h>
+ #include <drm/drm_of.h>
+ #include <drm/drm_probe_helper.h>
++#include <drm/mediatek_drm.h>
+ #include <linux/component.h>
+ #include <linux/iommu.h>
+ #include <linux/of_address.h>
+@@ -369,6 +370,14 @@ static void mtk_drm_kms_deinit(struct drm_device *drm)
  	drm_mode_config_cleanup(drm);
  }
  
@@ -57,7 +66,7 @@ index f4ae858dd017..110aa5da241d 100644
  static const struct file_operations mtk_drm_fops = {
  	.owner = THIS_MODULE,
  	.open = drm_open,
-@@ -351,7 +359,7 @@ static const struct file_operations mtk_drm_fops = {
+@@ -394,7 +403,7 @@ struct drm_gem_object *mtk_drm_gem_prime_import(struct drm_device *dev,
  
  static struct drm_driver mtk_drm_driver = {
  	.driver_features = DRIVER_MODESET | DRIVER_GEM | DRIVER_PRIME |
@@ -66,7 +75,7 @@ index f4ae858dd017..110aa5da241d 100644
  
  	.gem_free_object_unlocked = mtk_drm_gem_free_object,
  	.gem_vm_ops = &drm_gem_cma_vm_ops,
-@@ -366,6 +374,8 @@ static struct drm_driver mtk_drm_driver = {
+@@ -409,6 +418,8 @@ static struct drm_driver mtk_drm_driver = {
  	.gem_prime_mmap = mtk_drm_gem_mmap_buf,
  	.gem_prime_vmap = mtk_drm_gem_prime_vmap,
  	.gem_prime_vunmap = mtk_drm_gem_prime_vunmap,
@@ -155,10 +164,10 @@ index ff9f976d9807..e59cb8c7c2f6 100644
  #endif
 diff --git a/include/uapi/drm/mediatek_drm.h b/include/uapi/drm/mediatek_drm.h
 new file mode 100644
-index 000000000000..19ea357b5503
+index 000000000000..652070d70f8d
 --- /dev/null
 +++ b/include/uapi/drm/mediatek_drm.h
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,65 @@
 +/*
 + * Copyright (c) 2015 MediaTek Inc.
 + *
@@ -177,6 +186,12 @@ index 000000000000..19ea357b5503
 +#define _UAPI_MEDIATEK_DRM_H
 +
 +#include <drm/drm.h>
++
++#ifdef __KERNEL__
++#include <linux/types.h>
++#else
++#include <stdint.h>
++#endif
 +
 +/**
 + * User-desired buffer creation information structure.
@@ -219,5 +234,5 @@ index 000000000000..19ea357b5503
 +
 +#endif /* _UAPI_MEDIATEK_DRM_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

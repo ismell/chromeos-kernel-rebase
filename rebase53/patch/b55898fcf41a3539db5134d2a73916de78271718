@@ -1,4 +1,4 @@
-From 380f3528783b9ae8839873c64b35900d0e774e6e Mon Sep 17 00:00:00 2001
+From 2b7fff221755da909b21c38568e27ca1734aa14d Mon Sep 17 00:00:00 2001
 From: Gwendal Grignou <gwendal@chromium.org>
 Date: Wed, 3 Jan 2018 11:29:07 -0800
 Subject: [PATCH] CHROMIUM: iio: cros_ec: Add synchronization sensor
@@ -19,16 +19,20 @@ Reviewed-by: Alexandru M Stan <amstan@chromium.org>
 [rebase419(groeck): Kernel API changes]
 Signed-off-by: Guenter Roeck <groeck@chromium.org>
 
-[rebase53(rrangel): drivers/iio/counter has been moved to
-drivers/counter]
+[rebase53(rrangel):
+	* drivers/iio/counter has been moved to drivers/counter
+	* drivers/counter/cros_ec_sensors_sync.c:
+	  Applied change from iio: cros_ec: Add calibscale for 3d MEMS
+	  since it's now applied before this patch.
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/counter/Kconfig                       |  10 +
  drivers/counter/Makefile                      |   1 +
- drivers/counter/cros_ec_sensors_sync.c        | 178 ++++++++++++++++++
+ drivers/counter/cros_ec_sensors_sync.c        | 176 ++++++++++++++++++
  .../cros_ec_sensors/cros_ec_sensors_core.c    |   9 +
  drivers/mfd/cros_ec_dev.c                     |   3 +
- 5 files changed, 201 insertions(+)
+ 5 files changed, 199 insertions(+)
  create mode 100644 drivers/counter/cros_ec_sensors_sync.c
 
 diff --git a/drivers/counter/Kconfig b/drivers/counter/Kconfig
@@ -66,10 +70,10 @@ index 40d35522937d..6efd5e5f19c1 100644
  obj-$(CONFIG_FTM_QUADDEC)	+= ftm-quaddec.o
 diff --git a/drivers/counter/cros_ec_sensors_sync.c b/drivers/counter/cros_ec_sensors_sync.c
 new file mode 100644
-index 000000000000..2c34cc33951d
+index 000000000000..4d49c53b9f6c
 --- /dev/null
 +++ b/drivers/counter/cros_ec_sensors_sync.c
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,176 @@
 +/*
 + * cros_ec_sensors_sync - Driver for barometer sensor behind CrOS EC.
 + *
@@ -195,8 +199,6 @@ index 000000000000..2c34cc33951d
 +	channel->ext_info = cros_ec_sensors_ext_info;
 +	channel->scan_type.sign = 'u';
 +
-+	state->core.calib[0] = 0;
-+
 +	/* sensor specific */
 +	switch (state->core.type) {
 +	case MOTIONSENSE_TYPE_SYNC:
@@ -249,7 +251,7 @@ index 000000000000..2c34cc33951d
 +MODULE_DESCRIPTION("ChromeOS EC synchronisation sensor driver");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-index ce24ac2fff60..cb8d1a584403 100644
+index dc3273bbfab4..beb1fb172c71 100644
 --- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 @@ -28,6 +28,7 @@
@@ -290,5 +292,5 @@ index b5e3375f54a6..8742045d9de0 100644
  			dev_warn(ec->dev, "unknown type %d\n", resp->info.type);
  			continue;
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 
