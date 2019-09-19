@@ -1,0 +1,85 @@
+#!/bin/bash -e
+
+# Regenerate the patches for the current branch
+HAYSTACK_START=v4.19
+HAYSTACK_END=cros/chromeos-4.19
+REBASE_ID=rebase53
+
+HAYSTACK="${HAYSTACK_START}..${HAYSTACK_END}"
+
+DEST_DIR="$1"
+
+if [[ -z "$DEST_DIR" ]]; then
+  echo "Usage: <dest-dir>" >&2
+  exit 1
+fi
+
+CACHE_DIR="$(dirname "${BASH_SOURCE[0]}")"
+
+function get-patch-id() {
+  cat - | git patch-id --stable | cut -d\  -f 1
+}
+
+readarray -t PATCHED_COMMITS < <(
+  git rev-list --no-merges --regexp-ignore-case --fixed-strings \
+    --grep "${REBASE_ID}(" "@{upstream}..HEAD")
+
+for COMMIT_SHA in "${PATCHED_COMMITS[@]}"; do
+  echo "Processing $COMMIT_SHA"
+  msg="$(git show -s --format=%B "$COMMIT_SHA")"
+
+  readarray -t CHANGE_IDS < <(
+    sed -En -e 's/^Change-Id: ([A-Za-z0-9]+)$/\1/p' <<<"$msg")
+
+  if [[ "${#CHANGE_IDS[@]}" -ne 1 ]]; then
+    echo "Multiple Change-Ids found: ${CHANGE_IDS[*]}"
+    exit 1;
+  fi
+
+  CHANGE_ID="${CHANGE_IDS[0]}"
+
+  readarray -t ORIG_SHAS < <(
+    git rev-list --grep "^Change-Id: $CHANGE_ID" "$HAYSTACK")
+
+  ORIG_SHA=
+  if [[ "${#ORIG_SHAS[@]}" -eq 0 ]]; then
+    pushd "$CACHE_DIR/change-id" >/dev/null
+    readarray -t MATCHING_SHAS < <(grep -l "$CHANGE_ID" -- *)
+    popd >/dev/null
+
+    echo "Possible SHA(s) for $CHANGE_ID: ${MATCHING_SHAS[*]}"
+    for MATCHING_SHA in "${MATCHING_SHAS[@]}"; do
+      if git merge-base --is-ancestor "$MATCHING_SHA" "$HAYSTACK_END"; then
+        ORIG_SHA="${MATCHING_SHAS[0]}"
+        break
+      fi
+    done
+
+    if [[ -z "$ORIG_SHA" ]]; then
+      echo "Unable to lookup $CHANGE_ID in $HAYSTACK"
+      continue
+    fi
+  elif [[ "${#ORIG_SHAS[@]}" -eq 1 ]]; then
+    ORIG_SHA="${ORIG_SHAS[0]}"
+  else
+    echo "Found multiple commits for $CHANGE_ID: ${ORIG_SHAS[*]}"
+    exit 1
+  fi
+  echo "=> $ORIG_SHA"
+
+  if [[ -e "$DEST_DIR/$ORIG_SHA" ]]; then
+    OLD_PATCH_ID="$(get-patch-id < "$DEST_DIR/$ORIG_SHA")"
+
+    git format-patch -1 "$COMMIT_SHA" --stdout > "/tmp/$ORIG_SHA"
+    NEW_PATCH_ID="$(get-patch-id < "/tmp/$ORIG_SHA")"
+
+    if [[ "$OLD_PATCH_ID" = "$NEW_PATCH_ID" ]]; then
+      echo "Patches are identical, skipping"
+      rm "/tmp/$ORIG_SHA"
+    else
+      mv "/tmp/$ORIG_SHA" "$DEST_DIR/$ORIG_SHA"
+    fi
+  else
+    git format-patch -1 "$COMMIT_SHA" --stdout > "$DEST_DIR/$ORIG_SHA"
+  fi
+done

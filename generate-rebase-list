@@ -1,0 +1,1210 @@
+#!/bin/bash -e
+
+## START CONFIG
+
+# Used to limit the commits we look at
+# REBASE_START_POINT=v4.19.61
+# REBASE_END_POINT=4.19-extract
+# TARGET_BRANCH=android/android-mainline-tracking
+# REBASE_ID=rebase53
+
+# REBASE_START_POINT=v4.19
+# REBASE_END_POINT=cros/chromeos-4.19
+# TARGET_BRANCH=v4.19.61
+# REBASE_ID=rebase419
+
+REBASE_START_POINT=v4.19
+REBASE_END_POINT=cros/chromeos-4.19
+TARGET_BRANCH=android/android-mainline-tracking
+REBASE_ID=rebase53
+
+SKIP_ANDROID=1
+SKIP_IWL7000=1
+
+## END CONFIG
+
+REBASE_END_POINT_SHA="$(git rev-parse "$REBASE_END_POINT")"
+REBASE_START_POINT_SHA="$(git rev-parse "$REBASE_START_POINT")"
+TARGET_BRANCH_SHA="$(git rev-parse "$TARGET_BRANCH")"
+
+WORK_DIR="$(dirname "${BASH_SOURCE[0]}")"
+mkdir -p "$WORK_DIR/change-id"
+mkdir -p "$WORK_DIR/type"
+
+REBASE_DIR="$WORK_DIR/$REBASE_ID"
+mkdir -p "$REBASE_DIR"
+mkdir -p "$REBASE_DIR/orig"
+mkdir -p "$REBASE_DIR/patch"
+mkdir -p "$REBASE_DIR/pre"
+mkdir -p "$REBASE_DIR/skip"
+mkdir -p "$REBASE_DIR/log"
+mkdir -p "$REBASE_DIR/fixup"
+
+CACHE_DIR="$WORK_DIR/cache"
+mkdir -p "$CACHE_DIR"
+mkdir -p "$CACHE_DIR/msg"
+mkdir -p "$CACHE_DIR/patch-id"
+mkdir -p "$CACHE_DIR/commit"
+mkdir -p "$CACHE_DIR/squash"
+
+
+if ! git diff-index --quiet HEAD; then
+  echo "Working directory is dirty."
+  exit 1
+fi
+
+git checkout -q "$TARGET_BRANCH"
+LOCAL_BRANCH="$REBASE_ID-$(date +%F-%H)"
+if git rev-parse --quiet --verify "$LOCAL_BRANCH"; then
+		git branch -D "$LOCAL_BRANCH"
+fi
+git checkout -b "$LOCAL_BRANCH" "$TARGET_BRANCH"
+
+TARGET_CACHE="$CACHE_DIR/$(git rev-parse HEAD)"
+TARGET_CACHE="$CACHE_DIR/${REBASE_START_POINT_SHA}..${TARGET_BRANCH_SHA}/"
+mkdir -p "$TARGET_CACHE"
+
+SRC_CACHE="$CACHE_DIR/${REBASE_START_POINT_SHA}..${REBASE_END_POINT_SHA}/"
+mkdir -p "$SRC_CACHE"
+
+sp='/-\|'
+
+GITK_PIDS=()
+
+function kill-gitk() {
+	for pid in "${GITK_PIDS[@]}"
+	do
+		kill "$pid" >/dev/null || true
+
+		wait "$pid" >/dev/null || true
+	done
+	GITK_PIDS=()
+}
+
+function finish {
+	kill-gitk
+}
+
+trap finish EXIT
+
+function ctrl_c() {
+	local answer
+	echo "Are you sure you want to exit [Yes/No]?"
+	read -r answer
+	if [[ "$answer" == "Yes" ]]; then
+		exit 1
+	fi
+}
+
+trap ctrl_c INT
+
+
+# Returns 0 if $1 is an ancestor of HEAD
+function is-ancestor() {
+	if [[ -n "${ANCESTOR_COMMITS["$1"]}" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+function get-commit-path() {
+	local full_sha
+	if ! full_sha="$(git rev-parse "$1")"; then
+		return 1
+	fi
+
+	if [[ ! -e "${CACHE_DIR}/commit/${full_sha}" ]]; then
+		if ! git show "$full_sha" > "${CACHE_DIR}/commit/${full_sha}"; then
+			return 1
+		fi
+	fi
+	echo "${CACHE_DIR}/commit/${full_sha}"
+}
+
+# Returns the commit msg of $1
+function get-msg() {
+	if [[ ! -e "${CACHE_DIR}/msg/${1}" ]]; then
+		# Maybe use git show -s --format=%B
+		git show -s --format=%B "${1}" > "${CACHE_DIR}/msg/${1}"
+	fi
+
+	cat "${CACHE_DIR}/msg/${1}"
+}
+
+function get-subject() {
+	get-msg "$1" | head -n 1
+}
+
+function pause-script() {
+	echo "Pausing script, use fg to resume"
+	(kill -STOP $$)
+}
+
+function strip-fixup() {
+	sed -E -e 's/(FIXUP):\s*//g' <<< "$1"
+}
+
+function sanitize-subject() {
+	sed -E -e 's/(CHROMIUMOS|CHROMIUM|CHROMEOS|FROMLIST|UPSTREAM|FROMGIT|BACKPORT|ANDROID):\s*//g' <<< "$1"
+}
+
+function get-patch-id() {
+	if [[ ! -e "${CACHE_DIR}/patch-id/${1}" ]]; then
+		git show "$1" | git patch-id --stable | cut -d\  -f 1 > "${CACHE_DIR}/patch-id/${1}"
+	fi
+
+	cat "${CACHE_DIR}/patch-id/${1}"
+}
+
+# $1: COMMIT_SHA
+# Sets MATCHING_COMMIT with cherry-picked commit
+function try-cherry-pick-original() {
+	local CHERRY_PICKED_COMMITS=()
+
+	IFS=' ' read -r -a CHERRY_PICKED_COMMITS <<< "${CHERRY_PICKED_FROM_COMMIT_MAP["$1"]}"
+	for CHERRY_PICKED_COMMIT in "${CHERRY_PICKED_COMMITS[@]}"; do
+		echo "Trying to cherry-pick $CHERRY_PICKED_COMMIT"
+		if git cherry-pick "$CHERRY_PICKED_COMMIT"; then
+			echo "Cherry pick was successful"
+			local msg
+			msg="$(get-msg "$1" | sed -E -e '1 s/\s*BACKPORT:\s*//' \
+				-e '$a['"$REBASE_ID"'('"$USER"'): Cherry picked original commit'"$CHERRY_PICKED_COMMIT"']' \
+				-e '$aSigned-off-by: '"$(git config user.name)"' <'"$(git config user.email)"'>'
+			)"
+			git commit --amend --message "$msg"
+			MATCHING_COMMIT="$CHERRY_PICKED_COMMIT"
+			return 0
+		else
+			git cherry-pick --abort
+		fi
+	done
+
+	return 1
+}
+
+# $1: left file
+# $2: right file
+# $3: Prompt
+function prompt-difftool() {
+	local PS3 opt meldpid
+
+	meld "$1" "$2" &
+	meldpid="$!"
+
+	# So it gets killed if we terminate
+	GITK_PIDS+=("$meldpid")
+
+	PS3="$3"
+	select opt in "Yes" "No"
+	do
+		if [[ -z "$opt" ]]; then
+			echo "Invalid option $opt. Try another one."
+			continue
+		fi
+		break
+	done
+
+	if [[ -n "$meldpid" ]]; then
+		unset 'GITK_PIDS[-1]'
+		kill "$meldpid" 2>/dev/null || true
+		wait "$meldpid" 2>/dev/null || true
+	fi
+
+	if [[ "$opt" = "Yes" ]]; then
+		return 0
+	fi
+
+	return 1
+}
+
+# $1: COMMIT_SHA
+# $2: POSSIBLE_COMMIT_SHA
+function prompt-is-commit() {
+	local commit_path possible_commit_path
+
+	if ! commit_path="$(get-commit-path "$1")"; then
+		echo "Failed to lookup $1" >&2
+		return 1
+	fi
+
+
+	if ! possible_commit_path="$(get-commit-path "$2")"; then
+		echo "Failed to lookup $2" >&2
+		return 1
+	fi
+
+	prompt-difftool "$commit_path" "$possible_commit_path" 'Is this commit correct?: '
+}
+
+# If a commit is found return 0 and set $POSSIBLE_COMMIT_SHA
+# $1: COMMIT_SHA
+# $2: SEARCH_STRING
+function search-for-possible-commit() {
+	local POSSIBLE_COMMITS
+	local found=false
+
+	local commit_patch_id
+	local possible_commit_patch_id
+
+	commit_patch_id="$(get-patch-id "$1")"
+	echo "Patch ID: $commit_patch_id"
+
+	readarray -t POSSIBLE_COMMITS < <(
+		git rev-list --no-merges --regexp-ignore-case --fixed-strings --grep "$2" "HEAD")
+
+	for POSSIBLE_COMMIT_SHA in "${POSSIBLE_COMMITS[@]}"; do
+		echo "Found $POSSIBLE_COMMIT_SHA: $(get-subject "$POSSIBLE_COMMIT_SHA")"
+
+		possible_commit_patch_id="$(get-patch-id "$POSSIBLE_COMMIT_SHA")"
+
+		# Not really used anymore
+		if [[ "$commit_patch_id" = "$possible_commit_patch_id" ]]; then
+			echo "Patch IDs ($commit_patch_id) are identical"
+			found=true
+			break
+		fi
+
+		if prompt-is-commit "$1" "$POSSIBLE_COMMIT_SHA"; then
+			found=true
+			break
+		fi
+	done
+
+	if [[ "$found" = "true" ]]; then
+		return 0
+	else
+		POSSIBLE_COMMIT_SHA=""
+		echo "Failed to find commit"
+		return 1
+	fi
+}
+
+# Generates a squash id
+# $1: COMMIT_SHA
+# $*: squashed shas
+function generate-squash-id() {
+	local commit_sha=$1
+
+	shift
+
+	local str
+	str=$"$commit_sha"$'\n'"$(git show -s --format='%h' "$@")"
+	echo "Generate squash-id from: $str" >&2
+
+	local squash_id
+	squash_id="$(git hash-object --stdin <<< "$str")"
+
+	echo "$squash_id"
+}
+
+# Extracts the squash id from stdin
+# $1 COMMIT_SHA
+function extract-squash-id() {
+	local src_shas
+	readarray -t src_shas < <(
+		sed -E -n -e '/^'"$REBASE_ID"' squashed:/,/^$/{s/^\s+([a-z0-9]+)\s.*$/\1/p}'
+	)
+
+	echo "src_shas: ${src_shas[*]}" >&2
+
+	if [[ "${#src_shas[@]}" -eq 0 ]]; then
+		return 1
+	fi
+
+	generate-squash-id "$1" "${src_shas[@]}"
+}
+
+# Generates the patch containing all the squashes
+# $1: COMMIT_SHA
+# Sets SQUASH_ID on exit
+function generate-squashed-patch {
+	local commit_sha="$1"
+	local src_shas
+	IFS=' ' read -r -a src_shas <<< "${SQUASH_MAP["$commit_sha"]}"
+	if [[ "${#src_shas[*]}" -eq 0 ]]; then
+		echo "No SHAs found to squash for $commit_sha"
+		exit 1
+	fi
+
+	# Generate a unique squash_id so we can cache the results
+	local squash_id
+	squash_id="$(generate-squash-id "$commit_sha" "${src_shas[@]}")"
+
+	SQUASH_ID="$squash_id"
+	echo "Squash ID: $squash_id" >&2
+
+	if [[ -e "$CACHE_DIR/squash/$squash_id" ]]; then
+		echo "Squash already generated, reusing"
+		return
+	fi
+
+	echo "Squashing ${src_shas[*]} into $commit_sha"
+
+	local head_sha
+  head_sha="$(git rev-parse HEAD)"
+
+	local rebase_work
+
+	rebase_work="pick $commit_sha
+$(printf "fixup %s\\n" "${src_shas[@]}")
+"
+	echo "$rebase_work"
+
+	if ! GIT_SEQUENCE_EDITOR="echo '$rebase_work' >" git rebase -i \
+			--onto "${commit_sha}~" "${commit_sha}~" "${commit_sha}"; then
+		echo "Auto squash failed."
+		echo "Please complete the squash manually."
+		pause-script
+
+		PS3='Squash successful?: '
+	  select opt in "Yes" "No"
+	  do
+	    if [[ -z "$opt" ]]; then
+	      echo "Invalid option $opt. Try another one."
+	      continue
+	    fi
+	    break
+	  done
+
+	  if [[ $opt == "No" ]]; then
+	    exit
+	  fi
+	fi
+
+	local msg
+	msg="${REBASE_ID} squashed:
+$(git show -s --format='	%h %s' "${src_shas[@]}")
+
+Signed-off-by: $(git config user.name) <$(git config user.email)>"
+
+	git commit --amend -m "$(get-msg "$commit_sha")" -m "$msg"
+
+	git format-patch -1 HEAD --stdout > "$CACHE_DIR/squash/$squash_id"
+
+	git checkout -q "$head_sha"
+
+}
+# Prints the arguments in a CSV compliant maner
+function print-csv() {
+	# This outputs an additional , at the end.
+	 printf '"%s",' "${@//\"/\"\"}"
+	 printf '\n'
+}
+
+# We try and create the list with commits that are more likely to be upstream
+# first, and finally chromium specific patches.
+
+declare -A IGNORE_LIST
+
+# Map of SHA => {UPSTREAM, FROMLIST, etc}
+declare -A COMMIT_TYPE_MAP
+
+# Map of SHA => Change-Id
+declare -A CHANGE_ID_MAP
+
+# Map of Local SHAS to their upstream commits' that were already merged
+declare -A MERGED_UPSTREAM_COMMIT_MAP
+
+# Map of Local SHAS to their cherry-picked from commits. The commits are space
+# separated.
+declare -A CHERRY_PICKED_FROM_COMMIT_MAP
+
+declare -A REVERT_COMMIT_MAP
+declare -A COMMIT_REVERTED_MAP
+
+# Map of Commit Subject => SHA
+# FIXUP commits use the subject as the key
+# If there are duplicate titles, the latest commit is always used.
+# This makes sense if there is a cherry-pick, revert and cherry-pick of a new
+# version with the same name.
+declare -A COMMITS_BY_SUBJECT
+
+# Map of Src SHA => Dest SHA
+declare -A SQUASH_INTO_MAP
+
+# Map of Dest SHA => List<Src SHA>
+declare -A SQUASH_MAP
+
+# Ordered list of commits
+declare -a UPSTREAM_COMMIT_LIST
+declare -a FROMLIST_COMMIT_LIST
+declare -a FROMGIT_COMMIT_LIST
+declare -a CHROMIUM_COMMIT_LIST
+declare -a REVERT_COMMIT_LIST
+
+# We need to care about the order for the newer commits because the might
+# not have been backported...
+declare -a NON_CHROMIUM_COMMIT_LIST
+
+# UPSTREAM patches need to be added first
+# git log --pretty=oneline --grep "UPSTREAM:" --no-merges --reverse m/master > "$FILE"
+
+# Loop through all of the commits and check if they are present in the current
+# tree.
+
+# git rev-list --grep "UPSTREAM:" --no-merges m/master > "$FILE"
+
+if [[ ! -e "$SRC_CACHE/ALL_COMMITS" ]]; then
+	# Adding Change-Id in here is unfortunate... but we need to do it
+	# because there are some CLs that were submitted without any tags :(
+	git rev-list --no-merges --reverse --grep "BACKPORT:" \
+		--grep "UPSTREAM:" --grep "FROMLIST:" --grep "FROMGIT:" \
+		--grep "CHROMIUM:" --grep "CHROMIUMOS:" --grep "CHROMEOS:" \
+		--grep "ANDROID:" \
+		--grep "^Change-Id:" \
+		--grep "^BUG=b:" \
+		"${REBASE_START_POINT}..${REBASE_END_POINT}" > "$SRC_CACHE/ALL_COMMITS"
+
+	xargs git show -s --format=oneline > "$SRC_CACHE/ALL_COMMITS.txt" < \
+		"$SRC_CACHE/ALL_COMMITS"
+fi
+
+readarray -t ALL_COMMITS < "$SRC_CACHE/ALL_COMMITS"
+
+declare -A ANCESTOR_COMMITS
+
+if [[ ! -e "$TARGET_CACHE/ANCESTOR_COMMITS" ]]; then
+	# There is no reason to look at anything older than the fork point when
+	# determining if a commit has been merged.
+	git rev-list --no-merges "$REBASE_START_POINT"..HEAD > "$TARGET_CACHE/ANCESTOR_COMMITS"
+	xargs git show -s --format=oneline > "$TARGET_CACHE/ANCESTOR_COMMITS.txt" < \
+		"$TARGET_CACHE/ANCESTOR_COMMITS"
+fi
+
+while read -r COMMIT_SHA; do
+	ANCESTOR_COMMITS["$COMMIT_SHA"]=1
+done < "$TARGET_CACHE/ANCESTOR_COMMITS"
+
+if [[ ! -e "$TARGET_CACHE/PATCH_IDS" ]]; then
+	i=0
+	rm -f "$TARGET_CACHE/PATCH_IDS.tmp"
+
+	while read -r COMMIT_SHA; do
+		printf '\b%s' "${sp:i++%${#sp}:1}"
+		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
+		if [[ -z "$PATCH_ID" ]]; then
+			echo "Failed to get patch id for $COMMIT_SHA"
+			exit 1
+		fi
+		echo "${PATCH_ID}=${COMMIT_SHA}" >> "$TARGET_CACHE/PATCH_IDS.tmp"
+	done < "$TARGET_CACHE/ANCESTOR_COMMITS"
+
+	mv "$TARGET_CACHE/PATCH_IDS.tmp" "$TARGET_CACHE/PATCH_IDS"
+fi
+
+declare -A PATCH_IDS
+while IFS="=" read -r PATCH_ID COMMIT_SHA; do
+	printf '\b%s' "${sp:i++%${#sp}:1}"
+	if [[ -n "${PATCH_IDS[$PATCH_ID]}" ]]; then
+		# echo "Duplicate PATCH ID $PATCH_ID"
+		# echo "Commits: $COMMIT_SHA ${PATCH_IDS[$PATCH_ID]}"
+		PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA ${PATCH_IDS[$PATCH_ID]}"
+	else
+		PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA"
+	fi
+	# echo "${PATCH_IDS["$PATCH_ID"]}=$COMMIT_SHA"
+done < "$TARGET_CACHE/PATCH_IDS"
+
+declare -A MISSING_COMMITS
+while read -r COMMIT_SHA; do
+	MISSING_COMMITS["$COMMIT_SHA"]=1
+done < <(git cherry HEAD "$REBASE_END_POINT" | sed -nE -e 's/^\+ (.*)/\1/p')
+
+i=0
+for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
+	printf '\b%s' "${sp:i++%${#sp}:1}"
+
+	if [[ -n "${IGNORE_LIST[$COMMIT_SHA]}" ]]; then
+		echo "Ignoring $COMMIT_SHA: ${IGNORE_LIST[$COMMIT_SHA]}"
+		continue
+	fi
+
+	if ! COMMIT_MSG="$(get-msg "$COMMIT_SHA")"; then
+		echo "Failed to get commit message for $COMMIT_SHA"
+		exit 1
+	fi
+
+
+	# Generate a map of COMMIT_SHA=>List<Upstream SHA>
+	readarray -t UPSTREAM_SHAS < <(
+		sed -n -E -e 's/\s*\(cherry[- ]picked from commit (commit )?([a-z0-9]+).*/\2/p' \
+			<<< "$COMMIT_MSG")
+
+	for UPSTREAM_SHA in "${UPSTREAM_SHAS[@]}"; do
+		if ! git cat-file -e "${UPSTREAM_SHA}"; then
+			# echo "Commit specified upstream hash '$UPSTREAM_SHA', but it was not found"
+			continue
+		fi
+
+		CHERRY_PICKED_COMMITS="${CHERRY_PICKED_FROM_COMMIT_MAP["$COMMIT_SHA"]}"
+		if [[ -z "$CHERRY_PICKED_COMMITS" ]]; then
+			CHERRY_PICKED_FROM_COMMIT_MAP["$COMMIT_SHA"]="$UPSTREAM_SHA"
+		else
+			CHERRY_PICKED_FROM_COMMIT_MAP["$COMMIT_SHA"]="$CHERRY_PICKED_COMMITS $UPSTREAM_SHA"
+		fi
+	done
+
+	if [[ -e "${WORK_DIR}/change-id/${COMMIT_SHA}" ]]; then
+		CHANGE_ID="$(<"${WORK_DIR}/change-id/${COMMIT_SHA}")"
+	else
+		readarray -t CHANGE_IDS < <(
+			sed -En -e 's/^Change-Id: ([A-Za-z0-9]+)$/\1/p' <<<"$COMMIT_MSG")
+
+			if [[ "${#CHANGE_IDS[@]}" -eq 0 ]]; then
+				# Use the cherry-pick from sha to make the change id.
+				# This improves the probability of them matching.
+				IFS=' ' read -r -a UPSTREAM_SHAS <<< "${CHERRY_PICKED_FROM_COMMIT_MAP["$COMMIT_SHA"]}"
+				if [[ -z "${UPSTREAM_SHAS[0]}" ]]; then
+					CHANGE_ID="I${COMMIT_SHA}"
+				else
+					CHANGE_ID="I${UPSTREAM_SHAS[0]}"
+				fi
+				echo "Commit $COMMIT_SHA was missing Change-Id, using $CHANGE_ID"
+				echo "$CHANGE_ID" > "${WORK_DIR}/change-id/${COMMIT_SHA}"
+			elif [[ "${#CHANGE_IDS[@]}" -eq 1 ]]; then
+				CHANGE_ID="${CHANGE_IDS[0]}"
+			else
+				echo "Multiple Change-Ids found for $COMMIT_SHA: ${CHANGE_IDS[*]}"
+				CHANGE_ID="${CHANGE_IDS[0]}"
+				echo "Using: $CHANGE_ID"
+				# echo "Please select the one you want to use:"
+				# PS3='Change-Id: '
+				# select opt in "${CHANGE_IDS[@]}"
+				# do
+				#   if [[ -z "$opt" ]]; then
+				#     echo "Invalid option $opt. Try another one."
+				#     continue
+				#   fi
+				#   break
+				# done
+				# CHANGE_ID="$opt"
+				# echo "$CHANGE_ID" > "${WORK_DIR}/change-id/${COMMIT_SHA}"
+			fi
+	fi
+
+	CHANGE_ID_MAP["$COMMIT_SHA"]="$CHANGE_ID"
+
+	COMMIT_SUBJECT="$(head -n 1 <<< "$COMMIT_MSG")"
+
+	if [[ -z "${COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]}" ]]; then
+		COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]="$COMMIT_SHA"
+	else
+		# echo "Duplicate title found: $COMMIT_SUBJECT"
+		# echo "Replacing ${COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]} with $COMMIT_SHA"
+
+		COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]="$COMMIT_SHA"
+	fi
+
+	# TODO: Come do the fixups later
+	if [[ "1" == "0" && "$COMMIT_SUBJECT" == "FIXUP: "* ]]; then
+		CLEAN_COMMIT_SUBJECT="$(strip-fixup "$COMMIT_SUBJECT")"
+
+		if [[ -e "$REBASE_DIR/fixup/$COMMIT_SHA" ]]; then
+			TARGET_SHA="$(<"$REBASE_DIR/fixup/$COMMIT_SHA")"
+		else
+			TARGET_SHA="${COMMITS_BY_SUBJECT[$CLEAN_COMMIT_SUBJECT]}"
+			if [[ -z "$TARGET_SHA" ]]; then
+				echo "Processing: $COMMIT_SHA $COMMIT_SUBJECT"
+				echo "Error: Fixup unable to locate: '$CLEAN_COMMIT_SUBJECT'"
+				echo "Manually lookup the commit and enter the SHA"
+				echo -n "Fixup Target SHA: "
+				read -r TARGET_SHA
+
+				if [[ -z "$TARGET_SHA" ]]; then
+					echo "No SHA specified, treating as normal commit..."
+					# Write down the fact that this commit isn't a FIXUP.
+					# We will apply it like normal
+					touch "$REBASE_DIR/fixup/$COMMIT_SHA"
+				else
+					TARGET_SHA="$(git rev-parse "$TARGET_SHA")"
+
+					echo "$TARGET_SHA" > "$REBASE_DIR/fixup/$COMMIT_SHA"
+				fi
+			fi
+		fi
+
+		if [[ -n "$TARGET_SHA" ]]; then
+			SQUASH_INTO_MAP[$COMMIT_SHA]="$TARGET_SHA"
+
+			if [[ -z "${SQUASH_MAP[$TARGET_SHA]}" ]]; then
+				SQUASH_MAP[$TARGET_SHA]="$COMMIT_SHA"
+			else
+				SQUASH_MAP[$TARGET_SHA]="${SQUASH_MAP[$TARGET_SHA]} $COMMIT_SHA"
+			fi
+		fi
+	fi
+
+	COMMIT_TYPE=""
+	while [[ -z "$COMMIT_TYPE" ]]; do
+		OVERRIDE_TYPE=""
+
+		# Detect commit type
+		if [[ -e "${WORK_DIR}/type/${CHANGE_ID}" ]]; then
+			COMMIT_TYPE="$(<"${WORK_DIR}/type/${CHANGE_ID}")"
+		elif [[ -e "${WORK_DIR}/type/${COMMIT_SHA}" ]]; then
+			# Migrate to the new format
+			mv "${WORK_DIR}/type/${COMMIT_SHA}" "${WORK_DIR}/type/${CHANGE_ID}"
+			COMMIT_TYPE="$(<"${WORK_DIR}/type/${CHANGE_ID}")"
+		elif [[ $COMMIT_SUBJECT == "Revert \""* ]]; then
+			COMMIT_TYPE="REVERT"
+		elif [[ $COMMIT_SUBJECT == *"ANDROID:"* ]]; then
+			COMMIT_TYPE="CHROMIUM"
+		elif [[ $COMMIT_SUBJECT == *"UPSTREAM:"* ]]; then
+			COMMIT_TYPE="UPSTREAM"
+		elif [[ $COMMIT_SUBJECT == *"FROMGIT:"* ]]; then
+			COMMIT_TYPE="FROMGIT"
+		elif [[ $COMMIT_SUBJECT == *"FROMLIST:"* ]]; then
+			COMMIT_TYPE="FROMLIST"
+		elif [[ $COMMIT_SUBJECT == *"CHROMIUM:"* \
+						|| $COMMIT_SUBJECT == *"CHROMIUMOS:"* \
+						|| $COMMIT_SUBJECT == *"CHROMEOS:"* ]]; then
+			COMMIT_TYPE="CHROMIUM"
+		elif [[ $COMMIT_SUBJECT == *"BACKPORT:"* ]]; then
+			readarray -t UPSTREAM_SHAS < <(
+				sed -n -E -e 's/\s*\(cherry[- ]picked from commit (commit )?([a-z0-9]+)\)/\2/p' \
+					<<< "$COMMIT_MSG")
+
+			# sometimes BACKPORT: is missing UPSTREAM:
+			if [[ "${#UPSTREAM_SHAS[@]}" -gt 0 ]]; then
+				COMMIT_TYPE="UPSTREAM"
+			fi
+		fi
+
+		# Validate the COMMIT_TYPE otherwise clear it out
+		if [[ "$COMMIT_TYPE" = "UPSTREAM" || "$COMMIT_TYPE" = "FROMGIT" ]]; then
+
+			UPSTREAM_SHA_FOUND=0
+			ALREADY_MERGED=0
+			IFS=' ' read -r -a UPSTREAM_SHAS <<< "${CHERRY_PICKED_FROM_COMMIT_MAP["$COMMIT_SHA"]}"
+			for UPSTREAM_SHA in "${UPSTREAM_SHAS[@]}"; do
+				UPSTREAM_SHA_FOUND=1
+
+				if is-ancestor "$UPSTREAM_SHA"; then
+					ALREADY_MERGED=1
+					break
+				fi
+			done
+
+			if [[ $ALREADY_MERGED -eq 1 ]]; then
+				#if [[ "${MISSING_COMMITS["$COMMIT_SHA"]}" -eq 1 ]]; then
+				#	echo "Commit $COMMIT_SHA is upstream as $UPSTREAM_SHA, but git cherry disagrees"
+				#fi
+				MERGED_UPSTREAM_COMMIT_MAP["$COMMIT_SHA"]="$UPSTREAM_SHA"
+			elif [[ $UPSTREAM_SHA_FOUND -eq 0 && "$COMMIT_TYPE" != "FROMGIT" ]]; then
+				echo "The following UPSTREAM hashes were not found: ${UPSTREAM_SHAS[*]}"
+				echo "Is the commit misclassified?"
+				COMMIT_TYPE=
+			fi
+		elif [[ "$COMMIT_TYPE" = "REVERT" ]]; then
+			REVERTS_COMMIT="$(sed -n -E -e 's/\s*This reverts commit ([a-z0-9]+).*/\1/p' <<< "$COMMIT_MSG")"
+			if [[ -z "$REVERTS_COMMIT" ]]; then
+				echo "Failed to extract reverted commit: "
+				COMMIT_TYPE=
+			else
+				REVERT_COMMIT_MAP["$COMMIT_SHA"]="$REVERTS_COMMIT"
+				COMMIT_REVERTED_MAP["$REVERTS_COMMIT"]="$COMMIT_SHA"
+			fi
+		fi
+
+		if [[ -n "$COMMIT_TYPE" ]]; then
+			COMMIT_TYPE_MAP["$COMMIT_SHA"]="$COMMIT_TYPE"
+			# Assign commit to the correct lists
+			if [[ $COMMIT_TYPE == "REVERT" ]]; then
+				REVERT_COMMIT_LIST+=("$COMMIT_SHA")
+			elif [[ $COMMIT_TYPE == "UPSTREAM" ]]; then
+				UPSTREAM_COMMIT_LIST+=("$COMMIT_SHA")
+				NON_CHROMIUM_COMMIT_LIST+=("$COMMIT_SHA")
+			elif [[ $COMMIT_TYPE == "FROMGIT" ]]; then
+				FROMGIT_COMMIT_LIST+=("$COMMIT_SHA")
+				NON_CHROMIUM_COMMIT_LIST+=("$COMMIT_SHA")
+			elif [[ $COMMIT_TYPE == "FROMLIST" ]]; then
+				FROMLIST_COMMIT_LIST+=("$COMMIT_SHA")
+				NON_CHROMIUM_COMMIT_LIST+=("$COMMIT_SHA")
+			elif [[ $COMMIT_TYPE == "CHROMIUM" ]]; then
+				CHROMIUM_COMMIT_LIST+=("$COMMIT_SHA")
+			else
+				echo "Unknown COMMIT TYPE '$COMMIT_TYPE' for $COMMIT_SHA"
+				exit 1
+			fi
+		else
+			# Clear any bad type information
+			rm -f "${WORK_DIR}/type/${COMMIT_SHA}"
+			rm -f "${WORK_DIR}/type/${CHANGE_ID}"
+
+			echo "Count: $i"
+			echo "Unable to determine the type of commit ($COMMIT_SHA):"
+			echo "$COMMIT_MSG"
+
+			PS3='Commit type: '
+			select OVERRIDE_TYPE in "UPSTREAM" "FROMGIT" "FROMLIST" "CHROMIUM"
+			do
+				if [[ -n "$OVERRIDE_TYPE" ]]; then
+					break
+				fi
+				echo "Invalid option $OVERRIDE_TYPE. Try another one."
+			done
+
+			# We loop around
+			echo "$OVERRIDE_TYPE" > "${WORK_DIR}/type/${CHANGE_ID}"
+		fi
+	done
+done
+
+for ARRAY_NAME in "ALL_COMMITS" "UPSTREAM_COMMIT_LIST" "FROMLIST_COMMIT_LIST" "FROMGIT_COMMIT_LIST" "CHROMIUM_COMMIT_LIST" "REVERT_COMMIT_LIST" "NON_CHROMIUM_COMMIT_LIST"; do
+	declare -n ARRAY_REF="$ARRAY_NAME"
+	xargs git show -s --format=oneline > "$REBASE_DIR/log/${ARRAY_NAME}.txt" <<< "${ARRAY_REF[@]}"
+done
+
+git_empty_message="The previous cherry-pick is now empty"
+
+
+# Map of SHA=>Applied
+declare -A POSSIBLE_PATCHES
+while read -r SHA
+do
+	POSSIBLE_PATCHES[$SHA]=0
+done < <(find "$REBASE_DIR/patch/" -type f -printf '%P\n')
+
+# Map of SHA=>Applied
+declare -A POSSIBLE_SKIP
+while read -r SHA
+do
+	POSSIBLE_SKIP[$SHA]=0
+done < <(find "$REBASE_DIR/skip/" -type f -printf '%P\n')
+
+WORKLOG_FILE="$REBASE_DIR/work.log"
+rm -f "$WORKLOG_FILE"
+
+echo "# Source: ${REBASE_START_POINT}..${REBASE_END_POINT} ($(git rev-parse "${REBASE_START_POINT}")..$(git rev-parse "${REBASE_END_POINT}"))" >> "$WORKLOG_FILE"
+echo "# Dest: $TARGET_BRANCH ($(git rev-parse "${TARGET_BRANCH}")" >> "$WORKLOG_FILE"
+
+EXISTS_IDENTICAL_FILE="$REBASE_DIR/log/exits-identical.csv"
+print-csv "Local SHA" "Local Subject" "Patch ID" "Upstream SHA" "Upstream Subject" > "$EXISTS_IDENTICAL_FILE"
+
+EXISTS_DIFFERENT_FILE="$REBASE_DIR/log/exits-different.csv"
+print-csv "Local SHA" "Local Subject" "Local Patch ID" "Upstream SHA" "Upstream Subject" "Upstream Patch ID" > "$EXISTS_DIFFERENT_FILE"
+
+EXISTS_PATCH_ID_FILE="$REBASE_DIR/log/exits-patch-id.csv"
+print-csv "Local SHA" "Local Subject" "Patch ID" "Commits" > "$EXISTS_PATCH_ID_FILE"
+
+CHERRY_PICKED_FILE="$REBASE_DIR/log/cherry-picked.csv"
+print-csv "Local SHA" "Local Subject" > "$CHERRY_PICKED_FILE"
+
+CHERRY_PICKED_EMPTY_FILE="$REBASE_DIR/log/cherry-picked-empty.csv"
+print-csv "Local SHA" "Local Subject" > "$CHERRY_PICKED_EMPTY_FILE"
+
+PATCHED_FILE="$REBASE_DIR/log/patched.csv"
+print-csv "Local SHA" "Local Subject" > "$PATCHED_FILE"
+
+SKIPPED_AUTOMATIC_FILE="$REBASE_DIR/log/skipped-automatic.csv"
+print-csv "Local SHA" "Local Subject" "Reason" > "$SKIPPED_AUTOMATIC_FILE"
+
+SKIPPED_FILE="$REBASE_DIR/log/skipped.csv"
+print-csv "Local SHA" "Local Subject" "Reason" > "$SKIPPED_FILE"
+
+i=0
+
+# TODO: Remove this. Only so we can start after all non-chromium
+# NON_CHROMIUM_COMMIT_LIST=()
+# HEAD_COMMIT="2ce91fd773450954d03aee397423a8eed0373067"
+# git reset --hard "$HEAD_COMMIT"
+
+echo "Cherry picking ${#NON_CHROMIUM_COMMIT_LIST[@]} non-CHROMIUM patches. "
+echo "Cherry picking ${#CHROMIUM_COMMIT_LIST[@]} CHROMIUM patches. "
+for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}"; do
+	i=$((i+1))
+	echo "Processing $i: $COMMIT_SHA"
+
+	if [[ -n "${IGNORE_LIST[$COMMIT_SHA]}" ]]; then
+		echo "Ignoring $COMMIT_SHA: ${IGNORE_LIST[$COMMIT_SHA]}" >> "$WORKLOG_FILE"
+		continue
+	fi
+
+	if [[ -n "${REVERT_COMMIT_MAP[$COMMIT_SHA]}" ]]; then
+		echo "Skipping revert"
+		echo "skip-revert $COMMIT_SHA" >> "$WORKLOG_FILE"
+		continue
+	fi
+
+	if [[ -n "${COMMIT_REVERTED_MAP[$COMMIT_SHA]}" ]]; then
+		echo "Skipping reverted commit"
+		echo "skip-reverted $COMMIT_SHA" >> "$WORKLOG_FILE"
+		continue
+	fi
+
+	if [[ -n "${MERGED_UPSTREAM_COMMIT_MAP[$COMMIT_SHA]}" ]]; then
+		UPSTREAM_COMMIT_SHA="${MERGED_UPSTREAM_COMMIT_MAP["$COMMIT_SHA"]}"
+		echo "exists $COMMIT_SHA as $UPSTREAM_COMMIT_SHA" >> "$WORKLOG_FILE"
+
+		LOCAL_PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
+		UPSTREAM_PATCH_ID="$(get-patch-id "$UPSTREAM_COMMIT_SHA")"
+
+		if [[ "$LOCAL_PATCH_ID" = "$UPSTREAM_PATCH_ID" ]]; then
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				"$LOCAL_PATCH_ID" "$UPSTREAM_COMMIT_SHA" \
+				"$(get-subject "$UPSTREAM_COMMIT_SHA")" >> "$EXISTS_IDENTICAL_FILE"
+		else
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				"$LOCAL_PATCH_ID" "$UPSTREAM_COMMIT_SHA" \
+				"$(get-subject "$UPSTREAM_COMMIT_SHA")" "$UPSTREAM_PATCH_ID" \
+				>> "$EXISTS_DIFFERENT_FILE"
+		fi
+		continue;
+	fi
+
+	if [[ -n "${SQUASH_INTO_MAP[$COMMIT_SHA]}" ]]; then
+		echo "Squashed, skipping"
+		echo "squashed $COMMIT_SHA into ${SQUASH_INTO_MAP["$COMMIT_SHA"]}" >> "$WORKLOG_FILE"
+		continue;
+	fi
+
+	CHANGE_ID="${CHANGE_ID_MAP["$COMMIT_SHA"]}"
+	if [[ -z "$CHANGE_ID" ]]; then
+		echo "Failed to get Change-Id for $COMMIT_SHA"
+		exit 1
+	fi
+
+	if ! COMMIT_MSG="$(get-msg "$COMMIT_SHA")"; then
+		echo "Failed to get commit message for $COMMIT_SHA"
+		exit 1
+	fi
+
+	COMMIT_TYPE="${COMMIT_TYPE_MAP["$COMMIT_SHA"]}"
+	COMMIT_SUBJECT="$(get-subject "$COMMIT_SHA")"
+
+	if [[ -e "$REBASE_DIR/skip/$COMMIT_SHA" ]]; then
+		SKIP_REASON="$(<"$REBASE_DIR/skip/$COMMIT_SHA")"
+		echo "skip $COMMIT_SHA $SKIP_REASON" >> "$WORKLOG_FILE"
+		POSSIBLE_SKIP[$COMMIT_SHA]=1
+
+		print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" "$SKIP_REASON" \
+			>> "$SKIPPED_FILE"
+		continue
+	fi
+
+	if [[ "$SKIP_ANDROID" -eq 1 && "$COMMIT_TYPE" == "CHROMIUM" && \
+			"$COMMIT_SUBJECT" == *"ANDROID:"* ]]; then
+		echo "skip-android $COMMIT_SHA Skipping all ANDROID changes" >> "$WORKLOG_FILE"
+
+		print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" "ANDROID" \
+			>> "$SKIPPED_AUTOMATIC_FILE"
+		continue
+	fi
+
+	if [[ "$SKIP_IWL7000" -eq 1 && "$COMMIT_TYPE" == "CHROMIUM" && \
+			"$COMMIT_SUBJECT" == *"iwl7000:"* ]]; then
+		echo "skip-iwl7000 $COMMIT_SHA Skipping all IWL7000 changes" >> "$WORKLOG_FILE"
+
+		print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" "IWL7000" \
+			>> "$SKIPPED_AUTOMATIC_FILE"
+		continue
+	fi
+
+	if [[ -z "${MISSING_COMMITS["$COMMIT_SHA"]}" ]]; then
+		echo "git cherry thinks commit $COMMIT_SHA is already applied"
+	fi
+
+	IFS=' ' read -r -a SQUASH_SHAS <<< "${SQUASH_MAP[$COMMIT_SHA]}"
+	SQUASH_ID=
+	if [[ "${#SQUASH_SHAS[*]}" -gt 0 ]]; then
+		# This sets SQUASH_ID on completion
+		generate-squashed-patch "$COMMIT_SHA"
+	fi
+
+	# TODO: Should we check the squashed version first first?
+	if [[ "$COMMIT_TYPE" = "FROMLIST" || "$COMMIT_TYPE" = "FROMGIT" ]]; then
+		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
+
+		if [[ -n "${PATCH_IDS["$PATCH_ID"]}" ]]; then
+			echo "found $COMMIT_SHA as ${PATCH_IDS[$PATCH_ID]}"
+			echo "found $COMMIT_SHA as ${PATCH_IDS[$PATCH_ID]} with patch id $PATCH_ID" >> "$WORKLOG_FILE"
+
+			IFS=' ' read -r -a PATCH_ID_SHAS <<< "${PATCH_IDS[$PATCH_ID]}"
+
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				"$PATCH_ID" "$(git show -s --format=oneline "${PATCH_ID_SHAS[@]}")" \
+				>> "$EXISTS_PATCH_ID_FILE"
+			continue
+		fi
+	fi
+
+	# Apply a patch before we can process the current patch.
+	# Typically used to insert a commit before another one
+	if [[ -e "$REBASE_DIR/pre/$COMMIT_SHA" ]]; then
+		if ! git am "$REBASE_DIR/pre/$COMMIT_SHA"; then
+			echo "Patch failed to apply: $REBASE_DIR/pre/$COMMIT_SHA"
+			pause-script
+		fi
+	fi
+
+	if [[ -e "$REBASE_DIR/patch/$COMMIT_SHA" ]]; then
+		# Verify the patch contains all the squashed commits
+		if [[ -n "$SQUASH_ID" ]]; then
+			echo "We have a patch for a squashed commit" >&2
+			if PATCH_SQUASH_ID="$(extract-squash-id "$COMMIT_SHA" < "$REBASE_DIR/patch/$COMMIT_SHA")"; then
+				echo "Patch does not contain any squashes"
+			fi
+
+			echo "SQUASH_ID: $SQUASH_ID, PATCH_SQUASH_ID: $PATCH_SQUASH_ID"
+
+			if [[ "$SQUASH_ID" != "$PATCH_SQUASH_ID" ]]; then
+				echo "Patch does not contain all of the squashed changes"
+				echo "Moving patch to $REBASE_DIR/patch/$COMMIT_SHA.stale"
+				mv "$REBASE_DIR/patch/$COMMIT_SHA" "$REBASE_DIR/patch/$COMMIT_SHA.stale"
+				echo "Going to reapply original squashed commit."
+			fi
+		fi
+	fi
+
+	APPLIED=0
+
+	GIT_ABORT_CMD=()
+
+	if [[ -e "$REBASE_DIR/patch/$COMMIT_SHA" ]]; then
+		GIT_ABORT_CMD=(am --abort)
+		if ! git am "$REBASE_DIR/patch/$COMMIT_SHA"; then
+			echo "Patch failed to apply: $REBASE_DIR/patch/$COMMIT_SHA"
+			echo "Moving patch to $REBASE_DIR/patch/$COMMIT_SHA.bad"
+			mv "$REBASE_DIR/patch/$COMMIT_SHA" "$REBASE_DIR/patch/$COMMIT_SHA.bad"
+		else
+			echo "am $COMMIT_SHA as $(git rev-parse HEAD) using ./$REBASE_ID/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
+
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				>> "$PATCHED_FILE"
+
+			POSSIBLE_PATCHES[$COMMIT_SHA]=1
+			APPLIED=1
+		fi
+	elif [[ -n "$SQUASH_ID" ]]; then
+		GIT_ABORT_CMD=(am --abort)
+		if git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
+			APPLIED=1
+		else
+			echo "Squash patch failed to apply: $CACHE_DIR/squash/$SQUASH_ID"
+		fi
+	else
+		GIT_ABORT_CMD=(cherry-pick --abort)
+		if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
+			echo "$out"
+			NEW_SHA="$(git rev-parse HEAD)"
+			echo "cherry-pick $COMMIT_SHA as $NEW_SHA" >> "$WORKLOG_FILE"
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				>> "$CHERRY_PICKED_FILE"
+			APPLIED=1
+		elif [[ $out = *"$git_empty_message"* ]]; then
+			echo "$COMMIT_SHA has already been applied"
+			echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
+			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+				>> "$CHERRY_PICKED_EMPTY_FILE"
+			APPLIED=1
+		else
+			echo "$out"
+		fi
+	fi
+
+	if [[ $APPLIED -eq 0 ]]; then
+		# cherry-pick failed
+		echo "---------"
+
+		if [[ "$COMMIT_TYPE" = "CHROMIUM" ]]; then
+			# iwl7000 cls seem to be cherry picked multiple times in different branches
+			echo "Checking to see if commit was already merged."
+			readarray -t CHANGE_IDS < <(
+				sed -n -E -e 's/^\s*Change-Id: ([a-zA-Z0-9]+)\s*$/\1/p' <<< "$COMMIT_MSG")
+
+			MATCHING_COMMIT=""
+			for CHANGE_ID in "${CHANGE_IDS[@]}"; do
+				echo "Searching for Change-Id: $CHANGE_ID"
+
+				if search-for-possible-commit "$COMMIT_SHA" "$CHANGE_ID"; then
+					MATCHING_COMMIT="$POSSIBLE_COMMIT_SHA"
+					break
+				fi
+			done
+
+			if [[ -n "$MATCHING_COMMIT" ]]; then
+				git "${GIT_ABORT_CMD[@]}"
+				reason="duplicate of $MATCHING_COMMIT"
+				echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
+				echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+				continue
+			else
+				echo "Please merge manually."
+			fi
+		else
+
+			echo "Checking to see if commit was already merged."
+			COMMIT_MSG_HEADER="$(sanitize-subject "$(head -n 1 <<< "$COMMIT_MSG")")"
+
+			MATCHING_COMMIT=""
+			if search-for-possible-commit "$COMMIT_SHA" "$COMMIT_MSG_HEADER"; then
+				MATCHING_COMMIT="$POSSIBLE_COMMIT_SHA"
+			fi
+
+			if [[ -n "$MATCHING_COMMIT" ]]; then
+				git "${GIT_ABORT_CMD[@]}"
+				reason="applied by $MATCHING_COMMIT"
+				echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
+				echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+				continue
+			elif [[ "$COMMIT_TYPE" == "FROMGIT" && "$COMMIT_SUBJECT" == *"BACKPORT:"* ]]; then
+				echo "Failed to automatically find commit upstream"
+				echo "Going to try to cherry-pick original commit"
+				git "${GIT_ABORT_CMD[@]}"
+
+				if try-cherry-pick-original "$COMMIT_SHA"; then
+					reason="replace $COMMIT_SHA with $MATCHING_COMMIT"
+					echo "$reason"
+					echo "reason" >> "$WORKLOG_FILE"
+
+					git format-patch -1 HEAD --stdout > "$REBASE_DIR/patch/$COMMIT_SHA"
+					git format-patch -1 "$COMMIT_SHA" --stdout > "$REBASE_DIR/orig/$COMMIT_SHA"
+					set +x
+					continue
+				else
+					echo "Failed to cherry-pick original"
+					echo "Going to cherry-pick the BACKPORT commit so you can fix it"
+					GIT_ABORT_CMD=(cherry-pick --abort)
+					git cherry-pick "$COMMIT_SHA" || true
+				fi
+			else
+				echo "Failed to automatically find commit upstream"
+			fi
+		fi
+
+		readarray -t CONFLICTING_FILES < <(git diff --name-only --diff-filter=U)
+
+		MERGE_MSG="$(git rev-parse --git-path MERGE_MSG)"
+		if [[ -z "$MERGE_MSG" ]]; then
+			echo "Failed to modify MERGE_MSG, please do it manually"
+		else
+			cat <<-EOF >> "$MERGE_MSG"
+				[${REBASE_ID}($USER):
+				* Conflicts:
+				$(printf "  * %s\\n" "${CONFLICTING_FILES[@]}")
+				]
+			EOF
+			if ! grep -q '^Change-Id:' "$MERGE_MSG"; then
+				echo -e "Change-Id: $CHANGE_ID" >> "$MERGE_MSG"
+			fi
+			echo "Signed-off-by: $(git config user.name) <$(git config user.email)>" >> "$MERGE_MSG"
+		fi
+
+		gitk "$COMMIT_SHA" &
+		GITK_PIDS+=($!)
+		sleep 0.1 # Just so the windows open in some kind of order
+
+		for RESOLVED_PATH in "${CONFLICTING_FILES[@]}"; do
+			gitk "$REBASE_END_POINT" -- "$RESOLVED_PATH" &
+			GITK_PIDS+=($!)
+			sleep 0.1
+
+			gitk "HEAD" -- "$RESOLVED_PATH" &
+			GITK_PIDS+=($!)
+		done
+
+		UPSTREAM_SHA=
+		if [[ "$COMMIT_TYPE" != "CHROMIUM" ]]; then
+			git status
+			echo "Enter the upstream commit if there is one, otherwise leave blank to manually handle the conflict"
+			echo -n "Upstream SHA: "
+			read -r UPSTREAM_SHA
+
+			if [[ -n "$UPSTREAM_SHA" ]]; then
+				if prompt-is-commit "$COMMIT_SHA" "$UPSTREAM_SHA"; then
+					kill-gitk
+					git "${GIT_ABORT_CMD[@]}"
+					reason="applied by $UPSTREAM_SHA"
+					echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
+					echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+					continue
+				fi
+			fi
+		fi
+
+		pause-script
+
+		kill-gitk
+
+		while git status| grep -q cherry-picking; do
+			echo "Cherry pick still in progress."
+			pause-script
+		done
+
+		# local opt
+		PS3='Cherry-Pick result: '
+		select opt in "Backport" "Skip" "Wrong Type" "Fixed" "Quit"
+		do
+			if [[ -z "$opt" ]]; then
+				echo "Invalid option $opt. Try another one."
+				continue
+			fi
+			#TODO: Prompt for incorrect list
+			case $opt in
+				"Backport")
+					git format-patch -1 HEAD --stdout > "$REBASE_DIR/patch/$COMMIT_SHA"
+					if [[ ! -e "$REBASE_DIR/orig/$COMMIT_SHA" ]]; then
+						git format-patch -1 "$COMMIT_SHA" --stdout > "$REBASE_DIR/orig/$COMMIT_SHA"
+					fi
+
+					if ! prompt-difftool "$REBASE_DIR/orig/$COMMIT_SHA" \
+							"$REBASE_DIR/patch/$COMMIT_SHA" \
+							"Does the patch look correct? "; then
+						echo "Fix the commit and then \`git commit --amend\`"
+						pause-script
+						continue
+					fi
+
+					echo "backport $COMMIT_SHA from $REBASE_DIR/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
+					POSSIBLE_PATCHES[$COMMIT_SHA]=1
+
+					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+						>> "$PATCHED_FILE"
+					break
+					;;
+				"Skip")
+					read -r -p 'reason: ' reason
+					echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
+					echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+
+					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" "$reason" \
+						>> "$SKIPPED_FILE"
+					break
+					;;
+				"Wrong Type")
+					read -r -p 'new type: ' OVERRIDE_TYPE
+					echo "$OVERRIDE_TYPE" > "${WORK_DIR}/type/${CHANGE_ID}"
+					break
+					;;
+				"Fixed")
+					break
+					;;
+				"Quit")
+					exit 1
+					;;
+				*)
+					echo "Unknown option: '$opt'"
+					exit 1
+					;;
+			esac
+		done
+	fi
+done
+
+for COMMIT_SHA in "${!POSSIBLE_PATCHES[@]}"
+do
+	if [[ "${POSSIBLE_PATCHES[$COMMIT_SHA]}" -eq 0 ]]; then
+		echo "rm $REBASE_DIR/patch/$COMMIT_SHA"
+	fi
+done
+
+for COMMIT_SHA in "${!POSSIBLE_SKIP[@]}"
+do
+	if [[ "${POSSIBLE_SKIP[$COMMIT_SHA]}" -eq 0 ]]; then
+		echo "rm $REBASE_DIR/skip/$COMMIT_SHA"
+	fi
+done
+
+
+echo "Done!"
