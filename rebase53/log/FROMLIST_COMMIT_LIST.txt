@@ -1,0 +1,712 @@
+ccd3431e3e55c717817595b6dae8371a0d4169a9 FROMLIST: KVM: X86: Add missing KVM_AMD dependency
+77ed5fbae6569a2b65ea07a9c081cfd0e6498d43 FROMLIST: arm64: kvm: use -fno-jump-tables with clang
+77ae8d45564e65630e9268680ede69eb480a7efd FROMLIST: sched: Factor out nr_iowait and nr_iowait_cpu
+03ba7e9b1745995688192003eb265874a6554ea0 FROMLIST: cpuidle/drivers/menu: Remove get_loadavg in the performance multiplier
+6b8fd775a0d3daf41e2bb0aea9a8c0f3ef88d190 FROMLIST: sched: Relocate arch_scale_cpu_capacity
+789ef1782d83521074fef5795e8b2b0cc2a1015a FROMLIST: sched/cpufreq: Prepare schedutil for Energy Aware Scheduling
+6758eb4914188233870eae9bc0e8fd56363ef409 FROMLIST: PM: Introduce an Energy Model management framework
+cd3102349ff3279a5d1085f3f137d4595de682f4 FROMLIST: PM / EM: Expose the Energy Model in sysfs
+cf0a78167db252f51f7ec7bb115d307753fcf868 FROMLIST: sched: Introduce a sched_feat for Energy Aware Scheduling
+65b391c53f93b74f7708f2ae6191164fac1aff29 FROMLIST: sched/topology: Reference the Energy Model of CPUs when available
+97da053c78b68f012c86133bad276f5a9f311e98 FROMLIST: sched/topology: Lowest CPU asymmetry sched_domain level pointer
+8d1fea14be3a2fbedd1c76f12f449123fef7e1c3 FROMLIST: sched/topology: Disable EAS on inappropriate platforms
+996d62ba153adf383c7399e29274388bdc65f973 FROMLIST: sched/fair: Clean-up update_sg_lb_stats parameters
+454d381629e07c7de93a96d63bae1290d70455e3 FROMLIST: sched: Add over-utilization/tipping point indicator
+935b5ba7eba175b18bd45757488c30ae53f60de7 FROMLIST: sched/fair: Introduce an energy estimation helper function
+1f1cb4eb202ff86e4928bd662cac144508748ac5 FROMLIST: sched/fair: Select an energy-efficient CPU on task wake-up
+b6f7b5c66bf1c8e878bfa41fa80b1925214006ea FROMLIST: sched/topology: Make Energy Aware Scheduling depend on schedutil
+a09367e3944d2a632de398fa76bad8c5fb69d87a FROMLIST: cpufreq: dt: Register an Energy Model
+841cb71852c609f3bdfe14f933f8e66f6f5824e2 FROMLIST: sched/fair: Use wake_q length as a hint for wake_wide
+96ae823772d44a458339bc2e0041194ca5d4bffa FROMLIST: arm64: dts: sdm845: enable tsens thermal zones
+2c8f7282824bb1663e12414cc657ea3d300e19b9 FROMLIST: arm64: dts: sdm845: Add dispcc node
+743c4a95897da0a4f4f30463a2bfd8eb6d0b84d1 FROMLIST: phy: Update PHY power control sequence
+5d6bb44f5a826df2c3834f3edffd762dbcb40a44 FROMLIST: phy: General struct and field cleanup
+94b5164324bce75402abe0c69c0a9e3a32adcb12 FROMLIST: phy: Add QMP phy based UFS phy support for sdm845
+99df7dbbaef3b683499924dab8d56c5e021ef4b9 FROMLIST: dt-bindings: phy-qcom-qmp: Add UFS phy compatible string for sdm845
+9d68a6ff4c80823eec4a7365a0c657f81bd125f2 BACKPORT: FROMLIST: arm64: dts: qcom: sdm845: Add USB-related nodes
+9f34ca2c7bcf381efb6f3e1a876dedf95f9b68ed BACKPORT: FROMLIST: virtio_blk: add discard and write zeroes support
+b4e76934402f68f186636a2114627bb9f9883d9e FROMLIST: drivers: soc: Add broadcast base for Last Level Cache Controller (LLCC)
+164715ae41c17e614f1dbcec2fa2ef4795fa0e34 FROMLIST: drivers: soc: Add support to register LLCC EDAC driver
+b8c3fcc2775a0ec658d35367f6480a211058ba43 FROMLIST: drivers: edac: Add EDAC driver support for QCOM SoCs
+88926cc60cf488060029b6286d9d674f95086739 FROMLIST: dt-bindings: msm: Update documentation of qcom,llcc
+e17dbf481badf891ca3fc31d1b61818260b6c39b FROMLIST: arm64: dts: qcom: pm8998: Add adc node
+4e19095cae8cb64fa86f4db96832626ebdf6c028 FROMLIST: arm64: dts: qcom: Populate pm8998 with some nodes
+ea9e56c6b77680c60957eee57ba0e73363903da5 FROMLIST: arm64: dts: qcom: Add AOSS reset driver node for SDM845
+7b79bdfb28b55d4358f58fb8fb3d848d23e87d4d FIXUP: FROMLIST: arm64: dts: qcom: Add AOSS reset driver node for SDM845
+41b6a7725b69c2f9fc7738b31777b9cdd11496e7 FROMLIST: arm64: dts: qcom: sdm845-mtp: Add RPMh VRM/XOB regulators
+fbca279906ef8942a40e92a1b9c9ab9c266326f6 FROMLIST: arm64: dts: qcom: sdm845-mtp: Add nodes for USB
+bc6880965515e24b113d325dd8f09b8a80454c9e FROMLIST: arm64: dts: qcom: sdm845: Add adsp, cdsp and slpi smp2p
+1afa2383c4c9c239c949da018b2c89fafc542ccf FROMLIST: arm64: dts: qcom: pm8998: Add spmi-temp-alarm node
+2d1eb6e6f0588e881e22a2fa831041c24048f4ce FROMLIST: arm64: dts: qcom: pm8998: Add pm8998 thermal zone
+59219df6b1c05b130bcf3b98c5f7f0e9233620e2 FROMLIST: soc: qcom: geni: Don't ignore clk_round_rate() errors in geni_se_clk_tbl_get()
+1c728cdf1ca51004f2288ea7366d2c5e4d7e43e5 FROMLIST: soc: qcom: geni: geni_se_clk_freq_match() should always accept multiples
+27424271dc5c98129ab7d3880a65a669f3e40679 FROMLIST: soc: qcom: geni: Make version macros simpler
+73c227f4bd51c239b8b01d2c794803d2093266e2 FROMLIST: iommu/arm-smmu: Add pm_runtime/sleep ops
+87a8d969fae21a57511f96b5758c151e96ecb9ab BACKPORT: FROMLIST: iommu/arm-smmu: Invoke pm_runtime during probe, add/remove device
+28d7c4293017c96141fca42501842314de22fe23 FROMLIST: iommu/arm-smmu: Add the device_link between masters and smmu
+8a97785624c9e638c7aff30586ffc0a0339499a0 FROMLIST: iommu/arm-smmu: Add support for qcom,smmu-v2 variant
+43d8007a897323eeb05ac51dfc6ec55a7ef5e969 FROMLIST: soc: qcom: Add irq clear handling during SE init
+29b66344a0e6d794f57e1424cd7072b45286ed02 FROMLIST: spi: spi-geni-qcom: Add SPI driver support for GENI based QUP
+6af66bea90f703db963da00384d91a7732129dad FROMLIST: spi: Introduce new driver for Qualcomm QuadSPI controller
+2d7630df8c4d1f1454bc8d9f464ddd253c8979ba FROMLIST: arm64: dts: qcom: sdm845: Add qspi (quad SPI) node
+eebd30cc67d161d9db0176da604f8b46ab41766a FROMLIST: dt-bindings: arm-smmu: Add bindings for qcom,smmu-v2
+943a4a64f48f170ee639858568833848fe91f4b5 FROMLIST: dt-bindings: soc: qcom: Remove SPI controller maximum frequency binding
+a11338d7734032fe5a2a70a129a3aa3810c9dcb9 FROMLIST: dt-bindings: soc: qcom: GENI SE SPI controller device tree binding
+1498e340fa2031a343910eea4a7d1b96cfe86424 FROMLIST: dt-bindings: spi: Qualcomm Quad SPI(QSPI) documentation
+34781ac850a53a49539ba35abedaa499032eb676 FROMLIST: arm64: dts: qcom: sdm845: Add UART nodes
+4f02d9b2f1f06c4f3494cf39bd4809a1b8490171 FROMLIST: dts: arm64/sdm845: Add node for arm,mmu-500
+dc8f32ccd6bb612a7207e62dcea38d90c19e2048 FROMLIST: phy: qcom-qusb2: Use HSTX_TRIM fused value as is
+415bb6d5144c361ed3e42c629bac933b54d453c2 FROMLIST: phy: qcom-qusb2: Fix HSTX_TRIM tuning with fused value for SDM845
+2a21f82ff0f8ad1398ac80cf5f85b4c346e9e3ee FROMLIST: dt-bindings: arm-smmu: Add binding doc for Qcom smmu-500
+93eb99242735c0b5edab26ede605b691e8f4cf15 FROMLIST: dt-bindings: phy-qcom-qmp: Fix several mistakes from prior commits
+63ed6f51c9082f33dbada69385eb0d296a9e3b6e FROMLIST: Bluetooth: btusb: Add quirk for BTUSB_INTEL_NEW
+1934ad55e89d0a0db617d47448c9abf0e7073bcc FROMLIST: cpufreq: dt-platdev: allow RK3399 to have separate tunables per cluster
+7082ea51dfa17f038d316c997bedb87b05858e12 FROMLIST: drm/msm: Remove pm_runtime operations from msm_iommu
+656684b746e846daa644ad9f7b023cedacf7ee92 FROMLIST: Add the `REL_WHEEL_HI_RES` event code
+24539d7f1927944be78bc581ea20c04dfcc43b42 FROMLIST: Create a utility class for counting scroll events
+9aa10d76c5e8f38c51035a69de8944db45667900 FROMLIST: Add function to enable HID++ 1.0 "scrolling acceleration"
+fe46e08eadb2d6e2df6e32b1f28e4befd9a2b190 FROMLIST: Enable high-resolution scrolling on Logitech mice
+04728ce98339e3552a567b4af9115d8615796524 FROMLIST: Use LDJ_DEVICE macro for existing Logitech mice
+41df57ea86a56581184489fd6ad8b20c27c9b727 FROMLIST: thermal: handle get_temp() errors properly
+7233d0a556ea4278803408861036cab088040026 FROMLIST: firmware: coreboot: Let OF core populate platform device
+5bf6fa6869eec24b066dcabe54062809091b65bb FROMLIST: mnt: Silence lockdep warning about i_mutex, mount and reclaim
+46bb9c70b205b190cd0dd42ed2d22dead6bfdfbd UBUNTU: SAUCE: trace: add trace events for open(), exec() and uselib()
+d4ad580db16a40a73edc30c37ae470fee80cbc18 FROMLIST: ecryptfs: sync before truncating lower inode
+6c04ef0cd48a68ae9f9b8990d94be8696677c176 FROMLIST: dt-bindings: iio: vadc: Fix documentation of 'reg'
+2c10a1d7c302bf099ac9afc239453dc439de076c FROMLIST: platform: chrome: cros_ec_dev - Return number of bytes read with CROS_EC_DEV_IOCRDMEM
+cf3eec27bede4b821e59e9c9331de3a5f0e0fc3f FROMLIST: mfd: cros_ec_dev: Register cros_ec_accel_legacy driver as a subdevice.
+b501ccaec3b0fa564615d6f68a02a3a83d0d96c7 FROMLIST: vb2: Anticipate queue specific DMA attributes for USERPTR buffers
+f24b395e9e3ebeacd7f1627249413e5c4322505c FROMLIST: vb2: dma-sg: Let drivers decide DMA attrs of MMAP and USERPTR bufs
+13ef5fcc0273f6b231d15584f747fdce61fb4056 FROMLIST: vb2: Move cache synchronisation from buffer done to dqbuf handler
+c5d422e189894a7367c3649a36edfa40ed6653aa FROMLIST: z3fold: fix wrong handling of headless pages
+29857d973759054f8481aec57892984963bb6bb8 FROMLIST: rtc: report time-retrieval errors when updating alarm
+f946546f51c84a0f2c4a14dae8c38e66bb09a5d9 FROMLIST: i2c: enable async suspend/resume on i2c devices
+ac69bc74240c2980d1c132c620e4bc797aa7d39a FROMLIST: PCI: pciehp: Optimize PCIe root resume time
+dac9f7e8f74be13def6f5c7006fca4c2bbb15f90 FROMLIST: BACKPORT: freeze: Add error reporting
+63c68db40b45828101f078b9a2569a01829c1ce0 FROMLIST: BACKPORT: tick: Add freeze timer events
+c7acbc0c6b864fa42e220ba27c76f8843e02b8dc FROMLIST: scsi: sg: Prevent potential double frees in sg driver
+25837122582fcfacf252fd787ee57af5d998763f FROMLIST: scsi: ufs: Power on phy after it is initialized
+13bfe0be048593e98d2591966572e72c28610ac0 FROMLIST: scsi/ufshcd: Fix NULL pointer dereference for in ufshcd_init
+af30a257b79400838f430df66f14b95165f6dfcf FROMLIST: scsi: ufs: Make sysfs attributes writable
+4049f6b5fe92cb91e518dc04f1d22f156de0bfaf FROMLIST: scsi: ufs: Make sysfs flags writable
+892b4e3b39771465c3f24476b090db9df5c1d83e FROMLIST: scsi: ufs: set the device reference clock setting
+77a753cac93851b686effa5f480814bd34860129 FROMLIST: scsi: ufs: Add configfs support for UFS provisioning
+fdc32e2074902f6e6a1a0711ab9b9c04f0401a03 FIXUP: FROMLIST: scsi: ufs: Add configfs support for UFS provisioning
+3f47d42207351450abbd0f2b10977d464cfe17e2 FROMLIST: scsi: ufs: make UFS Tx lane1 clock optional for QCOM platforms
+6f87c0764b43588ced66999130ed83dfdd65cf8e FROMLIST: scsi: ufs: Schedule clk gating work on correct queue
+2d83f8ecdeb62adef11b206a51b9dc1d646ebf96 FROMLIST: dt-bindings: ufs: Fix the compatible string definition
+70099737fb0df890ae7101aeffdfb6f329daea6b FROMLIST: BACKPORT: ASoC: Intel: Boards: Add CNL RT274 I2S machine driver
+036ee8b937a6232c77f59bbafdc01771bca33690 FROMLIST: ASoC: Intel: Add Geminilake Dialog Maxim machine driver support
+0079a540e4471cc428316bf0da7f16cb4063a74c FROMLIST: ASoC: Intel: glk: Add DAI links for Multi-Playback
+58e586f64f7a515af99a66eaa0b5d2980e383a52 FROMLIST: SoC: Intel: Power down links before tuning off display audio power
+6d590e5f5d5d05d832ae723d94ab73b11fc1e30f FROMLIST: ASoC: Intel: Headset button support in broxton machine driver
+58511334fc57c6f71fa91d8f6560c375a7e76a94 FROMLIST: staging: max98927: Added controls for Envelope tracking
+2448035897c5ec1b1db49a62d3e19efc41927648 FROMLIST: ASoC: amd: Adds rate and channel constraints for capture in Stoney rt5645
+434ac7e1bfa33c746e65f5832f6344e3643ce286 FROMLIST: ASoC: da7219: read fmw property to get mclk for non-dts systems
+76e29dbe7d313a283435aa645b5c9b996b59f01d FROMLIST: ASoC: Intel: hdac_hdmi: Limit sampling rates at dai creation
+40198b854537b5fc42d6daa9df15f16ea6811475 FROMLIST: ASoC: AMD: Change MCLK to 48Mhz
+90296850d0e9725ca75677189a1c38056cf459e0 FROMLIST: ASoC: AMD: Set constraints for DMIC and MAX98357a codec
+07a389630828fa6687972dbf98fc8987f62f710f FROMLIST: ASoC: AMD: Fix capture unstable in beginning for some runs
+3d68998c815a4b3941901537e484d7d7bd03858f FROMLIST: ASoC: AMD: Add SND_JACK_LINEOUT jack type
+965ad3a2a8c32b9f8637a246e53d892f414a36eb FROMLIST: tty: serial: qcom_geni_serial: Fix serial when not used as console
+f25b8733da6a5400cdde4d6bb59370b1fd1a74ae FROMLIST: tty: serial: qcom_geni_serial: Don't slow all ports just for kgdb
+c1c3d82a8ac3949c8266782790136db6d69741f9 FROMLIST: tty: serial: qcom_geni_serial: Rectify UART suspend mechanism
+2ce5d4826c3833f3e013e8c9ced05f2eeacdce28 FROMLIST: tpm_tis_core: add optional max xfer size check
+b170908295d1b3772c0bea2c97eb56a193e5705c FROMLIST: tpm_tis_spi: add max xfer size
+fe99c14ab0c690fdd20437afd08d036f37ee4c2f FROMLIST: tpm: add sysfs attributes for tpm2
+cd28aefd096747258e821e66c9ee615bfe147bfa FROMLIST: tpm: add driver for cr50 on SPI
+eaffff36d0e615d30f990f1e58c173f770e98010 FROMLIST: tpm: devicetree: document properties for cr50
+0190f8fe5bf68c56e53654614265dc4a43efb3f4 BACKPORT: tpm: Add explicit chip->ops locking for sysfs attributes.
+c6030e715e1053aefb5b0aea289d7af8d044c72b FROMLIST: platform/x86: intel_pmc_ipc: Use XTAL freq based on cpuid
+f082f3f0d0e5c306c8f4b79e3230e25bc5daa4b4 FROMLIST: BACKPORT: x86, apic: Add freeze event support
+96850c92d9c134696b392adcf25fc93a907b19c1 FROMLIST: ath10k: Add qmi service helpers for wcn3990 qmi client
+58829be84a53911e061a9e69a853be6e5fbaad27 FROMLIST: ath10k: Add support to create boardname for non-bmi target
+3a2736af5265d12f5c90faf4c271860bc63b9bb9 FROMLIST: ath10k: Add debug mask for QMI layer
+db109515ab06877e25f04b943746226b012801c8 FROMLIST: dt: bindings: add bindings for msa memory region
+55e36a513546ebc063959d1f949d99c8765bda7c FROMLIST: firmware: qcom: scm: Add WLAN VMID for Qualcomm SCM interface
+9e444e4e938244a0d81da26ff4dfd56927624e3e FROMLIST: ath10k: Add QMI message handshake for wcn3990 client
+e25f7a3fde49aafcb866c2789a6114cef966d8f5 FROMLIST: ath10k: Set DMA address mask to 35 bit for WCN3990
+f1eefdcf632ef137b90cc0d093bfed27ea1c61ff FROMLIST: ath10k: Move napi_enable to hif_start for consistent pairing
+04f8a6edda3d760d047d6c472e91e16a748cafd8 FROMLIST: ath10k: Disable napi before resource cleanup to avoid "use after free"
+32309bc06e5a42c432124e3ad318245dd59a959d FROMLIST: ath10k: utilize random MAC address if none is provided
+c1c06a975ca6dfe1caf2f5581d86a6b969cba394 FROMLIST: efi/libstub: Disable some warnings for x86{,_64}
+87bc14d8d9f5f78df59bbde8d4ae7663041db07c FROMLIST: dt-bindings: phy-qcom-qmp: Fix register underspecification
+d9ed7c2be74719184ef09035f2046936a723d747 FROMLIST: phy: qcom-qmp: Utilize fully-specified DT registers
+df93117e3abb977634c0b053cc8a19b4bc9ba3d0 FROMLIST: arm64: dts: qcom: sdm845: add UFS controller
+121a1d526d7406993a37ac9c435b1eded758f882 FROMLIST: arm64: dts: qcom: sdm845: Add UFS nodes for sdm845-mtp
+5b7790e6642dfff26332a54d1647480818077fd6 FROMLIST: arm64: dts: qcom: sdm845: Add USB PHY lane two
+64fe4c35c9161a0666855f87565467b78dc224da FROMLIST: ath10k: snoc: remove 'wcn3990' from generic resource handling
+0afcd2a9b1274b68272b0aecc560636b60ecf251 FROMLIST: ath10k: snoc: fix unabalanced regulator error handling
+1d8b66e8900825222e0ed195b0930099385d2345 FROMLIST: ath10k: snoc: relax voltage requirements
+5df6711e186d5311aaf583a50d0da759a40dbbbb FROMLIST: ath10k: snoc: fix unbalanced clock error handling
+7bbca67069e64687748864f935fe1301636b8ca6 FROMLIST: arm64: dts: qcom: sdm845: Fix pcs_misc region address for UNI PHY
+3f87f8a78147956068cd063e88af0e6c94f78f81 FROMLIST: mmc: sdhci-pci: Try "cd" for card-detect lookup before using NULL
+c8d9b13b6580799b8d8868d2f5a1efc340bb4402 FROMLIST: arm64: dts: qcom: sdm845: Add SCM DT node
+15b87b9da9aa624f00828915e5c10122622cd43d FROMLIST: arm64: dts: qcom: sdm845: Add PDC Global reset driver node
+8488148153f842cf027cd9bd15cdd6c0ff895789 FROMLIST: arm64: dts: qcom: sdm845: Add reserve-memory nodes
+a2f1b7ecc9293f662853c4bcf76d70a80adf65d3 FROMLIST: serial: qcom_geni_serial: Finish supporting sysrq
+a32661679957726e9a6ed3c7e081c353d8a30284 FROMLIST: i2c: i2c-qcom-geni: Fix runtime PM mismatch with child devices
+9103000dcf71e6a6ebde134e45543e83c40395ff FROMLIST: drm/msm/dpu: Correct dpu destroy and disable order
+0f9dbfd8d4a124308d1df91dcfe68c905e0aba8e FROMLIST: Revert "ath10k: add quiet mode support for QCA6174/QCA9377"
+0a069dd172099560c64539c1004405341a2a573c FROMLIST: Revert "scripts/setlocalversion: git: Make -dirty check more robust"
+0400d4b09e7c9290dbbfd95943da466a6e171c35 BACKPORT: drm/i915/icl: toggle PHY clock gating around link training
+240da81570b7d7b2f0337a1648624620c07991ef BACKPORT: FROMLIST: dt: bindings: add missing dt properties for WCN3990 wifi node
+1b2927cd36db882de27d7b84c3636c4ffe988f33 FROMLIST: dts: arm64/sdm845: Add WCN3990 WLAN module device node
+2b668d3fd0fb7e3f554d75d2252cd6c402e0df48 BACKPORT: FROMLIST: dt: bindings: add bindings for wifi iommu node
+5ff64fbffcbfa5c90afaeefca42834613edd40ea FROMLIST: platform/chrome: straighten out cros_ec_get_{next,host}_event() error codes
+459fc2c34dcca6e8a2a0809c57f561ea35233de8 FROMLIST: platform/chrome: don't report EC_MKBP_EVENT_SENSOR_FIFO as wakeup
+b50ea33bf1af15ed25486274149f26bbe5cf3465 FROMLIST: proc: use ns_capable instead of capable for timerslack_ns
+4e66a4de5eef2a387ef9a8d30ee3e7c722f256c4 FROMLIST: dt-bindings: iio: vadc: Add unit address to ADC channel node in example
+b2c9c0099785344b013a401529d645bb859e9a24 FROMLIST: arm64: dts: qcom: pm8998: Add die temperature channel node to the ADC
+c58618019deb3ccb41fe793152c1955558b50d03 FROMLIST: blk-mq: not embed .mq_kobj and ctx->kobj into queue instance
+f5e981aceae5ebca308ef30f02bb6e6ace2bcac7 FROMLIST: arm64: dts: qcom: sdm845: Add gpio-ranges to TLMM node
+8412b18b1ba1f324b7175b5aba38f43456c5d7dc FROMLIST: pinctrl: msm: Add sleep pinctrl state transitions
+5a20bd37d63cac35b6b7993c92e56f686748284c FROMLIST: ath10k: support PCIe enter L1 state
+cead9571ce8e1010a8a04357caaf83a8262f398b FROMLIST: dt-bindings: clock: Update GCC bindings for protected-clocks
+72d5afdf13fe5e05d7185a2ac223cbbd56ee7f8f FROMLIST: lib/raid6: sort algos in rough performance order
+10093edd34018dc30ca82df4d0d0ebe831248587 FROMLIST: lib/raid6: add option to skip algo benchmarking
+dab0511f1254c579de731b4664e409a3d50d455f BACKPORT: FROMLIST: soc: qcom/llcc: add MODULE_LICENSE tag
+ff49a5198fc131e881bd3d78ab6d715f225c989b FROMLIST: soc: qcom: llcc-slice: Add error checks for API functions
+ae682cde4eb53689418f9f102ba0f81729b62f26 FROMLIST: arm64: dts: sdm845: Add gpu clock controller node
+955aff86e532617165779eb5e904434ffd3e7146 FROMLIST: drivers: qcom: rpmh: avoid sending sleep/wake sets immediately
+5b6e980423434871ca97ddb3d21be51f3885df97 FROMLIST: arm64: dts: qcom: pm8998: Use ADC temperature to temp-alarm node
+da4c1b2d9f5ee9526fd3d25fdc10b9520808e593 BACKPORT: FROMLIST: interconnect: Add generic on-chip interconnect API
+b4a8bc6ba2bebd049df0a4036ecba20cb595f71f FROMLIST: dt-bindings: Introduce interconnect binding
+610e114842d13d4d4c1d28e3d92020521f6a8cf5 FROMLIST: interconnect: Allow endpoints translation via DT
+9a295683ef3b013ebccb73132b1edb9a6d04a287 FROMLIST: interconnect: Add debugfs support
+b2c182b7c4661b5b3b88f4cdaa9f87463b6ab052 FROMLIST: interconnect: qcom: Add sdm845 interconnect provider driver
+0208796b9ce9d8800ccc28fd5d059f6b6c71e0de FROMLIST: arm64: dts: sdm845: Add interconnect provider DT nodes
+4e0a02895a589f259ea0ddbee662374c6130ff80 FROMLIST: MAINTAINERS: add a maintainer for the interconnect API
+11be3e7b2c60767859b1c56040cadc864536b350 FROMLIST: drm/msm: Only add available components
+4db1062e17e202f57b125bb1102e837c9df77289 FROMLIST: drm/msm/dpu: set geometry for iommu domain
+3c111af9437ad21d7db82120a116936bc968cab9 FROMLIST: arm64: dts: qcom: sdm845: Add dpu to sdm845 dts file
+81534abc1d84ca7b3c63ba03f98bb6c103bb1ab5 FROMLIST: arm64: dts: sdm845: Add videocc node
+ae2d07ae0999298106ab3ae84307aa0de09e1947 FROMLIST: iio: adc: qcom-spmi-adc5: Initialize prescale properly
+4ae1ef1b2491576ee780b2b2d86d7905c2fece2e FROMLIST: drm/msm: dpu: Allocate proper amount for dpu_crtc_state
+48c0c22eef630edb010af82112f0b5d6db800357 FROMLIST: arm64: dts: qcom: sdm845: Add SD node
+3e99f52df663f18638044f5dc5e0bf5a10ad1047 FROMLIST: arm64: dts: qcom: sdm845: Add SD nodes for sdm845-mtp
+0b08eb5c0406c2da97f1607303072de50c25d19c BACKPORT: FROMLIST: arm64: dts: sdm845: Add lpasscc node
+ade1de9e834b861ef8bd4a75d5e837cc3c6321ea FIXUP: FROMLIST: interconnect: Add generic on-chip interconnect API
+f9fedc34be9d28b86914df941c906dffe2f98a67 FIXUP: FROMLIST: dt-bindings: Introduce interconnect binding
+fa30475edc3d201873c99c206e660f14996eef9e FIXUP: FROMLIST: interconnect: Allow endpoints translation via DT
+0d363ad331f33c149009f0fbcd616f1fa62f31a4 FIXUP: FROMLIST: interconnect: qcom: Add sdm845 interconnect provider driver
+90219efc1c47c28cf51bf7e47bc306eeb094679d FIXUP: FROMLIST: arm64: dts: sdm845: Add interconnect provider DT nodes
+369d3f127310a4a9413822a11468446dd67b0ad8 FROMLIST: tty: serial: qcom_geni_serial: Remove interrupt storm
+8af1c6cdaa7ed2dcb6283d693e54561cfb5e3ab1 FROMLIST: opp: Add API for getting voltage from supplies
+a6ca1a969a521b07481ee33c05430a56bd7d25e8 FROMLIST: tty: serial: qcom_geni_serial: Fix UART hang
+b9061de5140b3b03456b6868bdb9477a4b61977e FROMLIST: tty: serial: qcom_geni_serial: Fix wrap around of TX buffer
+e4b6699f180ec51deb7e5ec119ff730a417df6d1 FROMLIST: drm/amdgpu/gmc: fix compiler errors [-Werror,-Wmissing-braces]
+3356a4b12f2d4992d3a44798ac165be95ffa47cb FROMLIST: drm/amd/display: fix compliler errors [-Werror,-Wmissing-braces]
+c83a5a4f406067f5a232c1b62a622c22e93fa8e7 FROMLIST: soc: qcom: rmtfs-mem: Add class to enable uevents
+ed80b937fe1ef14a6e8927b048559a571128a795 FROMLIST: soc: qcom: rmtfs-mem: Make sysfs attributes world-readable
+b4240c52ff8b1ca1d2522a651abfc8cce4ab9082 FROMLIST: arm64: dts: sdm845: Add cpufreq device node
+40cca5363b8d454ffa67de73da0a2f1423065296 FROMLIST: Bluetooth: Fix locking in bt_accept_enqueue() for BH context
+d6ec2d34eebc43d6970edee18c8d1fef883b14fc FROMLIST: dt-bindings: opp: Introduce opp-level bindings
+149cac5ab1c40a52a3823e8323bff307485b9623 FROMLIST: OPP: Add support for parsing the 'opp-level' property
+414a38e5619e0cc81a6a474090013ab989db59cc FROMLIST: dt-bindings: power: Add qcom rpm power domain driver bindings
+0c3a6475dd48c3ebb1241af1527c11da35391c20 FROMLIST: soc: qcom: rpmpd: Add a Power domain driver to model corners
+6d7b07f8e949560615e2262ea4f4efdc7fdb6075 FROMLIST: soc: qcom: rpmpd: Add support for get/set performance state
+3bc21565274fe7c7a74bffe44508f7cacfee20cb FROMLIST: arm64: dts: msm8996: Add rpmpd device node
+60acd33f01669f10bdd603c2f0a51d4d4fad70c8 FROMLIST: soc: qcom: rpmhpd: Add RPMh power domain driver
+7a3fe2785c28d803c3ed43ea41c9dd44c5d4bb57 BACKPORT: FROMLIST: arm64: dts: sdm845: Add rpmh powercontroller node
+f37e689c14bc1a4f8aac200d045a49a6d87e3aa5 FROMLIST: soc: qcom: rpmhpd: Mark mx as a parent for cx
+47e48a1539375617ef2c6c07ba578542c26c6f74 FIXUP: BACKPORT: FROMLIST: arm64: dts: sdm845: Add interconnect provider DT nodes (include)
+1aeb56153d28950fbaa3c3bef53f13f7dedfb997 FIXUP: BACKPORT: FROMLIST: interconnect: Add generic on-chip interconnect API
+ac2bee07bd9a1957487bdd941cb64cf57e4ad314 FIXUP: FROMLIST: interconnect: Add debugfs support
+5de5e9b9fb0754672b530caad867f17f925a8643 FROMLIST: interconnect: Revert to previous config if any request fails
+392021f191d5c30cbffdecb57ae6bfcb5b3ac59a FIXUP: FROMLIST: soc: qcom: rpmpd: Add a Power domain driver to model corners
+7139d985f49f636f4eaaa889377def262433383e FIXUP: FROMLIST: arm64: dts: sdm845: Add lpasscc node (status=disabled)
+f1601f07ee03f6f0e0072b6d254922eb60b2e38d BACKPORT: FROMLIST: arm64: dts: qcom: sdm845: Increase address and size cells for soc
+1874b608cb90cc5ccd1377cc994cda26da090383 FROMLIST: arm64: dts: qcom: sdm845: Extend ranges and describe DMA space
+9d91f44d0b4ba397f0b6b84432771f35244fd2b5 FROMLIST: arm64: dts: qcom: sdm845: Fix lpasscc reg
+758dc382f136b3ae3521a897661c9bde22ddf60e FROMLIST: arm64: dts: sdm845: Add CPU capacity values
+bee0d14543bd6180b2e95820980eafbd3b000e7a FROMLIST: arm64: dts: sdm845: Add CPU topology
+b205ba4d97cf0bc140866c368e9610d30053405f FROMLIST: drm/msm/a6xx: Add support for an interconnect path
+45fd4273d8b73d265a5526f6ce7055c4037ad12a FROMLIST: dt-bindings: drm/msm/a6xx: Document interconnect properties for GPU
+eeafc37c48477197406629173446b72bc325389a BACKPORT: FROMLIST: arm64: dts: sdm845: Add gpu and gmu device nodes
+77a1d33fa5fd793d2cd67e31ff2bb0029b70c76b FIXUP: FROMLIST: arm64: dts: sdm845: Add gpu and gmu device nodes (address-cells)
+01313c6e8cb9c3317773d713274864021a2c33e4 FROMLIST: arm64: dts: sdm845: Add interconnect for GPU
+0546c1f485a5314bdb31d247a96f9d73ab24fd21 FROMLIST: drm/msm/dpu: clean up references of DPU custom bus scaling
+1c65bbb51db9331cfba4280b05e50113356bef32 FROMLIST: drm/msm/dpu: Integrate interconnect API in MDSS
+a10ad2af020a29638f1c89aafdf3e41c9e75c12b FROMLIST: dt-bindings: msm/disp: Introduce interconnect bindings for MDSS on SDM845
+28ca8b6bf79b5206877214dc69d48e83ee7599f7 FROMLIST: arm64: dts: sdm845: add interconnect DT entries for MDSS on SDM845
+c24401bfe8a36b1807fe416d0c3328867f3577dd FROMLIST: arm64: defconfig: Add Qualcomm UFS PHY
+584b9900d98e9492c23a0af59d350b40095df922 FROMLIST: uvc: Avoid NULL pointer dereference at the end of streaming
+90617d289bbfd9d921040e91a66dcb1eb8037ae6 FROMLIST: cros_ec: Remove cros_ec dependency in lpc_mec
+15b95780aadc1805280def3d0ee7bd6308dfbb2d FROMLIST: wilco_ec: Add new driver for Wilco EC
+2a9b85eff5b672d02cc82c426e89ef871d659d48 FROMLIST: ath10k: correct bus type for WCN3990
+100abc3b61ad8aa0362f399f6ede0e5d9dfc9bd6 FROMLIST: ath10k: sdio: add .owner field
+291b755a67bec55184e06913d6bbc445d8d03612 FROMLIST: arm64: dts: sdm845: Add dynamic CPU power coefficients
+eb81c255938faee173dce4eccd1dbbbc6bbd1041 FROMLIST: arm64: dts: sdm845: wireup the thermal trip points to cpufreq
+99b31623aad91d739a011121d57b0ea29f10dec6 FROMLIST: loop: properly observe rotational flag of underlying device
+cf8a809363c0a92877bac7184149beed96f20b72 FROMLIST: wilco_ec: Fix Kconfig dependencies
+71d2cfe97ba1e38342cd2d1fb1d01d2826bf717d FROMLIST: soc: qcom: rpmhpd: Set 'active_only' for active only power domains
+f34acfb57c992777f8d73da998d0990e6489936f FROMLIST: wilco_ec: Fix wilco_ec core driver.
+117929663c367332d1ea3dca2d9c353f79373513 FROMLIST: wilco_ec: Add support for raw commands in debugfs
+d7d34cd043e4e75a6d0401f4f7f0d0bf236e90c3 FIXUP: FROMLIST: scsi: ufs: set the device reference clock setting
+6448fd21910ef6725aae096b24c65c2e3ab7f918 FROMLIST: wilco_ec: Add RTC driver
+ed97906024f85dbb5fcf40a055812b65d2819c72 FROMLIST: usb: core: add option of only authorizing internal devices
+70271c03844fd3adb3bfe5ea6d8976e54df2c18c FROMLIST: of: fix kmemleak crash caused by imbalance in early memory reservation
+10b56ce292f5cfdfb6f32fda1d8cb6d341d58274 FROMLIST: of: fix parameters order for call to memblock_find_in_range()
+15eafae044028b388d82b0d63d3f857504182784 FROMLIST: mm: Add support for kmem caches in DMA32 zone
+9c1e97c8fb8f18fcb970033b0e1fd9ad7ed9ec15 FROMLIST: iommu/io-pgtable-arm-v7s: Request DMA32 memory, and improve debugging
+680f03f4eb3f95ba569ec7118f0a6f36a51124e5 FROMLIST: mm: Add /sys/kernel/slab/cache/cache_dma32
+ac951441ba80c8c0d6f7a3e6a72ca296a8833b5b FROMLIST: dt-bindings: mediatek: Add binding for mt8183 IOMMU and SMI
+12eb20d3a62850cfac0e4e1de38cf794e29f928b FROMLIST: iommu/mediatek: Use a struct as the platform data
+48d90fcea08058b500f3f51f419c99a63a4e9a41 FROMLIST: memory: mtk-smi: Use a general config_port interface
+b446dd6cfd2247773f23e75db81082141daaa34b FROMLIST: memory: mtk-smi: Use a struct for the platform data for smi-common
+7883fc8cd0658bbb6c855cb4dab7d5531a2989f9 FROMLIST: iommu/io-pgtable-arm-v7s: Add paddr_to_iopte and iopte_to_paddr helpers
+fc3537185864df2902b1b7498b2e6c76ee7e1da4 FROMLIST: iommu/io-pgtable-arm-v7s: Extend MediaTek 4GB Mode
+94b05b1186c7816914b64d7eac7aaa9907c9883b FROMLIST: iommu/mediatek: Add bclk can be supported optionally
+80915d0f513c5c26355978f32a3414a0f15b4572 FROMLIST: iommu/mediatek: Add larb-id remapped support
+773f2cf132bad170732c35cfe6ca2d5b3516a9ee FROMLIST: iommu/mediatek: Refine protect memory definition
+4b42f19dd60b6b3c0c3372965d9f4f1cb37655ee FROMLIST: iommu/mediatek: Move reset_axi into plat_data
+9cf24004a7aa95408e48e39b5d4104bc86c19213 FROMLIST: iommu/mediatek: Move vld_pa_rng into plat_data
+b40e05a4ccca7e34ce97100bb732a09cac3f9ef8 FROMLIST: memory: mtk-smi: Add gals support
+f087255846f144b2cad0dbaa54eb5890bba6136b FROMLIST: iommu/mediatek: Add mt8183 IOMMU support
+1bb2cc318f2915ea6ad893bee187a014b80f8847 FROMLIST: iommu/mediatek: Add mmu1 support
+c48d872f905ea9f5ca2ea231bd6cf0ac1cf5ce66 FROMLIST: memory: mtk-smi: Invoke pm runtime_callback to enable clocks
+91e2e825730c0a71616990a3981394c7ae336270 FROMLIST: memory: mtk-smi: Add bus_sel for mt8183
+e01dedd41e7fa84b8d11ec02841d3eacaa815592 FROMLIST: memory: mtk-smi: Get rid of need_larbid
+9acf5d0ad932eb4ad97fb8a10b8ddc3ceac49bed FROMLIST: iommu/mediatek: Fix VLD_PA_RNG register backup when suspend
+1e3ce1c9d96ec0b26455a6e2facb608cdba64dc2 FROMLIST: iommu/mediatek: Add shutdown callback
+b478a44fd58cf7f2c5bbcf6cf1f7302c4846116f FROMLIST: iommu/mediatek: Rename enable_4GB to dram_is_4gb
+f726ab02350545ab66d814115db332de3116ff16 FROMLIST: iommu/mediatek: Fix iova_to_phys PA start for 4GB mode
+00018db4291fbef08630810fdd64f797ad4f9533 FROMLIST: iommu/mediatek: Switch to SPDX license identifier
+e34b02b02fbb0f90b21313027b5991fbd69a593c FROMLIST: mfd: cros_ec: instantiate properly CrOS ISH MCU device
+71a746ee9e8fba2935eb461b69145fa9c923b4a4 FROMLIST: mfd: cros_ec: Do not attempt to register a non-positive IRQ number
+3dbfb034158967cf43fc2cf7cfbe5a74c8cd75c4 FROMLIST: arm64: dts: Add Mediatek SoC MT8183 and evaluation board dts and Makefile
+91caeaf91cca77055d7c2f2aa8f8f8926b713cea FROMLIST: clk: mediatek: Disable tuner_en before change PLL rate
+ade20e3b572d5a94eead1407f68d031bc41d1cf2 FROMLIST: clk: mediatek: Add new clkmux register API
+8f00881ffa6e584236be3414a86336f58bc656fa FROMLIST: clk: mediatek: Add configurable pcwibits and fmin to mtk_pll_data
+e6d8e6d5d2b22487ab03d773b8afc77db755bc20 FROMLIST: dt-bindings: ARM: Mediatek: Document bindings for MT8183
+6d5dbaeb13a484048da6732e7e4364819b78d943 FROMLIST: clk: mediatek: Add dt-bindings for MT8183 clocks
+30b5a437e645e113a49d0a3587b6c3a1cec25384 FROMLIST: clk: mediatek: Add flags support for mtk_gate data
+52d21a9d118024d791d6a2f247e709386788fafb FROMLIST: clk: mediatek: Add configurable pcw_chg_reg to mtk_pll_data
+50fdc0e97bce122bcaac14a90a3e6d2358cdfcf7 FROMLIST: clk: mediatek: Add MT8183 clock support
+cf44c09c70e56f7053dd550cbbeeb5b38095a44c FROMLIST: clk: mediatek: Allow changing PLL rate when it is off
+74d49a34b188d11b042b3590b40cc7b3ab234867 FROMLIST: mfd: mt6397: clean up code
+08806d8a7bc70b4805cbc5a9512c74494911c446 FROMLIST: mfd: mt6397: extract irq related code from core driver
+7b89b8db28adc6d1f38dd2d10d6d16ded8cf8097 FROMLIST: dt-bindings: mfd: Add compatible for the MediaTek MT6358 PMIC
+d77e49b30f60cee59926b97a042bfc9a4d8f1743 FROMLIST: regulator: Add document for MT6358 regulator
+5c179d0330fd5d0e708f08aa273c4347209c2028 FROMLIST: mfd: Add support for the MediaTek MT6358 PMIC
+a3942743b5e47de6701dd15e94e99372b42f0f81 FROMLIST: regulator: mt6358: Add support for MT6358 regulator
+09045589ee926ab9e13a141881263c6f308d0bcd FROMLIST: i2c: mediatek: Add offsets array for new i2c registers
+fd91b98f4e565b376b25250c71b0a50f68f51ba5 FROMLIST: dt-bindings: i2c: Add Mediatek MT8183 i2c binding
+92742c586ecffd4bc1fa2df42016517a30281fc2 FROMLIST: i2c: mediatek: Add arb clock in i2c driver
+678b49bb056c4baada6b375ef2874718bfb48994 FROMLIST: i2c: mediatek: Add i2c and apdma sync in i2c driver
+5ee9f084ec478613d3044943dd262f09cba6bbf6 FROMLIST: i2c: mediatek: Add i2c support for MediaTek MT8183
+ad5339e2cabcc3db991f7236616e13dc58c5f585 FROMLIST: dt-bindings: serial: Add compatible for Mediatek MT8183
+16e9cbde112564521c456396fae6b6c8bf15b544 FROMLIST: soc: mediatek: add new flow for mtcmos power.
+4668553533b02a8bd60c50612286f9165105525b FROMLIST: dt-bindings: soc: Add MT8183 power dt-bindings
+ae9ff36e3b8fb6be2deb868f89987c214dfc37ec FROMLIST: soc: mediatek: Add MT8183 scpsys support
+455144164a29ba099c85afa1f751d4cc092c4188 FROMLIST: rtc: mt6397: fix alarm register overwrite
+d8d16ba1096f5fe79f244a6fa0db8aa875eef66b FROMLIST: rtc: Add support for the MediaTek MT6358 RTC
+d504e9690b307048d02517c269169f241ef45598 FIXUP: FROMLIST: clk: mediatek: Add new clkmux register API
+171f74e23a4ceb1dd7d425a7e4d1debf1da3b3c6 FIXUP: FROMLIST: mfd: Add support for the MediaTek MT6358 PMIC
+41570922db500a55ded29026e96aeb3232869abb FROMLIST: platform/x86: intel_pmc_core: Convert to a platform_driver
+4a25e1d58c3b9237e690b76101d6b45b16e4cd7b BACKPORT: FROMLIST: Revert "kbuild: use -Oz instead of -Os when using clang"
+97dd03e4657ad641cfea5c7704c99be9d5433cdf FROMLIST: arm64: dts: Add power controller device node of MT8183
+a8cf3ce4ebe92c300b6a451465f48234cc73afe1 FROMLIST: arm64: dts: Add m4u and smi-larbs nodes for mt8183
+9ce4d3307595c32733e47e4e4a5c875754fc3edf FROMLIST: HID: intel-ish: enable raw interface to HID devices on ISH
+627189fb1fea522ef6d3959246e8b5d251455e4e FROMLIST: platform/x86: intel_pmc_core: Allow to dump debug registers on S0ix failure
+82f950f4663da84d727c4bac79148d17ebae5c70 FROMLIST: drivers/acpi: Clear status of an event before enabling it
+31482a5d1aa387d599eaca110afe8186439a0203 FIXUP: FROMLIST: platform/x86: intel_pmc_core: Allow to dump debug registers on S0ix failure
+d9ee761cac9706518549ad92b687dbbd6ce9046a FROMLIST: pinctrl: add drive for I2C related pins on MT8183
+487f13b472ecde995aa493f284ccd0783e81e33b FROMLIST: dt-bindings: pinctrl: mt8183: add binding document
+07becdd8c6619e96cbad7a1c095876d1ad073b0e FROMLIST: arm64: dts: mt8183: add pintcrl file
+ba9be29e4cd199a191af057b3e1a5b0d79f6712a FROMLIST: ASoC: intel: Fix crash at suspend/resume after failed codec registration
+456fbed4a441e6114f80dbb354ff7f6a5563faee FROMLIST: Input: i8042 - signal wakeup from atkbd/psmouse
+0497388cad3da78547a7f27a318219a8a045f501 FIXUP: FROMLIST: arm64: dts: mt8183: add pintcrl device node
+9e943a66fcee0f1b3da039964fb3cfe158e57a4e FROMLIST: dt-bindings: mediatek: add binding for mt8183 display
+c5262ee90afe9019659e5ae11c1d51f37e3e7880 FROMLIST: drm/mediatek: add mutex mod into ddp private data
+cd65d1b465f51fa3bfcbbc397286a29bd46531e7 FROMLIST: drm/mediatek: add mutex sof into ddp private data
+b3c1472eb8ccb9f755f102ed60a1f73f789ff701 FROMLIST: drm/mediatek: split DISP_REG_CONFIG_DSI_SEL setting into another use case
+e8fdf926eb9c5178719c5871da3a0cd2352984ff FROMLIST: drm/mediatek: redefine mtk_ddp_sout_sel
+fba3944a435f6039fdd6b652f7c28fe4b0b2a099 FROMLIST: drm/mediatek: move rdma sout from mtk_ddp_mout_en into mtk_ddp_sout_sel
+000565ff2483ed65ca808f8639e14561513b9b9b FROMLIST: drm/mediatek: add ddp component CCORR
+e07b3315c7b3643900284a426e5a5960a2ae87a5 FROMLIST: drm/mediatek: add mmsys private data for ddp path config
+d38f36b2f4b30984648ea8018424be7dc26859b2 FROMLIST: drm/mediatek: add commponent OVL0_2L
+1b8a7ac6f96970e3f4ed1b982b6547eb3d2b072a FROMLIST: drm/mediatek: add component OVL1_2L
+eb459af001fcdac3eeca815ca0ebc57692f2f853 FROMLIST: drm/mediatek: add component DITHER
+a4eb1af425bb172a7b1ad5b15331dd02e0e2eaaa FROMLIST: drm/mediatek: add gmc_bits for ovl private data
+8f1d4efcc26af285ea549621bc191635d047e45a FROMLIST: drm/medaitek: add layer_nr for ovl private data
+2503afc921849071602ffbccf0fb664f60bf32b9 FROMLIST: drm/mediatek: add function to background color input select for ovl/ovl_2l direct link
+7caaa587a3eba2c36e38c1578977a48bb205b47b FROMLIST: drm/mediatek: add ddp write register common api
+bc5c19950911a310f6b39bd3581ce91aac17b90d FROMLIST: drm/mediatek: add background color input select function for ovl/ovl_2l
+c06159dbb39befc7e3c93085db05053b5784ef65 FROMLIST: drm/mediatek: add RDMA fifo size error handle
+78b55fb28e5855451fdc4e421319daa9d806fb28 FROMLIST: drm/mediatek: add function mtk_ddp_comp_get_type
+5fe3d97737a43303e0e9055134f2b41a5411f43a FROMLIST: drm/mediatek: add ovl0/ovl0_2l usecase
+08f60811b59c3cb508cec7c12fbb602c8cdf3aeb FROMLIST: drm/mediatek: add support for mediatek SOC MT8183
+fd27f109ba480911cbcb599343eca55f587b02ab FROMLIST: drm/mediatek: adjust ddp clock control flow
+156cf99d1e059f5631393468cdba83f7b402774c FROMLIST: drm/mediatek: add vmap support for mediatek drm
+d85d02ebfd5a12b00fa03bc7e0b82ef93a676779 FROMLIST: drm/mediatek: respect page offset for PRIME mmap calls
+251b21ddeaecd46dae2a37eb2f650fc19bb658ac FROMLIST: arm64: dts: mt8183: add spi node
+93b4a5a45f58076b830e3d52efe36538095bef11 FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+f46e060fcc04342dabaa2959aa2e3aa81864a435 FROMLIST: dts: arm64: mt8183: Add I2C nodes
+f77741931b5efd04eb46fc22d2e0314fe6415b1c FROMLIST: cpufreq: mediatek: add mt8183 cpufreq support
+e68bb06b8ad62d1bd5d7081ba58e2c765ee7cb20 FROMLIST: HID: intel-ish-hid: ISH firmware loader client driver
+4af67b8216df79d300c5e0e9336af3b649a5b4b6 FROMLIST: arm64: dts: msm8996: Add UFS PHY reset controller
+3abfc571741d76edec43a60f708932d75efdbcff FROMLIST: arm64: dts: sdm845: Add UFS PHY reset
+98f73c308d437b41bafbb8153e9f68503bb7676d FROMLIST: HID: input: add mapping for Assistant key
+1f89200dcdddf96e0d7b4008bb7e2e7a6ae02e6b FROMLIST: ASoC: SOF: Add Sound Open Firmware driver core
+1306fb4d1046a9af8aceede1f1047b2107345463 FROMLIST: ASoC: SOF: Add Sound Open Firmware KControl support
+e001a26dcaa95636cba58fe8b8be6a4f404a800a FROMLIST: ASoC: SOF: Add driver debug support.
+3927a7153d1a34c22678b5f412fea2be1d09364a FROMLIST: ASoC: SOF: Add support for IPC IO between DSP and Host
+012da46be73bb1d33a0b6798f95dc392c15aca82 FROMLIST: ASoC: SOF: Add PCM operations support
+5d434e0b6d6df4c5af41f3c6078aca29e0b2d487 FROMLIST: ASoC: SOF: Add support for loading topologies
+0242f8844b08cdbece336698c68f1227692672a8 FROMLIST: ASoC: SOF: Add DSP firmware logger support
+dc2bcdca0f2ba7d70b61b23fa5df09deeb413cbe FROMLIST: ASoC: SOF: Add DSP HW abstraction operations
+5a1695276d2b466ca0f0f45e2b83fa02cf03ede6 FROMLIST: ASoC: SOF: Add firmware loader support
+fcce22d8067e8b6a0a822215b096f364b58b6b6a FROMLIST: ASoC: SOF: Add userspace ABI support
+1869aab6d4142a04d655433a72eaabe7721471fd FROMLIST: ASoC: SOF: Add PM support
+ba61ab33386398507823fe2500ed3cdd15a5f521 FROMLIST: ASoC: SOF: Add Nocodec machine driver support
+463bfbcf654fd3c692e801b86aff85c3005d5d83 FROMLIST: ASoC: SOF: Add xtensa support
+0bc74df683a7140358c32646d7a73d37dbd1afa9 FROMLIST: ASoC: SOF: Add utils
+d600ecb9d526eea4f7397c62c0c39af83bd9a2dd FROMLIST: ASoC: SOF: Intel: Add BYT, CHT and BSW DSP HW support.
+515740e367babdd17f5dde608d1db969391a8e39 FROMLIST: ASoC: SOF: Intel: Add HSW HW DSP support
+c806c66bf6e0e34c57b39dc140c7a5182fadc5cc FROMLIST: ASoC: SOF: Intel: Add BDW HW DSP support
+bf6855f3abcc56d0fd23a01b047d8678d9bfb1cf FROMLIST: ASoC: SOF: Intel: Add APL/CNL HW DSP support
+6d112d04f420bd18092ac3aeee723740dce9dcc9 FROMLIST: ASoC: SOF: Intel: Add HDA controller for Intel DSP
+8923de9d686816b74f4d264254f616b0a1bab6d4 FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA DSP HW operations
+544839a052da7ca130f9cd20d9972823f95b8bcf FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA IPC mechanisms.
+eb6e8e20dfae7d8acad44089f85db8d40632868e FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA firmware loader
+15f645495a56a10ef6fbfcb4a36c7e71e4b77587 FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA PCM operations
+c269deb28ce5e84b17f44c4aa12c05507b0578e9 FROMLIST: ASoC: SOF: Intel: Add hda-bus support and initialization
+e83a61670a69283cbfd32ffcf98e985eeb1a0c56 FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA stream operations
+ab94b24ea672ca14ca9aa4b1bfce376339855a16 FROMLIST: ASoC: SOF: Intel: Add Intel specific HDA trace operations
+19f21ddfcd0c6cfd30972e1e8e21a472a02af2ac FROMLIST: ASoC: SOF: Intel: Add support for HDAudio codecs
+e4f9f6993504c4196a3234f481c39207444ebf0f FROMLIST: ASoC: SOF: Intel: SKL, CNL, APL platform DAIs
+3b5336091ecddf2b909e3ee34cbe42d3430c5751 FROMLIST: ASoC: SOF: Intel: Add platform differentiation for SKL, APL and CNL
+99996a17aa12d73e402a7c2520d5c15ad3eb0c8f FROMLIST: ASoC: SOF: Intel: Add SKL-specific code loader
+7ded5a51b17461f62a4e0e3bf0090980a5292f2f FROMLIST: ASoC: SOF: Add ACPI device support
+257a5225432a270e10f82b3c973abb1fccc5f587 FROMLIST: ASoC: SOF: Add PCI device support
+479cf87c0b14035b3e8fd897fff2a4037c616791 FROMLIST: ASoC: Intel: Kconfig: expose common option between SST and SOF drivers
+f05fac60091358fb9805b6a6c6dc38a995361910 FROMLIST: ASoC: SOF: Add Build support for SOF core and Intel drivers
+0c494186eecf5e1bc16720a63fb84d815b660311 FROMLIST: ASoC: rt5682: recording has no sound after booting
+66443887b531d77147675afbd0e312dfe932ad2f FROMLIST: ASoC: dapm: set power_check callback for widgets that shouldnt be always on
+35665c342634d27827f489da0fae22a101ddc322 FROMLIST: mfd: cros_ec: Add host_sleep_event_v1 command
+5649be19926c484f05f5add342345a2d971e722e BACKPORT: FROMLIST: opp: add API which get max freq by voltage
+4ec21d25e3b7a523edd09067ea4f3e4716a7f6c7 FROMLIST: dt-bindings: devfreq: add compatible for mt8183 cci devfreq
+c7972a934775c8d1df2c5478aa765d9207f4d124 FROMLIST: devfreq: add mediatek cci devfreq
+a19d712b63adaa622bdb7b43ddb1323b81de5847 FROMLIST: arm64: dts: add display nodes for mt8183
+dece8cfd376cf70ea278bf056c7da69f14ec255c FROMLIST: platform: chrome: Add ChromeOS EC ISHTP driver
+d50bac491e483e583756039a8dcdc3468562bb83 BACKPORT: FROMLIST: cros_ec: handle MKBP more events flag
+94fbcafa176539c820d147e1b06d4cb42305260f FROMLIST: mfd: cros_ec: check for NULL transfer function
+318b4aefad10509bf62c93d735a6990d06855cea FIXUP: FROMLIST: devfreq: add mediatek cci devfreq
+80b6c5f0068ddc24b20477e2e07362c41a704d60 FROMLIST: Add Wilco EC keyboard backlight LEDs support
+3feadc3134036df8e5d1804b2ca9b83eb063265d BACKPORT: FROMLIST: platform/chrome: Add support for v1 of host sleep event
+4659cdfdf70944ff5ca083c221183dd1bf2a5145 FROMLIST: dt-bindings: panel: Add Boe Himax8279d is 1200x1920, 4-lane MIPI-DSI LCD panel
+653df787909b968e1452a5a9eace88085c2711aa FROMLIST: drm/panel: Add Boe Himax8279d MIPI-DSI LCD panel
+6436b0a20f046216d45b998239d71b1e5f8f550a BACKPORT: FROMLIST: arm64: dts: mt8183: add mmc node
+d5a18bab0a66abf803a9a99905aa6e0cdab4a0ab FROMLIST: wilco_ec: Add Boot on AC support
+d9630588a767374bf0cc54109dfb68d04f6c151b FROMLIST: wilco_ec: Add USB PowerShare Policy control
+c4211dbab6a838c2d2df19121733ddfcb2f64b24 FROMLIST: power_supply: Add more charge types and CHARGE_CONTROL_* properties
+596ff82b1994f24e7d331f0bd8efae71d34f9340 FROMLIST: mfd: intel-lpss: Add Intel Comet Lake PCI IDs
+4b4d91ebed258b450b60e8474fb2711ef62839e6 BACKPORT: FROMLIST: arm64: dts: mt8183: add usb node
+189274a68823d5dabf4f870690f74b558b9cbb95 FROMLIST: drm/i915: delay hotplug scheduling
+71b4e964ac1a10ba8f81bd5704b1777e1cc74e02 FROMLIST: spi: pxa2xx: Add support for Intel Comet Lake
+2a018453dec06fa0092c2be0a1cc1035c45816e6 BACKPORT: FROMLIST: r8152: Refresh MAC address during USBDEVFS_RESET
+20d0be293126288ccbada727fae505ecf6fd3516 FIXUP: FROMLIST: wilco_ec: Add Boot on AC support
+b8e4cd307637f531f4fa513d2ef100b095d87e48 FROMLIST: mwifiex: Make resume actually do something useful again on SDIO cards
+4b3fa41b6ab7c27d9288c9378f77edd4778a6992 FROMLIST: Bluetooth: hci_qca: Load customized NVM based on the device property
+8e76c85192014a4ccf10f1a00c388e6c5c2e5e3c FROMLIST: dt-bindings: net: bluetooth: Add device property firmware-name for QCA6174
+68d609348481c72f79ddb91940f4b1736b0b90a8 BACKPORT: FROMLIST: arm64: dts: mt8183: add pwm0 node
+57274eb8bcc2a684d0bdef912c20e7feac65e714 FROMLIST: modsign: use all trusted keys to verify module signature
+818058685a8aa0bbbe064f8117cbf7b1c8ff2bb6 BACKPORT: FROMLIST: r8152: sync sa_family with the media type of network device
+a0cce7991e7c1fae3d68d5566216d0a088862dfa FROMLIST: dt-bindings: Add panel-timing subnode to simple-panel
+5938bbcda2eb36f7da4fb5371bf6dccdf1077b8b FROMLIST: drm/panel: simple: Add ability to override typical timing
+0493ba0d634447d39375293c0f85e3edfdac6b00 FROMLIST: arm64: dts: rockchip: Specify override mode for kevin panel
+1eac4a7b1df07c94a307197c55f21eca4700fc78 FROMLIST: drm/panel: simple: Use display_timing for Innolux n116bge
+0251f307a7cfa9b35c1bd9e096ed688f8cb440b0 FROMLIST: drm/panel: simple: Use display_timing for AUO b101ean01
+124c8275bb032f6b6b969c99dd12ec6392a59256 FROMLIST: ARM: dts: rockchip: Specify rk3288-veyron-chromebook's display timings
+9b58e43756a65d84b557524615c5e937e6269576 FROMLIST: ARM: dts: rockchip: Specify rk3288-veyron-minnie's display timings
+bc03a53a430cc4b8ac0b37aaf02bac111bdf9a50 FROMLIST: Revert "drm/virtio: drop prime import/export callbacks"
+8cd737758a69106ac4b56f0b37934a0cac0d6bec FROMLIST: BACKPORT: platform/chrome: wilco_ec: Add property helper library
+5cda3702ac4340d8a7377381ce6906ce4211915f FROMLIST: BACKPORT: power_supply: platform/chrome: wilco_ec: Add charging config driver
+a3b761576972b8d0bbc0e2d2bedbf10a0c0a22e7 FROMLIST: spi-nor: intel-spi: Add support for Intel Comet Lake SPI serial flash
+366811d9373f3fd7315ef0827b891ddf02003b12 FROMLIST: mmc: sdhci-pci: Add support for Intel CML
+3583d836d9fee8bb97e3ec9abe306cfc3b9cbe56 FROMLIST: intel_th: pci: Add Comet Lake support
+43e4132127c98d9ca12926b4c9b262ccb66f4f17 FROMLIST: ARM: errata: Workaround errata A12 857271 / A17 857272
+2769711eafcea5e7828803a188d5ca3d2f8accb1 FROMLIST: mmc: dw_mmc: Disable SDIO interrupts while suspended to fix suspend/resume
+51a60ba18ecf007d8a12da05115d1828fba46557 FROMLIST: ARM: dts: rockchip: fix PWM clock found on RK3288 Socs
+f9ec1b4338d97ba4b16a0411e2a5d2a59c2f4e42 FROMLIST: Input: add KEY_KBD_LAYOUT_NEXT
+1ae0f08dc0e16cc7392b3e0653a22b3698148090 FROMLIST: HID: input: add mapping for KEY_KBD_LAYOUT_NEXT
+9f1383e6af7ad2dfc24741c481957c1ced2a4aea BACKPORT: FROMLIST: drm: rockchip: Add DDR devfreq support
+46cd580a84ecce72e84a16b065e282431ddc3632 FROMLIST: dt-bindings: display: mediatek: update dsi supported chips
+edd646348a7385f82346a407ae03c0b1011cc8d7 FROMLIST: drm/mediatek: separate mipi_tx to different file
+a7d238acb996fbd440d580b31009f691cfd1edeb FROMLIST: drm/mediatek: add mipi_tx driver for mt8183
+e51f81c804eb836acad49ff85c01f776e2cf4af4 FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe
+0a41a884fc397a8824b9b569969a8ec612133765 BACKPORT: FROMLIST: drm/mediatek: CMDQ reg address of mt8173 is different with mt2701
+57892fa75742a0c3480aebc9b2615653ba4acbe0 FROMLIST: drm/mediatek: add dsi reg commit control
+387443daddc97e696406dac1b7837fe9105b854f FROMLIST: drm/mediatek: add frame size control
+20c46f37277676aae666992ee8ffd1027016e866 FROMLIST: drm/mediatek: add mt8183 dsi driver support
+3ef7cd30fd61f42a7a1e86097b0983b4ba80cf0c FROMLIST: ASoC: Intel: avoid Oops if DMA setup fails
+f8e527077c1e48fd211326cfa8ffb94f15466b87 FROMLIST: dt-bindings: usb: dwc2: Document quirk to reset PHY upon wakeup
+22c9fd3d0b859b449af25b698d530c05b881fecb FROMLIST: usb: dwc2: optionally assert phy reset when waking up
+d9d0099d1c78278170fa5a1832c41df4c12f976e FIXUP: usb: dwc2: optionally assert phy reset when waking up
+6eed6409fa49e49b768a64bde86766026d02fc12 FROMLIST: ARM: dts: rockchip: Hook resets up to USB PHYs on rk3288.
+986f4ec5f4a1d26c712abcb73d33d8b154aef00f FROMLIST: ARM: dts: rockchip: Add quirk for resetting rk3288's dwc2 host on wakeup
+1199f9bcab988aa96caf4d2a77ffd33cf1a40d0c BACKPORT: FROMLIST: dt-bindings: mt8183: Add watchdog dt-binding
+5202e9078510d2a82d3e4a82976a7bbd78d39e45 FROMLIST: arm64: dts: mt8183: Add watchdog device node
+090d3ec145de0200353a96113ce6a749c53404a0 BACKPORT: FROMLIST: arm64: dts: mt8183: Add reset-cells in infracfg
+212a80983043bb37187210057e73e07879c7f664 FROMLIST: clk: reset: Modify reset-controller driver
+42c7a955b10809c087eb9bf64f5e0d44f664270b FROMLIST: usb: dwc2: bus suspend/resume for hosts with DWC2_POWER_DOWN_PARAM_NONE
+bff558eedc248c1c0e8755231f1d33db9341a891 FROMLIST: USB: Export usb_wakeup_enabled_descendants()
+7d13fb679ef10dd3362b194f1af44c2bf6b51387 FROMLIST: Documentation: dt-bindings: Add snps,need-phy-for-wake for dwc2 USB
+285147f7f5c4a92335a002facdfd36da2b9c5959 FROMLIST: USB: dwc2: Don't turn off the usbphy in suspend if wakeup is enabled
+9f41aacc5112dfb68acdada767409d33fd6f7be3 FROMLIST: ARM: dts: rockchip: Allow wakeup from rk3288-veyron's dwc2 USB ports
+9dc66890ccca0c77f0dc4cb46810320c7a4de2e7 FIXUP: FROMLIST: mfd: intel-lpss: Add Intel Comet Lake PCI IDs
+9a655f4b2ff6739568e18ae7a7eae3b2929fb39e FROMLIST: BACKPORT: platform/chrome: wilco_ec: Remove 256 byte transfers
+d9d4c7230369d37466ede72888b9078945cbf882 FROMLIST: BACKPORT: platform/chrome: wilco_ec: Add telemetry char device interface
+a027467e1e454be2473f68579277d25ff2616d95 FROMLIST: of: Add dummy for of_node_is_root if not CONFIG_OF
+8f778930922ff10bb461b30db8fc0c6416ee29de FROMLIST: pstore/ram: Improve backward compatibility with older Chromebooks
+83c94009e486c7bcf874551aec95c9e15eca0020 FROMLIST: loop: Report EOPNOTSUPP properly
+a6787f36099ac59a625388d0ee451c779d9e8a2c FROMLIST: loop: Better discard support for block devices
+5fe8aae942e48992c7357c700bc9e944479749c3 FROMLIST: ARM: dts: rockchip: Remove bogus 'i2s_clk_out' from rk3288-veyron-mickey
+bca143d3d53a57e8055de1c5ef367dcd1f07a2b1 FROMLIST: ARM: dts: rockchip: Make rk3288-veyron-minnie run at hs200
+6af80895d6b51163d647851f66074a367d5e62d4 FROMLIST: ARM: dts: rockchip: Make rk3288-veyron-mickey's emmc work again
+bc8c8013b784a14e2ca44152c37a7919b2943d9d FROMLIST: mfd: mt6397: extract irq related code from core driver
+671928f446ed549233ed24d426b4d2bb730baf22 FROMLIST: mfd: mt6397: modify suspend/resume behavior
+39cccbc3b249b54653e82108693c055dbfd08d8f FROMLIST: dt-bindings: mfd: Add compatible for the MediaTek MT6358 PMIC
+6d3014c37b34a6d49d066dd19481984f23f4eed9 FROMLIST: regulator: Add document for MT6358 regulator
+29c2ffb60b643e5e9a5177bb4ccb17389959e059 FROMLIST: mfd: Add support for the MediaTek MT6358 PMIC
+efe1a591419d7e0c17a0f524f7889fd687655374 FROMLIST: regulator: mt6358: Add support for MT6358 regulator
+2aef73c5f39c5967b188eb11984b3402945b0690 FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+1e01edd5038ea331847652170e100a6b39e0dc0d FROMLIST: rtc: mt6397: fix alarm register overwrite
+8f482726926e70372fd22394476b5fe78c6ed0cd FROMLIST: rtc: Add support for the MediaTek MT6358 RTC
+7e2b50926be2c0adb4a0b95c69cd5737bd6f0a0a FIXUP: FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+f709ec49933fe65dad49be853c548db7edf083d2 FROMLIST: ASoC: SOF: Add Comet Lake PCI IDs
+e4607402d2c02da6cd04142779ee9e27fb4ea0a0 FROMLIST: ASoC: Intel: Skylake: Add Cometlake PCI IDs
+0bf56aa13c17bcb4e67e08dbcf0b8c71fbf62231 FIXUP: FROMLIST: BACKPORT: platform/chrome: wilco_ec: Remove 256 byte transfers
+4411b3fb21f073f610cdc04f4eef39abd5851baf BACKPORT: FROMLIST: arm64: dts: mt8183: add dsi node
+0eadc61a338afe7e9815bb384e253dfdca5aeb6a BACKPORT: FROMLIST: arm64: dts: mt8183: Add auxadc device node
+91cb0f5c2434c94be238ffa1ffaffe0a74daaa31 FROMLIST: dt-bindings: nvmem: mediatek: add support for MediaTek mt8183 SoC
+c4e3999a3bae828e20655195350fb89601381c81 BACKPORT: FROMLIST: arm64: dts: mt8183: add efuse and Mediatek Chip id node to read
+d325527f39a82f704d39b039b949ff35217c0077 BACKPORT: FROMLIST: arm64: dts: mediatek: add cpufreq and cci devfreq nodes for mt8183
+3fe8d793e1139e8db2b4fc6b34a9c898bbfbd4c1 BACKPORT: FROMLIST: arm64: dts: mt8183: add thermal zone node
+97658163e1e1c96fe35994659d031a50bda58a37 BACKPORT: FROMLIST: arm64: dts: mt8183: add/update dynamic power coefficients
+cceb2c2b031cbeb92576e43a24af6439b5e1bc97 BACKPORT: FROMLIST: arm64: dts: mt8183: Add #cooling-cells to CPU nodes
+3b954b9f3372ea30d5c55c639997adf72cca163b BACKPORT: FROMLIST: arm64: dts: mt8183: Configure CPU cooling
+f7890249fa334649a88b5acbfda280f6c4085a0f FROMLIST: arm64: dts: mt8183: Increase polling frequency for CPU thermal zone
+cb78a1d9b28908ce76615b819ad59df6238eea77 FROMLIST: dt-bindings: Add a binding for Mediatek SCP
+64fcf13f37100a8af5a12410f987f28789421f64 FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+14a3169cfe14c9ebf0953bfaf605ee0d3c7f76e1 FROMLIST: remoteproc: mt8183: add reserved memory manager API
+083cb872134aa67c6294e4bc57f7306796869433 FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+1724e70a75383af536ba227e45e158d964792ae7 FROMLIST: dt-bindings: Add binding for cros-ec-rpmsg.
+5eadd78aa226ffa0243e238d590d7b2c982d5fe3 FROMLIST: mfd: cros_ec: differentiate SCP from EC by feature bit.
+2262d74291832561ecfcf89db9d5b5980189ddd6 FROMLIST: elan_i2c: Increment wakeup count if wake source.
+9b9d6c5d31bfc7f1e3271d89fcf6b8ef63ef918d FROMLIST: platform/chrome: cros_ec_spi: Move to real time priority for transfers
+d42316bd7a721540a1491c0bb5868196853fe51e FROMLIST: platform/chrome: cros_ec_spi: Always add of_match_table
+1144db32ca98ea33da152e326b343176d3d36ab4 FROMLIST: ARM: dts: rockchip: raise CPU trip point temperature for veyron to 100 degC
+f087f21f460d617275460c86e817c112f276facb BACKPORT: FROMLIST: ARM: dts: rockchip: raise GPU trip point temperatures for veyron
+ead6d27d2650fa1ba53cd30bef5a281904102cc0 FROMLIST: ARM: dts: raise GPU trip point temperature for speedy to 80 degC
+3d601961c2379cbb8c3322eb07b662c035c6447a FROMLIST: ACPI: PM: Clear wake-up device GPEs before enabling
+88fba2c8fabd256975b5b11c6f7fa5ab5f147fc4 FROMLIST: mm/failslab: By default, do not fail allocations with direct reclaim only
+744185b64768571fea0489de89e01b0f96343559 FROMLIST: BACKPORT: platform/chrome: wilco_ec: Add telemetry char device interface
+289acf83022334e59084466fda3b760084711807 FROMLIST: platform/x86: intel-vbtn: Report switch events when event wakes device
+463e35d6bca65148848690aba132d2b185f52849 FROMLIST: ARM: dts: rockchip: Add pin names for rk3288-veyron-minnie
+6a7c9c15c5731aff511ae2e1f0b597f28a47c80f FROMLIST: phy: rockchip-dp: Avoid power leak by leaving the PHY power on
+4ae30088771a2f84523e0eca540269d75f855763 FROMLIST: dt-bindings: gpu: add #cooling-cells property to the ARM Mali Midgard GPU binding
+6a5d80ddfb9f4bb0e1218b06cbf6a5b6b10b7bc4 FROMLIST: scripts/decode_stacktrace: Match basepath using shell prefix operator, not regex
+0a5798a82a22db9049ce74a8ab170285a649c418 FROMLIST: scripts/decode_stacktrace: Look for modules with .ko.debug extension
+771812a13500aa6c21f4faf5aeba3f3b46c70afe BACKPORT: FROMLIST: arm64: dts: mt8183: add capacity-dmips-mhz
+c071252927c84fe868bf4bb596b6804e4eb5a2ec FROMLIST: platform/chrome: cros_ec_spi: Request the SPI thread be realtime
+5568f4d311e64ab469ee8a926a7e60c6e6693d21 FIXUP: FROMLIST: USB: dwc2: Don't turn off the usbphy in suspend if wakeup is enabled
+42d5374ed9caf27d47d9f77710cd4979d83ec223 FROMLIST: hid: remove NO_D3 flag for non Cherry Trail(CHT)
+9dd9d5a68d7603605802fc97d90f93ce22e02310 FROMLIST: usb: dwc2: Fix DMA cache alignment issues
+9905cba23fd54f5d7442945fcce8c1edb3a90931 FROMLIST: mfd: cros_ec: Register cros_ec_lid_angle driver when present
+df512869bebe0da6cc1961e9647c74dcab948a76 FROMLIST: fs/select: avoid clang stack usage warning
+08a49f2f2a6d079b0e14d6650026c0c9eea20e2f CHROMIUM: FROMLIST: dt-bindings: gpu: add a power_model optional properties for MALI
+6227949af26aeebf9ad8172b7bb199927402f217 FROMLIST: pwm: fine tune pwm-mtk-disp clock control flow
+7d270ab3a452636a7f78f952a3093596f2129b54 FROMLIST: pwm/mtk_disp: fix update reg issue when chip doesn't have commit
+1d154d305da3ea06ba6ba5e4af53388106244293 FROMLIST: drm: mediatek: adjust dsi and mipi_tx probe sequence
+0cb512bf6c058f8d4cca1ea5bb2d58f0ead5966e FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+144799a1eca413285ce1e9f00c7163695973a859 FROMLIST: clk: mediatek: Remove MT8183 unused clock
+0de67d142468cde5ab6408697701aa13bca6d74d FROMLIST: thermal: mediatek: mt8183: fix bank number settings
+5d2ff2ebaf78df47131d7299f636748eb1ba58c9 FROMLIST: thermal: mediatek: add another get_temp ops for thermal sensors
+467fb1632b8512b9691080c7a2349d5e3fcf4f77 FROMLIST: cpufreq: mediatek: change to regulator_get_optional
+a46de32aca388e701850c9de783993ad63f36c5f FROMLIST: cpufreq: mediatek: add clock enable for intermediate clock
+229d93bf9fd0edd810c3662baa572f31f9f73bd4 FROMLIST: cpufreq: mediatek: Add support for mt8183
+902a0442213f592b2614e9a2dd860920f772f616 FROMLIST: dt-bindings: devfreq: add compatible for mt8183 cci devfreq
+115de2a0997c703b089116db7618add8f25122c5 FROMLIST: devfreq: add mediatek cci devfreq
+acea16a328484a7e23c286bdf751a64bfc8cec5d FROMLIST: PM / OPP: Support adjusting OPP voltages at runtime
+f28623dc3d3464cd0f90ab52a1b99df4812af738 FROMLIST: cpufreq: mediatek: add opp notification for SVS support
+a4581f0f3082ef39d3ef3f6a3b399d88bb6c336d FROMLIST: devfreq: mediatek: cci devfreq register opp notification for SVS support
+90a5cf04d3e909a11cb16a53d36b2d4b008505d0 FIXUP: FROMLIST: fixes CMDQ reg address of mt8173 is different with mt2701
+502daf74d351967ce2ec5d61dc2357793565fa21 FROMLIST: drm/mediatek: add dsi module reset driver
+97d8da70696905c4e00b4088023a407315afd5cd FROMLIST: dt-bindings: display: mediatek: update dsi supported chips
+31ab8916ae31d7d328407a9ecd2652d0b20cccd3 FROMLIST: drm/mediatek: separate mipi_tx to different file
+d84ae4626f954d8b8c58c1c20f47d80cb1acf3e3 FROMLIST: drm/mediatek: add mipi_tx driver for mt8183
+ba303d8aee748e968e600b7de4853617db30ef70 FIXUP: FROMLIST: scripts/decode_stacktrace: Look for modules with .ko.debug extension
+6f0aa6c94dcf4bb7a1114d85534cee023938dc52 FROMLIST: scripts/decode_stacktrace: Accept dash/underscore in modules
+9607a4f7c8396d44270fcaaddeb449ca355a80a2 FROMLIST: mm: smaps: split PSS into components
+1fce3c357bb2ded2091d3cefc473788a4231ec84 FIXUP: FROMLIST: drm/mediatek: add dsi reg commit disable control
+6bc146a7e6125ae0088cf09aec8029e1955a2b20 FIXUP: FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+3e416627c4e81c94e557500a5362fcdbd07578fb FIXUP: FROMLIST: drm/mediatek: separate mipi_tx to different file
+cf20425a7b68af8a99237851ceeff63c5d2d8ea8 FIXUP: FROMLIST: drm/mediatek: add mipi_tx driver for mt8183
+b5d18d83b28856508efb060d24e551e664477b53 BACKPORT: FROMLIST: arm64: dts: mt8183: add scp node
+7ba5402b7e2e4995fb440c0048ddf556699115f5 BACKPORT: FROMLIST: arm64: dts: add audio node
+7209b2aa5bf4bb045a4dee3d2ffbbf4134647e4a FIXUP: FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+e52e089281fb602081d925db3243b09a12605bf4 FROMLIST: usb: dwc2: host: Fix wMaxPacketSize handling (fix webcam regression)
+39479e169e78b320e0cf6175d9dcd48599b6597b FROMLIST: dt-bindings: display: mediatek: update dpi supported chips
+3495e1a07fd695801c579be381603bb3167dbcfb FROMLIST: drm/mediatek: dpi dual edge support
+b2f573be22313231c3ff9d7a35f750474e8640fa FROMLIST: drm/mediatek: add mt8183 dpi dual edge support
+8e3ee902b6e917a3e62563b1ef5a381f42927ccc FROMLIST: drm/mediatek: control dpi pins dpi or gpio mode in on or off
+fd981aa5029a607267d6b8671ef248b513fcf07b FROMLIST: drm/mediatek: add mt8183 support dpi pins control
+2ec76e1af56a634cc6a2102984042bfea3ad9f2e FROMLIST: HID: intel-ish-hid: fix wrong driver_data usage
+09219b80b8a637e6c2206d6a0fc408c4aa8b90e2 FIXUP: FROMLIST: thermal: mediatek: add another get_temp ops for thermal sensors
+2f8abede9307122753e76813d9fffd005ff530c9 FIXUP: FROMLIST: drm/mediatek: add dsi module reset driver
+46a56127e2ef31502e59772d97d0116057f24235 FIXUP: FROMLIST: devfreq: mediatek: cci devfreq register opp notification for SVS support
+ca5a311b4d026b20f07ffa6eb643f860ba14e396 FIXUP: FROMLIST: remoteproc: mt8183: add reserved memory manager API
+dfe151ed3bd2d63860e217aa5b33578afd3a5084 FROMLIST: platform/chrome: fix crash during suspend
+97ba37d7975db70a9a668d5d13130ef4f9112c71 FROMLIST: Bluetooth: btusb: add QCA6174A compatible properties
+1981488fee0bdced6fe003745f5b3ed217f8f5ed BACKPORT: FROMLIST: arm64: dts: add display nodes for mt8183
+4b00729f0e2fb41de9ddfd26392cd944e48f8e89 FROMLIST: pinctrl: mediatek: Ignore interrupts that are wake only during resume
+a17a70598b13c522831c04a7e7d83baf3b78bc7c FROMLIST: pinctrl: mediatek: Update cur_mask in mask/mask ops
+4465bd5a47080e477eecf4d2979c5c73280b5a5b BACKPORT: FROMLIST: tpm: Fix TPM 1.2 Shutdown sequence to prevent future TPM operations
+969d9f86117c484816c9745cb61a4e0c7ad593cf FIXUP: FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+1e3e709a8120227b302b2c71c500d9d48c259f8c FIXUP: FROMLIST: remoteproc: mt8183: add reserved memory manager API
+e1cbf330d2d258418bf832666894e1f91b31a84e FROMLIST: USB: add usbfs ioctl to retrieve the connection parameters
+df43cb12badf804f26bc0092e87bfa68a6ecdb71 BACKPORT: FROMLIST: arm64: dts: mt8183: Enable CPU idle-states
+9e6132f8d0a4016b02e1caac5202f5ac36c21086 FROMLIST: dt-bindings: mediatek: update bindings for MT8183 systimer
+ffc97595d1e64b91e30211cd35a60e172459b4cc BACKPORT: FROMLIST: arm64: dts: mt8183: add systimer0 device node
+086f99e7449aba0d2a248d75e885bbbc5a8fae69 FROMLIST: clk: mediatek: mt8183: Register 13MHz clock earlier for clocksource
+c9b963c4b9a46286ad2a1ac88623c77412d8864b FROMLIST: dt-binding: gce: remove thread-num property
+00945b158ed448d1c16163daac1dac088cdaeeb5 FROMLIST: dt-binding: gce: add gce header file for mt8183
+a635460821b3fde4555bd7855142463ea00e9377 FROMLIST: dt-binding: gce: add binding for gce client reg property
+bebf3a883c1db99f2ef659cd850df833ba21fdaf FROMLIST: mailbox: mediatek: cmdq: move the CMDQ_IRQ_MASK into cmdq driver data
+2530d327f2a6c81fe33e641d5614bd7369b38dbc FROMLIST: mailbox: mediatek: cmdq: support mt8183 gce function
+c17cc88f7eeac94ea6ecc2d8e8d0fb784f354c6b FROMLIST: soc: mediatek: cmdq: clear the event in cmdq initial flow
+2b84837b90875a3773dd863bb62aeb1fdcf8164d FROMLIST: soc: mediatek: cmdq: reorder the parameter
+8acfce018c3088c507e58f88196814a76d8ef1fa FROMLIST: soc: mediatek: cmdq: change the type of input parameter
+9bc7b0276de728cdb6f773ee67187250b441d0e1 FROMLIST: soc: mediatek: cmdq: define the instruction struct
+d43fb6caf3451d5033168626e0075ee2ada6f72f FROMLIST: soc: mediatek: cmdq: add polling function
+35663b22e756b750183ba31bd305d6602de4678e FROMLIST: soc: mediatek: cmdq: add cmdq_dev_get_client_reg function
+3c3cbfff5bb157a51871e51abddf1ca77def29a5 BACKPORT: FROMLIST: arm64: dts: add gce node for mt8183
+01fd9a18f8b0b2a343c8fa48c9f2e64a76bb9cd8 FIXUP: FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe
+905bff277dcef1c1d702008912de42422664a9ad FROMLIST: hid: remove NO_D3 flag when remove driver
+960efabcd57f01f65cb14eb9a36b8a764f6d2221 BACKPORT: FROMLIST: iio: cros_ec: Add lid angle driver
+57ee23de7490470069e34de04bd8fe96d6f247f5 BACKPORT: FROMLIST: security/loadpin: Allow to exclude specific file types
+e02499a4d55a66fdeb2367ae9efbe31fbc1d8629 FROMLIST: drm/bridge: dw-hdmi: Use automatic CTS generation mode when using non-AHB audio
+438b0382fc046ed6e9552c116e3f8d2e6718ef1e FROMLIST: drm/bridge/synopsys: dw-hdmi: Handle audio for more clock rates
+c1d3c575f4f475010a0f4b6543c310c327d26717 FROMLIST: drm/bridge/synopsys: dw-hdmi: Allow platforms to provide custom audio tables
+bd2106e4fa9c3a326d1481082e56c01bb1c22a53 FROMLIST: mm: add filemap_fdatawait_range_keep_errors()
+adce70f718dd0c7ac7fbdad5fd5f5cc56ecff157 FROMLIST: jbd2: introduce jbd2_inode dirty range scoping
+7e0390904e1d8e458490018610a156819749b47e FROMLIST: ext4: use jbd2_inode dirty range scoping
+a9f883b64430ee349370edee2c365419083c2adc FROMLIST: Input: cros_ec_keyb: mask out extra flags in event_type
+df9c979ba4115eba05512985d218f509a5f13307 FROMLIST: Bluetooth: btusb: hci_event: handle msbc audio over USB Endpoints
+e06dbec7a4f5020a9699c2d1ccb8c4228fdc3a40 FIXUP: FROMLIST: jbd2: introduce jbd2_inode dirty range scoping
+7fce8818ca405064ab2e72a779e411d4262a7179 BACKPORT: FROMLIST: audit: collect audit task parameters
+e97c9a30072a51c17c54b6c23614fbdeeff33e47 BACKPORT: FROMLIST: audit: add container id
+7f424d7a68cd0b9a8c11f64a3eed8e2f1cf5c626 BACKPORT: FROMLIST: iio: cros_ec: Add sign vector in core for backward compatibility
+b5acf6aecc77e63a15dba9ac0bb205f374053458 FROMLIST: iio: cros_ec : Extend legacy support to ARM device
+496b0a35dee21a184c56780d638189ff82afb727 FROMLIST: dt-bindngs: display: panel: Add BOE tv101wum-n16 panel bindings
+88070385a41a70db09f1fbcb59a4e2efbd531ce5 BACKPORT: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel
+a7b78acace1e522893bf2c5cc2c2534a72183f34 FIXUP: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel
+5f3a269645c3b31d5705c42e6a77aca371358309 FROMLIST: dt-bindings: display: panel: add auo kd101n80-45na panel bindings
+87d23ca88cfd18e84c71fdfe7c597fef1605009a FROMLIST: drm/panel: support for auo, kd101n80-45na wuxga dsi video mode panel
+6808dd14a2a618e795199b799d81d616ae390f99 FIXUP: FROMLIST: drm/panel: support for auo, kd101n80-45na wuxga dsi video mode panel
+cb469f153be5f90361b82bc7d7a959c2a594df9a FIXUP: BACKPORT: FROMLIST: audit: collect audit task parameters
+9df7ee08b398b6ee3f1dbc6118cec9b0b6490789 FROMLIST: platform/chrome: lightbar: Assign drvdata during probe
+40a691d7f86f7f3e7317bb2f2187e31e155e4168 FIXUP: FROMLIST: iio: cros_ec : Extend legacy support to ARM device
+840dbfc0a4b3d14cc414357a2272f850d4bb982c FROMLIST: x86/microcode: Fix the microcode load on CPU hotplug for real
+f7f0e8cf848d05558bf0c6986430caf7e11848bb FROMLIST: usb: Handle USB3 remote wakeup for LPM enabled devices correctly
+03da05c843bf8cdd27f85260c307bc2a86257591 FROMLIST: ASoC: SOF: trace: move to opt-in with Kconfig and module parameter
+17ed3f1d3cdd050d54a952370176ab0816f53c4a FROMLIST: ALSA: hdac: fix memory release for SST and SOF drivers
+980208302decd8cf520fb7b5e0aeb98a8931674c FROMLIST: ASoC: SOF: acpi: add module param to disable pm_runtime
+31bebc48c062d049f692274b5fd19cf4698b75be FROMLIST: ASoC: SOF: pci: add module param to disable pm_runtime
+bc9b3b955afd5bf968ce85fd8f18bdf3b0a388d1 FROMLIST: gen_compile_command: Add support for separate KBUILD_OUTPUT directory
+ed5313374aae221c489487adc625dec9dde642ab FROMLIST: platform/chrome: lightbar: Get drvdata from parent in suspend/resume
+34af8bf5ad6ef3370a6c8e73a9c328dd6a459061 FROMLIST: mtd: mtdcore: add debugfs nodes for querying the flash name and id
+41f755dc8e2b623f258eea9a7554ec0eecdd0edb FROMLIST: mtd: spi-nor: enable the debugfs for the partname and partid
+70e0960f8b5b2a096fae673f3f945eb14e414d2b FROMLIST: thermal: mediatek: add suspend/resume callback
+61f0c855768b57b52e62d94144f15baef605359b FIXUP: FROMLIST: cpufreq: mediatek: add opp notification for SVS support
+75f31ee9b2678080080d2fab271031512fc5507a FROMLIST: platform/chrome: wilco_ec: Fix unreleased lock in event_read()
+1add47185175f0a03955fe98e8a99271a124c398 FROMLIST: mmc: dw_mmc: Fix occasional hang after tuning on eMMC
+029b8a7d6a860f8b9e36894dc62f7b98ac957a13 FROMLIST: mmc: sdio: Drop mmc_claim|release_host() in mmc_sdio_power_restore()
+a4b1f2ea47eb541ac6d42ae98385caad56c5c1ba FROMLIST: mmc: sdio: Move comment about re-initialization to mmc_sdio_reinit_card()
+3fdc0317781a6270d0c8db14d1248b014157fe47 FROMLIST: mmc: sdio: Drop powered-on re-init at runtime resume and HW reset
+f72b90279db4b34aa18c97be826014b611969509 FROMLIST: Revert "ARM: dts: rockchip: add startup delay to rk3288-veyron panel-regulators"
+c5ca96db39da130c92969ce07652df5cd7322fe3 FROMLIST: input: touchscreen: add delay time to device power on
+385d7209f13fc8d8c2b60f4181ee1d0014794d69 FROMLIST: drm/panel: Add helper for reading DT rotation
+37fa1a28e4fc82718f422848f2353ad51af587f7 FROMLIST: drm/panel: set display info in panel attach
+3e4be30cc3bdebda9b48607807cab2e27bc328ff FROMLIST: drm/connector: Split out orientation quirk detection
+1509c3461cf4eb1b8c59fc113eec18d4faef713b FROMLIST: drm/mtk: add panel orientation property
+cacfd13db7de541a9884b7fd25c2f69b70b09a93 FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+f38318ba899ccc85c2a01f0c914c5af071229f84 FROMLIST: remoteproc: mt8183: add reserved memory manager API
+9ca193bb728516acb81fd139dbb78c9627f17374 FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+3faaf7f8d2a009db6add70b4b7783965e16dc28e FROMLIST: OPP: Allow required-opps even if the device doesn't have power-domains
+bd74a1a20af016d71ab585b810a435a83663cc14 FROMLIST: PM / devfreq: Add cpu based scaling support to passive_governor
+36eb552a6d58efeac682999109a06b342ce42931 FROMLIST: OPP: Export a number of helpers to prevent code duplication
+1c5125da75a80365710957687e63e18f48dc14af FROMLIST: devfreq: mt8183-cci: using cpu based scaling passive_governor
+b1efdd4ac5092952b328f79efab685ae48783e01 FROMLIST: cpufreq: mediatek: Support vproc shared by multiple component
+2133f91b5d1ca31f13c821df96f5833a8bf030d8 FROMLIST: ASoC: hdmi-codec: Add an op to set callback function for plug event
+fe37cb0786c8aa357d615645a830a9cd054cb632 FROMLIST: drm: bridge: dw-hdmi: Report connector status using callback
+24d17ba368d6288daff5c64c923cbe23978f308e FROMLIST: drm: dw-hdmi-i2s: Use fixed id for codec device
+672118d6d6ae64afe8a0ea08295ca0b13bd40dfc FROMLIST: ASoC: rockchip_max98090: Add dai_link for HDMI
+fec0237a93ed98915ec404fc418a952ab4021cb3 FROMLIST: ASoC: rockchip_max98090: Add HDMI jack support
+bafdd7369137be7d98b640d5b78f46f5b1a0e657 FROMLIST: mmc: core: Add sdio_trigger_replug() API
+1f833cba81e604ecd4fe5806bab9641ccd27a200 FROMLIST: mwifiex: Make use of the new sdio_trigger_replug() API to reset
+4419fef1897980845b0c9da891032178519ea2be FROMLIST: OPP: Allow required-opps even if the device doesn't have power-domains
+cf108050aa250fed501fcb12fb5e077e331f549f FROMLIST: OPP: Add function to look up required OPP's for a given OPP
+993bf626c2062d7878e43f304424765e5ecd12a7 FROMLIST: OPP: Improve require-opps linking
+ba0991082ced89c6db66a9c326ef978de288fed5 FROMLIST: PM / devfreq: Cache OPP table reference in devfreq
+5097221921b57ec26b7de982cbfa492dfa985aed FROMLIST: PM / devfreq: Add required OPPs support to passive governor
+060dda1e6a2ddf9013fc2307306f6dfa0fb84662 FROMLIST: PM / devfreq: Add cpu based scaling support to passive_governor
+d8e3134cf2a37bdc42fe97e76c0db41bf1fb06cc FIXUP: FROMLIST: devfreq: mt8183-cci: using cpu based scaling passive_governor
+a8ff5c66c5ada177bfe7e056aab642de3258f07a BACKPORT: FROMLIST: media: v4l2-ctrl: Move compound control validation
+f704a31e1cc0ec02d57cf1a181515657056f77ef BACKPORT: FROMLIST: media: uapi: Add VP8 stateless decoder API
+edbb2cd689f17e27dbd66a873c8c2b196d14faca FROMLIST: media: v4l2-ctrl: Validate VP8 stateless decoder controls
+94e25770b70f87f3ff29df3cc740261ca8d27160 FROMLIST: media: hantro: Add support for VP8 decoding on rk3288
+72ee1db4d22b0276f393c4e7ae90725bc0f45b69 FROMLIST: media: uapi: h264: Clarify our expectations regarding NAL header format
+113c22468e0023a9ec845d5858fb4758abc7b1f4 BACKPORT: FROMLIST: media: uapi: h264: Add the concept of decoding mode
+38ff92751051d8cb784d1534287b811758b30827 FROMLIST: media: uapi: h264: Get rid of the p0/b0/b1 ref-lists
+9349f5489c9cb9a90a8403b35a59387d0431de29 FROMLIST: lib/sort.c: implement sort() variant taking context argument
+7d19cb46c3a1d8ea2aa2ba16bdff7cf2e512f42e FROMLIST: media: hantro: Move copy_metadata() before doing a decode operation
+359afbc41cb63dda6423b3adb5fc9fead01eaabe FROMLIST: media: hantro: Constify the control array
+74f9d7cebdd37a17753006a502f707e2024d5e43 BACKPORT: FROMLIST: media: hantro: Simplify the controls creation logic
+492a67644251c62db97b52451cda48d3eb0d3f45 FROMLIST: media: hantro: Add hantro_get_{src,dst}_buf() helpers
+c83d9c4aefe5c29d55a4d8a16b24c67294784296 FROMLIST: media: hantro: Add helpers to prepare/finish a run
+6ef4171eed5ffdc2108ab673a755d1dd77fb3dcd BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding
+66393e7e8d92d58bf990dee336899d869571753c FROMLIST: media: hantro: Add support for H264 decoding on G1
+0bd0bd2e1f78044f67475abf417e9b95ecd0854c FROMLIST: media: hantro: Enable H264 decoding on rk3288
+6e28c41729387eb4915cadb59f29ed989e477be6 FROMLIST: Documentation: bridge: Add documentation for ps8640 DT properties
+71e4156c5ec43f72077bb1f50882f588cfd71d71 FROMLIST: drm/bridge: Add I2C based driver for ps8640 bridge
+e09a9439c5a794b24f73e6909d8eba778e3e3041 FIXUP: FROMLIST: drm/bridge: Add I2C based driver for ps8640 bridge
+bdf7f203d3a08614f259af0235d519ee238bd6b3 FIXUP: FROMLIST: OPP: Add function to look up required OPP's for a given OPP
+7785514f58514ced8c7910aa5cbb7ca2a21d0399 BACKPORT: FROMLIST: x86/purgatory: do not use __builtin_memcpy and __builtin_memset
+6437ec34f301c09029c1a67b9f461211ab31e73c FROMLIST: KBUILD_CFLAGS is very carefully built up in the top level Makefile, particularly when cross compiling or using different build tools. Resetting KBUILD_CFLAGS via := assignment is an antipattern.
+a491b9eaf95b1a999741c41b1ee0691d396f51b8 FROMLIST: Revert "ASoC: rockchip: i2s: Support mono capture"
+767e56e7d1548584cd361c61589c5b8c23ffb48a BACKPORT: FROMLIST: serial: 8250-mtk: modify mtk uart power and clock management
+6a83c410173ddef8f944378a1168253271bfb976 FIXUP: FROMLIST: OPP: Improve require-opps linking
+c49490f0213258ade0161ec70f53ed6663a4f688 FROMLIST: HID: logitech-dj: extend consumer usages range
+a704b0cfbf23e2601c939cfff5fd37eb951bb8ec FROMLIST: media: hantro: Set DMA max segment size
+86ed20b592ce47a20a82dbfdf268459daadb6ccf FROMLIST: media: hantro: Move VP8 common code
+94f6169bce8c7b431a665772b143e42067bdedc5 FIXUP: BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding
+cf6420263777ea55730e45ed3b0e9b0df3ed8452 FROMLIST: drm/rockchip: Suspend DP late
+d1b1d9f9908e5d0e427a1f8f19e2855e12c9d60e FROMLIST: Revert "mwifiex: fix system hang problem after resume"
+79e54a00fe7ab76348ecf4a5d0edc962a07ce390 FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+7dc74054cc90450211e60eda2c642e1cf0450cc1 FROMLIST: remoteproc: mt8183: add reserved memory manager API
+5f0e81f1afd55465df70bc783017eeeaec4b6776 FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+8d6674b0c9466ea7c951a875e429f74c24fe027f FROMLIST: ASoC: rt1011: Add R0 temperature and TDM1 ADC2DAT Swap control
+ec3e8dd8c65e7b38dc7dbeab77e7e6458f90f97d FIXUP: FROMLIST: arm64: dts: mt8183: add scp node
+e8d4381e6c27b5d1b563d29dd251e34d05af32dc FIXUP: FROMLIST: drm/bridge: Add I2C based driver for ps8640 bridge
+a2fbc04f40d37052d7ac598a08b513a14b37d2fb FIXUP: FROMLIST: OPP: Improve require-opps linking
+bf3bda1709edb1efef7798546db2b3b7b6f5e1f8 FIXUP: FROMLIST: remoteproc: mt8183: add reserved memory manager API
+555a6be01174936bb10e7b3324ab3e55170ee3a5 FROMLIST: ASoC: rt1011: Add a flag for the R0 calibration test
+806f0bc580b7bf9492fcac5f93ddc488b114bada FROMLIST: drm/mediatek: use correct device to import PRIME buffers
+e30a92fb9b889a0a88c057e752e734786db12bcf FROMLIST: drm/mediatek: set DMA max segment size
+41e1cca1f3eb9ad6c093b5f9399c06ed7ed87018 FROMLIST: Bluetooth: btqca: release_firmware after qca_inject_cmd_complete_event
+164354d2b60053af731f2e7d3f5a35a82522af75 FROMLIST: drm/msm/dsi: Fix return value check for clk_get_parent
+b76022244711d37002f7e899c1197ab76a1e1124 BACKPORT: FROMLIST: clk: Remove cached cores in parent map during unregister
+48425b33b106fad4c9e9fdd984a0683e7c679cc6 FROMLIST: ASoC: rockchip: rockchip_max98090: Set period size to 240
+c4d886665235b2f31f8aaba9cf58bc0c1d866f0c FROMLIST: i2c: mediatek: disable zero-length transfers for mt8183
+2f7d5297b38e364447fdffda2dfcb2f58e010185 BACKPORT: FROMLIST: nvme: Add quirk for LiteON CL1 devices running FW 22301111
+a2484b889f3e636a2e2f953c11d5b6b8c389e1be FIXUP: FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+50340a86f1feafb4938f3eca8c0ef9aed3b82b66 FIXUP: FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe
+07777af26d5bb87daad021b198c93fd66c8b1e12 FIXUP: FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+2a9abaf958681bd95ee0f86f99d821fe84f20479 FROMLIST: bluetooth: xbox controller bug fix
+e41cffebd3aa58a243863dfb2aeb1ba57ee50548 FIXUP: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel
+b7ad1e1836487f6585f1fe33c93c59f9575f2234 FIXUP: FROMLIST: drm/panel: support for auo, kd101n80-45na wuxga dsi video mode panel
+597aa9cf977f8b971fdf7dd5f1dc3e1a4a1aa7bb FROMLIST: platform/x86: intel_pmc_core: Attach using APCI HID "INT33A1"
