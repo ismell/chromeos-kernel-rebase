@@ -1,4 +1,4 @@
-From c01920b44fc000e6f36ce2b2a2fcf3d1c4f06bfd Mon Sep 17 00:00:00 2001
+From fbd1bb67085699726802453cf406d1616973d877 Mon Sep 17 00:00:00 2001
 From: Guenter Roeck <groeck@chromium.org>
 Date: Fri, 21 Sep 2018 09:33:24 -0700
 Subject: [PATCH] CHROMIUM: alt-syscall: Make required syscalls available for
@@ -32,7 +32,7 @@ Signed-off-by: Raul E Rangel <rrangel@chromium.org>
  6 files changed, 87 insertions(+), 16 deletions(-)
 
 diff --git a/include/linux/compat.h b/include/linux/compat.h
-index 16dafd9f4b86..4230d25b6904 100644
+index 16dafd9f4b862..4230d25b69048 100644
 --- a/include/linux/compat.h
 +++ b/include/linux/compat.h
 @@ -918,7 +918,6 @@ asmlinkage long compat_sys_socketcall(int call, u32 __user *args);
@@ -44,10 +44,10 @@ index 16dafd9f4b86..4230d25b6904 100644
   * For most but not all architectures, "am I in a compat syscall?" and
   * "am I a compat task?" are the same question.  For architectures on which
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 88145da7d140..451a9195462c 100644
+index f7c561c4dcdd5..799e3dc50e5c9 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -1402,4 +1402,25 @@ static inline unsigned int ksys_personality(unsigned int personality)
+@@ -1402,6 +1402,27 @@ static inline unsigned int ksys_personality(unsigned int personality)
  	return old;
  }
  
@@ -72,9 +72,11 @@ index 88145da7d140..451a9195462c 100644
 +
 +#endif /* CONFIG_ALT_SYSCALL */
 +
- #endif
+ /* for __ARCH_WANT_SYS_IPC */
+ long ksys_semtimedop(int semid, struct sembuf __user *tsops,
+ 		     unsigned int nsops,
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 0ce922009dd0..5d3d96ba8db5 100644
+index 0ce922009dd0c..5d3d96ba8db58 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
 @@ -10785,9 +10785,8 @@ __perf_event_ctx_lock_double(struct perf_event *group_leader,
@@ -104,7 +106,7 @@ index 0ce922009dd0..5d3d96ba8db5 100644
   * perf_event_create_kernel_counter
   *
 diff --git a/kernel/sys.c b/kernel/sys.c
-index fe4c6db242b2..7a75ffa5ef9c 100644
+index fe4c6db242b26..7a75ffa5ef9c6 100644
 --- a/kernel/sys.c
 +++ b/kernel/sys.c
 @@ -195,7 +195,7 @@ static int set_one_prio(struct task_struct *p, int niceval, int error)
@@ -190,7 +192,7 @@ index fe4c6db242b2..7a75ffa5ef9c 100644
   * do_sysinfo - fill in sysinfo struct
   * @info: pointer to buffer to fill
 diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
-index d7f2d91acdac..2fe84c494014 100644
+index d7f2d91acdac1..2fe84c4940147 100644
 --- a/kernel/time/posix-timers.c
 +++ b/kernel/time/posix-timers.c
 @@ -1052,8 +1052,8 @@ int do_clock_adjtime(const clockid_t which_clock, struct __kernel_timex * ktx)
@@ -242,7 +244,7 @@ index d7f2d91acdac..2fe84c494014 100644
  		struct old_timespec32 __user *, tp)
  {
 diff --git a/kernel/time/time.c b/kernel/time/time.c
-index 5c54ca632d08..172aa97a08d9 100644
+index 5c54ca632d08c..172aa97a08d95 100644
 --- a/kernel/time/time.c
 +++ b/kernel/time/time.c
 @@ -268,7 +268,7 @@ COMPAT_SYSCALL_DEFINE2(settimeofday, struct old_timeval32 __user *, tv,
@@ -289,5 +291,5 @@ index 5c54ca632d08..172aa97a08d9 100644
  
  /*
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

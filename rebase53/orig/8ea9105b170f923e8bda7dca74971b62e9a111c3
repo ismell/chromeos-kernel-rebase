@@ -55,7 +55,7 @@ Reviewed-by: Douglas Anderson <dianders@chromium.org>
  create mode 100644 arch/arm/kernel/alt-syscall.c
 
 diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index 8ef577f78cb2..ce318ba56140 100644
+index 8ef577f78cb25..ce318ba56140d 100644
 --- a/arch/arm/Kconfig
 +++ b/arch/arm/Kconfig
 @@ -4,6 +4,7 @@ config ARM
@@ -67,7 +67,7 @@ index 8ef577f78cb2..ce318ba56140 100644
  	select ARCH_HAS_DEVMEM_IS_ALLOWED
  	select ARCH_HAS_ELF_RANDOMIZE
 diff --git a/arch/arm/include/asm/syscall.h b/arch/arm/include/asm/syscall.h
-index 06dea6bce293..c844f12ee72e 100644
+index 06dea6bce293b..c844f12ee72e0 100644
 --- a/arch/arm/include/asm/syscall.h
 +++ b/arch/arm/include/asm/syscall.h
 @@ -19,6 +19,10 @@
@@ -82,7 +82,7 @@ index 06dea6bce293..c844f12ee72e 100644
  				 struct pt_regs *regs)
  {
 diff --git a/arch/arm/include/asm/thread_info.h b/arch/arm/include/asm/thread_info.h
-index 8f55dc520a3e..9e2f8f1dee4d 100644
+index 8f55dc520a3e5..9e2f8f1dee4db 100644
 --- a/arch/arm/include/asm/thread_info.h
 +++ b/arch/arm/include/asm/thread_info.h
 @@ -65,14 +65,27 @@ struct thread_info {
@@ -114,7 +114,7 @@ index 8f55dc520a3e..9e2f8f1dee4d 100644
  
  /*
 diff --git a/arch/arm/kernel/Makefile b/arch/arm/kernel/Makefile
-index 8cad59465af3..bf3f74d5d384 100644
+index 8cad59465af39..bf3f74d5d3841 100644
 --- a/arch/arm/kernel/Makefile
 +++ b/arch/arm/kernel/Makefile
 @@ -65,6 +65,7 @@ obj-$(CONFIG_CRASH_DUMP)	+= crash_dump.o
@@ -127,7 +127,7 @@ index 8cad59465af3..bf3f74d5d384 100644
  obj-$(CONFIG_CPU_XSC3)		+= xscale-cp0.o
 diff --git a/arch/arm/kernel/alt-syscall.c b/arch/arm/kernel/alt-syscall.c
 new file mode 100644
-index 000000000000..08424ac0183c
+index 0000000000000..08424ac0183c4
 --- /dev/null
 +++ b/arch/arm/kernel/alt-syscall.c
 @@ -0,0 +1,53 @@
@@ -185,7 +185,7 @@ index 000000000000..08424ac0183c
 +}
 +EXPORT_SYMBOL_GPL(arch_set_sys_call_table);
 diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
-index 3968d6c22455..49b52f193490 100644
+index 3968d6c22455b..49b52f1934906 100644
 --- a/arch/arm/kernel/asm-offsets.c
 +++ b/arch/arm/kernel/asm-offsets.c
 @@ -78,6 +78,10 @@ int main(void)
@@ -200,7 +200,7 @@ index 3968d6c22455..49b52f193490 100644
    BLANK();
    DEFINE(S_R0,			offsetof(struct pt_regs, ARM_r0));
 diff --git a/arch/arm/kernel/entry-common.S b/arch/arm/kernel/entry-common.S
-index 746565a876dc..a4609f4acf5a 100644
+index 746565a876dcd..a4609f4acf5a0 100644
 --- a/arch/arm/kernel/entry-common.S
 +++ b/arch/arm/kernel/entry-common.S
 @@ -227,7 +227,13 @@ ENTRY(vector_swi)
@@ -240,7 +240,7 @@ index 746565a876dc..a4609f4acf5a 100644
  		movhs	scno, #0
  		csdb
 diff --git a/arch/arm/kernel/entry-header.S b/arch/arm/kernel/entry-header.S
-index 773424843d6e..c5c43bb73e56 100644
+index 773424843d6ef..c5c43bb73e56b 100644
 --- a/arch/arm/kernel/entry-header.S
 +++ b/arch/arm/kernel/entry-header.S
 @@ -380,8 +380,14 @@
@@ -273,7 +273,7 @@ index 773424843d6e..c5c43bb73e56 100644
  	.if	\reload
  	add	r1, sp, #S_R0 + S_OFF		@ pointer to regs
 diff --git a/security/chromiumos/Kconfig b/security/chromiumos/Kconfig
-index 14d657fb4d1b..b3759d287083 100644
+index 14d657fb4d1b6..b3759d287083c 100644
 --- a/security/chromiumos/Kconfig
 +++ b/security/chromiumos/Kconfig
 @@ -1,7 +1,7 @@
@@ -286,5 +286,5 @@ index 14d657fb4d1b..b3759d287083 100644
  	  The purpose of the Chromium OS security module is to reduce attacking
  	  surface by preventing access to general purpose access modes not
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 
