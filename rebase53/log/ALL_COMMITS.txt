@@ -5117,6 +5117,13 @@ ea0f6a09a7a993fc7c781fd8ca675b29c42d4719 CHROMIUM: wilco_ec: Add batt_ppid_info 
 60ec81791abeff01bf1e28d097e740cc45e9770e UPSTREAM: ip_sockglue: Fix missing-check bug in ip_ra_control()
 670b16f672c289536c304cd79e84cd9a15e2be17 FIXUP: CHROMIUM: drm/i915: Disable boost and waitboost
 c07f0885937887b78784d060dfe35f60f3ad470a FROMGIT: ASoC: soc-core: fixup references at soc_cleanup_card_resources()
+1d0ea3941663975d3d4dfebb83bd3505adabb480 CHROMIUM: iwl7000: mvm: clear FW_RUNNING bit after debug collection
+4fa234723a576902a268df368868d05c94370d29 CHROMIUM: iwl7000: mvm: delay GTK setting in FW in AP mode
+12d02d0206d4e5b16f5a51fb23ce22bbae8faf0e CHROMIUM: iwl7000: mac80211: call rate_control_send_low() internally
+679bf6c2554826edfc3eb8217e8c3da7dad09664 CHROMIUM: iwl7000: mac80211: use STA info in rate_control_send_low()
+5c7e11b56942719b786c35f85ba4ea05fcccc225 CHROMIUM: iwl7000: mac80211: fill low rate even for HAS_RATE_CONTROL
+82ee611db57d1cf72dc3707fdcda5526748e5451 CHROMIUM: iwl7000: add support for hr1 RF ID
+eb36c73a2b3855dccf46cebc1c6beb27f8286feb CHROMIUM: iwl7000: disable d0i3 by default
 50b1e8b88494f96daca6b70194b013313d7cc554 UPSTREAM: media: uvcvideo: Refactor URB descriptors
 b6dcc09b801fe7271286f0a09a003fc093ca3012 UPSTREAM: media: uvcvideo: Convert decode functions to use new context structure
 80295918a9feae8e91b5f7e309ffa3691be2d92b UPSTREAM: media: uvcvideo: Protect queue internals with helper
@@ -5185,6 +5192,9 @@ af8f73ada7d9fd0b81041c8067460ecb404084c4 UPSTREAM: drm/rockchip: Add reflection 
 a1d97a61e26650adfe341db01fd719a55526de69 CHROMIUM: i915: intel_dp_aux_backlight: Fix max backlight calculations
 42c2ab1d19a62b61d71af33497ec11d79013f62b UPSTREAM: drm/rockchip: Add implicit fencing support for planes
 4465bd5a47080e477eecf4d2979c5c73280b5a5b BACKPORT: FROMLIST: tpm: Fix TPM 1.2 Shutdown sequence to prevent future TPM operations
+36f4103e0efa2b4d6a66de4619f3e7596b31e2d6 CHROMIUM: iwl7000: add new cards for 22000 and change wrong structs
+4b9c8421b4f69dbd462b2f7373d21c48ff7fea0f CHROMIUM: iwl7000: change 0x02F0 fw from qu to quz
+403f0c081fd6c24e8843cfa4e6ca1f2e9fe6cab2 CHROMIUM: iwl7000: mac80211: drop robust management frames from unknown TA
 60d314555684c19a99d13b0ab466472842f7cd8e FROMGIT: ASoC: Intel: sst: fix kmalloc call with wrong flags
 33901c602a1a67fded5d428819eaf226ec3a9c08 CHROMIUM: mfd: cros_ec: Remove chromium specific changes in cros_ec_commands.h
 db473727dfc185494b35fca8f600e24f47d2d10e FROMGIT: mfd: cros_ec: Update license term
@@ -5230,6 +5240,8 @@ a01fddf49d211eb59d53db24b6026fd2e997ac7d FROMGIT: drm/rockchip: dw_hdmi: Handle 
 e1cbf330d2d258418bf832666894e1f91b31a84e FROMLIST: USB: add usbfs ioctl to retrieve the connection parameters
 bef0f8bc5663afa2cf547f037306d9b01bdea592 CHROMIUM: bluetooth: fix invalid pointer access to null command
 2b4dc57b38c378d7eb44b763a19f940eb43b3049 CHROMIUM: Bluetooth: Enable Bluetooth LE splitter for x86-64
+185178e928889f2dcea45e965bb0168f0c3d334e CHROMIUM: iwl7000: mvm: disable 2Mhz only in radar channel
+847bc5f03974877b2b67c69094b7133564dc5cc9 CHROMIUM: iwl7000: mac80211: vht: add support VHT EXT NSS BW in parsing VHT
 1f92c7a079ac0c10d85fa5d2c9ffb9b0afcc7745 UPSTREAM: dt-bindings: gpu: add bindings for the ARM Mali Bifrost GPU
 46cb8b000083d15675473af8c112b76a1998f7ec Revert "CHROMIUM: wilco_ec: Add exclusive lock to event node"
 f3e1259b64de0a0a9d5deeec7bba0e1195198e46 Revert "FIXUP: CHROMIUM: wilco_ec: Add event handling"
@@ -5301,6 +5313,9 @@ a7cda4d7cd5fe18b7741acff09f379c54064a9f7 FROMGIT: ath10k: Check tx_stats before 
 01fd9a18f8b0b2a343c8fa48c9f2e64a76bb9cd8 FIXUP: FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe
 ce823a5a51832fa94a7c7e2573489e570462a611 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
 905bff277dcef1c1d702008912de42422664a9ad FROMLIST: hid: remove NO_D3 flag when remove driver
+60e29bd362921dc67f17a4bcc0bb21e287ebf279 CHROMIUM: iwl7000: mvm: enable Atlas platform workaround
+96ea36918cb169ebcefe30fec88666712a6cb2fe CHROMIUM: iwl7000: don't use qnj config for quz hr
+027e947899a7ae03ce55b95248bb5d720ce7d9b6 CHROMIUM: iwl7000: mvm: allow reduce tx nss
 960efabcd57f01f65cb14eb9a36b8a764f6d2221 BACKPORT: FROMLIST: iio: cros_ec: Add lid angle driver
 970618977ae1a9a78ea124bbc7d6da2a55a7b639 CHROMIUM: config: Add cros_ec lid angle driver
 6768e99cfe0514e553f4d0a2efe273f4c1d4b137 CHROMIUM: iwl7000: mvm: clear FW_RUNNING bit after debug collection
@@ -5392,6 +5407,8 @@ f7f0e8cf848d05558bf0c6986430caf7e11848bb FROMLIST: usb: Handle USB3 remote wakeu
 652c6416fdfac3e436f530c27fe8866884e4232b FROMGIT: ath10k: add report MIC error for sdio chip
 511c9de086f080265aa2e527ea585dcf74721229 FROMGIT: ath10k: add missing error handling
 4b0eb9973d692f0d866ec600e6b496ef898161e2 UPSTREAM: media: v4l: Add definitions for MPEG-2 slice format and metadata
+dcdba4b07a30f56254156154ae3dd5c5f9d2f764 CHROMIUM: iwl7000: add new cards for 9000 and 20000 series
+57bf5e75ee3152135ef94e055acc790ca45ee92e CHROMIUM: iwl7000: pcie: Remove explicit invocation of mmiowb()
 a72f49258d4a8aec21e74fe0da8d38917e4de6a0 BACKPORT: FROMGIT: platform/chrome: cros_ec_debugfs: Add debugfs entry to  retrieve EC uptime
 7c966453ee85056944208a7f73c800b608c06b15 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
 6d1ef793a28a992a8f2ac05e8f69f39d08ac8710 arcvm: Regenerate arcvm config using defconfig
@@ -5700,6 +5717,7 @@ a259e6fea89c90266306351b3967a593a7dfddcb FROMGIT: ath10k: add new hw_ops for sdi
 5a13ba6fd4511157aca91bdfc34763afe390c765 FROMGIT: ath10k: destroy sdio workqueue while remove sdio module
 9a35126c17a7fc720ed30de53010aba24a33d8df UPSTREAM: media: v4l: Add support for V4L2_BUF_TYPE_META_OUTPUT
 0a461e60b88406cf6c01eccd58d3889c227b5c6b UPSTREAM: media: v4l: uAPI: V4L2_BUF_TYPE_META_OUTPUT is an output buffer type
+248ee1d0d868b1ef43541bb3a71ff090de6b69fc CHROMIUM: iwl7000: add netlink family policy to testmode
 ba9999a2296b08f9a2bd5c5787457510f0c9ff71 UPSTREAM: ASoC: core: move DAI pre-links initiation to snd_soc_instantiate_card
 e8911da41304caa159ad146866255635d0fdb84a UPSTREAM: media: mtk-mdp: Correct return type for mem2mem buffer helpers
 7d1ef39e3a7482d0c6002393dfd7e2a2eeed0c64 Revert "BACKPORT: media: vicodec: Introducing stateless fwht defs and structs"
@@ -5770,6 +5788,7 @@ c5e5a75b843e9232c43f1f5e41d0b8dab80183b0 FROMGIT: media: hantro: add support for
 345e557ceb328ad0d84a71a3759b7f8b01ca901f FIXUP: arm64: dts: mediatek: Modify opp table for cpu big cluster for mt8183
 30705a3966e7c56bc4a769a43a520d9b9b40759b CHROMIUM: ASoC: Intel: Read sst DSP DMA pointer after period elapse occurs
 e081ba1d801950367c2af088175a71c392f89e2c CHROMIUM: arm64: dts: mt8183: add kodama dts
+2411541061dfbe09c51234719de0aed7219ff8cd CHROMIUM: iwl7000: tree-wide: set genl non-strict validation flags
 78b316cfa6b7b30e067fd8701c7c3879f75e762f Revert "CHROMIUM: ASoC: max98357a: fix speaker pop when starting playback"
 8743f9e81f836e4f9e85bb411f828abe2341e608 FROMGIT: ASoC: max98357a: request GPIO when device get probed
 6b7250cd91d27f7767cb0ab77b575d948b922583 FROMGIT: ASoC: max98357a: avoid speaker pop when playback startup
@@ -5796,6 +5815,7 @@ c03d5a7a1477ac0049ccd7885696502a275280d9 FROMGIT: drm/i915/icl+: Always use TPS2
 475fab6e2e175d4c379c793447c3da88c5040145 FROMGIT: drm/i915/psr: Initialize PSR mutex even when sink is not reliable
 28866e61e4b9b399306585b465ae06aea801cb94 FROMGIT: drm/i915/psr: Do not enable PSR in interlaced mode for all GENs
 75f31ee9b2678080080d2fab271031512fc5507a FROMLIST: platform/chrome: wilco_ec: Fix unreleased lock in event_read()
+cf6ac84bb359f12e8803ad7e4d5000398c96def8 CHROMIUM: iwl7000: pcie: add support for qu c-step devices
 1add47185175f0a03955fe98e8a99271a124c398 FROMLIST: mmc: dw_mmc: Fix occasional hang after tuning on eMMC
 f4250a24b2fd301e42c6dcac6b297315d5434b67 CHROMIUM: config: Turn off Rockchip crypto for arm64
 029b8a7d6a860f8b9e36894dc62f7b98ac957a13 FROMLIST: mmc: sdio: Drop mmc_claim|release_host() in mmc_sdio_power_restore()
@@ -5814,8 +5834,32 @@ f72b90279db4b34aa18c97be826014b611969509 FROMLIST: Revert "ARM: dts: rockchip: a
 5cdb0f24c0499173a54f9e32f97aaafff721e70b BACKPORT: FROMGIT: drm/i915: Check backlight type while doing eDP backlight initializaiton
 b0c96f7dfd5cdea04e07a589c48904c32d8e71c4 CHROMIUM: drm/i915: Modify i915.enable_dpcd_backlight default value
 ceeecb7cbec1ab0ec11c912b92b1a6bc794e97f4 CHROMIUM: drm/i915: Modify AUX backlight enable sequence for specific eDP panel
+f11ffd96bb7859e0b7090ab2d824f9cf0d9f5428 CHROMIUM: iwl7000: mvm: Allow multicast data frames only when associated
 1eafbb701f39551feac4cbee22204dd004cd646f Revert "FROMLIST: gen_compile_command: Add support for separate KBUILD_OUTPUT directory"
 c5ca96db39da130c92969ce07652df5cd7322fe3 FROMLIST: input: touchscreen: add delay time to device power on
+39974285f93e21a8c97c5b11379bd2a8338fad17 CHROMIUM: iwl7000: mvm: disable TX-AMSDU on older NICs
+8a0c929a5e432b78f64ffe396e34e40878992f65 CHROMIUM: iwl7000: mvm: ftm: make common calib signed
+19729114dee695caddbb8c61715e29b2043ca61a CHROMIUM: iwl7000: mvm: Allow multicast data frames only when authorized
+c5d0098dac47496c18e25a61a19aa00d7656a82a CHROMIUM: iwl7000: mvm: avoid races in rate init and rate perform
+c0a62acbabde0ebbef95d0d34709bd5841423dd7 CHROMIUM: iwl7000: mvm: don't call rs_rate_init in an atomic context
+085404fb7b1f7ce430b54297db4af70c11f1fb7d CHROMIUM: iwl7000: mvm: don't send GEO_TX_POWER_LIMIT on version < 41
+bf94b53a6b7a93a5af1678fad5b01fbdfab29190 CHROMIUM: iwl7000: mvm: prepare the ground for more RSS notifications
+8a4b5e07f889d4ebb8ee2e6c8e9a5d9e9ba74015 CHROMIUM: iwl7000: mvm: add a new RSS sync notification for NSSN sync
+68969112010e474ac09cdc7b029b658b98790f97 CHROMIUM: iwl7000: iwlwiif: mvm: refactor iwl_mvm_notify_rx_queue
+e2ceaa827133ec9bd369c86e884b733f0be0a585 CHROMIUM: iwl7000: mvm: add a loose synchronization of the NSSN across Rx queues
+9f1883496541a0a9abc98bdb6592ac9ef7bc6e91 CHROMIUM: iwl7000: mvm: fix the reordering buffer loose sync
+ece1d60166291a7d9f00ab37b31a2c3c8fa0b141 CHROMIUM: iwl7000: mvm: add a wrapper around rs_tx_status to handle locks
+1e281444f486350124cf5505ea9a13839d714f1e CHROMIUM: iwl7000: dbg_ini: move iwl_dbg_tlv_load_bin out of debug override ifdef
+3dcf383938a2c2e1046512f5d9164a88c5b1c92b CHROMIUM: iwl7000: dbg_ini: move iwl_dbg_tlv_free outside of debugfs ifdef
+c5dba9e98056ab0100bc10f1ff54aa4340c8a18f CHROMIUM: iwl7000: fix locking in delayed GTK setting
+11eb3a9098f76ee19c5a0aea23c67756e597f57f CHROMIUM: iwl7000: dbg_ini: remove periphery phy and aux regions handling
+e4da38f4e47d48110b8196cde0255b1266050ec2 CHROMIUM: iwl7000: mvm: fix comparison of u32 variable with less than zero
+d4aa4a1802189a464601b8c25bec36b478659f15 CHROMIUM: iwl7000: mac80211: send IBSS probe request with correct BSSID
+9a5d7c54742fc3ee5a9620d15565905c35f4bb38 CHROMIUM: iwl7000: mvm: fix frame drop from the reordering buffer
+28790f553f80e4e1e9a8200a958b5b58272ec145 CHROMIUM: iwl7000: mvm: replace RS mutex with a spin_lock
+5ee00b383ccebfd030933dbad609779450da19d7 CHROMIUM: iwl7000: mvm: remove check for lq_sta in __iwl_mvm_rs_tx_status()
+b835c455a4d1f28940c0d2ea812808bcdb933f61 CHROMIUM: iwl7000: mvm: move RS lock to the persistent region of lq_sta
+5f3f1133181e8735e680828c471060a6ca184010 CHROMIUM: iwl7000: mvm: fix possible out-of-bounds read when accessing lq_info
 deb74929f8cb092a293aff7af3b35fff6ca03b74 CHROMIUM: config: Change HANTRO to be =y, not =m
 075757e0e876df18ba30d1f2c57705d6daebb8b8 FROMGIT: Bluetooth: btqca: Add a short delay before downloading the NVM
 58e97e262501819b4aa2eea6cf226bb583229339 FROMGIT: Bluetooth: hci_qca: Use kfree_skb() instead of kfree()
@@ -5827,6 +5871,7 @@ de62be4b67cecf466f50142702bcbc8e23aa8d3c CHROMIUM: net: phy: realtek: Add missin
 0e273b97fec5f1dac3a58663e1d7778017df1980 UPSTREAM: net: phy: realtek: Replace phy functions with non-locked version in rtl8211e_config_init()
 609d2227d9bc9c734f14312e9b6c6cac34b116a8 BACKPORT: net: phy: realtek: add missing page operations
 51617274483692263db9cbcb5b8f69b37fc08b34 UPSTREAM: net: phy: Add phydev_warn()
+6b04e03ed2563a671c2779333dbb6f757e00fb93 CHROMIUM: iwl7000: mvm: send LQ command always ASYNC
 c7404c50885306c30e2c5cad55fa94a6b3a06e33 BACKPORT: FROMGIT: drm/i915: Add windowing for primary planes on gen2/3 and chv
 2014220d4d9ac427e0d24f47cae61932af1ccce2 BACKPORT: FROMGIT: drm/i915: Disable sprite gamma on ivb-bdw
 5593da8976a98a572a27b71765c97c3ba4138470 BACKPORT: FROMGIT: drm/i915: Program plane gamma ramps
@@ -5899,6 +5944,9 @@ c932cb91c7b4ae6eb833f20c430a1cb75ecc70b9 BACKPORT: FROMGIT: nvme-pci: Unblock re
 9e9f138440cfca9b9726d6128f2d0cf6854eb28f BACKPORT: FROMGIT: nvme-pci: Sync queues on reset
 5ddf440d305adbbc31743c784ea744c4ee7cf465 FROMGIT: nvme: Export get and set features
 bc7304877066a781782a7b43ea0ed2edcc767637 BACKPORT: FROMGIT: nvme-pci: Use host managed power state for suspend
+589d83c1ffc14b56fb6218039a495de7369954d8 CHROMIUM: iwl7000: mvm: assert mutex held only in sync notification
+ef72885f5f616c56c85b8979055759ff541b2712 CHROMIUM: iwl7000: add 3 new IDs for the 9000 series (iwl9260_2ac_160_cfg)
+9a7ede8d014b4064f333dc9ad0a3acf8d803b91a CHROMIUM: iwl7000: add sta_id to WOWLAN_CONFIG_CMD
 40f0dc838f2f657c2168733058f4be990220417f Revert "ANDROID: AVB error handler to invalidate vbmeta partition."
 e328fb106a2fe0ffcd2a5de9ba9a7d1674dac95b CHROMIUM: config: Set MMAP_RND_BITS to max for arm32
 23a8aa13f1beb37efa03583eb5032d2585e5e0cb Revert "FROMLIST: mmc: dw_mmc: Disable SDIO interrupts while suspended to fix suspend/resume"
@@ -6174,3 +6222,519 @@ e5ef6755612c7ca6bfc557263bd025b4e5658083 Revert "FROMLIST: platform/x86: intel_p
 597aa9cf977f8b971fdf7dd5f1dc3e1a4a1aa7bb FROMLIST: platform/x86: intel_pmc_core: Attach using APCI HID "INT33A1"
 8e4f3c081f55fc943c74ea211075bf8c5a4d925f CHROMIUM: platform/x86: intel_pmc_core: dev_warn() on S0ix failure
 97c4d29ea2291ebe07af88e5b968df55aae1aebd UPSTREAM: ASoC: mediatek: mt8183: make some functions static
+9a0952050fad4dc7a2b86fd330613d6cca919930 CHROMIUM: input: Drop using wakeup_source_init().
+802d1a5411939001757b50fcb523fc718268724d UPSTREAM: PM / wakeup: Drop wakeup_source_drop()
+04b5489542a266ac31ae325f609a2570b1697aaa UPSTREAM: drivers: base: power: remove wakeup_sources_stats_dentry variable
+f1961a41380554dd70ebd27b9124564d881e6bda UPSTREAM: PM / core: Add support to skip power management in device/driver model
+885bd843251834651ff708d0d31b6b01fba4b78f FROMGIT: PM / wakeup: Drop wakeup_source_init(), wakeup_source_prepare()
+0fe794cc4deb2517b9265248a391b833a7ce02d8 FROMGIT: PM / wakeup: Use wakeup_source_register() in wakelock.c
+ef228d4a2998f1a6f382381e8ab5e30a38f40820 FROMGIT: PM / wakeup: Show wakeup sources stats in sysfs
+a5caab61a2baebc1ca1c1cda5a636e4a61b306fc FROMGIT: PM / wakeup: Fix sysfs registration error path
+9ebfc883b98caf56fa3e0a817e1e85977b260b9f FROMGIT: PM / wakeup: Register wakeup class kobj after device is added
+cd5a4da14c862674d01685477c56aa2e2346a8ef FROMGIT: PM / wakeup: Unexport wakeup_source_sysfs_{add,remove}()
+8654a1d9c340884edc83a6e55eea5f6ad64b43e3 FROMLIST: media: uvcvideo: Use streaming DMA APIs to transfer buffers
+fff2d1b4d5c3d86bc9c267def80601d206862ed2 CHROMIUM: wakeup_source: Correct chromuim only drivers that use legacy api.
+a729ca540033202d9744956c8fbe6fc0b6dca7db FROMGIT: arm64: map FDT as RW for early_init_dt_scan()
+b70ee078adc5070a12dba3f4ec6494c210b3c45d FROMGIT: fdt: add support for rng-seed
+5432c052137810d762e3f75d776a3691f8a58abf CHROMIUM: config: enable CONFIG_RANDOM_TRUST_BOOTLOADER
+400630fd01699c4fede60907c23a4bb15f14e288 UPSTREAM: pinctrl: msm: Actually use function 0 for gpio selection
+c9d895d315d8aa9b213314c9c32e11124784e53f CHROMIUM: arm64: dts: mt8183: Add jacuzzi
+f15aa0ec373c094fd9dc04d9a472bd982d887491 FROMGIT: fdt: Update CRC check for rng-seed
+31bd349342b8854c9f9eaf53a434a554c2aab947 FROMGIT: arm64: dts: mt8183: fix pwrap gic number
+d63b8988a6b41b2a63048cc4493fc3e566707863 UPSTREAM: ath10k: implement set_base_macaddr to fix rx-bssid mask in multiple APs conf
+8cfa7f0f45843152c6fc0b1ff8acc4e349f133d8 UPSTREAM: pinctrl: mediatek: fix check on EINT_NA comparison
+b6153e0adb1eb9ae2f91366e0b07ec8092f15d82 UPSTREAM: pinctrl: mediatek: moore: fix return value check in mtk_moore_pinctrl_probe()
+71f29332ee338ba89fdade4bc71d7e2d80d105e5 UPSTREAM: pinctrl: mediatek: paris: fix return value check in mtk_paris_pinctrl_probe()
+1e109910e8fb7d2af2c4cd0c7865ff198503023f UPSTREAM: pinctrl: mediatek: fix static checker warning caused by EINT_NA
+9e1d2b3dcd39b73cfc3419c2ccf7f5adb43a84ec BACKPORT: FROMLIST: iio: cros_ec: set calibscale for 3d MEMS to unit vector
+44dc2e8b3091bbf4b4fa51a3b98ad29e07d486b2 CHROMIUM: iio: cros_ec_light: Add support for RGB sensor
+751e4585f5598db89a5f09071118c33ead907662 UPSTREAM: ASoC: Intel: cht_bsw_max98090: fix kernel oops with platform_name override
+8aa9c902562c13083fcf971d26bfdf8eab5cafd7 UPSTREAM: drm/bridge: tc358764: Fix build error
+4cf8d13ce38dacb3aeffc166b0ae28f3f51bd221 UPSTREAM: drm/rockchip: add missing of_node_put
+ffe3f3a0cc1002d85af38a97750971477602abb8 UPSTREAM: drm/rockchip: rgb: update SPDX license identifier
+9276e7530cab247d2dff8342871f967ba696316d UPSTREAM: drm/rockchip: vop: add rk3188 hs_start interrupt as dsp_hold equivalent
+05c01a5612e76f1db069c8023b3b4268936482e9 UPSTREAM: drm/sun4i: tcon: prevent tcon->panel dereference if NULL
+f044922e7fb36e85cef0c19804d1bbd48e92ed4f UPSTREAM: drm/bochs: Fix the ID mismatch error
+976cf0a8097d1f0f7ace42ff1bef08ca54c9d505 UPSTREAM: drm/doc: fix drm_driver_legacy_fb_format
+737febf48ebad6ab21ab8c939edf866506c91f05 UPSTREAM: drm/omap: dsi: Fix crash in DSI debug dumps
+8be2fc0ee4a766a64d3cb43efff5b2f512eb0f01 UPSTREAM: drm/omap: dsi: Ensure the device is active during probe
+de6f373c69f093d8513810c4087c564f1a2b53a8 UPSTREAM: drm/omap: Move DISPC runtime PM handling to omapdrm
+f0841b3bfde76588b28a85355e1273a05b01a1fa UPSTREAM: drm/omap: dsi: Fix OF platform depopulate
+56fc527794fa13caa684a9e2b57f7bfe8b74d60b UPSTREAM: drm/omap: Populate DSS children in omapdss driver
+596497f8ba57270c2ea43eb515e0f96737e06e75 UPSTREAM: drm/omap: hdmi4: Ensure the device is active during bind
+e2694c01cc7d925fc90edc548b882c21fb1d4860 UPSTREAM: drm/omap: dsi: Fix missing of_platform_depopulate()
+63db91e332714eaa4afa674435a275bd1cb5c423 UPSTREAM: drm/omap: populate DSI platform bus earlier
+2e1c4f2a164dbc258e4f295f02a46787e4378227 UPSTREAM: ARM: 8788/1: ftrace: remove old mcount support
+5884a0c4dfeed62e0cfcb659b6eac2767de60890 UPSTREAM: ARM: 8800/1: use choice for kernel unwinders
+84dd61f2898b7096c3f05cb2e649b0b7bd309022 BACKPORT: ARM: fix function graph tracer and unwinder dependencies
+ff05e813773eb6352fc15537bb63142a83c4d5e6 FROMLIST: ARM: UNWINDER_FRAME_POINTER implementation for Clang
+91803478c331620042d53bcf67c60a88ce4827ca UPSTREAM: drm/omap: fix bus_flags for panel-dpi
+07a506c2ad06272c1f24df03cadd9a80bf92a191 UPSTREAM: drm/amd/display: Fix disabled cursor on top screen edge
+96f78536dac04e7c31e98c8e5e00ec44a9633aba UPSTREAM: drm/amd/display: Fix misleading buffer information
+b892dde83fa1211a2e00557fc6421cb8c3fa95f6 UPSTREAM: uapi: fix more linux/kfd_ioctl.h userspace compilation errors
+fb6f8fab849488251c47b7b3a7251cd302dc09c2 UPSTREAM: drm/vmwgfx: Fix an uninitialized fence handle value
+9a0eacb8d24e9ae2e11186014fa5ecffa9b81dda UPSTREAM: drm/vmwgfx: Fix user space handle equal to zero
+bbe20983261435c604bac58bf397ce3b5664fb87 UPSTREAM: drm/vmwgfx: Fix compat mode shader operation
+1bfa7cd4b82c53e70c2fcda571bad1cf8dd148ea UPSTREAM: drm/fb-helper: Fix typo in parameter description
+58e174d64f969dcfb880d110b7f5b634b24f1125 UPSTREAM: drm/exynos: checking for NULL instead of IS_ERR()
+1c2b73abcd89c46882e4811051db5669e7555fab UPSTREAM: drm/exynos/dsi: register connector if it is created after drm bind
+6e2d9761bf79950b37dc70a57b34da4aad9fa419 UPSTREAM: drm/exynos/fbdev: do not skip fbdev init if there are no connectors
+0e7ea2915e92bccc3c1d9781b8f2a66d0925039f UPSTREAM: drm/mediatek: fix the rate and divder of hdmi phy for MT2701
+ee8406310accd5658118e4ac4e86cc8d3d3575ee UPSTREAM: drm/omap: fix incorrect union usage
+19376475e46dff8108d3266f71201ff3f847f941 UPSTREAM: drm/omap: dsi: Hack-fix DSI bus flags
+53357b51c9d287ca7fb0f97b2c806d33e2f4b5d8 FROMLIST: Bluetooth: hci_qca: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for QCA UART Radio
+8517d66cefcd7c63d76426368311012a9fb4c5aa CHROMIUM: arm64: dts: mt8183-kukui: add gpio and tdm mode in audio
+c5ee235b80c2448e323ef69fad255730dbc41b7c FROMGIT: ASoC: mediatek: mt8183-mt6358-ts3a227-max98357: remove unused variables
+807ceb1cc6cda12f773af3759d56a5bec9d49d8a FROMGIT: ASoC: mediatek: mt8183: switch tdm pins gpio function when playback on or off
+fbbcd6553072d8cfd43b964ac0761d42ae338cb6 FROMGIT: ASoC: mediatek: mt8183: remove unused DAPM-related variables
+b16cd94f517a51cba95db25d0015deddb70e6b7d FROMGIT: ASoC: mediatek: mt8183: fix tdm out data align issue
+2020662f509c0dca7ff1ed22820fd3e5a156000d FROMGIT: ASoC: mediatek: mt8183: tdm hw support tdm out and 8ch i2s out
+f11dabb77e129a8c8f75a8a601fe6f86407843c2 FROMGIT: ASoC: mediatek: mt8183: fix tdm out data is valid on rising edge
+712ee33503ec810da2866a6dff8674bc980b24ca FROMGIT: platform/chrome: cros_ec_rpmsg: Add host command AP sleep state support
+7df5ba73b95185d6da454ec3ea1a638d35e279de FIXUP: FROMLIST: mfd: Add support for the MediaTek MT6358 PMIC
+e8f07e252892aa71c3aa29c61d7d881813f74ed3 FIXUP: FROMLIST: regulator: mt6358: Add support for MT6358 regulator
+d36b285a6c82afb91e3d89f78ec1ffeead8eeb5e FIXUP: FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+ad09460f972e14d6f092ab372529b87dad457c53 FIXUP: FROMLIST: rtc: mt6397: Add support for the MediaTek MT6358 RTC
+d5f7a2f8a1da7d31119e1e7f2c537f217226d270 UPSTREAM: udmabuf: actually unmap the scatterlist
+e7f1c817fc2c45a30bcdde36888e476441f7b060 UPSTREAM: ARM: OMAP2+: add missing of_node_put after of_device_is_available
+b072f0e7af79d41c33e270683af082831ce04505 UPSTREAM: regulator: core: fix error path for regulator_set_voltage_unlocked
+828de4e8f9c2c725462e843746dbd0dec96ffdd2 UPSTREAM: regulator: core: Avoid potential deadlock on regulator_unregister
+136dd0b1c5d03f3b3b8bbb00b6bd74f966dc8b94 UPSTREAM: regulator: core: Take lock before applying system load
+066398434fa721c072d17d7c9691c61fc17caf64 UPSTREAM: regulator: core: Drop lockdep annotation in drms_uA_update()
+da5d5e64cf1759e65f4da84525593c72e6435270 UPSTREAM: regulator: core: Fix application of "drop lockdep annotation in drms_uA_update()"
+f5e279214b82689015b55ba9e21d28ec3e4f6994 Revert "FROMLIST: drm/bridge/synopsys: dw-hdmi: Handle audio for more clock rates"
+cadf8b3e0d52b16c63c286750a4626d7b0f663ce FROMLIST: drm: dw-hdmi-i2s: enable audio clock in audio_startup
+a3eba10af271b0062e3755feef91935d17189c9b CHROMIUM: config: enable Mediatek MT8183 auxadc config
+32641d47e4ee3d19fe0a5ab3e9d41fb1c42ebcf3 CHROMIUM: arm64: dts: mt8183: Drop 'google,kukui' from kukui followers
+ec5cbab268c24af039362b4bb77b4ff3750b319e Revert "BACKPORT: FROMLIST: arm64: dts: add gce node for mt8183"
+973156c7589967128e16b0591cf375f0e424cd16 Revert "FROMLIST: soc: mediatek: cmdq: add cmdq_dev_get_client_reg function"
+088f91b232f37cdabf1c2e5e25f74897cb71b33c Revert "FROMLIST: soc: mediatek: cmdq: add polling function"
+15523f87a46cddd390b5850a9e8190342a379160 Revert "FROMLIST: soc: mediatek: cmdq: define the instruction struct"
+e5740262cc7ab9bc50a0583431bfc5f317f653c0 Revert "FROMLIST: soc: mediatek: cmdq: change the type of input parameter"
+b959905f713684a723dfb33a2be5514bb64d6098 Revert "FROMLIST: soc: mediatek: cmdq: reorder the parameter"
+c52fd49ba900c05c236bc34f8c62d6d2b3f8fe41 Revert "FROMLIST: soc: mediatek: cmdq: clear the event in cmdq initial flow"
+32815e9302aa1cf756663b42ee053b3514d317d1 Revert "FROMLIST: mailbox: mediatek: cmdq: support mt8183 gce function"
+fac6b317c37b4a057d1feec04605d0dc8ee9b28d Revert "FROMLIST: mailbox: mediatek: cmdq: move the CMDQ_IRQ_MASK into cmdq driver data"
+fc6d94ab080acf128bdf9c03f6a60e55f15a8a5f Revert "FROMLIST: dt-binding: gce: add binding for gce client reg property"
+b6192769400a4d0841c069a0410e56c2efaa87c3 Revert "FROMLIST: dt-binding: gce: add gce header file for mt8183"
+d015178cb62955bdd524b73a3672cc3f616ab971 Revert "FROMLIST: dt-binding: gce: remove thread-num property"
+b253dc3bcf4ec9fe21de714f294f7048543d23fd FROMGIT: soc: mediatek: cmdq: reorder the parameter
+fc4d993062476545fde43d4583010e68f90f44a0 FROMGIT: soc: mediatek: cmdq: change the type of input parameter
+c68b4b81c2ab0915cd4097cf003abb83e2f95ca9 FROMLIST: dt-binding: gce: remove thread-num property
+688e86bfdad6ba71dbd8e3dccafd905f2b1260b1 FROMLIST: dt-binding: gce: add gce header file for mt8183
+8f6a90c0feed83e7aba88cc4073925b76091e84a FROMLIST: dt-binding: gce: add binding for gce client reg property
+50af4b0387705fa7b980c32287b4ff1527fdd863 FROMLIST: mailbox: mediatek: cmdq: move the CMDQ_IRQ_MASK into cmdq driver data
+722e5d75b66ec12939fb79c27a5570bd60e3f487 FROMLIST: mailbox: mediatek: cmdq: support mt8183 gce function
+09e5393710c0c06d109aeab5f01440eeab3d32f5 FROMLIST: soc: mediatek: cmdq: clear the event in cmdq initial flow
+ddfeac9d241cfa2d2033ffd70ce84418a46ca815 BACKPORT: FROMLIST: soc: mediatek: cmdq: define the instruction struct
+c62585f26cad8bae8458b84074557494dee3bad1 FROMLIST: soc: mediatek: cmdq: add polling function
+bbe21eb823496a634aa659c63a033d4a5e5b97ee FROMLIST: soc: mediatek: cmdq: add cmdq_dev_get_client_reg function
+3b83dc6b1b7fd6df873bc1f30dbe62309516e338 BACKPORT: FROMLIST: arm64: dts: add gce node for mt8183
+8040f33804a8f4bb3b23ad366d4c2306a8be4480 CHROMIUM: config: set CONFIG_IIO=y for Mediatek MT8183 auxadc.
+e85b7c523882b333c6b954af313ec78c57530416 CHROMIUM: config: Enable MT8183 thermal Tboard driver
+9b8ae8f52a9b04a969ec368acced85ab2e49b695 UPSTREAM: drm: rcar-du: Fix DU3 start/stop on M3-N
+9773baf241ae4deafb5b71d2bcd20907f076d6e6 UPSTREAM: drm/i915: Don't apply the 16Gb DIMM wm latency w/a to BXT/GLK
+546b4b8362f3590cb2e4e35365d06fd0c323713c UPSTREAM: drm/msm/a6xx: Don't enable GPU state code if dependencies are missing
+277bc6d6c94125b34933647a4f7233520f6a56b3 UPSTREAM: drm/msm: correct attempted NULL pointer dereference in debugfs
+ee3866d8ed1f6e573d958fd59473c89f8398e866 UPSTREAM: drm/msm: fix an error code in the ioctl
+494b8295ab02a2b1b9c925429ea1b154cfa49fab UPSTREAM: drm: Fix doc warning in drm_connector_attach_edid_property()
+502eb045e9f43fb4853c4824e020637d8bd5a5c3 UPSTREAM: drm/virtio: move drm_connector_update_edid_property() call
+3e02b89df0de9e35b91e04534e36c0f90c8aa837 UPSTREAM: drm/nouveau: Only release VCPI slots on mode changes
+7fe779f5624d4a2e00eae9891743f7b5ed5848a1 UPSTREAM: drm: Ignore drm_gem_vram_mm_funcs in generated documentation
+97b411b8edc9c03beb2305fb5bd4ba4a43509252 UPSTREAM: drm/msm: Truncate the buffer object name if the copy from user failed
+59fe9008f87fb9ad30a567b2fb9d5e6478ee1c97 UPSTREAM: ASoC: rsnd: fixup MIX kctrl registration
+e37ceb9cb05317023f4652b160a35fe3aece02ad UPSTREAM: cpufreq: scmi: Fix use-after-free in scmi_cpufreq_exit()
+49fbb3e5489b6543c5a0aa587e085894fd6ac06d UPSTREAM: opp: Don't use IS_ERR on invalid supplies
+be68dadf46dfbe3959254d803f701f17a0c1529b UPSTREAM: PM / OPP: Update performance state when freq == old_freq
+dd4cad315ce63bc4e64932918716ae1a0b3d93c9 UPSTREAM: bridge: mcast: Default back to multicast enabled state
+2547921c9c7646349d2a17a64a3815d6de3b9726 BACKPORT: pinctrl: mediatek: fix Kconfig build errors for moore core
+d0cadc267a259daf6fab79e83696e67e5b3a7a48 UPSTREAM: mmc: mediatek: fix SDIO IRQ detection issue
+203d10c9b6a495af21426e84b4b99e55d62ddd36 UPSTREAM: mmc: mediatek: fix SDIO IRQ interrupt handle flow
+13b141ff07a04410368ef138a846e328c1069ab1 UPSTREAM: arm64: dts: mt7622: fix no more console output on BPI-R64 board
+e5ef7be094716ca409a7e54baa47c1aa91b084d7 UPSTREAM: clk: mediatek: fix the PCIe MAC clock parent
+b07a869856b5a899f301e0581cce29eeff15fd9c UPSTREAM: iommu/mediatek: Use correct fwspec in mtk_iommu_add_device()
+818a5a0983ad55681f6ae25049a5b3bc9304285e UPSTREAM: v4l2-controls: add a missing include
+7f6b13f273ed9e0d89603211bda23ae53285c956 UPSTREAM: HID: input: make sure the wheel high resolution multiplier is set
+735d09da4847a81566565fd5ffb0e6f5946f9377 UPSTREAM: HID: input: fix assignment of .value
+00be095fbf398411018bcc894a68d136f80b3ed0 UPSTREAM: HID: logitech: Handle 0 scroll events for the m560
+d8da13cd864a921884e93974d450558b94a80094 UPSTREAM: HID: a4tech: fix horizontal scrolling
+5c91bd9e264c557c1a131a43605cb0cf0fb64112 Revert "FROMLIST: mm: Add /sys/kernel/slab/cache/cache_dma32"
+0c6c1bf75837c14daf5d3fd093714c1596d0e851 Revert "FROMLIST: iommu/mediatek: Fix iova_to_phys PA start for 4GB mode"
+e6e7cb964c53a8625ab7eede50739fce63decf47 Revert "FROMLIST: iommu/mediatek: Rename enable_4GB to dram_is_4gb"
+ff609511a919341ec2ce88cdf572eb094fb50ada Revert "FROMLIST: iommu/mediatek: Add shutdown callback"
+2e9e3a920b2f40c45c3a38a2c951342264ecf109 Revert "FROMLIST: iommu/mediatek: Fix VLD_PA_RNG register backup when suspend"
+2837034607c96ae8f606d4c2a8a07c0b8e8c2971 Revert "FROMLIST: memory: mtk-smi: Get rid of need_larbid"
+c40c1232c11358d045821f8028d72499d89d3398 Revert "FROMLIST: memory: mtk-smi: Add bus_sel for mt8183"
+372f5637524a82bef6692731036eec23aa17edb0 Revert "FROMLIST: memory: mtk-smi: Invoke pm runtime_callback to enable clocks"
+07d64f9838dec2426e04f5f5f4256ed4fe7c21bf Revert "FROMLIST: iommu/mediatek: Add mmu1 support"
+6cd5646857e670a0b38ac6d844cacfe160006fb5 Revert "FROMLIST: iommu/mediatek: Add mt8183 IOMMU support"
+2ddd9abf5cf48a803ef257aab026274fe8698ebb Revert "FROMLIST: memory: mtk-smi: Add gals support"
+1407182d9e0dfa7adc8d5223a4eebe9751e1a6b2 Revert "FROMLIST: iommu/mediatek: Move vld_pa_rng into plat_data"
+b7efd552acf95729e6f5c3d71af6273a7c9c524d Revert "FROMLIST: iommu/mediatek: Move reset_axi into plat_data"
+9c3441672e820aaa088f4cd8e18783e9cd25734a Revert "FROMLIST: iommu/mediatek: Refine protect memory definition"
+70c970d19cb40b424f336ecc6fc0995480b2641e Revert "FROMLIST: iommu/mediatek: Add larb-id remapped support"
+f42d7ecb61e1cd10a9621cb1f6c0c34dcce6c058 Revert "FROMLIST: iommu/mediatek: Add bclk can be supported optionally"
+36c8af062db26d78b24a345eddb0e18213bdc49e Revert "FROMLIST: iommu/io-pgtable-arm-v7s: Extend MediaTek 4GB Mode"
+3fdf994876a3475dac256740a8c8c99a51258bb5 Revert "FROMLIST: memory: mtk-smi: Use a general config_port interface"
+b5e285363db9f40c5f913026ac0879b79be0d9cc FROMGIT: memory: mtk-smi: Use a general config_port interface
+4809a2db519a75760caa53fbd338395a0e3bc91b FROMGIT: iommu/mediatek: Fix iova_to_phys PA start for 4GB mode
+172ceda3ba9a2cdc3bbd61b648409d07a021ab98 FROMGIT: iommu/io-pgtable-arm-v7s: Use ias/oas to check the valid iova/pa
+3810158cf5530a71a78027bc5e40510082057044 UPSTREAM: iommu: Allow io-pgtable to be used outside of drivers/iommu/
+ab447b110ecf479c21fb0ffbfde4828771db4995 FROMGIT: iommu/io-pgtable-arm-v7s: Rename the quirk from MTK_4GB to MTK_EXT
+5f1b6f933b956ef18b0e55eaa50768f7d2215ba8 FROMGIT: iommu/io-pgtable-arm-v7s: Extend to support PA[33:32] for MediaTek
+f7b295f595826caaa0a874a383fdc8e1501ba898 FROMGIT: iommu/mediatek: Adjust the PA for the 4GB Mode
+f65c689ccb59b15720566cdddc3dd2252e92bb11 FROMGIT: iommu/mediatek: Add bclk can be supported optionally
+b736c31a31dec8b9ff4a3404b1009c4cd6782beb FROMGIT: iommu/mediatek: Add larb-id remapped support
+d26c6e83f8b8722ac1be8f9fa71bc4a0db2f078e FROMGIT: iommu/mediatek: Refine protect memory definition
+c63304f6fe92538f5f7a76b1a038cd84d63c8719 FROMGIT: iommu/mediatek: Move reset_axi into plat_data
+8edbfe65a2981dadb9d5cfee5f772058cf8a95cc FROMGIT: iommu/mediatek: Move vld_pa_rng into plat_data
+1478dacf3502fde87e5d1598209e25069f69f0f0 FROMGIT: memory: mtk-smi: Add gals support
+2c85f4986120c29ec1bdedb4707ddd4a3249af85 FROMGIT: iommu/mediatek: Add mt8183 IOMMU support
+9739717144bd93c27c522b603a61eeb53088b0f5 FROMGIT: iommu/mediatek: Add mmu1 support
+c415ddd8f61e3e0ddfa6c1ea172939c2884767a6 FROMGIT: memory: mtk-smi: Invoke pm runtime_callback to enable clocks
+90ee513a2a100a23bf6a8e97895be441270cad90 FROMGIT: memory: mtk-smi: Add bus_sel for mt8183
+4ce92c5ff66fa8e79b2edfc87f6e9e6d2a8614ca FROMGIT: iommu/mediatek: Fix VLD_PA_RNG register backup when suspend
+862b6308ac74f0e5f0a5adb91396646b0b3d61de FROMGIT: memory: mtk-smi: Get rid of need_larbid
+102608a1e7f3b40b813c577bad9269ce218d89e9 UPSTREAM: iommu/mediatek: Fix leaked of_node references
+529311886658cb84fb94d15070e89d6a3db491c8 FROMGIT: iommu/mediatek: Clean up struct mtk_smi_iommu
+aeffa538849e1a81c7b4bd127f29f5b773e83e11 CHROMIUM: arm64: dts: mt8183-kukui: enable auxadc on kukui
+19a452562c79418d7d5f70aa24af89c43b36cc5d FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183
+f2dd00b62ef7c37dea0cb36457f670961ebd5bab FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183
+d0666909792cb4dee9715d4a807eee84e063e954 Revert "FROMLIST: drm/mediatek: add support for mediatek SOC MT8183"
+51f57dec75e64c5acd9dde414bc71e46ed3c9704 Revert "FROMLIST: drm/mediatek: add function mtk_ddp_comp_get_type"
+d763ca4c736ef7011228b2e88fabf24143851378 Revert "FROMLIST: drm/mediatek: add RDMA fifo size error handle"
+df8432bb726be03064d42b6b294e6bc5b5c1fc08 Revert "FROMLIST: drm/mediatek: add ddp write register common api"
+a20dfe8406991f0a30bcd45e88e2a45748dc3a52 Revert "FROMLIST: drm/mediatek: add component OVL1_2L"
+e3fe50a1f5f5b9ec1d82d93dc8bb80cfff214d93 Revert "FROMLIST: drm/mediatek: add commponent OVL0_2L"
+3c6b51cf25a9ce8cfdf2f56b3ee78d64bce24b6e Revert "FROMLIST: drm/mediatek: add mmsys private data for ddp path config"
+bc9420ddc96bfb03d6e7d0cb504fa042a6c7ac88 Revert "FROMLIST: drm/mediatek: move rdma sout from mtk_ddp_mout_en into mtk_ddp_sout_sel"
+1df17521e9cb9ad6b8fbc237bd1bb1d234e84262 Revert "FROMLIST: drm/mediatek: redefine mtk_ddp_sout_sel"
+eaf4a9e9db3ebb695164cd9282a83c8f1df109de Revert "FROMLIST: drm/mediatek: add mutex sof into ddp private data"
+c5437793473c1e3dadcab30c4579f7fe359eaa02 Revert "FROMLIST: drm/mediatek: add mutex mod into ddp private data"
+b593bb28550eaf6a7b3f490353f5ff28f70ebcd5 Revert "FROMLIST: dt-bindings: mediatek: add binding for mt8183 display"
+58e1de8d695f232acdcc627ca96797536da76ea2 FROMLIST: dt-bindings: mediatek: add binding for mt8183 display
+e18d57c0e1789e5da6b65c2220d08bfea35f0044 FROMLIST: dt-bindings: mediatek: add ovl_2l description for mt8183 display
+d82bc506662c43fe345dddef7a1c65909c0e1e05 FROMLIST: dt-bindings: mediatek: add ccorr description for mt8183 display
+8f6faa5cb148e1696c739be2e19778fe64c5def1 FROMLIST: dt-bindings: mediatek: add dither description for mt8183 display
+401a6446c3730c569543c1236ae94cf165fc1c24 FROMLIST: dt-bindings: mediatek: add mutex description for mt8183 display
+b1ea3cbf6a65080865b407d3e560114fed7d3f11 FROMLIST: drm/mediatek: add mutex mod into ddp private data
+1c666b155802ae799453f307579742572acc9253 FROMLIST: drm/mediatek: add mutex mod register offset into ddp private data
+76fd8caf18463194736130f56238e7cb287a7a00 FROMLIST: drm/mediatek: add mutex sof into ddp private data
+c13aa93e1cb8179321d4362b74ca0cd5f10f0e57 FROMLIST: drm/mediatek: add mutex sof register offset into ddp private data
+81b200d001d9e57edf83d29d4807a4479607df9d FROMLIST: drm/mediatek: add mmsys private data for ddp path config
+21a712275b2c92c13643211bc464c7b05701e6af FROMLIST: drm/mediatek: move rdma sout from mtk_ddp_mout_en into mtk_ddp_sout_sel
+73272b902fab84748afef2e73ad077ebd9e7bde0 FROMLIST: drm/mediatek: add commponent OVL_2L0
+41317202a56a40fc255e539b218a873b618650de FROMLIST: drm/mediatek: add component OVL_2L1
+f935f93c6e0a97b0fab885474dbf68165c133c4e FIXUP: FROMLIST: drm/mediatek: add component DITHER
+b950f1f279f3bc034b8309f4b38eef46db59472f FIXUP: FROMLIST: drm/mediatek: add function to background color input select for ovl/ovl_2l direct link
+63e2503b917d09eb0675bc97cafe4d8b920f4b3b FIXUP: FROMLIST: drm/mediatek: add background color input select function for ovl/ovl_2l
+ddead01e42abfcf05b91183f7c0e1e9916f8de59 FIXUP: FROMLIST: drm/mediatek: add ovl0/ovl_2l0 usecase
+e39dc5ae83fedc932e6b135a9311cb0d43a2493c FROMLIST: drm/mediatek: distinguish ovl and ovl_2l by layer_nr
+04c5b8f8f363f5108c6c377e5c1c5a13a8e51e7f FROMLIST: drm/mediatek: add clock property check before get it
+4c8f27295e1c1f4e5325ed8eb4b13ebfb18505cd FROMLIST: drm/mediatek: add connection from OVL0 to OVL_2L0
+6d3732be70d4e4fa6b8a98321dcc3d4cd07478ea FROMLIST: drm/mediatek: add connection from RDMA0 to COLOR0
+07ccef61be3ed52b94ee09adaa88012671a83600 FROMLIST: drm/mediatek: add connection from RDMA1 to DSI0
+2b6d2b5b16164be3a55d8aca04a669b5e5f229a5 FROMLIST: drm/mediatek: add connection from OVL_2L0 to RDMA0
+9bec8d6fac0c382cd46643f001b4dba30e3c866b FROMLIST: drm/mediatek: add connection from OVL_2L1 to RDMA1
+a21034bf255e28370ce6020522d2df8b97ba0dea FROMLIST: drm/mediatek: add connection from DITHER0 to DSI0
+842f97a5367b1a5d81b24b1a9e40b9dba75f909d FROMLIST: drm/mediatek: add connection from RDMA0 to DSI0
+8c03dd8896c742f6775aec0b0dc3f945decd5053 FROMLIST: drm/mediatek: add support for mediatek SOC MT8183
+20b09c289fb8a52b32187d49bc35a8f20e4411a7 FIXUP: FROMLIST: drm/mediatek: add support for mediatek SOC MT8183
+335fd7c876920f7fe16e4e9adcbd9936fc6bba71 Revert "FROMLIST: i2c: mediatek: disable zero-length transfers for mt8183"
+1ce0045d8580e9953fc58141c412fbd61015c8d5 UPSTREAM: i2c: mediatek: disable zero-length transfers for mt8183
+c0cabec97571ed28ae3e62b0fb17ddb547a25dd3 FROMGIT: ASoC: rt1011: add mutex protection to set_fmt/set_tdm_slot
+c0ae9c12dc46e01d7a98e71e255ce6779de8b5fc CHROMIUM: [media] hantro: add VP8 encoding support
+c8b6948c787acdf4c435ab063e51bf995f9bc1ac FROMLIST: drm/mediatek: Only block updates to CRTCs that have a pending update
+2431b273eaa1ebf108f87b20e2139f24439a8612 FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates
+8d7bd9d9538e3911a9885a40b1bb5188f36bea29 FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+d5e900c121230265ff5ea76d9c6d03bcb0e38852 FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+a19410e4d1e520df434bcf752613110402ff2bde FROMLIST: drm/mediatek: Apply CMDQ control flow
+002274707fb9333e319986333ecb5966d5da33ae FROMLIST: arm64: dts: mt8183: add gce setting in display node
+e3565912f7cf5fb1c000774840b09dd59fd3a37d FROMGIT: mmc: mediatek: enable SDIO IRQ low level trigger function
+b9ac3523a58fa2817f98238378a3e685bb92e5df BACKPORT: FROMLIST: misc: eeprom: at24: support pm_runtime control
+be3a9ba349b672deb5014fcbe65fa279a97cc57d CHROMIUM: arm64: dts: mt8183: kodama: Add support Elan touchscreen
+0222fac441c10d64f49f3cf2ee45c2cacf3748af FROMLIST: media: dt-bindings: mt8183: Added camera ISP Pass 1
+0f7036128bf8f1e2cb372d2093fdc30a189e324c FROMLIST: dts: arm64: mt8183: Add ISP Pass 1 nodes
+a794aab0db40f58e8e3b5e4344c0dc9e520f1ccb FROMLIST: media: videodev2.h: Add new boottime timestamp type
+8ab5cf7e97c9d70af83b2b1374f86e1ea9c3861b FROMLIST: media: pixfmt: Add Mediatek ISP P1 image & meta formats
+910bef3a45ed1e7f972f68e83327775901629aa7 BACKPORT: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+12a1f0529ed07cbd7ee28c45d79356210be304cf HACK: CHROMIUM: platform: mtk-isp: AAO/AFO non-request support
+9fb734d6bf21d540a6bda91d62672602138b3507 CHROMIUM: platform: mtk-isp: meta cache
+259be286ce1dd69ce90b165fffe660156084c445 CHROMIUM: config: enable Mediatek ISP Pass 1 drivers
+067e517dfb374afa34c955dc3e63fe4733cc782e CHROMIUM: dt-bindings: net: phy: Add subnode for LED configuration
+1b21b92b353675af5c7fab4920507b3dbdbd5f60 UPSTREAM: net: phy: improve phy_init_hw
+e0eb312f6c333f61ddf1ef639516f3e2fd823536 CHROMIUM: net: phy: Add support for generic LED configuration through the DT
+adfd2c6430e14fdb5165db322026789555e84c41 CHROMIUM: net: phy: realtek: Add helpers for accessing RTL8211x extension pages
+a7a9e8db25b32f1ab96135e8cf66bdf65b0ba2fe CHROMIUM: net: phy: realtek: Add LED configuration support for RTL8211E
+bdd0ccfb70232a9aea7a14c4bc5935fbfd335db4 CHROMIUM: ARM: dts: rockchip: Configure Ethernet PHY LEDs for fievel (and tiger)
+c4474803e11dbe8eb861c150cec90539af82a2c6 BACKPORT: FROMLIST: ARM: Emit __gnu_mcount_nc when using Clang 10.0.0 or newer
+5bdf48ff870d51ba098b8331c59d0227cc3eec1c CHROMIUM: ARM: Kconfig: allow use of FUNCTION_TRACER with clang 9
+607fe81841ee820cd2e57750a4e8bdb02d63cc20 FROMGIT: MAINTAINERS: Add entry for stable backlight sysfs ABI documentation
+d41866a9d8a2813d5b4657c5e53295a3702ce720 FROMGIT: backlight: Expose brightness curve type through sysfs
+fee34e3f658ea83845545fe1cc3a57a01773e228 FROMGIT: backlight: pwm_bl: Set scale type for CIE 1931 curves
+c33cb75e5629e9b951c7b7bef1eafa8e2bed81e7 FROMGIT: backlight: pwm_bl: Set scale type for brightness curves specified in the DT
+c8afe425ba8fbbd06b4b88e8d9c2660efc11cb8f CHROMIUM: iwl7000: take mutex before sending SYNC command
+2f57803597de745781a003074237304fdb7c39d4 FROMLIST: dt-bindings: Add binding for IT6505.
+2e9b197ce26cda014fbdd36552b003b8a018aa87 FROMLIST: dt-binding: mediatek: Get rid of mediatek,larb for multimedia HW
+571af29841bfe0df418ee66206c48559732d02a2 FROMLIST: iommu/mediatek: Add probe_defer for smi-larb
+6a441d39ad73e9c693b389b623f3192103fb8ffb FROMLIST: iommu/mediatek: Add device_link between the consumer and the larb devices
+11c2819a60e8545a4c9743437ca1df4d8bbb13ed FROMLIST: memory: mtk-smi: Add device-link between smi-larb and smi-common
+3718d834f99a5cb5c6f3f088e8149d622fc3ccc4 FROMLIST: media: mtk-jpeg: Get rid of mtk_smi_larb_get/put
+a1acd350b641c9faec0d222544832dac782859ef FROMLIST: media: mtk-mdp: Get rid of mtk_smi_larb_get/put
+0694ba1febb21d038d98eec9c99487cf1cad2420 FROMLIST: media: mtk-vcodec: Get rid of mtk_smi_larb_get/put
+9940b4a173f2055e88d646dd2e422a5de367ab23 BACKPORT: FROMLIST: drm/mediatek: Get rid of mtk_smi_larb_get/put
+3573e61237c183c840c6d3a9796b4ac844f25418 FROMLIST: iommu/mediatek: Use builtin_platform_driver
+3d7f0129bab17f16fc9e86f3b53333b513eec985 FROMLIST: memory: mtk-smi: Use device_is_bound to check if smi-common is ready
+d9852c2c9f0d5c630704272c00853762d659e91d BACKPORT: FROMLIST: drm/mediatek: Add pm runtime support for ovl and rdma
+d9965d536728aced14d0e31a3fee2a4f4cca2ba8 FROMLIST: arm64: dts: mediatek: Get rid of mediatek,larb for MM nodes
+c6368b3fd55e646b022f2f26872757fed11cb05f Revert "FROMLIST: clk: mediatek: Add flags support for mtk_gate data"
+b574f56b220b980cf877e9ff363967947ee709d4 UPSTREAM: clk: mediatek: Add flags to mtk_gate
+69b6e8e1638a6ed946006c5e05125d983937ae2b UPSTREAM: clk: mediatek: fix clk-gate flag setting
+e076fa84c462433bccf7a50d5b387d8c13cafde2 FROMLIST: clk: mediatek: Register clock gate with device
+0051af42b4e549dce978f137b2824a5ab0940d4b FROMLIST: clk: mediatek: Runtime PM support for MT8183 mcucfg clock provider
+3b75aaf46ab1fb8875772717c7dfd705662b29bc BACKPORT: FROMLIST: arm64: dts: Add power-domains properity to mfgcfg
+cec2b51563c24317f8280bc50e49b2aba028f382 FIXUP: FROMLIST: arm64: dts: mt8183: Configure CPU cooling
+71dcb0ce70ead6bf6445ae247a2a13835953b3e6 FIXUP: FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+4da4558dce990d3886b7b9752d5665afd5c5bbd9 Enable SquashFS LZ4 support in arcvm kernel config
+b9ba793072cac903f85b3848bacff9f6e2344d12 CHROMIUM: media: mtk-isp: Fix crash if seninf is not present
+6c4f525fd6402a465169de6c607b2d1c016aa660 CHROMIUM: arm64: dts: mt8183-kukui: Enable thermal Tboard
+436ffa2866c2741aaf5b675052198797c59bd536 Revert "FIXUP: FROMLIST: rpmsg: add rpmsg support for mt8183 SCP."
+d1551505018eaf7d0d8721b84859882f2b0712e9 Revert "FIXUP: FROMLIST: remoteproc/mediatek: add SCP support for mt8183"
+92d892018cfde3dce49e4dfd6963ceb5e08ef398 Revert "FIXUP: FROMLIST: remoteproc: mt8183: add reserved memory manager API"
+b962d53c2aae259c9e53539a8ec4dd5f16a06f7a Revert "FROMLIST: rpmsg: add rpmsg support for mt8183 SCP."
+623fa2dc0ef02f6d52448ce2fe1249b254a16961 Revert "FROMLIST: remoteproc: mt8183: add reserved memory manager API"
+57c512984664317bc456f3c627a42caed1c22621 Revert "FROMLIST: remoteproc/mediatek: add SCP support for mt8183"
+badfc166850a3a621d9f793b6cacc4e5f0ff75ff FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+6648ce69b39c7574be58708f80822e28e2a33fe4 FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+5eb3083fd8006c52164ba3688fa5f6429f01b29b FROMLIST: platform/chrome: cros_ec_rpmsg: Fix race with host command when probe failed.
+8ed651e515fc8ddf20833effddeb63a605d3ea68 FIXUP: FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates
+b19c830319d3b6c71ab25b57adf9b803708fe0bd FIXUP: CHROMIUM: net: phy: Add support for generic LED configuration through the DT
+c06ba6767e40f4699d859ae1922b98afdeca1f17 FROMLIST: drm/i915: Fix corruption lines on the screen on Gen9 chromebooks
+9615476e00019319e297e67aa706bb87a3345091 Revert "FIXUP: FROMLIST: drm/mediatek: add mipi_tx driver for mt8183"
+c2187b65efe3ad44b2815eef1151ee13fba9e67d Revert "FIXUP: FROMLIST: drm/mediatek: separate mipi_tx to different file"
+0c8cf1237399b972c2e6d65064acd671740896a4 Revert "FROMLIST: drm/mediatek: add mipi_tx driver for mt8183"
+740436cd5e4042e1b304910fd54d4235f593d7a4 Revert "FROMLIST: drm/mediatek: separate mipi_tx to different file"
+eb1b71f97cdf14b1a81ed1367eb1b231b6550445 Revert "FROMLIST: dt-bindings: display: mediatek: update dsi supported chips"
+7081316c2b39b552ecefda5cc5e57f91bc1c7301 FROMGIT: dt-bindings: display: mediatek: update dsi supported chips
+9f43048dfdeb515fbda2e44af5ad74297dfe70fd FROMGIT: drm/mediatek: separate mipi_tx to different file
+dee2ba436fdff989e6143165c9a3d1da61229dc4 FROMGIT: drm/mediatek: add mipi_tx driver for mt8183
+7a1e4f4fda0711afdb7e64bb82b548698f9e46ac FIXUP: FROMGIT: drm/mediatek: change the dsi phytiming calculate method
+a3f7d76d0a1bd6dad3c4f28b07487cd3ea257b0c FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+6dd9e5b3a4f697dd9a394ba48eefa92c32cc0927 CHROMIUM: arm64: mm: handle prot with non-consistent attribute
+e37c41f3a8346d25a356bb2d33fa83621b816547 CHROMIUM: media: videobuf2-dc: Support cacheable MMAP
+92abcf935b2c37acfd1970792e9b6a3d43cc199d FROMLIST: clk: mediatek: add pericfg clocks for MT8183
+8fb738c9fe3f259b8d32e133ee939a49b05d07b7 FROMLIST: phy: phy-mtk-tphy: add a property for disconnect threshold
+e885f6aa8b47d6b464ee49480ff38f3bebcf2a69 FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183
+f7f7f006a3ef8f5f03e52c3461d81049eb480fee FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183
+05de2df72ff4c55e017fd7a83cfa5b35aed613b2 BACKPORT: FROMLIST: arm64: dts: mt8183: add usb and phy nodes
+80f21b1347dd7b71e1bf8b57ce1b73a239ff7dd1 FROMLIST: arm64: dts: mt8183: enable USB remote wakeup
+3c8f6a812ee44e7659001035e00e3af48a290ae7 FROMLIST: arm64: dts: mt8183: tune disconnect threshold of u2phy
+008bda4ebebec7881667dc36e11fa29584e6279e CHROMIUM: arm64: dts: mt8183: kukui: Enable HID remote wakeup
+3d825f915ead1c86bc0ce80381fb10996849457e UPSTREAM: gcov: clang: move common GCC code into gcc_base.c
+bf9302490645a9d7ed9ed294f99c708ce62f3ed3 UPSTREAM: gcov: docs: add a note on GCC vs Clang differences
+35be48648a6552869bd5d6c9a0d278102d23d46c UPSTREAM: gcov: clang support
+d06b5269009aca6f38683e5fc950b759463dbb69 CHROMIUM: mm: low_mem_notify before unreserving highatomic
+405cbf6799c0ca6626712688e9f86a5d27146d5d CHROMIUM: mm: kstaled: a kswapd alternative
+e27bb2600df89fa58d1a93ab664fa6b9d82cef9c CHROMIUM: net: phy: realtek: Support SSC for the RTL8211E
+6c4f8cbba24e745794db5400bdc2d21ad5f67496 CHROMIUM: ARM: dts: rockchip: Enable SSC for the Ethernet PHY of fievel/tiger
+ec96a64d9b23a8c01d5a053d893697cf738a4b9c FROMLIST: drm/bridge: add it6505 driver
+4dfeaae5a306348c8ece2c5f9a552d1111fce2b3 CHROMIUM: config: Enable it6505 config.
+3b15659f5d68b7486f04cbfdad228e5febf66345 FIXUP: FROMLIST: drm/bridge: add it6505 driver
+27e90d1b846e62b96f02c053cf13be395283ea4f CHROMIUM: x86: x86_64_arcvm_defconfig: Enable overlayfs
+1a0fe0475f6ca1339614ef7f862b7877516d001a FROMLIST: media: i2c: dw9768: Add DT support and MAINTAINERS entry
+ff293a4d6692926fcdad46ac6313a82ed0c9fb91 FROMLIST: media: i2c: Add DW9768 VCM driver
+7ddec4989cfdf93bdf36c097f1eb8077bcc1abcd FIXUP: FROMLIST: media: i2c: Add DW9768 VCM driver
+169befa61a024c4184a2b1534bb097c00efe7a29 CHROMIUM: config: Enable CONFIG_EEPROM_AT24 config.
+3f730310eecdbf150ac1377c2c65db4cadbde53d CHROMIUM: config: Enable CONFIG_VIDEO_DW9768 config.
+09d0fbf984e07abaa46fe5323044c922dc1dac30 FROMLIST: media: dt-bindings: media: i2c: Add bindings for OV02A10
+649bb4174147a7d63a610bb86b442dee6171822d FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+a381d646b404ce94d6c80199bfd9c33142e0841c FIXUP: FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+a116a0ae4b3c0da338242761c8630668dba6d081 CHROMIUM: config: Enable CONFIG_VIDEO_OV02A10 config
+4a027b4117e3d71d5739522f4c0761673910da1a UPSTREAM: ath10k: fix failure to set multiple fixed rate
+3d0d0d8c70a7d7395337c9092e8c9e05d7bce6f9 UPSTREAM: ath10k: work around uninitialized vht_pfr variable
+8f5e6ee1bf6cfe7c803add23aecf57c3aaa3eb9b UPSTREAM: mac80211: implement ieee80211_tx_rate_update to update rate
+5ce12519c6797b9beed57f0caaa1799bfca1396c UPSTREAM: ath10k: report tx rate using ieee80211_tx_rate_update()
+92b7f61350ade17688b38ef225aa6efeddcafce4 FROMLIST: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet
+02ae233373b80dc3ee34cebfbb8871255eb5d5cd UPSTREAM: backlight: pwm_bl: Fix heuristic to determine number of brightness levels
+2369c33b01f3f1afa0d966e65ed0d88df82d72f3 CHROMIUM: iwl7000: Temporarily disable fall through warning.
+6661793371e5d03805828c1e13bd196df28f6849 FIXUP: CHROMIUM: [media] hantro: add VP8 encoding support
+e5833e88f112c470cec5a6e784329c771916f328 FIXUP: CHROMIUM: iio: cros_ec_light: Add support for RGB sensor
+83c19e78e3144902ecfcf2655547b6c30cb0654c CHROMIUM: config: Renormalize CONFIG_KSTALED
+1f0f1db82f91dd914dd22833097aaa641515583e CHROMIUM: arm64: dts: mt8183-kukui-p2: Enable thermal Tboard
+79d3ec8cd5fa90dd65a660d354f81bc635b6269a FIXUP: CHROMIUM: mm: kstaled: a kswapd alternative
+739fb5349e3f69dca74e8b5d7421fb3b49f3ed1c FROMLIST: platform/chrome: chromeos_tbmc : Report wake events.
+22bd488f5bfd457167372ea73c57300d586ca53e CHROMIUM: arm: add arch_sync_dma_for_*()
+144f861dd13379825d5ec938e9f4aea9aae053bd CHROMIUM: arm64: add arch_sync_dma_for_*()
+f445c72f5d8277569bf2d5e20df38153c9141b7d CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)
+00622e6d880c1f266976215265b1199a9ee9941b CHROMIUM: drm/vgem: plug in our own dma_ops
+d91758439ffe754ec8056bdcf1a989a9261caba6 FIXUP: CHROMIUM: low-mem: handle multiple levels and provide edge notifications
+bc9fe65f73b6a5ce3d7249d775f799bd25aa5be1 CHROMIUM: arm64: dts: mt8183: set opp-suspend for gpu opp table
+5e04af21b86aba0e0fa0fcf313aadd99ee9a5004 FIXUP: FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+421383301dc6c9eede3904685dada42755548d37 FROMLIST: dt-bindings: mt8183: Added FD dt-bindings
+7bfd24aa5db63cbaa436acf9918f9cb3d32fac48 BACKPORT: FROMLIST: dts: arm64: mt8183: Add FD nodes
+224a9820a3f92a4010da216eff2f2bd5a5ef390d BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+b12aa7ce7855905ec1bf0166e5f525791f2a01d4 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+55d0d3f3451dd2b2abf2e95f21c3853f51f9e9db FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+01da829aabb70b29b22f62b58f707d232aa641c7 CHROMIUM: config: set Mediatek ISP Pass 1 driver as module
+2d40316368b5b2032c650dfcd1e96586b512260c CHROMIUM: config: enable Mediatek FD drivers
+4d8a0c2b0aaa3e223a6c93593b07867bd737f133 UPSTREAM: media: mem2mem: Require capture and output mutexes to match
+5827ba84fd901b9e93c5efaa36ce822d15500d4d UPSTREAM: media: v4l2-mem2mem: Simplify exiting the function in __v4l2_m2m_try_schedule
+5c08b4037b515488dfdd8765c28a1171968487c1 UPSTREAM: media: v4l2-mem2mem: fix epoll() by calling poll_wait first
+931084913375d47aaa10fa7def27f0ff20835f3b UPSTREAM: media: v4l2-mem2mem: add q->error check to v4l2_m2m_poll()
+c62b37419ad894291b1c3952f37935d66fa10fe5 UPSTREAM: media: v4l2-mem2mem: add try_en/decoder_cmd ioctl helpers
+56c3f426a7e59fa420356542e60f8d52fc2cc69e FROMGIT: media: v4l2-mem2mem: reorder checks in v4l2_m2m_poll()
+2eeb84cb2903ae93555ca1d4b2d724d56577ff18 FROMGIT: media: videodev2.h: add V4L2_FMT_FLAG_CONTINUOUS_BYTESTREAM
+74a505124fd8e5397a7529f81b6607572ffcba1a FROMGIT: media: videodev2.h: add V4L2_FMT_FLAG_DYN_RESOLUTION
+81c8fee085684da216996a146bed763a0a31907e FROMGIT: media: mtk-vcodec: Handle H264 error bitstreams
+3f2ddedd20596ad5cd1bb5f1bcf0ce81e823917e FROMGIT: media: mtk-vcodec: flag OUTPUT formats with V4L2_FMT_FLAG_DYN_RESOLUTION
+9945f00b93103923e5d18380e0e33513951ebc0b FROMGIT: media: venus: venc: amend buffer size for bitstream plane
+5ec3ded83114b21a7aecc7eac5a08c2047f37452 FROMGIT: media: venus: helpers: export few helper functions
+5e0ccc5fa7cb554c572fa98e83cfd87927fa017d FROMGIT: media: venus: hfi: add type argument to hfi flush function
+0e41beb03cd4c541bcc483e142d555683ded0ca3 FROMGIT: media: venus: hfi: export few HFI functions
+2afb8b724eeeedb1323c8674e9bc8b236cd62cb9 FROMGIT: media: venus: hfi: return an error if session_init is already called
+53082c4c40a773fc5d1c039e1620685f4f04e643 FROMGIT: media: venus: helpers: add three more helper functions
+6495ec64ab2d2f70ae7114ec74b321e46314feee FROMGIT: media: venus: vdec_ctrls: get real minimum buffers for capture
+f00871b3c436106db6c2a2ad65b9f85a7c82058d FROMGIT: media: venus: vdec: allow bigger sizeimage set by clients
+719642f59b509c5a80db42d7d6f755649fcfd78e FROMGIT: media: venus: make decoder compliant with stateful codec API
+a2713f350e5fe52cdf4bbbe93ef7273363fa5d17 FROMGIT: media: venus: helpers: handle correctly vbuf field
+4831b49ded478c9bf53cb89fa67f0a1c76ea2423 FROMGIT: media: venus: dec: populate properly timestamps and flags for capture buffers
+c0c06826fa5774e6f01a39ac9531b3c27b06ef08 FROMGIT: media: venus: vdec: flag OUTPUT formats with V4L2_FMT_FLAG_DYN_RESOLUTION
+8acb48f154654d0d5435df07ec50569788891e1f FROMGIT: media: don't do a 31 bit shift on a signed int
+73903bba167b1236a6c3fc4ee0b8bbb7db9d2e90 BACKPORT: FROMGIT: media: uapi: h264: Rename pixel format
+d1d7e0bd0fd240ec877939644442d6b66d85663b FROMGIT: firmware: google: check if size is valid when decoding VPD data
+cd591e6ddaea7c77cd2686f3e4b3552e4574eec6 CHROMIUM: iwl7000: mvm: enable Atlas platform workaround
+66979993558dfa5ded9db8b1fc3fdbbd67e0c617 FROMGIT: mmc: core: Add helper function to indicate if SDIO IRQs is enabled
+e49908dd987872a2778023aa89681b8a8c2ee377 FROMGIT: mmc: dw_mmc: Re-store SDIO IRQs mask at system resume
+2e5642cbcd2ffb0a8b55f2e576ef462ae76117f9 FROMGIT: mmc: mtk-sd: Re-store SDIO IRQs mask at system resume
+6b61ee4ec1fdf9dbc09101be8e75674bbb7aa7a4 FROMGIT: mmc: core: Move code to get pending SDIO IRQs to a function
+47c004feb0e805d4c9e48a8abd845dfd316da367 FROMGIT: mmc: core: Clarify sdio_irq_pending flag for MMC_CAP2_SDIO_IRQ_NOTHREAD
+2603b91730467c9b1fe060b93a1f308a14b535dd FROMGIT: mmc: core: Clarify that the ->ack_sdio_irq() callback is mandatory
+715a6ed3cf2ef6ab0b9f6f52b6d9b71443038709 FROMGIT: mmc: core: WARN if SDIO IRQs are enabled for non-powered card in suspend
+269b8e06fced41c4c8202520a8242e52b16975dc FROMGIT: mmc: core: Fixup processing of SDIO IRQs during system suspend/resume
+33f060daafea7097bb910fe0cbcb56f3ca30fa2f FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)
+101275356a3994d26de26256f3e47cedb3d56411 FIXUP: BACKPORT: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+405e889ade24ad68eddeb167814232718a0af4e4 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+a1dd43b715a0400960b71c3412094459694696ae FIXUP: FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183
+4027487f45fd979543a66e7fdf0023f7b065a766 FIXUP: BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding
+de2fc9fa4f547135daa7073a477c38d5a237d479 FROMLIST: media: hantro: h264: Fix a comment in b1_ref_list_cmp()
+4cd5c4cbe86ff178f3df8f536ef6fc5bdf7c4aa2 FROMLIST: media: hantro: h264: Rename POC_CMP() into HANTRO_CMP()
+49b053a4e06774026086982d1649502ac1d52606 FROMLIST: media: hantro: h264: Fix the frame_num wraparound case
+3173e7f841f0db70b47184fd9b11d199a1621d73 BACKPORT: FROMLIST: drm/ttm: let ttm_bo_wait timeout be configurable
+7b72f3863eb9f53bc0017a2f3069f5a966ebfbb0 arcvm: Increase ttm_bo_wait timeout to 30 seconds.
+572f35be58f69c57cc839a4edc0ae5f7089354d1 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver (take 2)
+5a4de0d9ac4bc240999584010ecb3d5f902bf165 FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take three)
+2182aa098aa0b38b4f879e855c1e599c4689482a UPSTREAM: ASoC: audio-graph-card: don't select DPCM via audio-graph-card
+3ef72f7d8f77c8b2d0cd1869acf27928ccc9b06c UPSTREAM: ASoC: simple-card: don't select DPCM via simple-audio-card
+9a6861bc1eab5b35dbd5e0ef8bce1f178211c041 UPSTREAM: ASoC: simple-card: fix an use-after-free in simple_dai_link_of_dpcm()
+ebce580f05d00a910d1e7f1a9c3b81fb15366c37 UPSTREAM: ASoC: Mediatek: MT8183: Fix build err while CONFIG_I2C set to module
+da735ff44e3f63cacdc2d538e4ba73f9c4d3e64e UPSTREAM: ASoC: Intel: cht_bsw_rt5672: fix kernel oops with platform_name override
+118d51158c15f344e7fb251c3244157250786817 UPSTREAM: ASoC: Intel: cht_bsw_nau8824: fix kernel oops with platform_name override
+63786d9d40a26b4d852a3b3d3a39333fc7570a46 UPSTREAM: ASoC: Intel: bytcht_es8316: fix kernel oops with platform_name override
+33ae605f661acaae1c9ff8746bb1e8528b78166f UPSTREAM: ASoC: audio-graph-card: fix use-after-free in graph_for_each_link
+e8c394111eb6fd99f4cc7655bc8dd6743c4e6d2d CHROMIUM: remove VIRTIO_GPU_CMD_GET_RESOURCE_PLANE_INFO
+f139f5504077d4f17983d7879203ad9e2c17c61d UPSTREAM: ASoC: SOF: Intel: hda: fix the hda init chip
+c029fb22d166cb6bd0a732c602703eafc0867e23 UPSTREAM: ASoC: SOF: Intel: hda: use the defined ppcap functions
+075118a1d6fed1b401e0d78f8621431531b250ea UPSTREAM: ALSA: hda: assign polling_mode after azx_bus_init
+ee6ea999c4620d45c497e18f725b0ebb2c31e225 UPSTREAM: ALSA: hda: move polling_mode flag to struct hdac_bus
+f8156f2aba69ddb82d088a168d42be51af88bfe9 UPSTREAM: ASoC: SOF: Force polling mode on CFL and CNL
+ba6c510ff35f38da5d467a37aa69e46caa2c845d UPSTREAM: ASoC: simple-card: rename to asoc_simple_card_canonicalize_platform()
+7e38466ef86baf6df49f8cf7f7a5e5b785d5c726 UPSTREAM: ASoC: audio-graph: rename graph_get_conversion() to graph_parse_convert()
+c6ac2c340b9336836293ce2d66c7490aa0d724ec UPSTREAM: ASoC: audio-graph: add graph_parse_mclk_fs()
+41d1bb3d8914c8cda5d427c4ba4c3e94a8669727 UPSTREAM: ASoC: audio-graph-card: fix use-after-free in graph_dai_link_of_dpcm()
+821257281ba6182cc47e127a1a8d41f1ee9053bb UPSTREAM: ASoC: simple-card: Fix missing of_node_put() at simple_dai_link_of()
+1b372359ffcf2fec44b90212b847ba3f2a9a71e3 UPSTREAM: ASoC: simple-card: Fix of-node refcount unbalance in DAI-link parser
+29b43d17d848570359e60b6feede2d5db90b2b60 UPSTREAM: ASoC: simple-card: fix an use-after-free in simple_for_each_link()
+b1c0be0ac191b9cffb9f7572215027ca3b194ac0 UPSTREAM: ALSA: pcm: Fix refcount_inc() on zero usage
+1cc955468b6fa31ad30f80e5770656f40ccded54 UPSTREAM: ALSA: hda/realtek - Add model description for Chrome headset button quirk
+e2d9f09b0811bbd2daa3118945a4b59bf71178df BACKPORT: ASoC: audio-graph-card: fix an use-after-free in graph_get_dai_id()
+abff48ac1b837d652bcebc891e8f6cc5e4248ccd FROMGIT: ASoC: SOF: Intel: hda: Initialize HDA controller after i915 init
+97133b5779a589bcfda4a8816fd1d41b245d534f FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver (take 3)
+10b15506bdc4207ebdc50951fe7f6bbf1469abeb FIXUP: FROMLIST: drm/bridge: add it6505 driver (take two)
+d00d2035cb92d610af5fe92b7e155d53d6d73bcc FROMLIST: watchdog: iTCO: Add support for Cannon Lake PCH iTCO
+1fc7bd50ece980d2ff8ca4803f6129f17cca5582 FROMLIST: i2c: i801: Use iTCO version 6 in Cannon Lake PCH and beyond
+2ef848edf3dd1e7c7c829e6e5dde5d65f6dc14da FROMLIST: drm/virtio: Rewrite virtio_gpu_queue_ctrl_buffer using fenced version.
+2e9acfe429b784ab92406e43b030748669ed83e0 FROMLIST: drm/virtio: Use vmalloc for command buffer allocations.
+0f619e47767dec8a7943b061f9f03e623cb13a25 FIXUP: FROMGIT: drm: dw-hdmi-i2s: enable audio clock in audio_startup
+35d9964720ddacc14c09c03e2322d7bc13505161 UPSTREAM: ath6kl: Remove unnecessary parentheses
+48ea501949573a1e5df1c75f7cbe4da9563fd102 FIXUP: CHROMIUM: [media] hantro: add VP8 encoding support (take 2)
+d5ecf6d8c93453fc4aad04fe31bfd9ebe7817c4e FROMGIT: ASoC: intel: cht_bsw_max98090_ti: Add all Chromebooks that need pmc_plt_clk_0 quirk
+d1853a9b3da14b1d18a3fa67bcf20c4abda36ba0 FIXUP: FROMGIT: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet
+c76dfa6403e81656954ea73db7856dce524b00bd CHROMIUM: Revert "drm/atomic_helper: Allow DPMS On<->Off changes for unregistered connectors"
+c6f91fa8e842988734bcf9416f2e90ccc01123ea CHROMIUM: Revert "ALSA: hda - Fix intermittent CORB/RIRB stall on Intel chips"
+bbb8a498fc3fb6760d2b3450f868cbead1c6b8ba CHROMIUM: Revert "drm/i915: Sanity check mmap length against object size"
+2d0e28e0d48a69f03bbea1cc4b7a4a8f29a8b76e CHROMIUM: Revert "drm/i915: Handle vm_mmap error during I915_GEM_MMAP ioctl with WC set"
+441211bfc69c5386d73b2c278e70e68b48315853 CHROMIUM: Revert "drm/i915: Cleanup gt powerstate from gem"
+fd8c067ebb6d6ff783864b87971411896ec25c38 CHROMIUM: Revert "drm/i915: Restore sane defaults for KMS on GEM error load"
+b923dc8dfa264b177e674b265307b2e87d27af37 CHROMIUM: Revert "drm/atomic_helper: Disallow new modesets on unregistered connectors"
+eeac8f097d7ab3e1942a0cbf22ca578c18cbb240 FROMGIT: drm/bridge: dw-hdmi-i2s: support more i2s format
+c3b35f0a49624127dfbcda0421ae9afd5734cde4 FROMGIT: drm/bridge: dw-hdmi: move audio channel setup out of ahb
+be6f633a643134fd1a1185e78b6b02f141b66096 FROMGIT: drm/bridge: dw-hdmi: set channel count in the infoframes
+29520776313bc119f3cf3b01c1641a0d535b49ab FROMGIT: drm/bridge: dw-hdmi-i2s: enable lpcm multi channels
+c3f0810475486d45cd9c21db3198736f5904d2be FROMGIT: drm/bridge: dw-hdmi-i2s: set the channel allocation
+a553fd19efdc76e5e96dfef552aa852034d35719 FROMGIT: drm/bridge: dw-hdmi-i2s: reset audio fifo before applying new params
+d6128e660d8a13a8c6daf45a50033debeef3a4b0 FROMGIT: drm/bridge: dw-hdmi-i2s: enable only the required i2s lanes
+8913bb87f18b4c923095781cd30a4ee0d8f68a63 FROMGIT: drm/bridge: dw-hdmi-i2s: add .get_eld support
+81a9cfa8e3c469a03c7ec4f451b5ced058c98115 FROMGIT: drm: bridge/dw_hdmi: add audio sample channel status setting
+4073da854c74f8a6a0b3d3e4318f3192409ee69e FROMLIST: media: mtk-vcodec: vdec: fix incorrect pointer dereference
+36b8e0ac11b002ea04dfe7812293a52384a81de5 FROMLIST: media: mtk-vcodec: vdec: set VPI IPI handler in one place
+9f595036e6fc9213a3be72e4e05838218c978aeb FROMLIST: media: mtk-vcodec: vdec: move stateful ops into their own file
+e7a9683fec0fac83be093cdf82f65020772ab4e1 FROMLIST: media: mtk-vcodec: vdec: handle firmware version field
+4833faee5fd2a0a2d37ed94d422b4c6e981e4702 FROMLIST: media: mtk-vcodec: abstract firmware interface
+fc9e50db8d33d87435af0c63b6790e16902884c8 BACKPORT: FROMLIST: media: mtk-vcodec: add SCP firmware ops
+b791307f7cba298c9ac6e670edac48aaeb717d87 BACKPORT: FROMLIST: media: add Mediatek's MM21 format
+0c067003090f6509c57424928dc63e36635bcb9a BACKPORT: FROMLIST: media: doc: Add documentation for MM21 video format
+dbb65e5bf6027de634f3e03b3e01b4122cb6b785 FROMLIST: media: mtk-vcodec: vdec: support stateless API
+31f9ea2329ceef7548e3292d1b0c3bfe52151230 FROMLIST: media: mtk-vcodec: vdec: support stateless H.264 decoding
+d8b73858258f986183a4d46832cf98e344bdaded BACKPORT: FROMLIST: media: mtk-vcodec: vdec: add media device if using stateless api
+9f8a0b993298bc244d7a105fe596a18416a204db FROMLIST: media: mtk-vcodec: enable MT8183 decoder
+407e96ba86218c43941d39d0421798f12bd3c3eb Revert "FROMLIST: drm/i915: Fix corruption lines on the screen on Gen9 chromebooks"
+3bfd7663b760d3bf67c4e079b2027580583cb825 CHROMIUM: Bluetooth: btmrvl: Detect hangs and force a replug of the SDIO card
+6992e016e77d6f0871b760b40bdbdb3a028b698b FIXUP: FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183
+e324987a17340f97dcf31c606eb2bb7e977be3a7 FROMLIST: dt-bindings: display: panel: add boe tv101wum-n53 panel documentation
+ac02f2cebc96f1c4a2da440776428b2ecc8f560c FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel
+1e5b7e6b152059b7db1322b8803d07189617ecde FROMLIST: dt-bindings: display: panel: add AUO auo, b101uan08.3 panel documentation
+1f2a2a6a3cac18fa441654e5fc1c0ceca49c2d6b FROMLIST: drm/panel: support for auo, b101uan08.3 wuxga dsi video mode panel
+6eeabb0898473600d301f7a4367f04c24e47bdf9 CHROMIUM: arm64: dts: mt8183: kodama: Add panel driver
+36c455de17482144fc2875e4204490f870866162 FROMLIST: dt-binding: mt8183: Add Mediatek MDP3 dt-bindings
+8817b3fbcbbbfa8bdaf97077fb24bf8f2cc887f7 FROMLIST: dts: arm64: mt8183: Add Mediatek MDP3 nodes
+5e4132dc75b7c5d0f25612fd18f1058812263f79 FROMLIST: media: platform: Add Mediatek MDP3 driver KConfig
+3aaa1dfd6a57ae1da76bd19706ac896e398fced0 FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver
+d356758bc94be521f8bd1a57fa1da24267ab4438 CHROMIUM: config: enable Mediatek MT8183 MDP3 config
+678999f5de26b87d1404d9fd02a54ac2124fa3fd FROMLIST: dt-bindings: soc: add mtk svs dt-bindings
+693f9ee177d82d0feb36619a049b73415277c6fb BACKPORT: FROMLIST: arm64: dts: mt8183: add svs device information
+dedd55f628eb7a05be29aeb7b3f25b8942d9b8ed CHROMIUM: arm64: dts: mt8183: add pmic reference in svs node
+9b1bdc4568cfee6bc7eb8959873ce461b84a761b FROMLIST: PM / AVS: SVS: Introduce SVS engine
+b8f0496ff3f598030e6f205fe361d4b21d5e8d54 CHROMIUM: config: enable SVS related configs
+345b3dc9c739dcd706ef652c4e068cc3bf6322e7 FROMLIST: dt-bindings: mt8183: Added DIP dt-bindings
+11ae30e775863f9e7b00c2d12fdfb227e4e5a77f FROMLIST: dts: arm64: mt8183: Add DIP nodes
+ebb91ad3c90cad55b54001c5e9aec1dfc0f50b32 FROMLIST: media: platform: Add Mediatek DIP driver KConfig
+5ce09d12b9f6bf4a060327e086881ceedff4239d FROMLIST: media: platform: mtk-mdp3: Add struct tuning_addr and img_sw_buffer
+ab922f68712a5768ffb8eca32d37b654738e3ecf FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+c917e05508d50264a3f83c1b38d2860f9f0d1337 FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+1dd53c0379bd4b9390ee9be0b13fb1e8eccd5cd4 CHROMIUM: config: enable Mediatek MT8183 DIP config
+61e12ddf8197612c314860cdc6efacf0c37424b6 BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+c23c9eae7e3f06bc29cfb3493a3d6c85ceb9ecca FIXUP: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+21d7588740d9f4e096005af37caa623d3d58f8f1 BACKPORT: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig
+3d6a9dd40289c9992eb4705c6c5a55e9c523c9e1 FIXUP: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig
+f31080071fedb992d4f6811ad960e00a563b5d42 FROMLIST: dt-bindings: mt8183: Add sensor interface dt-bindings
+dfd87e4b22ee5a08d8b3f66c92f4dbe7b4d406ba BACKPORT: FROMLIST: dts: arm64: mt8183: Add sensor interface nodes
+cfb6caecccf522a2a913dc883385a8e8e8ee4504 CHROMIUM: config: enable seninf drivers
+460d79c74d89329c715f046a54c1e8394ac0d76e FROMLIST: media: dt-bindings: media: i2c: Add bindings for ov8856
+b8b97c2ff7c4f7eac9f656bdad35f8a1389a945f FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+1b1008f1812fa64b30b1a4b564f8ac2865fc85b2 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+b055f6b00d16a4cf0c76695773d2e59a04a073c7 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+f0cac5f5cd066c102cd8928801674b1bfe025ffc CHROMIUM: config: Enable CONFIG_VIDEO_OV8856 config
+b88a9bbcc80f9244648daba296f17f72838199c1 UPSTREAM: x86/tsc: Use CPUID.0x16 to calculate missing crystal frequency
+f83e334a3823d3ead44dcf29d5fe762bba883551 UPSTREAM: Revert "Bluetooth: validate BLE connection interval updates"
+b5811c5300a5c82d0f92455050920b5071fa195f BACKPORT/FROMGIT: drm/i915/vbt: Fix VBT parsing for the PSR section
+5bcdd900a5509775b18bbf2edc696bc7176b29d4 FIXUP: FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel
+5a21fdc055e9d2e75c9a010f006d79898757177b CHROMIUM: [media] hantro: add w/a for VP8 encoding
+b37426d5170a648b12c8e311ccca33912e78834c CHROMIUM: ARM64: dts: mt8183: Add port nodes to seninf and camisp
+8299cf8f42c3fbf41f279ed0eaa6ac9766533d62 CHROMIUM: ARM64: dts: mt8183-kukui*: Add camera nodes
+90d558344b1533ddfa18bdcbfb77e343dd3bc66a CHROMIUM: ARM64: dts: mt8183-kukui: Remove DIP reserved memory
+ab69eb49666b3a0662cadff27e33301ab3f119c7 Revert "CHROMIUM: platform: mtk-isp: meta cache"
+e09014601ed43aa5a9b9c4fff1f2bb56d1eff1fb FIXUP: FROMLIST: media: i2c: Add DW9768 VCM driver
+c6e6aa26125d5d4a496018d396955eeae7cd5aee FIXUP: BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver
+ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine

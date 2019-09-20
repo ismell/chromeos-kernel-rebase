@@ -1,0 +1,117 @@
+From 22bd488f5bfd457167372ea73c57300d586ca53e Mon Sep 17 00:00:00 2001
+From: Rob Clark <robdclark@chromium.org>
+Date: Tue, 13 Aug 2019 16:23:21 -0700
+Subject: [PATCH] CHROMIUM: arm: add arch_sync_dma_for_*()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG=chromium:983368
+TEST=vgem_test on cheza
+
+Change-Id: If5483dee885941887dfa2b540089588011115136
+Signed-off-by: Rob Clark <robdclark@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1754641
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+Commit-Queue: Douglas Anderson <dianders@chromium.org>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+---
+ arch/arm/Kconfig                |  2 ++
+ arch/arm/mm/dma-mapping-nommu.c | 14 ++++++++++++++
+ arch/arm/mm/dma-mapping.c       | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 44 insertions(+)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 8e6fbc6c2f687..9a422932f476f 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -16,6 +16,8 @@ config ARM
+ 	select ARCH_HAS_SET_MEMORY
+ 	select ARCH_HAS_STRICT_KERNEL_RWX if MMU && !XIP_KERNEL
+ 	select ARCH_HAS_STRICT_MODULE_RWX if MMU
++	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
++	select ARCH_HAS_SYNC_DMA_FOR_CPU
+ 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+ 	select ARCH_HAVE_CUSTOM_GPIO_H
+ 	select ARCH_HAS_GCOV_PROFILE_ALL
+diff --git a/arch/arm/mm/dma-mapping-nommu.c b/arch/arm/mm/dma-mapping-nommu.c
+index f448a0663b106..3d9121e229b6a 100644
+--- a/arch/arm/mm/dma-mapping-nommu.c
++++ b/arch/arm/mm/dma-mapping-nommu.c
+@@ -105,6 +105,13 @@ static void __dma_page_cpu_to_dev(phys_addr_t paddr, size_t size,
+ 		outer_clean_range(paddr, paddr + size);
+ }
+ 
++void arch_sync_dma_for_device(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_cpu_to_dev(paddr, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_device);
++
+ static void __dma_page_dev_to_cpu(phys_addr_t paddr, size_t size,
+ 				  enum dma_data_direction dir)
+ {
+@@ -114,6 +121,13 @@ static void __dma_page_dev_to_cpu(phys_addr_t paddr, size_t size,
+ 	}
+ }
+ 
++void arch_sync_dma_for_cpu(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_dev_to_cpu(paddr, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_cpu);
++
+ static dma_addr_t arm_nommu_dma_map_page(struct device *dev, struct page *page,
+ 					 unsigned long offset, size_t size,
+ 					 enum dma_data_direction dir,
+diff --git a/arch/arm/mm/dma-mapping.c b/arch/arm/mm/dma-mapping.c
+index 8211cf45ece17..6e0be7afbcbe2 100644
+--- a/arch/arm/mm/dma-mapping.c
++++ b/arch/arm/mm/dma-mapping.c
+@@ -1006,6 +1006,13 @@ static void __dma_page_cpu_to_dev(struct page *page, unsigned long off,
+ 	/* FIXME: non-speculating: flush on bidirectional mappings? */
+ }
+ 
++void arch_sync_dma_for_device(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_cpu_to_dev(phys_to_page(paddr), paddr % PAGE_SIZE, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_device);
++
+ static void __dma_page_dev_to_cpu(struct page *page, unsigned long off,
+ 	size_t size, enum dma_data_direction dir)
+ {
+@@ -1040,6 +1047,27 @@ static void __dma_page_dev_to_cpu(struct page *page, unsigned long off,
+ 	}
+ }
+ 
++void arch_sync_dma_for_cpu(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_dev_to_cpu(phys_to_page(paddr), paddr % PAGE_SIZE, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_cpu);
++
++/*
++ * arch_dma_{alloc,free} fail-stubs needed to avoid link-errors in dma/direct.c
++ * (which is not actually used on arch/arm)
++ */
++void *arch_dma_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
++		gfp_t flags, unsigned long attrs)
++{
++	return NULL;
++}
++void arch_dma_free(struct device *dev, size_t size, void *vaddr,
++		dma_addr_t dma_handle, unsigned long attrs)
++{
++}
++
+ /**
+  * arm_dma_map_sg - map a set of SG buffers for streaming mode DMA
+  * @dev: valid struct device pointer, or NULL for ISA and EISA-like devices
+-- 
+2.23.0.351.gc4317032e6-goog
+

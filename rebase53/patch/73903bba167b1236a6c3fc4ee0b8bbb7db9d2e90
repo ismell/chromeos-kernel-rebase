@@ -1,0 +1,170 @@
+From df384ca66a86b86fd1d8c0c857e134a9e4a104cf Mon Sep 17 00:00:00 2001
+From: Ezequiel Garcia <ezequiel@collabora.com>
+Date: Fri, 16 Aug 2019 13:01:23 -0300
+Subject: [PATCH] BACKPORT: FROMGIT: media: uapi: h264: Rename pixel format
+
+The V4L2_PIX_FMT_H264_SLICE_RAW name was originally suggested
+because the pixel format would represent H264 slices without any
+start code.
+
+However, as we will now introduce a start code menu control,
+give the pixel format a more meaningful name, while it's
+still early enough to do so.
+
+BUG=b:123551776
+TEST=Build Cheza and Kukui images.
+
+Signed-off-by: Ezequiel Garcia <ezequiel@collabora.com>
+Tested-by: Philipp Zabel <p.zabel@pengutronix.de>
+Signed-off-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+(cherry picked from commit 7bb3c32abd7bafd346f667cccb7dfe9686f14ddd
+ git://linuxtv.org/media_tree.git)
+[acourbot: remove part for Cedrus driver which is not in our tree,
+ update Hantro driver with new format name]
+Signed-off-by: Alexandre Courbot <acourbot@chromium.org>
+
+Change-Id: I28550022c79feb7ac331f0bb9a85251eefd216d8
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1789362
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+Tested-by: Alexandre Courbot <acourbot@chromium.org>
+Commit-Queue: Alexandre Courbot <acourbot@chromium.org>
+
+[rebase53(rrangel):
+	* Added back the cedrus changes
+	* Added missing hantro change
+]
+---
+ Documentation/media/uapi/v4l/pixfmt-compressed.rst | 4 ++--
+ drivers/media/v4l2-core/v4l2-ioctl.c               | 2 +-
+ drivers/staging/media/hantro/hantro_v4l2.c         | 4 ++--
+ drivers/staging/media/hantro/rk3288_vpu_hw.c       | 2 +-
+ drivers/staging/media/sunxi/cedrus/cedrus_dec.c    | 2 +-
+ drivers/staging/media/sunxi/cedrus/cedrus_video.c  | 6 +++---
+ include/media/h264-ctrls.h                         | 2 +-
+ 7 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/Documentation/media/uapi/v4l/pixfmt-compressed.rst b/Documentation/media/uapi/v4l/pixfmt-compressed.rst
+index f52a7b67023d9..9b65473a2288b 100644
+--- a/Documentation/media/uapi/v4l/pixfmt-compressed.rst
++++ b/Documentation/media/uapi/v4l/pixfmt-compressed.rst
+@@ -52,9 +52,9 @@ Compressed Formats
+       - ``V4L2_PIX_FMT_H264_MVC``
+       - 'M264'
+       - H264 MVC video elementary stream.
+-    * .. _V4L2-PIX-FMT-H264-SLICE-RAW:
++    * .. _V4L2-PIX-FMT-H264-SLICE:
+ 
+-      - ``V4L2_PIX_FMT_H264_SLICE_RAW``
++      - ``V4L2_PIX_FMT_H264_SLICE``
+       - 'S264'
+       - H264 parsed slice data, without the start code and as
+ 	extracted from the H264 bitstream.  This format is adapted for
+diff --git a/drivers/media/v4l2-core/v4l2-ioctl.c b/drivers/media/v4l2-core/v4l2-ioctl.c
+index 8e452fb55fc4e..9b958c766aa92 100644
+--- a/drivers/media/v4l2-core/v4l2-ioctl.c
++++ b/drivers/media/v4l2-core/v4l2-ioctl.c
+@@ -1358,7 +1358,7 @@ static void v4l_fill_fmtdesc(struct v4l2_fmtdesc *fmt)
+ 		case V4L2_PIX_FMT_H264:		descr = "H.264"; break;
+ 		case V4L2_PIX_FMT_H264_NO_SC:	descr = "H.264 (No Start Codes)"; break;
+ 		case V4L2_PIX_FMT_H264_MVC:	descr = "H.264 MVC"; break;
+-		case V4L2_PIX_FMT_H264_SLICE_RAW:	descr = "H.264 Parsed Slice Data"; break;
++		case V4L2_PIX_FMT_H264_SLICE:	descr = "H.264 Parsed Slice Data"; break;
+ 		case V4L2_PIX_FMT_H263:		descr = "H.263"; break;
+ 		case V4L2_PIX_FMT_MPEG1:	descr = "MPEG-1 ES"; break;
+ 		case V4L2_PIX_FMT_MPEG2:	descr = "MPEG-2 ES"; break;
+diff --git a/drivers/staging/media/hantro/hantro_v4l2.c b/drivers/staging/media/hantro/hantro_v4l2.c
+index b0940fa82542c..748b7126558b5 100644
+--- a/drivers/staging/media/hantro/hantro_v4l2.c
++++ b/drivers/staging/media/hantro/hantro_v4l2.c
+@@ -345,7 +345,7 @@ hantro_update_requires_request(struct hantro_ctx *ctx, u32 fourcc)
+ 		break;
+ 	case V4L2_PIX_FMT_MPEG2_SLICE:
+ 	case V4L2_PIX_FMT_VP8_FRAME:
+-	case V4L2_PIX_FMT_H264_SLICE_RAW:
++	case V4L2_PIX_FMT_H264_SLICE:
+ 		ctx->fh.m2m_ctx->out_q_ctx.q.requires_requests = true;
+ 		break;
+ 	default:
+@@ -536,7 +536,7 @@ hantro_queue_setup(struct vb2_queue *vq, unsigned int *num_buffers,
+ 	}
+ 
+ 	/* The H264 decoder needs extra size on the output buffer. */
+-	if (ctx->vpu_src_fmt->fourcc == V4L2_PIX_FMT_H264_SLICE_RAW)
++	if (ctx->vpu_src_fmt->fourcc == V4L2_PIX_FMT_H264_SLICE)
+ 		extra_size0 = 128 * DIV_ROUND_UP(pixfmt->width, 16) *
+ 			      DIV_ROUND_UP(pixfmt->height, 16);
+ 
+diff --git a/drivers/staging/media/hantro/rk3288_vpu_hw.c b/drivers/staging/media/hantro/rk3288_vpu_hw.c
+index 58829535abc9b..6bfcc47d1e58b 100644
+--- a/drivers/staging/media/hantro/rk3288_vpu_hw.c
++++ b/drivers/staging/media/hantro/rk3288_vpu_hw.c
+@@ -62,7 +62,7 @@ static const struct hantro_fmt rk3288_vpu_dec_fmts[] = {
+ 		.codec_mode = HANTRO_MODE_NONE,
+ 	},
+ 	{
+-		.fourcc = V4L2_PIX_FMT_H264_SLICE_RAW,
++		.fourcc = V4L2_PIX_FMT_H264_SLICE,
+ 		.codec_mode = HANTRO_MODE_H264_DEC,
+ 		.max_depth = 2,
+ 		.frmsize = {
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_dec.c b/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
+index bdad87eb9d795..56ca4c9ad01c0 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_dec.c
+@@ -46,7 +46,7 @@ void cedrus_device_run(void *priv)
+ 			V4L2_CID_MPEG_VIDEO_MPEG2_QUANTIZATION);
+ 		break;
+ 
+-	case V4L2_PIX_FMT_H264_SLICE_RAW:
++	case V4L2_PIX_FMT_H264_SLICE:
+ 		run.h264.decode_params = cedrus_find_control_data(ctx,
+ 			V4L2_CID_MPEG_VIDEO_H264_DECODE_PARAMS);
+ 		run.h264.pps = cedrus_find_control_data(ctx,
+diff --git a/drivers/staging/media/sunxi/cedrus/cedrus_video.c b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+index e2b530b1a9561..06c695615703c 100644
+--- a/drivers/staging/media/sunxi/cedrus/cedrus_video.c
++++ b/drivers/staging/media/sunxi/cedrus/cedrus_video.c
+@@ -38,7 +38,7 @@ static struct cedrus_format cedrus_formats[] = {
+ 		.directions	= CEDRUS_DECODE_SRC,
+ 	},
+ 	{
+-		.pixelformat	= V4L2_PIX_FMT_H264_SLICE_RAW,
++		.pixelformat	= V4L2_PIX_FMT_H264_SLICE,
+ 		.directions	= CEDRUS_DECODE_SRC,
+ 	},
+ 	{
+@@ -104,7 +104,7 @@ static void cedrus_prepare_format(struct v4l2_pix_format *pix_fmt)
+ 
+ 	switch (pix_fmt->pixelformat) {
+ 	case V4L2_PIX_FMT_MPEG2_SLICE:
+-	case V4L2_PIX_FMT_H264_SLICE_RAW:
++	case V4L2_PIX_FMT_H264_SLICE:
+ 		/* Zero bytes per line for encoded source. */
+ 		bytesperline = 0;
+ 
+@@ -469,7 +469,7 @@ static int cedrus_start_streaming(struct vb2_queue *vq, unsigned int count)
+ 		ctx->current_codec = CEDRUS_CODEC_MPEG2;
+ 		break;
+ 
+-	case V4L2_PIX_FMT_H264_SLICE_RAW:
++	case V4L2_PIX_FMT_H264_SLICE:
+ 		ctx->current_codec = CEDRUS_CODEC_H264;
+ 		break;
+ 
+diff --git a/include/media/h264-ctrls.h b/include/media/h264-ctrls.h
+index 206fd5ada620f..999a933c3ad9c 100644
+--- a/include/media/h264-ctrls.h
++++ b/include/media/h264-ctrls.h
+@@ -14,7 +14,7 @@
+ #include <linux/videodev2.h>
+ 
+ /* Our pixel format isn't stable at the moment */
+-#define V4L2_PIX_FMT_H264_SLICE_RAW v4l2_fourcc('S', '2', '6', '4') /* H264 parsed slices */
++#define V4L2_PIX_FMT_H264_SLICE v4l2_fourcc('S', '2', '6', '4') /* H264 parsed slices */
+ 
+ /*
+  * This is put insanely high to avoid conflicting with controls that
+-- 
+2.23.0.351.gc4317032e6-goog
+

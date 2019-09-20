@@ -1,0 +1,151 @@
+From b9ac3523a58fa2817f98238378a3e685bb92e5df Mon Sep 17 00:00:00 2001
+From: Bibby Hsieh <bibby.hsieh@mediatek.com>
+Date: Mon, 2 Sep 2019 11:32:05 +0800
+Subject: [PATCH] BACKPORT: FROMLIST: misc: eeprom: at24: support pm_runtime
+ control
+
+Although in the most platforms, the power of eeprom and i2c
+are alway on, some platforms disable the eeprom and i2c power
+in order to meet low power request.
+This patch add the pm_runtime ops to control power to support
+all platforms.
+
+Changes since v1:
+ - remove redundant code
+ - fixup coding style
+
+Signed-off-by: Bibby Hsieh <bibby.hsieh@mediatek.com>
+
+TEST=build pass
+BUG=b:111289971
+BUG=b:140391398
+
+Change-Id: I7b120ee1c8a51d60a62ac926d0a56b08ded5982b
+Signed-off-by: Bibby Hsieh <bibby.hsieh@mediatek.com>
+(am from https://patchwork.ozlabs.org/patch/1156422/)
+[Bibby: Context conflict in at24_remove as upstream
+ removed at24_data and at24_remove_dummy_clients call]
+Signed-off-by: Tomasz Figa <tfiga@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1781416
+---
+ drivers/misc/eeprom/at24.c | 56 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/misc/eeprom/at24.c b/drivers/misc/eeprom/at24.c
+index dc3537651b807..cf38ced51bf10 100644
+--- a/drivers/misc/eeprom/at24.c
++++ b/drivers/misc/eeprom/at24.c
+@@ -24,6 +24,7 @@
+ #include <linux/regmap.h>
+ #include <linux/platform_data/at24.h>
+ #include <linux/pm_runtime.h>
++#include <linux/regulator/consumer.h>
+ #include <linux/gpio/consumer.h>
+ 
+ /*
+@@ -54,6 +55,12 @@
+  * which won't work on pure SMBus systems.
+  */
+ 
++static const char * const at24_supply_names[] = {
++	"power", "i2c",
++};
++
++#define AT24_NUM_SUPPLIES ARRAY_SIZE(at24_supply_names)
++
+ struct at24_client {
+ 	struct i2c_client *client;
+ 	struct regmap *regmap;
+@@ -78,6 +85,8 @@ struct at24_data {
+ 
+ 	struct gpio_desc *wp_gpio;
+ 
++	bool has_supplies;
++	struct regulator_bulk_data supplies[AT24_NUM_SUPPLIES];
+ 	/*
+ 	 * Some chips tie up multiple I2C addresses; dummy devices reserve
+ 	 * them for us, and we'll use them with SMBus calls.
+@@ -683,6 +692,15 @@ static int at24_probe(struct i2c_client *client)
+ 	at24->client[0].client = client;
+ 	at24->client[0].regmap = regmap;
+ 
++	for (i = 0; i < AT24_NUM_SUPPLIES; i++)
++		at24->supplies[i].supply = at24_supply_names[i];
++
++	err =  devm_regulator_bulk_get(&at24->client[0].client->dev,
++				       AT24_NUM_SUPPLIES, at24->supplies);
++	if (err == -EPROBE_DEFER)
++		return err;
++	at24->has_supplies = !err;
++
+ 	at24->wp_gpio = devm_gpiod_get_optional(dev, "wp", GPIOD_OUT_HIGH);
+ 	if (IS_ERR(at24->wp_gpio))
+ 		return PTR_ERR(at24->wp_gpio);
+@@ -709,13 +727,21 @@ static int at24_probe(struct i2c_client *client)
+ 	/* enable runtime pm */
+ 	pm_runtime_set_active(dev);
+ 	pm_runtime_enable(dev);
++	pm_runtime_get_sync(dev);
++	if (at24->has_supplies) {
++		err = regulator_bulk_enable(AT24_NUM_SUPPLIES, at24->supplies);
++		if (err) {
++			dev_err(dev, "Failed to enable power regulators\n");
++			return err;
++		}
++	}
+ 
+ 	/*
+ 	 * Perform a one-byte test read to verify that the
+ 	 * chip is functional.
+ 	 */
+ 	err = at24_read(at24, 0, &test_byte, 1);
+-	pm_runtime_idle(dev);
++	pm_runtime_put(dev);
+ 	if (err) {
+ 		err = -ENODEV;
+ 		goto err_clients;
+@@ -767,13 +793,41 @@ static int at24_remove(struct i2c_client *client)
+ 	at24_remove_dummy_clients(at24);
+ 	pm_runtime_disable(&client->dev);
+ 	pm_runtime_set_suspended(&client->dev);
++	if (at24->has_supplies)
++		regulator_bulk_disable(AT24_NUM_SUPPLIES, at24->supplies);
+ 
+ 	return 0;
+ }
++static int __maybe_unused at24_suspend(struct device *dev)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	struct at24_data *at24 = i2c_get_clientdata(client);
++
++	if (at24->has_supplies)
++		return regulator_bulk_disable(AT24_NUM_SUPPLIES,
++					      at24->supplies);
++
++	return 0;
++}
++
++static int __maybe_unused at24_resume(struct device *dev)
++{
++	struct i2c_client *client = to_i2c_client(dev);
++	struct at24_data *at24 = i2c_get_clientdata(client);
++
++	if (at24->has_supplies)
++		return regulator_bulk_enable(AT24_NUM_SUPPLIES,
++					     at24->supplies);
++
++	return 0;
++}
++
++static SIMPLE_DEV_PM_OPS(at24_pm_ops, at24_suspend, at24_resume);
+ 
+ static struct i2c_driver at24_driver = {
+ 	.driver = {
+ 		.name = "at24",
++		.pm = &at24_pm_ops,
+ 		.of_match_table = at24_of_match,
+ 		.acpi_match_table = ACPI_PTR(at24_acpi_ids),
+ 	},
+-- 
+2.23.0.351.gc4317032e6-goog
+

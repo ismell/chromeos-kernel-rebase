@@ -2355,3 +2355,123 @@ b32095f6116cda5f3935f3386999c6e44d0a3cba UPSTREAM: drm/i915: Synchronize hpd wor
 1bd42df3245dadce9a792562a56b2e0ad016cab0 UPSTREAM: platform/x86: intel_pmc_core: Convert to a platform_driver
 9433f6acfaac71db6b2251611e4f229a90c653e4 UPSTREAM: platform/x86: intel_pmc_core: Allow to dump debug registers on S0ix failure
 97c4d29ea2291ebe07af88e5b968df55aae1aebd UPSTREAM: ASoC: mediatek: mt8183: make some functions static
+802d1a5411939001757b50fcb523fc718268724d UPSTREAM: PM / wakeup: Drop wakeup_source_drop()
+04b5489542a266ac31ae325f609a2570b1697aaa UPSTREAM: drivers: base: power: remove wakeup_sources_stats_dentry variable
+f1961a41380554dd70ebd27b9124564d881e6bda UPSTREAM: PM / core: Add support to skip power management in device/driver model
+400630fd01699c4fede60907c23a4bb15f14e288 UPSTREAM: pinctrl: msm: Actually use function 0 for gpio selection
+d63b8988a6b41b2a63048cc4493fc3e566707863 UPSTREAM: ath10k: implement set_base_macaddr to fix rx-bssid mask in multiple APs conf
+8cfa7f0f45843152c6fc0b1ff8acc4e349f133d8 UPSTREAM: pinctrl: mediatek: fix check on EINT_NA comparison
+b6153e0adb1eb9ae2f91366e0b07ec8092f15d82 UPSTREAM: pinctrl: mediatek: moore: fix return value check in mtk_moore_pinctrl_probe()
+71f29332ee338ba89fdade4bc71d7e2d80d105e5 UPSTREAM: pinctrl: mediatek: paris: fix return value check in mtk_paris_pinctrl_probe()
+1e109910e8fb7d2af2c4cd0c7865ff198503023f UPSTREAM: pinctrl: mediatek: fix static checker warning caused by EINT_NA
+751e4585f5598db89a5f09071118c33ead907662 UPSTREAM: ASoC: Intel: cht_bsw_max98090: fix kernel oops with platform_name override
+8aa9c902562c13083fcf971d26bfdf8eab5cafd7 UPSTREAM: drm/bridge: tc358764: Fix build error
+4cf8d13ce38dacb3aeffc166b0ae28f3f51bd221 UPSTREAM: drm/rockchip: add missing of_node_put
+ffe3f3a0cc1002d85af38a97750971477602abb8 UPSTREAM: drm/rockchip: rgb: update SPDX license identifier
+9276e7530cab247d2dff8342871f967ba696316d UPSTREAM: drm/rockchip: vop: add rk3188 hs_start interrupt as dsp_hold equivalent
+05c01a5612e76f1db069c8023b3b4268936482e9 UPSTREAM: drm/sun4i: tcon: prevent tcon->panel dereference if NULL
+f044922e7fb36e85cef0c19804d1bbd48e92ed4f UPSTREAM: drm/bochs: Fix the ID mismatch error
+976cf0a8097d1f0f7ace42ff1bef08ca54c9d505 UPSTREAM: drm/doc: fix drm_driver_legacy_fb_format
+737febf48ebad6ab21ab8c939edf866506c91f05 UPSTREAM: drm/omap: dsi: Fix crash in DSI debug dumps
+8be2fc0ee4a766a64d3cb43efff5b2f512eb0f01 UPSTREAM: drm/omap: dsi: Ensure the device is active during probe
+de6f373c69f093d8513810c4087c564f1a2b53a8 UPSTREAM: drm/omap: Move DISPC runtime PM handling to omapdrm
+f0841b3bfde76588b28a85355e1273a05b01a1fa UPSTREAM: drm/omap: dsi: Fix OF platform depopulate
+56fc527794fa13caa684a9e2b57f7bfe8b74d60b UPSTREAM: drm/omap: Populate DSS children in omapdss driver
+596497f8ba57270c2ea43eb515e0f96737e06e75 UPSTREAM: drm/omap: hdmi4: Ensure the device is active during bind
+e2694c01cc7d925fc90edc548b882c21fb1d4860 UPSTREAM: drm/omap: dsi: Fix missing of_platform_depopulate()
+63db91e332714eaa4afa674435a275bd1cb5c423 UPSTREAM: drm/omap: populate DSI platform bus earlier
+2e1c4f2a164dbc258e4f295f02a46787e4378227 UPSTREAM: ARM: 8788/1: ftrace: remove old mcount support
+5884a0c4dfeed62e0cfcb659b6eac2767de60890 UPSTREAM: ARM: 8800/1: use choice for kernel unwinders
+84dd61f2898b7096c3f05cb2e649b0b7bd309022 BACKPORT: ARM: fix function graph tracer and unwinder dependencies
+91803478c331620042d53bcf67c60a88ce4827ca UPSTREAM: drm/omap: fix bus_flags for panel-dpi
+07a506c2ad06272c1f24df03cadd9a80bf92a191 UPSTREAM: drm/amd/display: Fix disabled cursor on top screen edge
+96f78536dac04e7c31e98c8e5e00ec44a9633aba UPSTREAM: drm/amd/display: Fix misleading buffer information
+b892dde83fa1211a2e00557fc6421cb8c3fa95f6 UPSTREAM: uapi: fix more linux/kfd_ioctl.h userspace compilation errors
+fb6f8fab849488251c47b7b3a7251cd302dc09c2 UPSTREAM: drm/vmwgfx: Fix an uninitialized fence handle value
+9a0eacb8d24e9ae2e11186014fa5ecffa9b81dda UPSTREAM: drm/vmwgfx: Fix user space handle equal to zero
+bbe20983261435c604bac58bf397ce3b5664fb87 UPSTREAM: drm/vmwgfx: Fix compat mode shader operation
+1bfa7cd4b82c53e70c2fcda571bad1cf8dd148ea UPSTREAM: drm/fb-helper: Fix typo in parameter description
+58e174d64f969dcfb880d110b7f5b634b24f1125 UPSTREAM: drm/exynos: checking for NULL instead of IS_ERR()
+1c2b73abcd89c46882e4811051db5669e7555fab UPSTREAM: drm/exynos/dsi: register connector if it is created after drm bind
+6e2d9761bf79950b37dc70a57b34da4aad9fa419 UPSTREAM: drm/exynos/fbdev: do not skip fbdev init if there are no connectors
+0e7ea2915e92bccc3c1d9781b8f2a66d0925039f UPSTREAM: drm/mediatek: fix the rate and divder of hdmi phy for MT2701
+ee8406310accd5658118e4ac4e86cc8d3d3575ee UPSTREAM: drm/omap: fix incorrect union usage
+19376475e46dff8108d3266f71201ff3f847f941 UPSTREAM: drm/omap: dsi: Hack-fix DSI bus flags
+d5f7a2f8a1da7d31119e1e7f2c537f217226d270 UPSTREAM: udmabuf: actually unmap the scatterlist
+e7f1c817fc2c45a30bcdde36888e476441f7b060 UPSTREAM: ARM: OMAP2+: add missing of_node_put after of_device_is_available
+b072f0e7af79d41c33e270683af082831ce04505 UPSTREAM: regulator: core: fix error path for regulator_set_voltage_unlocked
+828de4e8f9c2c725462e843746dbd0dec96ffdd2 UPSTREAM: regulator: core: Avoid potential deadlock on regulator_unregister
+136dd0b1c5d03f3b3b8bbb00b6bd74f966dc8b94 UPSTREAM: regulator: core: Take lock before applying system load
+066398434fa721c072d17d7c9691c61fc17caf64 UPSTREAM: regulator: core: Drop lockdep annotation in drms_uA_update()
+da5d5e64cf1759e65f4da84525593c72e6435270 UPSTREAM: regulator: core: Fix application of "drop lockdep annotation in drms_uA_update()"
+9b8ae8f52a9b04a969ec368acced85ab2e49b695 UPSTREAM: drm: rcar-du: Fix DU3 start/stop on M3-N
+9773baf241ae4deafb5b71d2bcd20907f076d6e6 UPSTREAM: drm/i915: Don't apply the 16Gb DIMM wm latency w/a to BXT/GLK
+546b4b8362f3590cb2e4e35365d06fd0c323713c UPSTREAM: drm/msm/a6xx: Don't enable GPU state code if dependencies are missing
+277bc6d6c94125b34933647a4f7233520f6a56b3 UPSTREAM: drm/msm: correct attempted NULL pointer dereference in debugfs
+ee3866d8ed1f6e573d958fd59473c89f8398e866 UPSTREAM: drm/msm: fix an error code in the ioctl
+494b8295ab02a2b1b9c925429ea1b154cfa49fab UPSTREAM: drm: Fix doc warning in drm_connector_attach_edid_property()
+502eb045e9f43fb4853c4824e020637d8bd5a5c3 UPSTREAM: drm/virtio: move drm_connector_update_edid_property() call
+3e02b89df0de9e35b91e04534e36c0f90c8aa837 UPSTREAM: drm/nouveau: Only release VCPI slots on mode changes
+7fe779f5624d4a2e00eae9891743f7b5ed5848a1 UPSTREAM: drm: Ignore drm_gem_vram_mm_funcs in generated documentation
+97b411b8edc9c03beb2305fb5bd4ba4a43509252 UPSTREAM: drm/msm: Truncate the buffer object name if the copy from user failed
+59fe9008f87fb9ad30a567b2fb9d5e6478ee1c97 UPSTREAM: ASoC: rsnd: fixup MIX kctrl registration
+e37ceb9cb05317023f4652b160a35fe3aece02ad UPSTREAM: cpufreq: scmi: Fix use-after-free in scmi_cpufreq_exit()
+49fbb3e5489b6543c5a0aa587e085894fd6ac06d UPSTREAM: opp: Don't use IS_ERR on invalid supplies
+be68dadf46dfbe3959254d803f701f17a0c1529b UPSTREAM: PM / OPP: Update performance state when freq == old_freq
+dd4cad315ce63bc4e64932918716ae1a0b3d93c9 UPSTREAM: bridge: mcast: Default back to multicast enabled state
+2547921c9c7646349d2a17a64a3815d6de3b9726 BACKPORT: pinctrl: mediatek: fix Kconfig build errors for moore core
+d0cadc267a259daf6fab79e83696e67e5b3a7a48 UPSTREAM: mmc: mediatek: fix SDIO IRQ detection issue
+203d10c9b6a495af21426e84b4b99e55d62ddd36 UPSTREAM: mmc: mediatek: fix SDIO IRQ interrupt handle flow
+13b141ff07a04410368ef138a846e328c1069ab1 UPSTREAM: arm64: dts: mt7622: fix no more console output on BPI-R64 board
+e5ef7be094716ca409a7e54baa47c1aa91b084d7 UPSTREAM: clk: mediatek: fix the PCIe MAC clock parent
+b07a869856b5a899f301e0581cce29eeff15fd9c UPSTREAM: iommu/mediatek: Use correct fwspec in mtk_iommu_add_device()
+818a5a0983ad55681f6ae25049a5b3bc9304285e UPSTREAM: v4l2-controls: add a missing include
+7f6b13f273ed9e0d89603211bda23ae53285c956 UPSTREAM: HID: input: make sure the wheel high resolution multiplier is set
+735d09da4847a81566565fd5ffb0e6f5946f9377 UPSTREAM: HID: input: fix assignment of .value
+00be095fbf398411018bcc894a68d136f80b3ed0 UPSTREAM: HID: logitech: Handle 0 scroll events for the m560
+d8da13cd864a921884e93974d450558b94a80094 UPSTREAM: HID: a4tech: fix horizontal scrolling
+3810158cf5530a71a78027bc5e40510082057044 UPSTREAM: iommu: Allow io-pgtable to be used outside of drivers/iommu/
+102608a1e7f3b40b813c577bad9269ce218d89e9 UPSTREAM: iommu/mediatek: Fix leaked of_node references
+1ce0045d8580e9953fc58141c412fbd61015c8d5 UPSTREAM: i2c: mediatek: disable zero-length transfers for mt8183
+1b21b92b353675af5c7fab4920507b3dbdbd5f60 UPSTREAM: net: phy: improve phy_init_hw
+b574f56b220b980cf877e9ff363967947ee709d4 UPSTREAM: clk: mediatek: Add flags to mtk_gate
+69b6e8e1638a6ed946006c5e05125d983937ae2b UPSTREAM: clk: mediatek: fix clk-gate flag setting
+3d825f915ead1c86bc0ce80381fb10996849457e UPSTREAM: gcov: clang: move common GCC code into gcc_base.c
+bf9302490645a9d7ed9ed294f99c708ce62f3ed3 UPSTREAM: gcov: docs: add a note on GCC vs Clang differences
+35be48648a6552869bd5d6c9a0d278102d23d46c UPSTREAM: gcov: clang support
+4a027b4117e3d71d5739522f4c0761673910da1a UPSTREAM: ath10k: fix failure to set multiple fixed rate
+3d0d0d8c70a7d7395337c9092e8c9e05d7bce6f9 UPSTREAM: ath10k: work around uninitialized vht_pfr variable
+8f5e6ee1bf6cfe7c803add23aecf57c3aaa3eb9b UPSTREAM: mac80211: implement ieee80211_tx_rate_update to update rate
+5ce12519c6797b9beed57f0caaa1799bfca1396c UPSTREAM: ath10k: report tx rate using ieee80211_tx_rate_update()
+02ae233373b80dc3ee34cebfbb8871255eb5d5cd UPSTREAM: backlight: pwm_bl: Fix heuristic to determine number of brightness levels
+4d8a0c2b0aaa3e223a6c93593b07867bd737f133 UPSTREAM: media: mem2mem: Require capture and output mutexes to match
+5827ba84fd901b9e93c5efaa36ce822d15500d4d UPSTREAM: media: v4l2-mem2mem: Simplify exiting the function in __v4l2_m2m_try_schedule
+5c08b4037b515488dfdd8765c28a1171968487c1 UPSTREAM: media: v4l2-mem2mem: fix epoll() by calling poll_wait first
+931084913375d47aaa10fa7def27f0ff20835f3b UPSTREAM: media: v4l2-mem2mem: add q->error check to v4l2_m2m_poll()
+c62b37419ad894291b1c3952f37935d66fa10fe5 UPSTREAM: media: v4l2-mem2mem: add try_en/decoder_cmd ioctl helpers
+2182aa098aa0b38b4f879e855c1e599c4689482a UPSTREAM: ASoC: audio-graph-card: don't select DPCM via audio-graph-card
+3ef72f7d8f77c8b2d0cd1869acf27928ccc9b06c UPSTREAM: ASoC: simple-card: don't select DPCM via simple-audio-card
+9a6861bc1eab5b35dbd5e0ef8bce1f178211c041 UPSTREAM: ASoC: simple-card: fix an use-after-free in simple_dai_link_of_dpcm()
+ebce580f05d00a910d1e7f1a9c3b81fb15366c37 UPSTREAM: ASoC: Mediatek: MT8183: Fix build err while CONFIG_I2C set to module
+da735ff44e3f63cacdc2d538e4ba73f9c4d3e64e UPSTREAM: ASoC: Intel: cht_bsw_rt5672: fix kernel oops with platform_name override
+118d51158c15f344e7fb251c3244157250786817 UPSTREAM: ASoC: Intel: cht_bsw_nau8824: fix kernel oops with platform_name override
+63786d9d40a26b4d852a3b3d3a39333fc7570a46 UPSTREAM: ASoC: Intel: bytcht_es8316: fix kernel oops with platform_name override
+33ae605f661acaae1c9ff8746bb1e8528b78166f UPSTREAM: ASoC: audio-graph-card: fix use-after-free in graph_for_each_link
+f139f5504077d4f17983d7879203ad9e2c17c61d UPSTREAM: ASoC: SOF: Intel: hda: fix the hda init chip
+c029fb22d166cb6bd0a732c602703eafc0867e23 UPSTREAM: ASoC: SOF: Intel: hda: use the defined ppcap functions
+075118a1d6fed1b401e0d78f8621431531b250ea UPSTREAM: ALSA: hda: assign polling_mode after azx_bus_init
+ee6ea999c4620d45c497e18f725b0ebb2c31e225 UPSTREAM: ALSA: hda: move polling_mode flag to struct hdac_bus
+f8156f2aba69ddb82d088a168d42be51af88bfe9 UPSTREAM: ASoC: SOF: Force polling mode on CFL and CNL
+ba6c510ff35f38da5d467a37aa69e46caa2c845d UPSTREAM: ASoC: simple-card: rename to asoc_simple_card_canonicalize_platform()
+7e38466ef86baf6df49f8cf7f7a5e5b785d5c726 UPSTREAM: ASoC: audio-graph: rename graph_get_conversion() to graph_parse_convert()
+c6ac2c340b9336836293ce2d66c7490aa0d724ec UPSTREAM: ASoC: audio-graph: add graph_parse_mclk_fs()
+41d1bb3d8914c8cda5d427c4ba4c3e94a8669727 UPSTREAM: ASoC: audio-graph-card: fix use-after-free in graph_dai_link_of_dpcm()
+821257281ba6182cc47e127a1a8d41f1ee9053bb UPSTREAM: ASoC: simple-card: Fix missing of_node_put() at simple_dai_link_of()
+1b372359ffcf2fec44b90212b847ba3f2a9a71e3 UPSTREAM: ASoC: simple-card: Fix of-node refcount unbalance in DAI-link parser
+29b43d17d848570359e60b6feede2d5db90b2b60 UPSTREAM: ASoC: simple-card: fix an use-after-free in simple_for_each_link()
+b1c0be0ac191b9cffb9f7572215027ca3b194ac0 UPSTREAM: ALSA: pcm: Fix refcount_inc() on zero usage
+1cc955468b6fa31ad30f80e5770656f40ccded54 UPSTREAM: ALSA: hda/realtek - Add model description for Chrome headset button quirk
+e2d9f09b0811bbd2daa3118945a4b59bf71178df BACKPORT: ASoC: audio-graph-card: fix an use-after-free in graph_get_dai_id()
+35d9964720ddacc14c09c03e2322d7bc13505161 UPSTREAM: ath6kl: Remove unnecessary parentheses
+b88a9bbcc80f9244648daba296f17f72838199c1 UPSTREAM: x86/tsc: Use CPUID.0x16 to calculate missing crystal frequency
+f83e334a3823d3ead44dcf29d5fe762bba883551 UPSTREAM: Revert "Bluetooth: validate BLE connection interval updates"

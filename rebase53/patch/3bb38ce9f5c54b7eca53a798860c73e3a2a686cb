@@ -1,4 +1,4 @@
-From 8a033a1882fab57d49908b1e172143f568543eea Mon Sep 17 00:00:00 2001
+From 3584c15ac72587eb168852ebd91e028c3452dced Mon Sep 17 00:00:00 2001
 From: Nick Fan <Nick.Fan@mediatek.com>
 Date: Sat, 18 Aug 2018 18:30:13 +0800
 Subject: [PATCH] CHROMIUM: arm64: dts: mt8183: Add GPU device tree node
@@ -25,10 +25,10 @@ Signed-off-by: Raul Rangel <rrangel@chromium.org>
  3 files changed, 186 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
-index eeebf53a6557..fb60e2656dea 100644
+index 866c1df76505b..8d1bf17e99cfa 100755
 --- a/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
 +++ b/arch/arm64/boot/dts/mediatek/mt8183-evb.dts
-@@ -95,6 +95,24 @@
+@@ -96,6 +96,24 @@
  	proc-supply = <&mt6358_vproc11_reg>;
  };
  
@@ -54,7 +54,7 @@ index eeebf53a6557..fb60e2656dea 100644
  	status = "okay";
  	pinctrl-names = "default", "state_uhs";
 diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi b/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
-index 6c8230a82ef7..58594cd4761a 100644
+index 6c8230a82ef72..58594cd4761af 100644
 --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui.dtsi
 @@ -39,6 +39,24 @@
@@ -83,11 +83,11 @@ index 6c8230a82ef7..58594cd4761a 100644
  	pinctrl-names = "default";
  	pinctrl-0 = <&i2c0_pins>;
 diff --git a/arch/arm64/boot/dts/mediatek/mt8183.dtsi b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
-index 4fc02726bc73..225ca685ab8f 100644
+index 0d95fb113f231..70a2c142da51d 100644
 --- a/arch/arm64/boot/dts/mediatek/mt8183.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt8183.dtsi
-@@ -1313,6 +1313,156 @@
- 			#clock-cells = <1>;
+@@ -1360,6 +1360,156 @@
+ 			power-domains = <&scpsys MT8183_POWER_DOMAIN_MFG_ASYNC>;
  		};
  
 +		gpu: mali@13040000 {
@@ -244,5 +244,5 @@ index 4fc02726bc73..225ca685ab8f 100644
  			compatible = "mediatek,mt8183-mmsys", "syscon";
  			reg = <0 0x14000000 0 0x1000>;
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.351.gc4317032e6-goog
 

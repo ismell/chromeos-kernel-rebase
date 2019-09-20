@@ -1,0 +1,46 @@
+From feecdfa9cbaef949010a5f6feb2078afb5496426 Mon Sep 17 00:00:00 2001
+From: Matthias Kaehlcke <mka@chromium.org>
+Date: Tue, 3 Sep 2019 11:03:36 -0700
+Subject: [PATCH] CHROMIUM: ARM: Kconfig: allow use of FUNCTION_TRACER with
+ clang 9
+
+The CL "BACKPORT: FROMLIST: ARM: Emit __gnu_mcount_nc when using
+Clang 10.0.0 or newer" specifies clang 10 as minimum version for
+using the function tracer. The Chrome OS version of clang 9
+includes backports of the necessary changes, so we can relax the
+version requirement in our kernel.
+
+BUG=chromium:819808
+TEST=build veyron kernel with clang
+  function tracer works
+
+Change-Id: I9e2928a17ec51471d72c751809bc03e82b35c70a
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1783258
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+
+[rebase53(rrangel):
+* Conflicts:
+  * arch/arm/Kconfig: context
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index babc0fc4b0e43..d67935c27cc9b 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -83,7 +83,7 @@ config ARM
+ 	select HAVE_FAST_GUP if ARM_LPAE
+ 	select HAVE_FTRACE_MCOUNT_RECORD if !XIP_KERNEL
+ 	select HAVE_FUNCTION_GRAPH_TRACER if !THUMB2_KERNEL && !CC_IS_CLANG
+-	select HAVE_FUNCTION_TRACER if !XIP_KERNEL && (CC_IS_GCC || CLANG_VERSION >= 100000)
++	select HAVE_FUNCTION_TRACER if !XIP_KERNEL && (CC_IS_GCC || CLANG_VERSION >= 90000)
+ 	select HAVE_GCC_PLUGINS
+ 	select HAVE_HW_BREAKPOINT if PERF_EVENTS && (CPU_V6 || CPU_V6K || CPU_V7)
+ 	select HAVE_IDE if PCI || ISA || PCMCIA
+-- 
+2.23.0.351.gc4317032e6-goog
+

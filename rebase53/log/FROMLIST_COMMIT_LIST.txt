@@ -710,3 +710,173 @@ a2484b889f3e636a2e2f953c11d5b6b8c389e1be FIXUP: FROMLIST: remoteproc/mediatek: a
 e41cffebd3aa58a243863dfb2aeb1ba57ee50548 FIXUP: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel
 b7ad1e1836487f6585f1fe33c93c59f9575f2234 FIXUP: FROMLIST: drm/panel: support for auo, kd101n80-45na wuxga dsi video mode panel
 597aa9cf977f8b971fdf7dd5f1dc3e1a4a1aa7bb FROMLIST: platform/x86: intel_pmc_core: Attach using APCI HID "INT33A1"
+8654a1d9c340884edc83a6e55eea5f6ad64b43e3 FROMLIST: media: uvcvideo: Use streaming DMA APIs to transfer buffers
+9e1d2b3dcd39b73cfc3419c2ccf7f5adb43a84ec BACKPORT: FROMLIST: iio: cros_ec: set calibscale for 3d MEMS to unit vector
+ff05e813773eb6352fc15537bb63142a83c4d5e6 FROMLIST: ARM: UNWINDER_FRAME_POINTER implementation for Clang
+53357b51c9d287ca7fb0f97b2c806d33e2f4b5d8 FROMLIST: Bluetooth: hci_qca: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for QCA UART Radio
+7df5ba73b95185d6da454ec3ea1a638d35e279de FIXUP: FROMLIST: mfd: Add support for the MediaTek MT6358 PMIC
+e8f07e252892aa71c3aa29c61d7d881813f74ed3 FIXUP: FROMLIST: regulator: mt6358: Add support for MT6358 regulator
+d36b285a6c82afb91e3d89f78ec1ffeead8eeb5e FIXUP: FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+ad09460f972e14d6f092ab372529b87dad457c53 FIXUP: FROMLIST: rtc: mt6397: Add support for the MediaTek MT6358 RTC
+cadf8b3e0d52b16c63c286750a4626d7b0f663ce FROMLIST: drm: dw-hdmi-i2s: enable audio clock in audio_startup
+c68b4b81c2ab0915cd4097cf003abb83e2f95ca9 FROMLIST: dt-binding: gce: remove thread-num property
+688e86bfdad6ba71dbd8e3dccafd905f2b1260b1 FROMLIST: dt-binding: gce: add gce header file for mt8183
+8f6a90c0feed83e7aba88cc4073925b76091e84a FROMLIST: dt-binding: gce: add binding for gce client reg property
+50af4b0387705fa7b980c32287b4ff1527fdd863 FROMLIST: mailbox: mediatek: cmdq: move the CMDQ_IRQ_MASK into cmdq driver data
+722e5d75b66ec12939fb79c27a5570bd60e3f487 FROMLIST: mailbox: mediatek: cmdq: support mt8183 gce function
+09e5393710c0c06d109aeab5f01440eeab3d32f5 FROMLIST: soc: mediatek: cmdq: clear the event in cmdq initial flow
+ddfeac9d241cfa2d2033ffd70ce84418a46ca815 BACKPORT: FROMLIST: soc: mediatek: cmdq: define the instruction struct
+c62585f26cad8bae8458b84074557494dee3bad1 FROMLIST: soc: mediatek: cmdq: add polling function
+bbe21eb823496a634aa659c63a033d4a5e5b97ee FROMLIST: soc: mediatek: cmdq: add cmdq_dev_get_client_reg function
+3b83dc6b1b7fd6df873bc1f30dbe62309516e338 BACKPORT: FROMLIST: arm64: dts: add gce node for mt8183
+19a452562c79418d7d5f70aa24af89c43b36cc5d FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183
+f2dd00b62ef7c37dea0cb36457f670961ebd5bab FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183
+58e1de8d695f232acdcc627ca96797536da76ea2 FROMLIST: dt-bindings: mediatek: add binding for mt8183 display
+e18d57c0e1789e5da6b65c2220d08bfea35f0044 FROMLIST: dt-bindings: mediatek: add ovl_2l description for mt8183 display
+d82bc506662c43fe345dddef7a1c65909c0e1e05 FROMLIST: dt-bindings: mediatek: add ccorr description for mt8183 display
+8f6faa5cb148e1696c739be2e19778fe64c5def1 FROMLIST: dt-bindings: mediatek: add dither description for mt8183 display
+401a6446c3730c569543c1236ae94cf165fc1c24 FROMLIST: dt-bindings: mediatek: add mutex description for mt8183 display
+b1ea3cbf6a65080865b407d3e560114fed7d3f11 FROMLIST: drm/mediatek: add mutex mod into ddp private data
+1c666b155802ae799453f307579742572acc9253 FROMLIST: drm/mediatek: add mutex mod register offset into ddp private data
+76fd8caf18463194736130f56238e7cb287a7a00 FROMLIST: drm/mediatek: add mutex sof into ddp private data
+c13aa93e1cb8179321d4362b74ca0cd5f10f0e57 FROMLIST: drm/mediatek: add mutex sof register offset into ddp private data
+81b200d001d9e57edf83d29d4807a4479607df9d FROMLIST: drm/mediatek: add mmsys private data for ddp path config
+21a712275b2c92c13643211bc464c7b05701e6af FROMLIST: drm/mediatek: move rdma sout from mtk_ddp_mout_en into mtk_ddp_sout_sel
+73272b902fab84748afef2e73ad077ebd9e7bde0 FROMLIST: drm/mediatek: add commponent OVL_2L0
+41317202a56a40fc255e539b218a873b618650de FROMLIST: drm/mediatek: add component OVL_2L1
+f935f93c6e0a97b0fab885474dbf68165c133c4e FIXUP: FROMLIST: drm/mediatek: add component DITHER
+b950f1f279f3bc034b8309f4b38eef46db59472f FIXUP: FROMLIST: drm/mediatek: add function to background color input select for ovl/ovl_2l direct link
+63e2503b917d09eb0675bc97cafe4d8b920f4b3b FIXUP: FROMLIST: drm/mediatek: add background color input select function for ovl/ovl_2l
+ddead01e42abfcf05b91183f7c0e1e9916f8de59 FIXUP: FROMLIST: drm/mediatek: add ovl0/ovl_2l0 usecase
+e39dc5ae83fedc932e6b135a9311cb0d43a2493c FROMLIST: drm/mediatek: distinguish ovl and ovl_2l by layer_nr
+04c5b8f8f363f5108c6c377e5c1c5a13a8e51e7f FROMLIST: drm/mediatek: add clock property check before get it
+4c8f27295e1c1f4e5325ed8eb4b13ebfb18505cd FROMLIST: drm/mediatek: add connection from OVL0 to OVL_2L0
+6d3732be70d4e4fa6b8a98321dcc3d4cd07478ea FROMLIST: drm/mediatek: add connection from RDMA0 to COLOR0
+07ccef61be3ed52b94ee09adaa88012671a83600 FROMLIST: drm/mediatek: add connection from RDMA1 to DSI0
+2b6d2b5b16164be3a55d8aca04a669b5e5f229a5 FROMLIST: drm/mediatek: add connection from OVL_2L0 to RDMA0
+9bec8d6fac0c382cd46643f001b4dba30e3c866b FROMLIST: drm/mediatek: add connection from OVL_2L1 to RDMA1
+a21034bf255e28370ce6020522d2df8b97ba0dea FROMLIST: drm/mediatek: add connection from DITHER0 to DSI0
+842f97a5367b1a5d81b24b1a9e40b9dba75f909d FROMLIST: drm/mediatek: add connection from RDMA0 to DSI0
+8c03dd8896c742f6775aec0b0dc3f945decd5053 FROMLIST: drm/mediatek: add support for mediatek SOC MT8183
+20b09c289fb8a52b32187d49bc35a8f20e4411a7 FIXUP: FROMLIST: drm/mediatek: add support for mediatek SOC MT8183
+c8b6948c787acdf4c435ab063e51bf995f9bc1ac FROMLIST: drm/mediatek: Only block updates to CRTCs that have a pending update
+2431b273eaa1ebf108f87b20e2139f24439a8612 FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates
+8d7bd9d9538e3911a9885a40b1bb5188f36bea29 FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+d5e900c121230265ff5ea76d9c6d03bcb0e38852 FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+a19410e4d1e520df434bcf752613110402ff2bde FROMLIST: drm/mediatek: Apply CMDQ control flow
+002274707fb9333e319986333ecb5966d5da33ae FROMLIST: arm64: dts: mt8183: add gce setting in display node
+b9ac3523a58fa2817f98238378a3e685bb92e5df BACKPORT: FROMLIST: misc: eeprom: at24: support pm_runtime control
+0222fac441c10d64f49f3cf2ee45c2cacf3748af FROMLIST: media: dt-bindings: mt8183: Added camera ISP Pass 1
+0f7036128bf8f1e2cb372d2093fdc30a189e324c FROMLIST: dts: arm64: mt8183: Add ISP Pass 1 nodes
+a794aab0db40f58e8e3b5e4344c0dc9e520f1ccb FROMLIST: media: videodev2.h: Add new boottime timestamp type
+8ab5cf7e97c9d70af83b2b1374f86e1ea9c3861b FROMLIST: media: pixfmt: Add Mediatek ISP P1 image & meta formats
+910bef3a45ed1e7f972f68e83327775901629aa7 BACKPORT: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+c4474803e11dbe8eb861c150cec90539af82a2c6 BACKPORT: FROMLIST: ARM: Emit __gnu_mcount_nc when using Clang 10.0.0 or newer
+2f57803597de745781a003074237304fdb7c39d4 FROMLIST: dt-bindings: Add binding for IT6505.
+2e9b197ce26cda014fbdd36552b003b8a018aa87 FROMLIST: dt-binding: mediatek: Get rid of mediatek,larb for multimedia HW
+571af29841bfe0df418ee66206c48559732d02a2 FROMLIST: iommu/mediatek: Add probe_defer for smi-larb
+6a441d39ad73e9c693b389b623f3192103fb8ffb FROMLIST: iommu/mediatek: Add device_link between the consumer and the larb devices
+11c2819a60e8545a4c9743437ca1df4d8bbb13ed FROMLIST: memory: mtk-smi: Add device-link between smi-larb and smi-common
+3718d834f99a5cb5c6f3f088e8149d622fc3ccc4 FROMLIST: media: mtk-jpeg: Get rid of mtk_smi_larb_get/put
+a1acd350b641c9faec0d222544832dac782859ef FROMLIST: media: mtk-mdp: Get rid of mtk_smi_larb_get/put
+0694ba1febb21d038d98eec9c99487cf1cad2420 FROMLIST: media: mtk-vcodec: Get rid of mtk_smi_larb_get/put
+9940b4a173f2055e88d646dd2e422a5de367ab23 BACKPORT: FROMLIST: drm/mediatek: Get rid of mtk_smi_larb_get/put
+3573e61237c183c840c6d3a9796b4ac844f25418 FROMLIST: iommu/mediatek: Use builtin_platform_driver
+3d7f0129bab17f16fc9e86f3b53333b513eec985 FROMLIST: memory: mtk-smi: Use device_is_bound to check if smi-common is ready
+d9852c2c9f0d5c630704272c00853762d659e91d BACKPORT: FROMLIST: drm/mediatek: Add pm runtime support for ovl and rdma
+d9965d536728aced14d0e31a3fee2a4f4cca2ba8 FROMLIST: arm64: dts: mediatek: Get rid of mediatek,larb for MM nodes
+e076fa84c462433bccf7a50d5b387d8c13cafde2 FROMLIST: clk: mediatek: Register clock gate with device
+0051af42b4e549dce978f137b2824a5ab0940d4b FROMLIST: clk: mediatek: Runtime PM support for MT8183 mcucfg clock provider
+3b75aaf46ab1fb8875772717c7dfd705662b29bc BACKPORT: FROMLIST: arm64: dts: Add power-domains properity to mfgcfg
+cec2b51563c24317f8280bc50e49b2aba028f382 FIXUP: FROMLIST: arm64: dts: mt8183: Configure CPU cooling
+71dcb0ce70ead6bf6445ae247a2a13835953b3e6 FIXUP: FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+badfc166850a3a621d9f793b6cacc4e5f0ff75ff FROMLIST: remoteproc/mediatek: add SCP support for mt8183
+6648ce69b39c7574be58708f80822e28e2a33fe4 FROMLIST: rpmsg: add rpmsg support for mt8183 SCP.
+5eb3083fd8006c52164ba3688fa5f6429f01b29b FROMLIST: platform/chrome: cros_ec_rpmsg: Fix race with host command when probe failed.
+8ed651e515fc8ddf20833effddeb63a605d3ea68 FIXUP: FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates
+c06ba6767e40f4699d859ae1922b98afdeca1f17 FROMLIST: drm/i915: Fix corruption lines on the screen on Gen9 chromebooks
+a3f7d76d0a1bd6dad3c4f28b07487cd3ea257b0c FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+92abcf935b2c37acfd1970792e9b6a3d43cc199d FROMLIST: clk: mediatek: add pericfg clocks for MT8183
+8fb738c9fe3f259b8d32e133ee939a49b05d07b7 FROMLIST: phy: phy-mtk-tphy: add a property for disconnect threshold
+e885f6aa8b47d6b464ee49480ff38f3bebcf2a69 FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183
+f7f7f006a3ef8f5f03e52c3461d81049eb480fee FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183
+05de2df72ff4c55e017fd7a83cfa5b35aed613b2 BACKPORT: FROMLIST: arm64: dts: mt8183: add usb and phy nodes
+80f21b1347dd7b71e1bf8b57ce1b73a239ff7dd1 FROMLIST: arm64: dts: mt8183: enable USB remote wakeup
+3c8f6a812ee44e7659001035e00e3af48a290ae7 FROMLIST: arm64: dts: mt8183: tune disconnect threshold of u2phy
+ec96a64d9b23a8c01d5a053d893697cf738a4b9c FROMLIST: drm/bridge: add it6505 driver
+3b15659f5d68b7486f04cbfdad228e5febf66345 FIXUP: FROMLIST: drm/bridge: add it6505 driver
+1a0fe0475f6ca1339614ef7f862b7877516d001a FROMLIST: media: i2c: dw9768: Add DT support and MAINTAINERS entry
+ff293a4d6692926fcdad46ac6313a82ed0c9fb91 FROMLIST: media: i2c: Add DW9768 VCM driver
+7ddec4989cfdf93bdf36c097f1eb8077bcc1abcd FIXUP: FROMLIST: media: i2c: Add DW9768 VCM driver
+09d0fbf984e07abaa46fe5323044c922dc1dac30 FROMLIST: media: dt-bindings: media: i2c: Add bindings for OV02A10
+649bb4174147a7d63a610bb86b442dee6171822d FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+a381d646b404ce94d6c80199bfd9c33142e0841c FIXUP: FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+92b7f61350ade17688b38ef225aa6efeddcafce4 FROMLIST: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet
+739fb5349e3f69dca74e8b5d7421fb3b49f3ed1c FROMLIST: platform/chrome: chromeos_tbmc : Report wake events.
+5e04af21b86aba0e0fa0fcf313aadd99ee9a5004 FIXUP: FROMLIST: media: i2c: Add Omnivision OV02A10 camera sensor driver
+421383301dc6c9eede3904685dada42755548d37 FROMLIST: dt-bindings: mt8183: Added FD dt-bindings
+7bfd24aa5db63cbaa436acf9918f9cb3d32fac48 BACKPORT: FROMLIST: dts: arm64: mt8183: Add FD nodes
+224a9820a3f92a4010da216eff2f2bd5a5ef390d BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+b12aa7ce7855905ec1bf0166e5f525791f2a01d4 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+55d0d3f3451dd2b2abf2e95f21c3853f51f9e9db FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+101275356a3994d26de26256f3e47cedb3d56411 FIXUP: BACKPORT: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+405e889ade24ad68eddeb167814232718a0af4e4 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver
+a1dd43b715a0400960b71c3412094459694696ae FIXUP: FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183
+4027487f45fd979543a66e7fdf0023f7b065a766 FIXUP: BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding
+de2fc9fa4f547135daa7073a477c38d5a237d479 FROMLIST: media: hantro: h264: Fix a comment in b1_ref_list_cmp()
+4cd5c4cbe86ff178f3df8f536ef6fc5bdf7c4aa2 FROMLIST: media: hantro: h264: Rename POC_CMP() into HANTRO_CMP()
+49b053a4e06774026086982d1649502ac1d52606 FROMLIST: media: hantro: h264: Fix the frame_num wraparound case
+3173e7f841f0db70b47184fd9b11d199a1621d73 BACKPORT: FROMLIST: drm/ttm: let ttm_bo_wait timeout be configurable
+572f35be58f69c57cc839a4edc0ae5f7089354d1 FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver (take 2)
+97133b5779a589bcfda4a8816fd1d41b245d534f FIXUP: BACKPORT: FROMLIST: platform: mtk-isp: Add Mediatek FD driver (take 3)
+10b15506bdc4207ebdc50951fe7f6bbf1469abeb FIXUP: FROMLIST: drm/bridge: add it6505 driver (take two)
+d00d2035cb92d610af5fe92b7e155d53d6d73bcc FROMLIST: watchdog: iTCO: Add support for Cannon Lake PCH iTCO
+1fc7bd50ece980d2ff8ca4803f6129f17cca5582 FROMLIST: i2c: i801: Use iTCO version 6 in Cannon Lake PCH and beyond
+2ef848edf3dd1e7c7c829e6e5dde5d65f6dc14da FROMLIST: drm/virtio: Rewrite virtio_gpu_queue_ctrl_buffer using fenced version.
+2e9acfe429b784ab92406e43b030748669ed83e0 FROMLIST: drm/virtio: Use vmalloc for command buffer allocations.
+4073da854c74f8a6a0b3d3e4318f3192409ee69e FROMLIST: media: mtk-vcodec: vdec: fix incorrect pointer dereference
+36b8e0ac11b002ea04dfe7812293a52384a81de5 FROMLIST: media: mtk-vcodec: vdec: set VPI IPI handler in one place
+9f595036e6fc9213a3be72e4e05838218c978aeb FROMLIST: media: mtk-vcodec: vdec: move stateful ops into their own file
+e7a9683fec0fac83be093cdf82f65020772ab4e1 FROMLIST: media: mtk-vcodec: vdec: handle firmware version field
+4833faee5fd2a0a2d37ed94d422b4c6e981e4702 FROMLIST: media: mtk-vcodec: abstract firmware interface
+fc9e50db8d33d87435af0c63b6790e16902884c8 BACKPORT: FROMLIST: media: mtk-vcodec: add SCP firmware ops
+b791307f7cba298c9ac6e670edac48aaeb717d87 BACKPORT: FROMLIST: media: add Mediatek's MM21 format
+0c067003090f6509c57424928dc63e36635bcb9a BACKPORT: FROMLIST: media: doc: Add documentation for MM21 video format
+dbb65e5bf6027de634f3e03b3e01b4122cb6b785 FROMLIST: media: mtk-vcodec: vdec: support stateless API
+31f9ea2329ceef7548e3292d1b0c3bfe52151230 FROMLIST: media: mtk-vcodec: vdec: support stateless H.264 decoding
+d8b73858258f986183a4d46832cf98e344bdaded BACKPORT: FROMLIST: media: mtk-vcodec: vdec: add media device if using stateless api
+9f8a0b993298bc244d7a105fe596a18416a204db FROMLIST: media: mtk-vcodec: enable MT8183 decoder
+6992e016e77d6f0871b760b40bdbdb3a028b698b FIXUP: FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183
+e324987a17340f97dcf31c606eb2bb7e977be3a7 FROMLIST: dt-bindings: display: panel: add boe tv101wum-n53 panel documentation
+ac02f2cebc96f1c4a2da440776428b2ecc8f560c FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel
+1e5b7e6b152059b7db1322b8803d07189617ecde FROMLIST: dt-bindings: display: panel: add AUO auo, b101uan08.3 panel documentation
+1f2a2a6a3cac18fa441654e5fc1c0ceca49c2d6b FROMLIST: drm/panel: support for auo, b101uan08.3 wuxga dsi video mode panel
+36c455de17482144fc2875e4204490f870866162 FROMLIST: dt-binding: mt8183: Add Mediatek MDP3 dt-bindings
+8817b3fbcbbbfa8bdaf97077fb24bf8f2cc887f7 FROMLIST: dts: arm64: mt8183: Add Mediatek MDP3 nodes
+5e4132dc75b7c5d0f25612fd18f1058812263f79 FROMLIST: media: platform: Add Mediatek MDP3 driver KConfig
+3aaa1dfd6a57ae1da76bd19706ac896e398fced0 FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver
+678999f5de26b87d1404d9fd02a54ac2124fa3fd FROMLIST: dt-bindings: soc: add mtk svs dt-bindings
+693f9ee177d82d0feb36619a049b73415277c6fb BACKPORT: FROMLIST: arm64: dts: mt8183: add svs device information
+9b1bdc4568cfee6bc7eb8959873ce461b84a761b FROMLIST: PM / AVS: SVS: Introduce SVS engine
+345b3dc9c739dcd706ef652c4e068cc3bf6322e7 FROMLIST: dt-bindings: mt8183: Added DIP dt-bindings
+11ae30e775863f9e7b00c2d12fdfb227e4e5a77f FROMLIST: dts: arm64: mt8183: Add DIP nodes
+ebb91ad3c90cad55b54001c5e9aec1dfc0f50b32 FROMLIST: media: platform: Add Mediatek DIP driver KConfig
+5ce09d12b9f6bf4a060327e086881ceedff4239d FROMLIST: media: platform: mtk-mdp3: Add struct tuning_addr and img_sw_buffer
+ab922f68712a5768ffb8eca32d37b654738e3ecf FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+c917e05508d50264a3f83c1b38d2860f9f0d1337 FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+61e12ddf8197612c314860cdc6efacf0c37424b6 BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+c23c9eae7e3f06bc29cfb3493a3d6c85ceb9ecca FIXUP: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+21d7588740d9f4e096005af37caa623d3d58f8f1 BACKPORT: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig
+3d6a9dd40289c9992eb4705c6c5a55e9c523c9e1 FIXUP: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig
+f31080071fedb992d4f6811ad960e00a563b5d42 FROMLIST: dt-bindings: mt8183: Add sensor interface dt-bindings
+dfd87e4b22ee5a08d8b3f66c92f4dbe7b4d406ba BACKPORT: FROMLIST: dts: arm64: mt8183: Add sensor interface nodes
+460d79c74d89329c715f046a54c1e8394ac0d76e FROMLIST: media: dt-bindings: media: i2c: Add bindings for ov8856
+b8b97c2ff7c4f7eac9f656bdad35f8a1389a945f FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+1b1008f1812fa64b30b1a4b564f8ac2865fc85b2 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+b055f6b00d16a4cf0c76695773d2e59a04a073c7 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+5bcdd900a5509775b18bbf2edc696bc7176b29d4 FIXUP: FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel
+e09014601ed43aa5a9b9c4fff1f2bb56d1eff1fb FIXUP: FROMLIST: media: i2c: Add DW9768 VCM driver
+c6e6aa26125d5d4a496018d396955eeae7cd5aee FIXUP: BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver
+ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine

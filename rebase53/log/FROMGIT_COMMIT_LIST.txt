@@ -1222,3 +1222,93 @@ e6afc423280366fb36722f0b776d9a2a14f39265 FROMGIT: media: hantro: Support RK3399 
 e612335072df632371c6aabad9cb5dc195e8def8 FROMGIT: media: staging: hantro: avoid future namespace collisions
 fe408bed35d5a4b67ac9581450da86668854705b FROMGIT: ASoC: mediatek: mt6358: add delay after dmic clock on
 8b26bb7109f3af57736504473060c04635b958e6 FROMGIT: Input: cros_ec_keyb - add back missing mask for event_type
+885bd843251834651ff708d0d31b6b01fba4b78f FROMGIT: PM / wakeup: Drop wakeup_source_init(), wakeup_source_prepare()
+0fe794cc4deb2517b9265248a391b833a7ce02d8 FROMGIT: PM / wakeup: Use wakeup_source_register() in wakelock.c
+ef228d4a2998f1a6f382381e8ab5e30a38f40820 FROMGIT: PM / wakeup: Show wakeup sources stats in sysfs
+a5caab61a2baebc1ca1c1cda5a636e4a61b306fc FROMGIT: PM / wakeup: Fix sysfs registration error path
+9ebfc883b98caf56fa3e0a817e1e85977b260b9f FROMGIT: PM / wakeup: Register wakeup class kobj after device is added
+cd5a4da14c862674d01685477c56aa2e2346a8ef FROMGIT: PM / wakeup: Unexport wakeup_source_sysfs_{add,remove}()
+a729ca540033202d9744956c8fbe6fc0b6dca7db FROMGIT: arm64: map FDT as RW for early_init_dt_scan()
+b70ee078adc5070a12dba3f4ec6494c210b3c45d FROMGIT: fdt: add support for rng-seed
+f15aa0ec373c094fd9dc04d9a472bd982d887491 FROMGIT: fdt: Update CRC check for rng-seed
+31bd349342b8854c9f9eaf53a434a554c2aab947 FROMGIT: arm64: dts: mt8183: fix pwrap gic number
+c5ee235b80c2448e323ef69fad255730dbc41b7c FROMGIT: ASoC: mediatek: mt8183-mt6358-ts3a227-max98357: remove unused variables
+807ceb1cc6cda12f773af3759d56a5bec9d49d8a FROMGIT: ASoC: mediatek: mt8183: switch tdm pins gpio function when playback on or off
+fbbcd6553072d8cfd43b964ac0761d42ae338cb6 FROMGIT: ASoC: mediatek: mt8183: remove unused DAPM-related variables
+b16cd94f517a51cba95db25d0015deddb70e6b7d FROMGIT: ASoC: mediatek: mt8183: fix tdm out data align issue
+2020662f509c0dca7ff1ed22820fd3e5a156000d FROMGIT: ASoC: mediatek: mt8183: tdm hw support tdm out and 8ch i2s out
+f11dabb77e129a8c8f75a8a601fe6f86407843c2 FROMGIT: ASoC: mediatek: mt8183: fix tdm out data is valid on rising edge
+712ee33503ec810da2866a6dff8674bc980b24ca FROMGIT: platform/chrome: cros_ec_rpmsg: Add host command AP sleep state support
+b253dc3bcf4ec9fe21de714f294f7048543d23fd FROMGIT: soc: mediatek: cmdq: reorder the parameter
+fc4d993062476545fde43d4583010e68f90f44a0 FROMGIT: soc: mediatek: cmdq: change the type of input parameter
+b5e285363db9f40c5f913026ac0879b79be0d9cc FROMGIT: memory: mtk-smi: Use a general config_port interface
+4809a2db519a75760caa53fbd338395a0e3bc91b FROMGIT: iommu/mediatek: Fix iova_to_phys PA start for 4GB mode
+172ceda3ba9a2cdc3bbd61b648409d07a021ab98 FROMGIT: iommu/io-pgtable-arm-v7s: Use ias/oas to check the valid iova/pa
+ab447b110ecf479c21fb0ffbfde4828771db4995 FROMGIT: iommu/io-pgtable-arm-v7s: Rename the quirk from MTK_4GB to MTK_EXT
+5f1b6f933b956ef18b0e55eaa50768f7d2215ba8 FROMGIT: iommu/io-pgtable-arm-v7s: Extend to support PA[33:32] for MediaTek
+f7b295f595826caaa0a874a383fdc8e1501ba898 FROMGIT: iommu/mediatek: Adjust the PA for the 4GB Mode
+f65c689ccb59b15720566cdddc3dd2252e92bb11 FROMGIT: iommu/mediatek: Add bclk can be supported optionally
+b736c31a31dec8b9ff4a3404b1009c4cd6782beb FROMGIT: iommu/mediatek: Add larb-id remapped support
+d26c6e83f8b8722ac1be8f9fa71bc4a0db2f078e FROMGIT: iommu/mediatek: Refine protect memory definition
+c63304f6fe92538f5f7a76b1a038cd84d63c8719 FROMGIT: iommu/mediatek: Move reset_axi into plat_data
+8edbfe65a2981dadb9d5cfee5f772058cf8a95cc FROMGIT: iommu/mediatek: Move vld_pa_rng into plat_data
+1478dacf3502fde87e5d1598209e25069f69f0f0 FROMGIT: memory: mtk-smi: Add gals support
+2c85f4986120c29ec1bdedb4707ddd4a3249af85 FROMGIT: iommu/mediatek: Add mt8183 IOMMU support
+9739717144bd93c27c522b603a61eeb53088b0f5 FROMGIT: iommu/mediatek: Add mmu1 support
+c415ddd8f61e3e0ddfa6c1ea172939c2884767a6 FROMGIT: memory: mtk-smi: Invoke pm runtime_callback to enable clocks
+90ee513a2a100a23bf6a8e97895be441270cad90 FROMGIT: memory: mtk-smi: Add bus_sel for mt8183
+4ce92c5ff66fa8e79b2edfc87f6e9e6d2a8614ca FROMGIT: iommu/mediatek: Fix VLD_PA_RNG register backup when suspend
+862b6308ac74f0e5f0a5adb91396646b0b3d61de FROMGIT: memory: mtk-smi: Get rid of need_larbid
+529311886658cb84fb94d15070e89d6a3db491c8 FROMGIT: iommu/mediatek: Clean up struct mtk_smi_iommu
+c0cabec97571ed28ae3e62b0fb17ddb547a25dd3 FROMGIT: ASoC: rt1011: add mutex protection to set_fmt/set_tdm_slot
+e3565912f7cf5fb1c000774840b09dd59fd3a37d FROMGIT: mmc: mediatek: enable SDIO IRQ low level trigger function
+607fe81841ee820cd2e57750a4e8bdb02d63cc20 FROMGIT: MAINTAINERS: Add entry for stable backlight sysfs ABI documentation
+d41866a9d8a2813d5b4657c5e53295a3702ce720 FROMGIT: backlight: Expose brightness curve type through sysfs
+fee34e3f658ea83845545fe1cc3a57a01773e228 FROMGIT: backlight: pwm_bl: Set scale type for CIE 1931 curves
+c33cb75e5629e9b951c7b7bef1eafa8e2bed81e7 FROMGIT: backlight: pwm_bl: Set scale type for brightness curves specified in the DT
+7081316c2b39b552ecefda5cc5e57f91bc1c7301 FROMGIT: dt-bindings: display: mediatek: update dsi supported chips
+9f43048dfdeb515fbda2e44af5ad74297dfe70fd FROMGIT: drm/mediatek: separate mipi_tx to different file
+dee2ba436fdff989e6143165c9a3d1da61229dc4 FROMGIT: drm/mediatek: add mipi_tx driver for mt8183
+7a1e4f4fda0711afdb7e64bb82b548698f9e46ac FIXUP: FROMGIT: drm/mediatek: change the dsi phytiming calculate method
+56c3f426a7e59fa420356542e60f8d52fc2cc69e FROMGIT: media: v4l2-mem2mem: reorder checks in v4l2_m2m_poll()
+2eeb84cb2903ae93555ca1d4b2d724d56577ff18 FROMGIT: media: videodev2.h: add V4L2_FMT_FLAG_CONTINUOUS_BYTESTREAM
+74a505124fd8e5397a7529f81b6607572ffcba1a FROMGIT: media: videodev2.h: add V4L2_FMT_FLAG_DYN_RESOLUTION
+81c8fee085684da216996a146bed763a0a31907e FROMGIT: media: mtk-vcodec: Handle H264 error bitstreams
+3f2ddedd20596ad5cd1bb5f1bcf0ce81e823917e FROMGIT: media: mtk-vcodec: flag OUTPUT formats with V4L2_FMT_FLAG_DYN_RESOLUTION
+9945f00b93103923e5d18380e0e33513951ebc0b FROMGIT: media: venus: venc: amend buffer size for bitstream plane
+5ec3ded83114b21a7aecc7eac5a08c2047f37452 FROMGIT: media: venus: helpers: export few helper functions
+5e0ccc5fa7cb554c572fa98e83cfd87927fa017d FROMGIT: media: venus: hfi: add type argument to hfi flush function
+0e41beb03cd4c541bcc483e142d555683ded0ca3 FROMGIT: media: venus: hfi: export few HFI functions
+2afb8b724eeeedb1323c8674e9bc8b236cd62cb9 FROMGIT: media: venus: hfi: return an error if session_init is already called
+53082c4c40a773fc5d1c039e1620685f4f04e643 FROMGIT: media: venus: helpers: add three more helper functions
+6495ec64ab2d2f70ae7114ec74b321e46314feee FROMGIT: media: venus: vdec_ctrls: get real minimum buffers for capture
+f00871b3c436106db6c2a2ad65b9f85a7c82058d FROMGIT: media: venus: vdec: allow bigger sizeimage set by clients
+719642f59b509c5a80db42d7d6f755649fcfd78e FROMGIT: media: venus: make decoder compliant with stateful codec API
+a2713f350e5fe52cdf4bbbe93ef7273363fa5d17 FROMGIT: media: venus: helpers: handle correctly vbuf field
+4831b49ded478c9bf53cb89fa67f0a1c76ea2423 FROMGIT: media: venus: dec: populate properly timestamps and flags for capture buffers
+c0c06826fa5774e6f01a39ac9531b3c27b06ef08 FROMGIT: media: venus: vdec: flag OUTPUT formats with V4L2_FMT_FLAG_DYN_RESOLUTION
+8acb48f154654d0d5435df07ec50569788891e1f FROMGIT: media: don't do a 31 bit shift on a signed int
+73903bba167b1236a6c3fc4ee0b8bbb7db9d2e90 BACKPORT: FROMGIT: media: uapi: h264: Rename pixel format
+d1d7e0bd0fd240ec877939644442d6b66d85663b FROMGIT: firmware: google: check if size is valid when decoding VPD data
+66979993558dfa5ded9db8b1fc3fdbbd67e0c617 FROMGIT: mmc: core: Add helper function to indicate if SDIO IRQs is enabled
+e49908dd987872a2778023aa89681b8a8c2ee377 FROMGIT: mmc: dw_mmc: Re-store SDIO IRQs mask at system resume
+2e5642cbcd2ffb0a8b55f2e576ef462ae76117f9 FROMGIT: mmc: mtk-sd: Re-store SDIO IRQs mask at system resume
+6b61ee4ec1fdf9dbc09101be8e75674bbb7aa7a4 FROMGIT: mmc: core: Move code to get pending SDIO IRQs to a function
+47c004feb0e805d4c9e48a8abd845dfd316da367 FROMGIT: mmc: core: Clarify sdio_irq_pending flag for MMC_CAP2_SDIO_IRQ_NOTHREAD
+2603b91730467c9b1fe060b93a1f308a14b535dd FROMGIT: mmc: core: Clarify that the ->ack_sdio_irq() callback is mandatory
+715a6ed3cf2ef6ab0b9f6f52b6d9b71443038709 FROMGIT: mmc: core: WARN if SDIO IRQs are enabled for non-powered card in suspend
+269b8e06fced41c4c8202520a8242e52b16975dc FROMGIT: mmc: core: Fixup processing of SDIO IRQs during system suspend/resume
+abff48ac1b837d652bcebc891e8f6cc5e4248ccd FROMGIT: ASoC: SOF: Intel: hda: Initialize HDA controller after i915 init
+0f619e47767dec8a7943b061f9f03e623cb13a25 FIXUP: FROMGIT: drm: dw-hdmi-i2s: enable audio clock in audio_startup
+d5ecf6d8c93453fc4aad04fe31bfd9ebe7817c4e FROMGIT: ASoC: intel: cht_bsw_max98090_ti: Add all Chromebooks that need pmc_plt_clk_0 quirk
+d1853a9b3da14b1d18a3fa67bcf20c4abda36ba0 FIXUP: FROMGIT: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet
+eeac8f097d7ab3e1942a0cbf22ca578c18cbb240 FROMGIT: drm/bridge: dw-hdmi-i2s: support more i2s format
+c3b35f0a49624127dfbcda0421ae9afd5734cde4 FROMGIT: drm/bridge: dw-hdmi: move audio channel setup out of ahb
+be6f633a643134fd1a1185e78b6b02f141b66096 FROMGIT: drm/bridge: dw-hdmi: set channel count in the infoframes
+29520776313bc119f3cf3b01c1641a0d535b49ab FROMGIT: drm/bridge: dw-hdmi-i2s: enable lpcm multi channels
+c3f0810475486d45cd9c21db3198736f5904d2be FROMGIT: drm/bridge: dw-hdmi-i2s: set the channel allocation
+a553fd19efdc76e5e96dfef552aa852034d35719 FROMGIT: drm/bridge: dw-hdmi-i2s: reset audio fifo before applying new params
+d6128e660d8a13a8c6daf45a50033debeef3a4b0 FROMGIT: drm/bridge: dw-hdmi-i2s: enable only the required i2s lanes
+8913bb87f18b4c923095781cd30a4ee0d8f68a63 FROMGIT: drm/bridge: dw-hdmi-i2s: add .get_eld support
+81a9cfa8e3c469a03c7ec4f451b5ced058c98115 FROMGIT: drm: bridge/dw_hdmi: add audio sample channel status setting
+b5811c5300a5c82d0f92455050920b5071fa195f BACKPORT/FROMGIT: drm/i915/vbt: Fix VBT parsing for the PSR section

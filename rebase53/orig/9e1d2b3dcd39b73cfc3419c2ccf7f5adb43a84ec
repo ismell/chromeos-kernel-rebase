@@ -1,0 +1,52 @@
+From 9e1d2b3dcd39b73cfc3419c2ccf7f5adb43a84ec Mon Sep 17 00:00:00 2001
+From: Gwendal Grignou <gwendal@chromium.org>
+Date: Mon, 26 Aug 2019 16:02:58 -0700
+Subject: [PATCH] BACKPORT: FROMLIST: iio: cros_ec: set calibscale for 3d MEMS
+ to unit vector
+
+By default, set the calibscale vector to unit vector.
+When calibrating one axis, the other axis calibrations  are sent as well.
+If left to 0, sensor data from uncalibrated axis are zero'ed out until
+all axis are calibrated.
+
+Fixes: ed1f2e85da79 ("iio: cros_ec: Add calibscale for 3d MEMS ")
+
+BUG=b:112957338
+TEST=On eve with current firmware, check reading calibscale returns 1.0,
+check with newer firmware values are applied.
+
+(am from https://patchwork.kernel.org/patch/11115775/)
+
+Change-Id: I3bd4126f511cd900653a3a788e0216020b85020c
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1750224
+---
+ drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+index 7b5a861218270..209932246f25d 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+@@ -114,7 +114,7 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
+ 	struct cros_ec_dev *ec = dev_get_drvdata(pdev->dev.parent);
+ 	struct cros_ec_sensor_platform *sensor_platform = dev_get_platdata(dev);
+ 	u32 ver_mask = 0;
+-	int ret;
++	int ret, i;
+ 
+ 	platform_set_drvdata(pdev, indio_dev);
+ 
+@@ -177,6 +177,9 @@ int cros_ec_sensors_core_init(struct platform_device *pdev,
+ 
+ 		/* Set sign vector, only used for backward compatibility. */
+ 		memset(state->sign, 1, CROS_EC_SENSOR_MAX_AXIS);
++
++		for (i = CROS_EC_SENSOR_X; i < CROS_EC_SENSOR_MAX_AXIS; i++)
++			state->calib[i].scale = MOTION_SENSE_DEFAULT_SCALE;
+ 	}
+ 
+ 	return 0;
+-- 
+2.23.0.351.gc4317032e6-goog
+

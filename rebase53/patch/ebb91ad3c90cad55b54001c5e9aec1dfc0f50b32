@@ -1,0 +1,60 @@
+From cfa2f8f737a1b3214f6b315ad59665e63dc227bc Mon Sep 17 00:00:00 2001
+From: Frederic Chen <frederic.chen@mediatek.com>
+Date: Tue, 10 Sep 2019 03:22:42 +0800
+Subject: [PATCH] FROMLIST: media: platform: Add Mediatek DIP driver KConfig
+
+This patch adds KConfig for Mediatek Digital Image Processing
+driver(DIP). DIP is embedded in Mediatek SoCs. It provides
+image format conversion, resizing, and rotation function.
+
+(am from https://patchwork.kernel.org/patch/11138499/)
+
+TEST=build pass
+BUG=b:140012892, b:111289971
+
+Change-Id: I41ca60ead8701837a4c3cd30851ed2e0c5ac26d7
+Signed-off-by: Frederic Chen <frederic.chen@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1798065
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+Commit-Queue: Nicolas Boichat <drinkcat@chromium.org>
+Tested-by: Nicolas Boichat <drinkcat@chromium.org>
+
+[rebase53(rrangel):
+	* Add missing dependency
+]
+---
+ drivers/media/platform/mtk-isp/Kconfig | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/media/platform/mtk-isp/Kconfig b/drivers/media/platform/mtk-isp/Kconfig
+index 4e4bd22626f04..ad35ea69a3592 100644
+--- a/drivers/media/platform/mtk-isp/Kconfig
++++ b/drivers/media/platform/mtk-isp/Kconfig
+@@ -15,3 +15,24 @@ config VIDEO_MEDIATEK_ISP_PASS1
+ 		Choose y if you want to use Mediatek SoCs to create image
+ 		captured application such as video recording and still image
+ 		capturing.
++
++config VIDEO_MEDIATEK_ISP_DIP
++	tristate "Mediatek Digital Image Processing function"
++	select VIDEO_V4L2_SUBDEV_API
++	select VIDEOBUF2_DMA_CONTIG
++	select VIDEOBUF2_CORE
++	select VIDEOBUF2_V4L2
++	select VIDEOBUF2_MEMOPS
++	select MEDIA_CONTROLLER
++	select MTK_SCP
++
++	default n
++	help
++	    Support the basic Digital Image Processing (DIP) driver.
++
++	    DIP driver provides image format conversion, resizing,
++	    and rotation function through the low power hardware.
++	    DIP also supports multiple output feature. It can
++	    generate two or more output image with different effect
++	    based on a single input image at the same time.
++
+-- 
+2.23.0.351.gc4317032e6-goog
+

@@ -1,0 +1,110 @@
+From 5fba893902b79c5816747e438f5520f303680f44 Mon Sep 17 00:00:00 2001
+From: Rob Clark <robdclark@chromium.org>
+Date: Tue, 13 Aug 2019 16:23:21 -0700
+Subject: [PATCH] CHROMIUM: arm: add arch_sync_dma_for_*()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG=chromium:983368
+TEST=vgem_test on cheza
+
+Change-Id: If5483dee885941887dfa2b540089588011115136
+Signed-off-by: Rob Clark <robdclark@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1754641
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+Commit-Queue: Douglas Anderson <dianders@chromium.org>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+
+[rebase53(rrangel):
+* Conflicts:
+  * arch/arm/Kconfig: ARCH_HAS_SYNC_DMA_FOR_CPU and ARCH_HAS_SYNC_DMA_FOR_DEVICE
+    were selected by 936376f88ff1845b384b3a82b9cd167e53039229.
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ arch/arm/mm/dma-mapping-nommu.c | 14 ++++++++++++++
+ arch/arm/mm/dma-mapping.c       | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
+
+diff --git a/arch/arm/mm/dma-mapping-nommu.c b/arch/arm/mm/dma-mapping-nommu.c
+index 52b82559d99b3..4a3df952151f2 100644
+--- a/arch/arm/mm/dma-mapping-nommu.c
++++ b/arch/arm/mm/dma-mapping-nommu.c
+@@ -84,6 +84,13 @@ static void __dma_page_cpu_to_dev(phys_addr_t paddr, size_t size,
+ 		outer_clean_range(paddr, paddr + size);
+ }
+ 
++void arch_sync_dma_for_device(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_cpu_to_dev(paddr, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_device);
++
+ static void __dma_page_dev_to_cpu(phys_addr_t paddr, size_t size,
+ 				  enum dma_data_direction dir)
+ {
+@@ -93,6 +100,13 @@ static void __dma_page_dev_to_cpu(phys_addr_t paddr, size_t size,
+ 	}
+ }
+ 
++void arch_sync_dma_for_cpu(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_dev_to_cpu(paddr, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_cpu);
++
+ static dma_addr_t arm_nommu_dma_map_page(struct device *dev, struct page *page,
+ 					 unsigned long offset, size_t size,
+ 					 enum dma_data_direction dir,
+diff --git a/arch/arm/mm/dma-mapping.c b/arch/arm/mm/dma-mapping.c
+index d42557ee69c28..c588f879012be 100644
+--- a/arch/arm/mm/dma-mapping.c
++++ b/arch/arm/mm/dma-mapping.c
+@@ -979,6 +979,13 @@ static void __dma_page_cpu_to_dev(struct page *page, unsigned long off,
+ 	/* FIXME: non-speculating: flush on bidirectional mappings? */
+ }
+ 
++void arch_sync_dma_for_device(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_cpu_to_dev(phys_to_page(paddr), paddr % PAGE_SIZE, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_device);
++
+ static void __dma_page_dev_to_cpu(struct page *page, unsigned long off,
+ 	size_t size, enum dma_data_direction dir)
+ {
+@@ -1013,6 +1020,27 @@ static void __dma_page_dev_to_cpu(struct page *page, unsigned long off,
+ 	}
+ }
+ 
++void arch_sync_dma_for_cpu(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_page_dev_to_cpu(phys_to_page(paddr), paddr % PAGE_SIZE, size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_cpu);
++
++/*
++ * arch_dma_{alloc,free} fail-stubs needed to avoid link-errors in dma/direct.c
++ * (which is not actually used on arch/arm)
++ */
++void *arch_dma_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
++		gfp_t flags, unsigned long attrs)
++{
++	return NULL;
++}
++void arch_dma_free(struct device *dev, size_t size, void *vaddr,
++		dma_addr_t dma_handle, unsigned long attrs)
++{
++}
++
+ /**
+  * arm_dma_map_sg - map a set of SG buffers for streaming mode DMA
+  * @dev: valid struct device pointer, or NULL for ISA and EISA-like devices
+-- 
+2.23.0.351.gc4317032e6-goog
+

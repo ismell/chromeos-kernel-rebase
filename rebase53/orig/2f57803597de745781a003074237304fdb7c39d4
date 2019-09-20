@@ -1,0 +1,76 @@
+From 2f57803597de745781a003074237304fdb7c39d4 Mon Sep 17 00:00:00 2001
+From: Allen Chen <allen.chen@ite.com.tw>
+Date: Tue, 3 Sep 2019 18:51:53 +0800
+Subject: [PATCH] FROMLIST: dt-bindings: Add binding for IT6505.
+
+Add a DT binding documentation for IT6505.
+
+Signed-off-by: Allen Chen <allen.chen@ite.com.tw>
+
+(am from https://lore.kernel.org/patchwork/patch/1123245/)
+
+BUG=b:126007406
+TEST=manually
+
+Change-Id: I1db1cc9ee2fed958f8cf32726a7d99bc5f6d1233
+Signed-off-by: Pi-Hsun Shih <pihsun@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1577251
+Reviewed-by: Nicolas Boichat <drinkcat@chromium.org>
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+---
+ .../bindings/display/bridge/ite,it6505.txt    | 30 +++++++++++++++++++
+ .../devicetree/bindings/vendor-prefixes.txt   |  1 +
+ 2 files changed, 31 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/display/bridge/ite,it6505.txt
+
+diff --git a/Documentation/devicetree/bindings/display/bridge/ite,it6505.txt b/Documentation/devicetree/bindings/display/bridge/ite,it6505.txt
+new file mode 100644
+index 0000000000000..c3506ac4c9800
+--- /dev/null
++++ b/Documentation/devicetree/bindings/display/bridge/ite,it6505.txt
+@@ -0,0 +1,30 @@
++iTE it6505 DP bridge bindings
++
++Required properties:
++        - compatible: "ite,it6505"
++        - reg: i2c address of the bridge
++        - ovdd-supply: I/O voltage
++        - pwr18-supply: Core voltage
++        - interrupts: interrupt specifier of INT pin
++        - reset-gpios: gpio specifier of RESET pin
++
++Example:
++	it6505dptx: it6505dptx@5c {
++                compatible = "ite,it6505";
++                status = "okay";
++                interrupt-parent = <&pio>;
++                interrupts = <152 IRQ_TYPE_EDGE_RISING 152 0>;
++                reg = <0x5c>;
++                pinctrl-names = "default";
++                pinctrl-0 = <&it6505_pins>;
++                ovdd-supply = <&mt6358_vsim1_reg>;
++                pwr18-supply = <&it6505_pp18_reg>;
++                reset-gpios = <&pio 179 1>;
++                hpd-gpios = <&pio 9 0>;
++                extcon = <&usbc_extcon>;
++                port {
++                        it6505_in: endpoint {
++                                remote-endpoint = <&dpi_out>;
++                        };
++                };
++        };
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index 2c3fc512e7466..c088646f3f1e3 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -184,6 +184,7 @@ iom	Iomega Corporation
+ isee	ISEE 2007 S.L.
+ isil	Intersil
+ issi	Integrated Silicon Solutions Inc.
++ite	iTE Tech. Inc.
+ itead	ITEAD Intelligent Systems Co.Ltd
+ iwave  iWave Systems Technologies Pvt. Ltd.
+ jdi	Japan Display Inc.
+-- 
+2.23.0.351.gc4317032e6-goog
+
