@@ -6738,3 +6738,8 @@ c6e6aa26125d5d4a496018d396955eeae7cd5aee FIXUP: BACKPORT: FROMLIST: media: platf
 f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver
 ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
 fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine
+ed3adf28d4bb2fbfc1353f2cbfc52228059f52af CHROMIUM: config: Turn on ROCKCHIP_EFUSE for arm32
+c352472d3904d7e191fb3c73ea54b8cfd5e16974 UPSTREAM: xhci: fix possible memleak on setup address fails.
+d145cca29f845e55e353cbb86fa9391a71f71dbb CHROMIUM: ARM64: dts: mt8183-jacuzzi: Add i2c2 and i2c4 attribute
+99b6cc1efda7eff87fa910c1ccfe9f3dbce0b4dc CHROMIUM: config: Re-enable CONFIG_I2C_DESIGNWARE_PLATFORM
+2670397aad54ecf2b6dbd236af12d4d0c92a6644 FROMLIST: KVM: coalesced_mmio: add bounds checking

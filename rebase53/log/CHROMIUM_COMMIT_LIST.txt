@@ -1842,3 +1842,6 @@ f0cac5f5cd066c102cd8928801674b1bfe025ffc CHROMIUM: config: Enable CONFIG_VIDEO_O
 b37426d5170a648b12c8e311ccca33912e78834c CHROMIUM: ARM64: dts: mt8183: Add port nodes to seninf and camisp
 8299cf8f42c3fbf41f279ed0eaa6ac9766533d62 CHROMIUM: ARM64: dts: mt8183-kukui*: Add camera nodes
 90d558344b1533ddfa18bdcbfb77e343dd3bc66a CHROMIUM: ARM64: dts: mt8183-kukui: Remove DIP reserved memory
+ed3adf28d4bb2fbfc1353f2cbfc52228059f52af CHROMIUM: config: Turn on ROCKCHIP_EFUSE for arm32
+d145cca29f845e55e353cbb86fa9391a71f71dbb CHROMIUM: ARM64: dts: mt8183-jacuzzi: Add i2c2 and i2c4 attribute
+99b6cc1efda7eff87fa910c1ccfe9f3dbce0b4dc CHROMIUM: config: Re-enable CONFIG_I2C_DESIGNWARE_PLATFORM
