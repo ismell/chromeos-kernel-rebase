@@ -1,0 +1,424 @@
+From 12a1f0529ed07cbd7ee28c45d79356210be304cf Mon Sep 17 00:00:00 2001
+From: Jungo Lin <jungo.lin@mediatek.com>
+Date: Thu, 25 Jul 2019 09:46:55 +0800
+Subject: [PATCH] HACK: CHROMIUM: platform: mtk-isp: AAO/AFO non-request
+ support
+
+This patch supports meta0/meta1 with non-request support
+for 3A requirements.
+
+This patch needs to be reverted when b/140397121 is fixed.
+
+BUG=b:111289971
+BUG=b:140012036
+BUG=b:140397121
+TEST=build pass
+
+Change-Id: Ie4c834415f677c74acb586cd8ec4c38a1729e128
+Signed-off-by: Jungo Lin <jungo.lin@mediatek.com>
+Signed-off-by: Bibby Hsieh <bibby.hsieh@mediatek.com>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1781422
+Reviewed-by: Tomasz Figa <tfiga@chromium.org>
+Tested-by: Nicolas Boichat <drinkcat@chromium.org>
+Commit-Queue: Nicolas Boichat <drinkcat@chromium.org>
+Commit-Queue: Tomasz Figa <tfiga@chromium.org>
+---
+ .../platform/mtk-isp/isp_50/cam/mtk_cam-hw.c  | 99 +++++++++++++++++--
+ .../platform/mtk-isp/isp_50/cam/mtk_cam-hw.h  |  6 ++
+ .../platform/mtk-isp/isp_50/cam/mtk_cam-ipi.h |  2 +
+ .../mtk-isp/isp_50/cam/mtk_cam-regs.h         | 10 ++
+ .../platform/mtk-isp/isp_50/cam/mtk_cam.c     | 69 ++++++++++++-
+ .../platform/mtk-isp/isp_50/cam/mtk_cam.h     |  3 +
+ 6 files changed, 176 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.c b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.c
+index 68a9560030069..716039d2d12ab 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.c
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.c
+@@ -117,6 +117,19 @@ static void isp_composer_uninit(struct mtk_isp_p1_device *p1_dev)
+ 	scp_ipi_unregister(p1_dev->scp_pdev, SCP_IPI_ISP_FRAME);
+ }
+ 
++static void isp_composer_meta_config(struct mtk_isp_p1_device *p1_dev,
++				     unsigned int dma)
++{
++	struct mtk_isp_scp_p1_cmd composer_tx_cmd;
++
++	memset(&composer_tx_cmd, 0, sizeof(composer_tx_cmd));
++	composer_tx_cmd.cmd_id = ISP_CMD_CONFIG_META;
++	composer_tx_cmd.enabled_dmas = dma;
++
++	scp_ipi_send(p1_dev->scp_pdev, SCP_IPI_ISP_CMD, &composer_tx_cmd,
++		     sizeof(composer_tx_cmd), MTK_ISP_IPI_SEND_TIMEOUT);
++}
++
+ static void isp_composer_hw_init(struct mtk_isp_p1_device *p1_dev)
+ {
+ 	struct mtk_isp_scp_p1_cmd composer_tx_cmd;
+@@ -195,13 +208,18 @@ int mtk_isp_hw_init(struct mtk_cam_dev *cam)
+ 		return ret;
+ 
+ 	pm_runtime_get_sync(dev);
++
+ 	isp_composer_hw_init(p1_dev);
++	isp_composer_meta_config(p1_dev, cam->enabled_dmas);
+ 
+ 	p1_dev->enqueued_frame_seq_no = 0;
+ 	p1_dev->dequeued_frame_seq_no = 0;
+ 	p1_dev->composed_frame_seq_no = 0;
+ 	p1_dev->sof_count = 0;
+ 
++	p1_dev->meta0_vb2_index = 0;
++	p1_dev->meta1_vb2_index = 0;
++
+ 	dev_dbg(dev, "%s done\n", __func__);
+ 
+ 	return 0;
+@@ -222,6 +240,28 @@ int mtk_isp_hw_release(struct mtk_cam_dev *cam)
+ 	return 0;
+ }
+ 
++void mtk_isp_enqueue(struct mtk_cam_dev *cam, unsigned int dma_port,
++		     struct mtk_cam_dev_buffer *buffer)
++{
++	struct mtk_isp_p1_device *p1_dev = dev_get_drvdata(cam->dev);
++	struct mtk_isp_scp_p1_cmd cmd_params;
++
++	if (!cam->enabled_dmas) {
++		dev_dbg(cam->dev, "Discard meta buf. when dma is disabled\n");
++		return;
++	}
++
++	memset(&cmd_params, 0, sizeof(cmd_params));
++	cmd_params.cmd_id = ISP_CMD_ENQUEUE_META;
++	cmd_params.meta_frame.enabled_dma = dma_port;
++	cmd_params.meta_frame.vb_index = buffer->vbb.vb2_buf.index;
++	cmd_params.meta_frame.meta_addr.iova = buffer->daddr;
++	cmd_params.meta_frame.meta_addr.scp_addr = buffer->scp_addr;
++
++	scp_ipi_send(p1_dev->scp_pdev, SCP_IPI_ISP_CMD,
++		     &cmd_params, sizeof(cmd_params), MTK_ISP_IPI_SEND_TIMEOUT);
++}
++
+ void mtk_isp_req_enqueue(struct mtk_cam_dev *cam,
+ 			 struct mtk_cam_dev_request *req)
+ {
+@@ -237,8 +277,43 @@ void mtk_isp_req_enqueue(struct mtk_cam_dev *cam,
+ 		cam->running_job_count);
+ }
+ 
++static void isp_irq_handle_event(struct mtk_isp_p1_device *p1_dev,
++				 unsigned int irq_status,
++				 unsigned int dma_status)
++{
++	if (irq_status & HW_PASS1_DON_ST && dma_status & AAO_DONE_ST)
++		mtk_cam_dev_dequeue_frame(&p1_dev->cam_dev,
++					  MTK_CAM_P1_META_OUT_0,
++					  p1_dev->dequeued_frame_seq_no,
++					  p1_dev->meta0_vb2_index);
++
++	if (dma_status & AFO_DONE_ST)
++		mtk_cam_dev_dequeue_frame(&p1_dev->cam_dev,
++					  MTK_CAM_P1_META_OUT_1,
++					  p1_dev->dequeued_frame_seq_no,
++					  p1_dev->meta1_vb2_index);
++
++	if (irq_status & SW_PASS1_DON_ST) {
++		mtk_cam_dev_dequeue_frame(&p1_dev->cam_dev,
++					  MTK_CAM_P1_META_OUT_0,
++					  p1_dev->dequeued_frame_seq_no,
++					  p1_dev->meta0_vb2_index);
++		mtk_cam_dev_dequeue_req_frame(&p1_dev->cam_dev,
++					      p1_dev->dequeued_frame_seq_no);
++		mtk_cam_dev_req_try_queue(&p1_dev->cam_dev);
++	}
++
++	dev_dbg(p1_dev->dev,
++		"%s IRQ:0x%x DMA:0x%x seq:%d idx0:%d idx1:%d\n",
++		__func__, irq_status, dma_status,
++		p1_dev->dequeued_frame_seq_no, p1_dev->meta0_vb2_index,
++		p1_dev->meta1_vb2_index);
++}
++
+ static void isp_irq_handle_sof(struct mtk_isp_p1_device *p1_dev,
+-			       unsigned int dequeued_frame_seq_no)
++			       unsigned int dequeued_frame_seq_no,
++			       unsigned int meta0_vb2_index,
++			       unsigned int meta1_vb2_index)
+ {
+ 	dma_addr_t base_addr = p1_dev->composer_iova;
+ 	struct device *dev = p1_dev->dev;
+@@ -252,6 +327,8 @@ static void isp_irq_handle_sof(struct mtk_isp_p1_device *p1_dev,
+ 	p1_dev->sof_count += 1;
+ 	/* Save frame information */
+ 	p1_dev->dequeued_frame_seq_no = dequeued_frame_seq_no;
++	p1_dev->meta0_vb2_index = meta0_vb2_index;
++	p1_dev->meta1_vb2_index = meta1_vb2_index;
+ 
+ 	req = mtk_cam_dev_get_req(&p1_dev->cam_dev, dequeued_frame_seq_no);
+ 	if (req)
+@@ -264,6 +341,7 @@ static void isp_irq_handle_sof(struct mtk_isp_p1_device *p1_dev,
+ 			composed_frame_seq_no, dequeued_frame_seq_no);
+ 		return;
+ 	}
++
+ 	addr_offset = MTK_ISP_CQ_ADDRESS_OFFSET *
+ 		(dequeued_frame_seq_no % MTK_ISP_CQ_BUFFER_COUNT);
+ 	writel(base_addr + addr_offset, p1_dev->regs + REG_CQ_THR0_BASEADDR);
+@@ -302,7 +380,9 @@ static irqreturn_t isp_irq_cam(int irq, void *data)
+ 	struct mtk_isp_p1_device *p1_dev = (struct mtk_isp_p1_device *)data;
+ 	struct device *dev = p1_dev->dev;
+ 	unsigned int dequeued_frame_seq_no;
++	unsigned int meta0_vb2_index, meta1_vb2_index;
+ 	unsigned int irq_status, err_status, dma_status;
++	unsigned int aao_fbc, afo_fbc;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&p1_dev->spinlock_irq, flags);
+@@ -310,6 +390,10 @@ static irqreturn_t isp_irq_cam(int irq, void *data)
+ 	err_status = irq_status & INT_ST_MASK_CAM_ERR;
+ 	dma_status = readl(p1_dev->regs + REG_CTL_RAW_INT2_STAT);
+ 	dequeued_frame_seq_no = readl(p1_dev->regs + REG_FRAME_SEQ_NUM);
++	meta0_vb2_index = readl(p1_dev->regs + REG_META0_VB2_INDEX);
++	meta1_vb2_index = readl(p1_dev->regs + REG_META1_VB2_INDEX);
++	aao_fbc = readl(p1_dev->regs + REG_AAO_FBC_STATUS);
++	afo_fbc = readl(p1_dev->regs + REG_AFO_FBC_STATUS);
+ 	spin_unlock_irqrestore(&p1_dev->spinlock_irq, flags);
+ 
+ 	/*
+@@ -320,15 +404,12 @@ static irqreturn_t isp_irq_cam(int irq, void *data)
+ 		dev_warn(dev, "sof_done block cnt:%d\n", p1_dev->sof_count);
+ 
+ 	/* De-queue frame */
+-	if (irq_status & SW_PASS1_DON_ST) {
+-		mtk_cam_dev_dequeue_req_frame(&p1_dev->cam_dev,
+-					      p1_dev->dequeued_frame_seq_no);
+-		mtk_cam_dev_req_try_queue(&p1_dev->cam_dev);
+-	}
++	isp_irq_handle_event(p1_dev, irq_status, dma_status);
+ 
+ 	/* Save frame info. & update CQ address for frame HW en-queue */
+ 	if (irq_status & SOF_INT_ST)
+-		isp_irq_handle_sof(p1_dev, dequeued_frame_seq_no);
++		isp_irq_handle_sof(p1_dev, dequeued_frame_seq_no,
++				   meta0_vb2_index, meta1_vb2_index);
+ 
+ 	/* Check ISP error status */
+ 	if (err_status) {
+@@ -338,9 +419,9 @@ static irqreturn_t isp_irq_cam(int irq, void *data)
+ 			isp_irq_handle_dma_err(p1_dev);
+ 	}
+ 
+-	dev_dbg(dev, "SOF:%d irq:0x%x, dma:0x%x, frame_num:%d\n",
++	dev_dbg(dev, "SOF:%d irq:0x%x, dma:0x%x, frame_num:%d, fbc1:0x%x , fbc2:0x%x",
+ 		p1_dev->sof_count, irq_status, dma_status,
+-		dequeued_frame_seq_no);
++		dequeued_frame_seq_no, aao_fbc, afo_fbc);
+ 
+ 	return IRQ_HANDLED;
+ }
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.h b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.h
+index 452dc06110e28..1aeb3a1884f51 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.h
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-hw.h
+@@ -26,6 +26,8 @@
+  * @dequeued_frame_seq_no: Frame sequence number of dequeued frame
+  * @composed_frame_seq_no: Frame sequence number of composed frame
+  * @timestamp: Frame timestamp in ns
++ * @meta0_vb2_index: Meta0 vb2 buffer index, set when SOF
++ * @meta1_vb2_index: Meta1 vb2 buffer index, set when SOF
+  * @sof_count: SOF counter
+  * @composer_wq: The work queue for frame request composing
+  * @composer_scp_addr: SCP address of ISP composer memory
+@@ -46,6 +48,8 @@ struct mtk_isp_p1_device {
+ 	unsigned int enqueued_frame_seq_no;
+ 	unsigned int dequeued_frame_seq_no;
+ 	unsigned int composed_frame_seq_no;
++	unsigned int meta0_vb2_index;
++	unsigned int meta1_vb2_index;
+ 	u8 sof_count;
+ 	struct workqueue_struct *composer_wq;
+ 	dma_addr_t composer_scp_addr;
+@@ -58,6 +62,8 @@ int mtk_isp_hw_release(struct mtk_cam_dev *cam_dev);
+ void mtk_isp_hw_config(struct mtk_cam_dev *cam_dev,
+ 		       struct p1_config_param *config_param);
+ void mtk_isp_stream(struct mtk_cam_dev *cam_dev, int on);
++void mtk_isp_enqueue(struct mtk_cam_dev *cam_dev, unsigned int dma_port,
++		     struct mtk_cam_dev_buffer *buffer);
+ void mtk_isp_req_enqueue(struct mtk_cam_dev *cam_dev,
+ 			 struct mtk_cam_dev_request *req);
+ 
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-ipi.h b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-ipi.h
+index 981b634dd91f3..b219bef40ed1e 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-ipi.h
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-ipi.h
+@@ -193,6 +193,8 @@ enum mtk_isp_scp_cmds {
+ 	ISP_CMD_DEINIT,
+ 	ISP_CMD_ACK,
+ 	ISP_CMD_FRAME_ACK,
++	ISP_CMD_CONFIG_META,
++	ISP_CMD_ENQUEUE_META,
+ 	ISP_CMD_RESERVED,
+ };
+ 
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-regs.h b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-regs.h
+index ab2277f45fa46..1e65e191e7fb0 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-regs.h
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam-regs.h
+@@ -78,6 +78,16 @@
+ /* Frame sequence number */
+ #define REG_FRAME_SEQ_NUM		0x13b8
+ 
++/* Spare register for meta0 vb2 index */
++#define REG_META0_VB2_INDEX		0x14dc
++/* Spare register for meta1 vb2 index */
++#define REG_META1_VB2_INDEX		0x151c
++
++/* AAO FBC's status */
++#define REG_AAO_FBC_STATUS		0x013c
++/* AFO FBC's status */
++#define REG_AFO_FBC_STATUS		0x0134
++
+ /* IRQ Error Mask */
+ #define INT_ST_MASK_CAM_ERR		( \
+ 					TG_ERR_ST |\
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.c b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.c
+index 8ea312b99503f..f37cd03fb5e65 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.c
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.c
+@@ -100,6 +100,36 @@ static void mtk_cam_dev_job_done(struct mtk_cam_dev *cam,
+ 	}
+ }
+ 
++void mtk_cam_dev_dequeue_frame(struct mtk_cam_dev *cam,
++			       unsigned int node_id, unsigned int frame_seq_no,
++			       int vb2_index)
++{
++	struct device *dev = cam->dev;
++	struct mtk_cam_video_device *node = &cam->vdev_nodes[node_id];
++	struct mtk_cam_dev_buffer *buf, *buf_prev;
++	struct vb2_buffer *vb;
++	unsigned long flags;
++
++	if (!cam->vdev_nodes[node_id].enabled || !cam->streaming)
++		return;
++
++	spin_lock_irqsave(&node->buf_list_lock, flags);
++	list_for_each_entry_safe(buf, buf_prev, &node->buf_list, list) {
++		vb = &buf->vbb.vb2_buf;
++		if (!vb->vb2_queue->uses_requests &&
++		    vb->index == vb2_index) {
++			dev_dbg(dev, "%s:%d:%d", __func__, node_id, vb2_index);
++			vb->timestamp = ktime_get_boot_ns();
++			/* AFO seq. num usage */
++			buf->vbb.sequence = frame_seq_no;
++			list_del(&buf->list);
++			vb2_buffer_done(vb, VB2_BUF_STATE_DONE);
++			break;
++		}
++	}
++	spin_unlock_irqrestore(&node->buf_list_lock, flags);
++}
++
+ struct mtk_cam_dev_request *mtk_cam_dev_get_req(struct mtk_cam_dev *cam,
+ 						unsigned int frame_seq_no)
+ {
+@@ -121,7 +151,6 @@ struct mtk_cam_dev_request *mtk_cam_dev_get_req(struct mtk_cam_dev *cam,
+ 
+ 	return NULL;
+ }
+-
+ void mtk_cam_dev_dequeue_req_frame(struct mtk_cam_dev *cam,
+ 				   unsigned int frame_seq_no)
+ {
+@@ -797,6 +826,21 @@ static void mtk_cam_vb2_buf_queue(struct vb2_buffer *vb)
+ 	list_add_tail(&buf->list, &node->buf_list);
+ 	spin_unlock_irqrestore(&node->buf_list_lock, flags);
+ 
++	/*
++	 * TODO(b/140397121): Remove non-request mode support when the HAL
++	 * is fixed to use the Request API only.
++	 *
++	 * For request buffers en-queue, handled in mtk_cam_req_try_queue
++	 */
++	if (!vb->vb2_queue->uses_requests) {
++		mutex_lock(&cam->op_lock);
++		/* If node is not streame on, re-queued when stream on */
++		if (vb->vb2_queue->streaming)
++			mtk_isp_enqueue(cam, node->desc.dma_port, buf);
++		mutex_unlock(&cam->op_lock);
++		return;
++	}
++
+ 	/* update buffer internal address */
+ 	req->frame_params.dma_bufs[buf->node_id].iova = buf->daddr;
+ 	req->frame_params.dma_bufs[buf->node_id].scp_addr = buf->scp_addr;
+@@ -948,6 +992,7 @@ static int mtk_cam_vb2_start_streaming(struct vb2_queue *vq,
+ {
+ 	struct mtk_cam_dev *cam = vb2_get_drv_priv(vq);
+ 	struct mtk_cam_video_device *node = mtk_cam_vbq_to_vdev(vq);
++	struct mtk_cam_dev_buffer *buf, *buf_prev;
+ 	struct device *dev = cam->dev;
+ 	int ret;
+ 
+@@ -973,6 +1018,16 @@ static int mtk_cam_vb2_start_streaming(struct vb2_queue *vq,
+ 		}
+ 	}
+ 
++	/*
++	 * TODO(b/140397121): Remove non-request mode support when the HAL
++	 * is fixed to use the Request API only.
++	 *
++	 * Need to make sure HW is initialized.
++	 */
++	if (!vq->uses_requests)
++		list_for_each_entry_safe(buf, buf_prev, &node->buf_list, list)
++			mtk_isp_enqueue(cam, node->desc.dma_port, buf);
++
+ 	/* Media links are fixed after media_pipeline_start */
+ 	cam->stream_count++;
+ 	dev_dbg(dev, "%s: count info:%d:%d\n", __func__, cam->stream_count,
+@@ -1012,9 +1067,11 @@ static void mtk_cam_vb2_stop_streaming(struct vb2_queue *vq)
+ 	mutex_lock(&cam->op_lock);
+ 	dev_dbg(dev, "%s node:%d count info:%d\n", __func__, node->id,
+ 		cam->stream_count);
+-	/* Check the first node to stream-off */
+-	if (cam->stream_count == cam->enabled_count)
++	/* Check the first node to stream-off & disable DMA */
++	if (cam->stream_count == cam->enabled_count) {
+ 		v4l2_subdev_call(&cam->subdev, video, s_stream, 0);
++		cam->enabled_dmas = 0;
++	}
+ 
+ 	mtk_cam_vb2_return_all_buffers(cam, node, VB2_BUF_STATE_ERROR);
+ 	cam->stream_count--;
+@@ -1335,7 +1392,11 @@ mtk_cam_video_register_device(struct mtk_cam_dev *cam,
+ 	vbq->drv_priv = cam;
+ 	vbq->lock = &node->vdev_lock;
+ 	vbq->supports_requests = true;
+-	vbq->requires_requests = true;
++	/*
++	 * TODO(b/140397121): Require requests when the HAL
++	 * is fixed to use the Request API only.
++	 */
++	// vbq->requires_requests = true;
+ 
+ 	ret = vb2_queue_init(vbq);
+ 	if (ret) {
+diff --git a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.h b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.h
+index 0a340a1e65ea9..c99941328d48c 100644
+--- a/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.h
++++ b/drivers/media/platform/mtk-isp/isp_50/cam/mtk_cam.h
+@@ -234,6 +234,9 @@ int mtk_cam_dev_init(struct platform_device *pdev,
+ 		     struct mtk_cam_dev *cam_dev);
+ void mtk_cam_dev_cleanup(struct mtk_cam_dev *cam_dev);
+ void mtk_cam_dev_req_try_queue(struct mtk_cam_dev *cam_dev);
++void mtk_cam_dev_dequeue_frame(struct mtk_cam_dev *cam_dev,
++			       unsigned int node_id, unsigned int frame_seq_no,
++			       int vb2_index);
+ void mtk_cam_dev_dequeue_req_frame(struct mtk_cam_dev *cam_dev,
+ 				   unsigned int frame_seq_no);
+ void mtk_cam_dev_event_frame_sync(struct mtk_cam_dev *cam_dev,
+-- 
+2.23.0.351.gc4317032e6-goog
+

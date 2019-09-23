@@ -1,0 +1,71 @@
+From 144f861dd13379825d5ec938e9f4aea9aae053bd Mon Sep 17 00:00:00 2001
+From: Rob Clark <robdclark@chromium.org>
+Date: Wed, 14 Aug 2019 11:40:16 -0700
+Subject: [PATCH] CHROMIUM: arm64: add arch_sync_dma_for_*()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Very partial backport of 886643b766321f15f63bd950be618cbb6dd22bbc
+without the swiotlb changes.
+
+Since 4.19 doesn't have dma-direct ops (the other uses of these APIs),
+we don't need the rest of the DMA/swiotlb changes that the upstream
+commit depends on.  We should be able to drop this after rebasing to
+v4.20 or newer.
+
+BUG=chromium:983368
+TEST=vgem_test on cheza
+
+Change-Id: Ide07742166219e68fa6318888fc3b73e222551bb
+Signed-off-by: Rob Clark <robdclark@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1754962
+Reviewed-by: Stéphane Marchesin <marcheu@chromium.org>
+Commit-Queue: Douglas Anderson <dianders@chromium.org>
+Tested-by: Douglas Anderson <dianders@chromium.org>
+---
+ arch/arm64/Kconfig          |  2 ++
+ arch/arm64/mm/dma-mapping.c | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b96668a9688c1..87959a6b2b3a9 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -25,6 +25,8 @@ config ARM64
+ 	select ARCH_HAS_SG_CHAIN
+ 	select ARCH_HAS_STRICT_KERNEL_RWX
+ 	select ARCH_HAS_STRICT_MODULE_RWX
++	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
++	select ARCH_HAS_SYNC_DMA_FOR_CPU
+ 	select ARCH_HAS_SYSCALL_WRAPPER
+ 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
+ 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+diff --git a/arch/arm64/mm/dma-mapping.c b/arch/arm64/mm/dma-mapping.c
+index aa86b84bdb86f..bfb12e1c6279d 100644
+--- a/arch/arm64/mm/dma-mapping.c
++++ b/arch/arm64/mm/dma-mapping.c
+@@ -45,6 +45,20 @@ static pgprot_t __get_dma_pgprot(unsigned long attrs, pgprot_t prot,
+ 	return prot;
+ }
+ 
++void arch_sync_dma_for_device(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_map_area(phys_to_virt(paddr), size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_device);
++
++void arch_sync_dma_for_cpu(struct device *dev, phys_addr_t paddr,
++		size_t size, enum dma_data_direction dir)
++{
++	__dma_unmap_area(phys_to_virt(paddr), size, dir);
++}
++EXPORT_SYMBOL_GPL(arch_sync_dma_for_cpu);
++
+ static struct gen_pool *atomic_pool __ro_after_init;
+ 
+ #define DEFAULT_DMA_COHERENT_POOL_SIZE  SZ_256K
+-- 
+2.23.0.351.gc4317032e6-goog
+
