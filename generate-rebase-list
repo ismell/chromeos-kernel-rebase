@@ -67,6 +67,9 @@ mkdir -p "$TARGET_CACHE"
 SRC_CACHE="$CACHE_DIR/${REBASE_START_POINT_SHA}..${REBASE_END_POINT_SHA}/"
 mkdir -p "$SRC_CACHE"
 
+LAST_UPSTREAM_MERGE="$(git show -s --merges -n 1 --format='%P' \
+	--grep '^CHROMIUM: Merge' "$REBASE_END_POINT" | cut -d ' ' -f 2)"
+
 sp='/-\|'
 
 GITK_PIDS=()
@@ -448,13 +451,8 @@ declare -a NON_CHROMIUM_COMMIT_LIST
 if [[ ! -e "$SRC_CACHE/ALL_COMMITS" ]]; then
 	# Adding Change-Id in here is unfortunate... but we need to do it
 	# because there are some CLs that were submitted without any tags :(
-	git rev-list --no-merges --reverse --grep "BACKPORT:" \
-		--grep "UPSTREAM:" --grep "FROMLIST:" --grep "FROMGIT:" \
-		--grep "CHROMIUM:" --grep "CHROMIUMOS:" --grep "CHROMEOS:" \
-		--grep "ANDROID:" \
-		--grep "^Change-Id:" \
-		--grep "^BUG=b:" \
-		"${REBASE_START_POINT}..${REBASE_END_POINT}" > "$SRC_CACHE/ALL_COMMITS"
+	git rev-list --no-merges "${REBASE_END_POINT}" "^${LAST_UPSTREAM_MERGE}" \
+		--reverse > "$SRC_CACHE/ALL_COMMITS"
 
 	xargs git show -s --format=oneline > "$SRC_CACHE/ALL_COMMITS.txt" < \
 		"$SRC_CACHE/ALL_COMMITS"
@@ -1195,7 +1193,7 @@ done
 for COMMIT_SHA in "${!POSSIBLE_PATCHES[@]}"
 do
 	if [[ "${POSSIBLE_PATCHES[$COMMIT_SHA]}" -eq 0 ]]; then
-		echo "rm $REBASE_DIR/patch/$COMMIT_SHA"
+		echo "rm $REBASE_DIR/patch/$COMMIT_SHA $REBASE_DIR/patch/${COMMIT_SHA}.orig"
 	fi
 done
 
