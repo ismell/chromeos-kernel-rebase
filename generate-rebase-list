@@ -153,11 +153,13 @@ function sanitize-subject() {
 }
 
 function get-patch-id() {
-	if [[ ! -e "${CACHE_DIR}/patch-id/${1}" ]]; then
-		git show "$1" | git patch-id --stable | cut -d\  -f 1 > "${CACHE_DIR}/patch-id/${1}"
+	local patch_id="${PATCH_ID_MAP[$1]}"
+	if [[ -n "$patch_id" ]]; then
+		echo "$patch_id"
+	else
+		echo "Unexpectedly generating patch-id for $1" >&2
+		git show "$1" | git patch-id --stable | cut -d\  -f 1
 	fi
-
-	cat "${CACHE_DIR}/patch-id/${1}"
 }
 
 # $1: COMMIT_SHA
@@ -429,6 +431,9 @@ declare -A SQUASH_INTO_MAP
 # Map of Dest SHA => List<Src SHA>
 declare -A SQUASH_MAP
 
+# Map of SHA => Patch ID
+declare -A PATCH_ID_MAP
+
 # Ordered list of commits
 declare -a UPSTREAM_COMMIT_LIST
 declare -a FROMLIST_COMMIT_LIST
@@ -460,9 +465,24 @@ fi
 
 readarray -t ALL_COMMITS < "$SRC_CACHE/ALL_COMMITS"
 
+if [[ ! -e "$SRC_CACHE/PATCH_IDS" ]]; then
+	echo "Generating patch-ids"
+
+	git show --no-merges "${REBASE_END_POINT}" "^${LAST_UPSTREAM_MERGE}" | \
+		git patch-id --stable > "$SRC_CACHE/PATCH_IDS.tmp"
+
+	mv "$SRC_CACHE/PATCH_IDS.tmp" "$SRC_CACHE/PATCH_IDS"
+fi
+
+echo "Loading patch-ids"
+while IFS=" " read -r PATCH_ID COMMIT_SHA; do
+	PATCH_ID_MAP[$COMMIT_SHA]="$PATCH_ID"
+done < "$SRC_CACHE/PATCH_IDS"
+
 declare -A ANCESTOR_COMMITS
 
 if [[ ! -e "$TARGET_CACHE/ANCESTOR_COMMITS" ]]; then
+	echo "Locating ancestor commits"
 	# There is no reason to look at anything older than the fork point when
 	# determining if a commit has been merged.
 	git rev-list --no-merges "$REBASE_START_POINT"..HEAD > "$TARGET_CACHE/ANCESTOR_COMMITS"
@@ -487,6 +507,9 @@ echo "Loading patch-ids"
 declare -A ANCESTOR_PATCH_IDS
 while IFS=" " read -r PATCH_ID COMMIT_SHA; do
 	printf '\b%s' "${sp:i++%${#sp}:1}"
+
+	PATCH_ID_MAP[$COMMIT_SHA]="$PATCH_ID"
+
 	if [[ -n "${ANCESTOR_PATCH_IDS[$PATCH_ID]}" ]]; then
 		# echo "Duplicate PATCH ID $PATCH_ID"
 		# echo "Commits: $COMMIT_SHA ${ANCESTOR_PATCH_IDS[$PATCH_ID]}"
@@ -494,9 +517,9 @@ while IFS=" " read -r PATCH_ID COMMIT_SHA; do
 	else
 		ANCESTOR_PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA"
 	fi
-	# echo "${ANCESTOR_PATCH_IDS["$PATCH_ID"]}=$COMMIT_SHA"
 done < "$TARGET_CACHE/ANCESTOR_PATCH_IDS"
 
+echo "Processing metadata"
 i=0
 for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 	printf '\b%s' "${sp:i++%${#sp}:1}"
