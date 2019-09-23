@@ -497,11 +497,6 @@ while IFS=" " read -r PATCH_ID COMMIT_SHA; do
 	# echo "${ANCESTOR_PATCH_IDS["$PATCH_ID"]}=$COMMIT_SHA"
 done < "$TARGET_CACHE/ANCESTOR_PATCH_IDS"
 
-declare -A MISSING_COMMITS
-while read -r COMMIT_SHA; do
-	MISSING_COMMITS["$COMMIT_SHA"]=1
-done < <(git cherry HEAD "$REBASE_END_POINT" | sed -nE -e 's/^\+ (.*)/\1/p')
-
 i=0
 for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 	printf '\b%s' "${sp:i++%${#sp}:1}"
@@ -678,9 +673,6 @@ for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 			done
 
 			if [[ $ALREADY_MERGED -eq 1 ]]; then
-				#if [[ "${MISSING_COMMITS["$COMMIT_SHA"]}" -eq 1 ]]; then
-				#	echo "Commit $COMMIT_SHA is upstream as $UPSTREAM_SHA, but git cherry disagrees"
-				#fi
 				MERGED_UPSTREAM_COMMIT_MAP["$COMMIT_SHA"]="$UPSTREAM_SHA"
 			elif [[ $UPSTREAM_SHA_FOUND -eq 0 && "$COMMIT_TYPE" != "FROMGIT" ]]; then
 				echo "The following UPSTREAM hashes were not found: ${UPSTREAM_SHAS[*]}"
@@ -890,10 +882,6 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 		print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" "IWL7000" \
 			>> "$SKIPPED_AUTOMATIC_FILE"
 		continue
-	fi
-
-	if [[ -z "${MISSING_COMMITS["$COMMIT_SHA"]}" ]]; then
-		echo "git cherry thinks commit $COMMIT_SHA is already applied"
 	fi
 
 	IFS=' ' read -r -a SQUASH_SHAS <<< "${SQUASH_MAP[$COMMIT_SHA]}"
