@@ -474,35 +474,28 @@ while read -r COMMIT_SHA; do
 	ANCESTOR_COMMITS["$COMMIT_SHA"]=1
 done < "$TARGET_CACHE/ANCESTOR_COMMITS"
 
-if [[ ! -e "$TARGET_CACHE/PATCH_IDS" ]]; then
-	i=0
-	rm -f "$TARGET_CACHE/PATCH_IDS.tmp"
+if [[ ! -e "$TARGET_CACHE/ANCESTOR_PATCH_IDS" ]]; then
+	echo "Generating patch-ids"
 
-	while read -r COMMIT_SHA; do
-		printf '\b%s' "${sp:i++%${#sp}:1}"
-		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
-		if [[ -z "$PATCH_ID" ]]; then
-			echo "Failed to get patch id for $COMMIT_SHA"
-			exit 1
-		fi
-		echo "${PATCH_ID}=${COMMIT_SHA}" >> "$TARGET_CACHE/PATCH_IDS.tmp"
-	done < "$TARGET_CACHE/ANCESTOR_COMMITS"
+	git show --no-merges "$REBASE_START_POINT"..HEAD | git patch-id --stable \
+		> "$TARGET_CACHE/ANCESTOR_PATCH_IDS.tmp"
 
-	mv "$TARGET_CACHE/PATCH_IDS.tmp" "$TARGET_CACHE/PATCH_IDS"
+	mv "$TARGET_CACHE/ANCESTOR_PATCH_IDS.tmp" "$TARGET_CACHE/ANCESTOR_PATCH_IDS"
 fi
 
-declare -A PATCH_IDS
-while IFS="=" read -r PATCH_ID COMMIT_SHA; do
+echo "Loading patch-ids"
+declare -A ANCESTOR_PATCH_IDS
+while IFS=" " read -r PATCH_ID COMMIT_SHA; do
 	printf '\b%s' "${sp:i++%${#sp}:1}"
-	if [[ -n "${PATCH_IDS[$PATCH_ID]}" ]]; then
+	if [[ -n "${ANCESTOR_PATCH_IDS[$PATCH_ID]}" ]]; then
 		# echo "Duplicate PATCH ID $PATCH_ID"
-		# echo "Commits: $COMMIT_SHA ${PATCH_IDS[$PATCH_ID]}"
-		PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA ${PATCH_IDS[$PATCH_ID]}"
+		# echo "Commits: $COMMIT_SHA ${ANCESTOR_PATCH_IDS[$PATCH_ID]}"
+		ANCESTOR_PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA ${ANCESTOR_PATCH_IDS[$PATCH_ID]}"
 	else
-		PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA"
+		ANCESTOR_PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA"
 	fi
-	# echo "${PATCH_IDS["$PATCH_ID"]}=$COMMIT_SHA"
-done < "$TARGET_CACHE/PATCH_IDS"
+	# echo "${ANCESTOR_PATCH_IDS["$PATCH_ID"]}=$COMMIT_SHA"
+done < "$TARGET_CACHE/ANCESTOR_PATCH_IDS"
 
 declare -A MISSING_COMMITS
 while read -r COMMIT_SHA; do
@@ -914,11 +907,11 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 	if [[ "$COMMIT_TYPE" = "FROMLIST" || "$COMMIT_TYPE" = "FROMGIT" ]]; then
 		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
 
-		if [[ -n "${PATCH_IDS["$PATCH_ID"]}" ]]; then
-			echo "found $COMMIT_SHA as ${PATCH_IDS[$PATCH_ID]}"
-			echo "found $COMMIT_SHA as ${PATCH_IDS[$PATCH_ID]} with patch id $PATCH_ID" >> "$WORKLOG_FILE"
+		if [[ -n "${ANCESTOR_PATCH_IDS["$PATCH_ID"]}" ]]; then
+			echo "found $COMMIT_SHA as ${ANCESTOR_PATCH_IDS[$PATCH_ID]}"
+			echo "found $COMMIT_SHA as ${ANCESTOR_PATCH_IDS[$PATCH_ID]} with patch id $PATCH_ID" >> "$WORKLOG_FILE"
 
-			IFS=' ' read -r -a PATCH_ID_SHAS <<< "${PATCH_IDS[$PATCH_ID]}"
+			IFS=' ' read -r -a PATCH_ID_SHAS <<< "${ANCESTOR_PATCH_IDS[$PATCH_ID]}"
 
 			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 				"$PATCH_ID" "$(git show -s --format=oneline "${PATCH_ID_SHAS[@]}")" \
