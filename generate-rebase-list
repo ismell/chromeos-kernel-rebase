@@ -53,6 +53,9 @@ if ! git diff-index --quiet HEAD; then
   exit 1
 fi
 
+echo "Source: ${REBASE_START_POINT}..${REBASE_END_POINT} (${REBASE_START_POINT_SHA}..${REBASE_END_POINT_SHA})"
+echo "Dest: $TARGET_BRANCH ($TARGET_BRANCH_SHA)"
+
 git checkout -q "$TARGET_BRANCH"
 LOCAL_BRANCH="$REBASE_ID-$(date +%F-%H)"
 if git rev-parse --quiet --verify "$LOCAL_BRANCH"; then
@@ -343,9 +346,6 @@ function generate-squashed-patch {
 
 	# echo "Squashing ${src_shas[*]} into $commit_sha"
 
-	local head_sha
-  head_sha="$(git rev-parse HEAD)"
-
 	local rebase_work
 
 	rebase_work="pick $commit_sha
@@ -359,7 +359,7 @@ $(printf "fixup %s\\n" "${src_shas[@]}")
 		git rebase --abort
 		SQUASH_ID=
 
-		git checkout -q "$head_sha"
+		git checkout -q "$LOCAL_BRANCH"
 		return 1
 	fi
 
@@ -373,7 +373,7 @@ Signed-off-by: $(git config user.name) <$(git config user.email)>"
 
 	git format-patch -1 HEAD --stdout > "$CACHE_DIR/squash/$squash_id"
 
-	git checkout -q "$head_sha"
+	git checkout -q "$LOCAL_BRANCH"
 
 }
 # Prints the arguments in a CSV compliant maner
@@ -764,6 +764,10 @@ rm -f "$WORKLOG_FILE"
 echo "# Source: ${REBASE_START_POINT}..${REBASE_END_POINT} ($(git rev-parse "${REBASE_START_POINT}")..$(git rev-parse "${REBASE_END_POINT}"))" >> "$WORKLOG_FILE"
 echo "# Dest: $TARGET_BRANCH ($(git rev-parse "${TARGET_BRANCH}")" >> "$WORKLOG_FILE"
 
+# src sha -> new sha
+COMMIT_MAP_FILE="$REBASE_DIR/commit-map.log"
+rm -f "$COMMIT_MAP_FILE"
+
 EXISTS_IDENTICAL_FILE="$REBASE_DIR/log/exits-identical.csv"
 print-csv "Local SHA" "Local Subject" "Patch ID" "Upstream SHA" "Upstream Subject" > "$EXISTS_IDENTICAL_FILE"
 
@@ -835,7 +839,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 	if [[ -n "${COMMIT_REVERTED_MAP[$COMMIT_SHA]}" ]]; then
 		echo "Skipping reverted commit"
-		echo "skip-reverted $COMMIT_SHA" >> "$WORKLOG_FILE"
+		echo "skip-reverted $COMMIT_SHA by ${COMMIT_REVERTED_MAP[$COMMIT_SHA]}" >> "$WORKLOG_FILE"
 		continue
 	fi
 
@@ -978,7 +982,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			echo "Moving patch to $REBASE_DIR/patch/$COMMIT_SHA.bad"
 			mv "$REBASE_DIR/patch/$COMMIT_SHA" "$REBASE_DIR/patch/$COMMIT_SHA.bad"
 		else
-			echo "am $COMMIT_SHA as $(git rev-parse HEAD) using ./$REBASE_ID/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
+			echo "am $COMMIT_SHA using ./$REBASE_ID/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
 
 			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 				>> "$PATCHED_FILE"
@@ -990,7 +994,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 		if [[ -n "$SQUASH_ID" ]]; then
 			GIT_ABORT_CMD=(am --abort)
 			if git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
-				echo "cherry-pick-squash $COMMIT_SHA as $(git rev-parse HEAD) squashed ${SQUASH_SHAS[*]}" >> "$WORKLOG_FILE"
+				echo "cherry-pick-squash $COMMIT_SHA squashed ${SQUASH_SHAS[*]}" >> "$WORKLOG_FILE"
 
 				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 					"$(git show -s --format=oneline "${SQUASH_SHAS[@]}")" \
@@ -1014,8 +1018,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			GIT_ABORT_CMD=(cherry-pick --abort)
 			if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
 				echo "$out"
-				NEW_SHA="$(git rev-parse HEAD)"
-				echo "cherry-pick $COMMIT_SHA as $NEW_SHA" >> "$WORKLOG_FILE"
+				echo "cherry-pick $COMMIT_SHA" >> "$WORKLOG_FILE"
 				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 					>> "$CHERRY_PICKED_FILE"
 				APPLIED=1
@@ -1024,7 +1027,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
 				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 					>> "$CHERRY_PICKED_EMPTY_FILE"
-				APPLIED=1
+				continue
 			else
 				echo "$out"
 			fi
@@ -1061,7 +1064,6 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				echo "Please merge manually."
 			fi
 		else
-
 			echo "Checking to see if commit was already merged."
 			COMMIT_MSG_HEADER="$(sanitize-subject "$(head -n 1 <<< "$COMMIT_MSG")")"
 
@@ -1087,36 +1089,27 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 					git format-patch -1 HEAD --stdout > "$REBASE_DIR/patch/$COMMIT_SHA"
 					git format-patch -1 "$COMMIT_SHA" --stdout > "$REBASE_DIR/orig/$COMMIT_SHA"
-					set +x
-					continue
+
+					APPLIED=1
 				else
 					echo "Failed to cherry-pick original"
 					echo "Going to cherry-pick the BACKPORT commit so you can fix it"
 					GIT_ABORT_CMD=(cherry-pick --abort)
+
+					# TODO(rrangel): This wrong since we might have had a patch
 					git cherry-pick "$COMMIT_SHA" || true
 				fi
 			else
 				echo "Failed to automatically find commit upstream"
 			fi
 		fi
+	fi
+
+	# Automatically locating the commit failed.
+	# Prompt for an upstream commit SHA if one exists.
+	if [[ $APPLIED -eq 0 ]]; then
 
 		readarray -t CONFLICTING_FILES < <(git diff --name-only --diff-filter=U)
-
-		MERGE_MSG="$(git rev-parse --git-path MERGE_MSG)"
-		if [[ -z "$MERGE_MSG" ]]; then
-			echo "Failed to modify MERGE_MSG, please do it manually"
-		else
-			cat <<-EOF >> "$MERGE_MSG"
-				[${REBASE_ID}($USER):
-				* Conflicts:
-				$(printf "  * %s\\n" "${CONFLICTING_FILES[@]}")
-				]
-			EOF
-			if ! grep -q '^Change-Id:' "$MERGE_MSG"; then
-				echo -e "Change-Id: $CHANGE_ID" >> "$MERGE_MSG"
-			fi
-			echo "Signed-off-by: $(git config user.name) <$(git config user.email)>" >> "$MERGE_MSG"
-		fi
 
 		gitk "$COMMIT_SHA" &
 		GITK_PIDS+=($!)
@@ -1145,29 +1138,48 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 					echo "$UPSTREAM_SHA" > "$REBASE_DIR/upstream/$COMMIT_SHA"
 					log-exists-manual "$COMMIT_SHA" "$UPSTREAM_SHA"
-					continue
+
+					APPLIED=1
 				fi
 			fi
 		fi
+	fi
+
+	# Manually handle the conflict
+	if [[ $APPLIED -eq 0 ]]; then
+		MERGE_MSG="$(git rev-parse --git-path MERGE_MSG)"
+		if [[ -z "$MERGE_MSG" ]]; then
+			echo "Failed to modify MERGE_MSG, please do it manually"
+		else
+			cat <<-EOF >> "$MERGE_MSG"
+				[${REBASE_ID}($USER):
+				* Conflicts:
+				$(printf "  * %s\\n" "${CONFLICTING_FILES[@]}")
+				]
+			EOF
+			if ! grep -q '^Change-Id:' "$MERGE_MSG"; then
+				echo -e "Change-Id: $CHANGE_ID" >> "$MERGE_MSG"
+			fi
+			echo "Signed-off-by: $(git config user.name) <$(git config user.email)>" >> "$MERGE_MSG"
+		fi
 
 		pause-script
-
-		kill-gitk
 
 		while git status| grep -q cherry-picking; do
 			echo "Cherry pick still in progress."
 			pause-script
 		done
 
-		# local opt
-		PS3='Cherry-Pick result: '
+		kill-gitk
+
+		PS3='Result: '
 		select opt in "Backport" "Skip" "Wrong Type" "Fixed" "Quit"
 		do
 			if [[ -z "$opt" ]]; then
 				echo "Invalid option $opt. Try another one."
 				continue
 			fi
-			#TODO: Prompt for incorrect list
+
 			case $opt in
 				"Backport")
 					git format-patch -1 HEAD --stdout > "$REBASE_DIR/patch/$COMMIT_SHA"
@@ -1188,6 +1200,8 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 						>> "$PATCHED_FILE"
+
+					APPLIED=1
 					break
 					;;
 				"Upstream")
@@ -1235,6 +1249,12 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 					;;
 			esac
 		done
+	fi
+
+	if [[ $APPLIED -eq 1 ]]; then
+		echo "$COMMIT_SHA $(git rev-parse HEAD)" >> "$COMMIT_MAP_FILE"
+
+		# TODO(rrangel): We can add a build test here
 	fi
 done
 
