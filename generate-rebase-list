@@ -768,10 +768,10 @@ echo "# Dest: $TARGET_BRANCH ($(git rev-parse "${TARGET_BRANCH}")" >> "$WORKLOG_
 COMMIT_MAP_FILE="$REBASE_DIR/commit-map.log"
 rm -f "$COMMIT_MAP_FILE"
 
-EXISTS_IDENTICAL_FILE="$REBASE_DIR/log/exits-identical.csv"
+EXISTS_IDENTICAL_FILE="$REBASE_DIR/log/exists-identical.csv"
 print-csv "Local SHA" "Local Subject" "Patch ID" "Upstream SHA" "Upstream Subject" > "$EXISTS_IDENTICAL_FILE"
 
-EXISTS_DIFFERENT_FILE="$REBASE_DIR/log/exits-different.csv"
+EXISTS_DIFFERENT_FILE="$REBASE_DIR/log/exists-different.csv"
 print-csv "Local SHA" "Local Subject" "Local Patch ID" "Upstream SHA" "Upstream Subject" "Upstream Patch ID" > "$EXISTS_DIFFERENT_FILE"
 
 EXISTS_MANUAL_FILE="$REBASE_DIR/log/exists-manual.csv"
@@ -792,7 +792,7 @@ function log-exists-manual() {
 		>> "$EXISTS_MANUAL_FILE"
 }
 
-EXISTS_PATCH_ID_FILE="$REBASE_DIR/log/exits-patch-id.csv"
+EXISTS_PATCH_ID_FILE="$REBASE_DIR/log/exists-patch-id.csv"
 print-csv "Local SHA" "Local Subject" "Patch ID" "Commits" > "$EXISTS_PATCH_ID_FILE"
 
 CHERRY_PICKED_FILE="$REBASE_DIR/log/cherry-picked.csv"
@@ -1016,20 +1016,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 		if [[ $APPLIED -eq 0 ]]; then
 			GIT_ABORT_CMD=(cherry-pick --abort)
-			if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
-				echo "$out"
-				echo "cherry-pick $COMMIT_SHA" >> "$WORKLOG_FILE"
-				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-					>> "$CHERRY_PICKED_FILE"
-				APPLIED=1
-			elif [[ $out = *"$git_empty_message"* ]]; then
-				echo "$COMMIT_SHA has already been applied"
-				echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
-				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-					>> "$CHERRY_PICKED_EMPTY_FILE"
-				continue
 			else
-				echo "$out"
 			fi
 		fi
 	fi
