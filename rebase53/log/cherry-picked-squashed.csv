@@ -1,0 +1,60 @@
+"Local SHA","Local Subject","Squashed Commits",
+"77ed5fbae6569a2b65ea07a9c081cfd0e6498d43","FROMLIST: arm64: kvm: use -fno-jump-tables with clang","41622a04b85163ed6dc1e0765f4060273b2afe61 FIXUP: UPSTREAM: kbuild: replace cc-name test with CONFIG_CC_IS_CLANG",
+"eb459af001fcdac3eeca815ca0ebc57692f2f853","FROMLIST: drm/mediatek: add component DITHER","f935f93c6e0a97b0fab885474dbf68165c133c4e FIXUP: FROMLIST: drm/mediatek: add component DITHER",
+"2503afc921849071602ffbccf0fb664f60bf32b9","FROMLIST: drm/mediatek: add function to background color input select for ovl/ovl_2l direct link","b950f1f279f3bc034b8309f4b38eef46db59472f FIXUP: FROMLIST: drm/mediatek: add function to background color input select for ovl/ovl_2l direct link",
+"bc5c19950911a310f6b39bd3581ce91aac17b90d","FROMLIST: drm/mediatek: add background color input select function for ovl/ovl_2l","63e2503b917d09eb0675bc97cafe4d8b920f4b3b FIXUP: FROMLIST: drm/mediatek: add background color input select function for ovl/ovl_2l",
+"5fe3d97737a43303e0e9055134f2b41a5411f43a","FROMLIST: drm/mediatek: add ovl0/ovl0_2l usecase","ddead01e42abfcf05b91183f7c0e1e9916f8de59 FIXUP: FROMLIST: drm/mediatek: add ovl0/ovl_2l0 usecase",
+"e51f81c804eb836acad49ff85c01f776e2cf4af4","FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe","01fd9a18f8b0b2a343c8fa48c9f2e64a76bb9cd8 FIXUP: FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe
+50340a86f1feafb4938f3eca8c0ef9aed3b82b66 FIXUP: FROMLIST: drm/mediatek: move mipi_dsi_host_register to probe",
+"57892fa75742a0c3480aebc9b2615653ba4acbe0","FROMLIST: drm/mediatek: add dsi reg commit control","1fce3c357bb2ded2091d3cefc473788a4231ec84 FIXUP: FROMLIST: drm/mediatek: add dsi reg commit disable control",
+"efe1a591419d7e0c17a0f524f7889fd687655374","FROMLIST: regulator: mt6358: Add support for MT6358 regulator","e8f07e252892aa71c3aa29c61d7d881813f74ed3 FIXUP: FROMLIST: regulator: mt6358: Add support for MT6358 regulator",
+"2aef73c5f39c5967b188eb11984b3402945b0690","FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes","7e2b50926be2c0adb4a0b95c69cd5737bd6f0a0a FIXUP: FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes
+d36b285a6c82afb91e3d89f78ec1ffeead8eeb5e FIXUP: FROMLIST: arm64: dts: mt6358: add PMIC MT6358 related nodes",
+"8f482726926e70372fd22394476b5fe78c6ed0cd","FROMLIST: rtc: Add support for the MediaTek MT6358 RTC","ad09460f972e14d6f092ab372529b87dad457c53 FIXUP: FROMLIST: rtc: mt6397: Add support for the MediaTek MT6358 RTC",
+"3b954b9f3372ea30d5c55c639997adf72cca163b","BACKPORT: FROMLIST: arm64: dts: mt8183: Configure CPU cooling","cec2b51563c24317f8280bc50e49b2aba028f382 FIXUP: FROMLIST: arm64: dts: mt8183: Configure CPU cooling",
+"5d2ff2ebaf78df47131d7299f636748eb1ba58c9","FROMLIST: thermal: mediatek: add another get_temp ops for thermal sensors","09219b80b8a637e6c2206d6a0fc408c4aa8b90e2 FIXUP: FROMLIST: thermal: mediatek: add another get_temp ops for thermal sensors",
+"f28623dc3d3464cd0f90ab52a1b99df4812af738","FROMLIST: cpufreq: mediatek: add opp notification for SVS support","61f0c855768b57b52e62d94144f15baef605359b FIXUP: FROMLIST: cpufreq: mediatek: add opp notification for SVS support",
+"a4581f0f3082ef39d3ef3f6a3b399d88bb6c336d","FROMLIST: devfreq: mediatek: cci devfreq register opp notification for SVS support","46a56127e2ef31502e59772d97d0116057f24235 FIXUP: FROMLIST: devfreq: mediatek: cci devfreq register opp notification for SVS support",
+"502daf74d351967ce2ec5d61dc2357793565fa21","FROMLIST: drm/mediatek: add dsi module reset driver","2f8abede9307122753e76813d9fffd005ff530c9 FIXUP: FROMLIST: drm/mediatek: add dsi module reset driver",
+"b5d18d83b28856508efb060d24e551e664477b53","BACKPORT: FROMLIST: arm64: dts: mt8183: add scp node","ec3e8dd8c65e7b38dc7dbeab77e7e6458f90f97d FIXUP: FROMLIST: arm64: dts: mt8183: add scp node",
+"1981488fee0bdced6fe003745f5b3ed217f8f5ed","BACKPORT: FROMLIST: arm64: dts: add display nodes for mt8183","19a452562c79418d7d5f70aa24af89c43b36cc5d FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183
+f2dd00b62ef7c37dea0cb36457f670961ebd5bab FIXUP: FROMLIST: arm64: dts: add display nodes for mt8183",
+"b5acf6aecc77e63a15dba9ac0bb205f374053458","FROMLIST: iio: cros_ec : Extend legacy support to ARM device","40a691d7f86f7f3e7317bb2f2187e31e155e4168 FIXUP: FROMLIST: iio: cros_ec : Extend legacy support to ARM device",
+"88070385a41a70db09f1fbcb59a4e2efbd531ce5","BACKPORT: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel","a7b78acace1e522893bf2c5cc2c2534a72183f34 FIXUP: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel
+e41cffebd3aa58a243863dfb2aeb1ba57ee50548 FIXUP: FROMLIST: drm/panel: support for BOE tv101wum-nl6 wuxga dsi video mode panel",
+"1c5125da75a80365710957687e63e18f48dc14af","FROMLIST: devfreq: mt8183-cci: using cpu based scaling passive_governor","d8e3134cf2a37bdc42fe97e76c0db41bf1fb06cc FIXUP: FROMLIST: devfreq: mt8183-cci: using cpu based scaling passive_governor",
+"cf108050aa250fed501fcb12fb5e077e331f549f","FROMLIST: OPP: Add function to look up required OPP's for a given OPP","bdf7f203d3a08614f259af0235d519ee238bd6b3 FIXUP: FROMLIST: OPP: Add function to look up required OPP's for a given OPP",
+"993bf626c2062d7878e43f304424765e5ecd12a7","FROMLIST: OPP: Improve require-opps linking","6a83c410173ddef8f944378a1168253271bfb976 FIXUP: FROMLIST: OPP: Improve require-opps linking
+a2fbc04f40d37052d7ac598a08b513a14b37d2fb FIXUP: FROMLIST: OPP: Improve require-opps linking",
+"6ef4171eed5ffdc2108ab673a755d1dd77fb3dcd","BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding","94f6169bce8c7b431a665772b143e42067bdedc5 FIXUP: BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding
+4027487f45fd979543a66e7fdf0023f7b065a766 FIXUP: BACKPORT: FROMLIST: media: hantro: Add core bits to support H264 decoding",
+"cadf8b3e0d52b16c63c286750a4626d7b0f663ce","FROMLIST: drm: dw-hdmi-i2s: enable audio clock in audio_startup","0f619e47767dec8a7943b061f9f03e623cb13a25 FIXUP: FROMGIT: drm: dw-hdmi-i2s: enable audio clock in audio_startup",
+"8c03dd8896c742f6775aec0b0dc3f945decd5053","FROMLIST: drm/mediatek: add support for mediatek SOC MT8183","20b09c289fb8a52b32187d49bc35a8f20e4411a7 FIXUP: FROMLIST: drm/mediatek: add support for mediatek SOC MT8183",
+"2431b273eaa1ebf108f87b20e2139f24439a8612","FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates","8ed651e515fc8ddf20833effddeb63a605d3ea68 FIXUP: FROMLIST: drm/mediatek: Bypass atomic helpers for cursor updates",
+"8d7bd9d9538e3911a9885a40b1bb5188f36bea29","FROMLIST: drm/mediatek: Support CMDQ interface in ddp component","d5e900c121230265ff5ea76d9c6d03bcb0e38852 FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component
+a3f7d76d0a1bd6dad3c4f28b07487cd3ea257b0c FIXUP: FROMLIST: drm/mediatek: Support CMDQ interface in ddp component",
+"e885f6aa8b47d6b464ee49480ff38f3bebcf2a69","FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183","a1dd43b715a0400960b71c3412094459694696ae FIXUP: FROMLIST: usb: mtu3: support ip-sleep wakeup for MT8183",
+"f7f7f006a3ef8f5f03e52c3461d81049eb480fee","FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183","6992e016e77d6f0871b760b40bdbdb3a028b698b FIXUP: FROMLIST: usb: mtk-xhci: support ip-sleep wakeup for MT8183",
+"92b7f61350ade17688b38ef225aa6efeddcafce4","FROMLIST: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet","d1853a9b3da14b1d18a3fa67bcf20c4abda36ba0 FIXUP: FROMGIT: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet",
+"ac02f2cebc96f1c4a2da440776428b2ecc8f560c","FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel","5bcdd900a5509775b18bbf2edc696bc7176b29d4 FIXUP: FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel",
+"3aaa1dfd6a57ae1da76bd19706ac896e398fced0","FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver","f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver",
+"9b1bdc4568cfee6bc7eb8959873ce461b84a761b","FROMLIST: PM / AVS: SVS: Introduce SVS engine","fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine",
+"ab922f68712a5768ffb8eca32d37b654738e3ecf","FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)","c917e05508d50264a3f83c1b38d2860f9f0d1337 FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
+ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)",
+"61e12ddf8197612c314860cdc6efacf0c37424b6","BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver","c23c9eae7e3f06bc29cfb3493a3d6c85ceb9ecca FIXUP: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
+c6e6aa26125d5d4a496018d396955eeae7cd5aee FIXUP: BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver",
+"21d7588740d9f4e096005af37caa623d3d58f8f1","BACKPORT: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig","3d6a9dd40289c9992eb4705c6c5a55e9c523c9e1 FIXUP: FROMLIST: media: platform: Add Mediatek sensor interface driver KConfig",
+"b8b97c2ff7c4f7eac9f656bdad35f8a1389a945f","FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor","1b1008f1812fa64b30b1a4b564f8ac2865fc85b2 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor
+b055f6b00d16a4cf0c76695773d2e59a04a073c7 FIXUP: FROMLIST: media: i2c: Add more sensor modes for ov8856 camera sensor",
+"b0fa9ee035b70f22e88df163bc54d12c04d87a15","CHROMIUM: ASoC: max98090: Enable DMIC at playback when selected.","8e248fe4cd4def1cb9eed2a9080d899ad992dd0b FIXUP: CHROMIUM: ASoC: max98090: Enable DMIC at playback when selected",
+"65cd67231ce06e5f562f68e9367839fcb81d4edc","CHROMIUM: Add process mgmt security policies to chromiumos LSM","d7929e9fcc97e2e2610117f2a136ca393ef22684 FIXUP: CHROMIUM: Add process mgmt security policies to chromiumos LSM",
+"d12dc1a835648e06925c9d8f4b4e14017104fe76","CHROMIUM: MALI: Add Mali platform specific source","f2bcb17c654efaf8f5ecb9128c6282911e2ba99d FIXUP: CHROMIUM: MALI: Add Mali platform specific source
+f738c609efda4ecb7b2ebe87c3ec9b97faeabc06 FIXUP: CHROMIUM: MALI: Add Mali platform specific source",
+"04fdb1751c20b807c81be7b43e2de7389e2b25ca","CHROMIUM: Device driver for TPM over virtio","743c29e99ecad9998c07d78fa246e138aff738df FIXUP: CHROMIUM: Device driver for TPM over virtio",
+"f9b2926124b8ed2cba2ca8282dc4858dff3d9a7a","CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring","1d76113a8dc73d70b9d89c70e3e8e8da5f5f4d15 FIXUP: CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring",
+"05213e598eb035557b73f72f21c7a759615e93ff","CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend","2a03de2e808fb3d9128af026c300df7714c0a4d8 FIXUP: CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend",
+"c257fa8632bb98df1fbc4e2ac46c91c938428be2","CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus","ce823a5a51832fa94a7c7e2573489e570462a611 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
+7c966453ee85056944208a7f73c800b608c06b15 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus",
+"e0eb312f6c333f61ddf1ef639516f3e2fd823536","CHROMIUM: net: phy: Add support for generic LED configuration through the DT","b19c830319d3b6c71ab25b57adf9b803708fe0bd FIXUP: CHROMIUM: net: phy: Add support for generic LED configuration through the DT",
+"f445c72f5d8277569bf2d5e20df38153c9141b7d","CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)","33f060daafea7097bb910fe0cbcb56f3ca30fa2f FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)
+5a4de0d9ac4bc240999584010ecb3d5f902bf165 FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take three)",

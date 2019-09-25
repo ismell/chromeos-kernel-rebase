@@ -5064,6 +5064,7 @@ d84ae4626f954d8b8c58c1c20f47d80cb1acf3e3 FROMLIST: drm/mediatek: add mipi_tx dri
 ba303d8aee748e968e600b7de4853617db30ef70 FIXUP: FROMLIST: scripts/decode_stacktrace: Look for modules with .ko.debug extension
 6f0aa6c94dcf4bb7a1114d85534cee023938dc52 FROMLIST: scripts/decode_stacktrace: Accept dash/underscore in modules
 9607a4f7c8396d44270fcaaddeb449ca355a80a2 FROMLIST: mm: smaps: split PSS into components
+c12ecebde005360314e4a0eee6c70c990ebe1c3e Revert "x86/build: Move _etext to actual end of .text"
 7ff3bae038f797994159f36fec68e95acf971cce UPSTREAM: block, bfq: increase idling for weight-raised queues
 16109c270fe5078e6a351a3f681484ee23aa1294 UPSTREAM: block, bfq: do not idle for lowest-weight queues
 ebddfd1aecbf97eb666966c677632a12de320e96 UPSTREAM: block, bfq: tune service injection basing on request service times
@@ -6659,13 +6660,6 @@ d00d2035cb92d610af5fe92b7e155d53d6d73bcc FROMLIST: watchdog: iTCO: Add support f
 48ea501949573a1e5df1c75f7cbe4da9563fd102 FIXUP: CHROMIUM: [media] hantro: add VP8 encoding support (take 2)
 d5ecf6d8c93453fc4aad04fe31bfd9ebe7817c4e FROMGIT: ASoC: intel: cht_bsw_max98090_ti: Add all Chromebooks that need pmc_plt_clk_0 quirk
 d1853a9b3da14b1d18a3fa67bcf20c4abda36ba0 FIXUP: FROMGIT: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet
-c76dfa6403e81656954ea73db7856dce524b00bd CHROMIUM: Revert "drm/atomic_helper: Allow DPMS On<->Off changes for unregistered connectors"
-c6f91fa8e842988734bcf9416f2e90ccc01123ea CHROMIUM: Revert "ALSA: hda - Fix intermittent CORB/RIRB stall on Intel chips"
-bbb8a498fc3fb6760d2b3450f868cbead1c6b8ba CHROMIUM: Revert "drm/i915: Sanity check mmap length against object size"
-2d0e28e0d48a69f03bbea1cc4b7a4a8f29a8b76e CHROMIUM: Revert "drm/i915: Handle vm_mmap error during I915_GEM_MMAP ioctl with WC set"
-441211bfc69c5386d73b2c278e70e68b48315853 CHROMIUM: Revert "drm/i915: Cleanup gt powerstate from gem"
-fd8c067ebb6d6ff783864b87971411896ec25c38 CHROMIUM: Revert "drm/i915: Restore sane defaults for KMS on GEM error load"
-b923dc8dfa264b177e674b265307b2e87d27af37 CHROMIUM: Revert "drm/atomic_helper: Disallow new modesets on unregistered connectors"
 eeac8f097d7ab3e1942a0cbf22ca578c18cbb240 FROMGIT: drm/bridge: dw-hdmi-i2s: support more i2s format
 c3b35f0a49624127dfbcda0421ae9afd5734cde4 FROMGIT: drm/bridge: dw-hdmi: move audio channel setup out of ahb
 be6f633a643134fd1a1185e78b6b02f141b66096 FROMGIT: drm/bridge: dw-hdmi: set channel count in the infoframes

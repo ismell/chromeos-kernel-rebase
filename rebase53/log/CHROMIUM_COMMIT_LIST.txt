@@ -1823,13 +1823,6 @@ cd591e6ddaea7c77cd2686f3e4b3552e4574eec6 CHROMIUM: iwl7000: mvm: enable Atlas pl
 5a4de0d9ac4bc240999584010ecb3d5f902bf165 FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take three)
 e8c394111eb6fd99f4cc7655bc8dd6743c4e6d2d CHROMIUM: remove VIRTIO_GPU_CMD_GET_RESOURCE_PLANE_INFO
 48ea501949573a1e5df1c75f7cbe4da9563fd102 FIXUP: CHROMIUM: [media] hantro: add VP8 encoding support (take 2)
-c76dfa6403e81656954ea73db7856dce524b00bd CHROMIUM: Revert "drm/atomic_helper: Allow DPMS On<->Off changes for unregistered connectors"
-c6f91fa8e842988734bcf9416f2e90ccc01123ea CHROMIUM: Revert "ALSA: hda - Fix intermittent CORB/RIRB stall on Intel chips"
-bbb8a498fc3fb6760d2b3450f868cbead1c6b8ba CHROMIUM: Revert "drm/i915: Sanity check mmap length against object size"
-2d0e28e0d48a69f03bbea1cc4b7a4a8f29a8b76e CHROMIUM: Revert "drm/i915: Handle vm_mmap error during I915_GEM_MMAP ioctl with WC set"
-441211bfc69c5386d73b2c278e70e68b48315853 CHROMIUM: Revert "drm/i915: Cleanup gt powerstate from gem"
-fd8c067ebb6d6ff783864b87971411896ec25c38 CHROMIUM: Revert "drm/i915: Restore sane defaults for KMS on GEM error load"
-b923dc8dfa264b177e674b265307b2e87d27af37 CHROMIUM: Revert "drm/atomic_helper: Disallow new modesets on unregistered connectors"
 3bfd7663b760d3bf67c4e079b2027580583cb825 CHROMIUM: Bluetooth: btmrvl: Detect hangs and force a replug of the SDIO card
 6eeabb0898473600d301f7a4367f04c24e47bdf9 CHROMIUM: arm64: dts: mt8183: kodama: Add panel driver
 d356758bc94be521f8bd1a57fa1da24267ab4438 CHROMIUM: config: enable Mediatek MT8183 MDP3 config

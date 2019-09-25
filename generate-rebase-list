@@ -144,12 +144,10 @@ function pause-script() {
 	(kill -STOP $$)
 }
 
-function strip-fixup() {
-	sed -E -e 's/(FIXUP):\s*//g' <<< "$1"
-}
-
 function sanitize-subject() {
-	sed -E -e 's/(CHROMIUMOS|CHROMIUM|CHROMEOS|FROMLIST|UPSTREAM|FROMGIT|BACKPORT|ANDROID):\s*//g' <<< "$1"
+	sed -E \
+		-e 's/(CHROMIUMOS|CHROMIUM|CHROMEOS|FROMLIST|UPSTREAM|FROMGIT|BACKPORT|ANDROID|FIXUP):\s*//g' \
+		-e 's/\.$//g' <<< "$1"
 }
 
 function get-patch-id() {
@@ -294,8 +292,7 @@ function generate-squash-id() {
 	shift
 
 	local str
-	str=$"$commit_sha"$'\n'"$(git show -s --format='%h' "$@")"
-	echo "Generate squash-id from: $str" >&2
+	str=$"$commit_sha"$'\n'"$(git show -s --format='%H' "$@")"
 
 	local squash_id
 	squash_id="$(git hash-object --stdin <<< "$str")"
@@ -344,7 +341,7 @@ function generate-squashed-patch {
 		return
 	fi
 
-	echo "Squashing ${src_shas[*]} into $commit_sha"
+	# echo "Squashing ${src_shas[*]} into $commit_sha"
 
 	local head_sha
   head_sha="$(git rev-parse HEAD)"
@@ -359,22 +356,11 @@ $(printf "fixup %s\\n" "${src_shas[@]}")
 	if ! GIT_SEQUENCE_EDITOR="echo '$rebase_work' >" git rebase -i \
 			--onto "${commit_sha}~" "${commit_sha}~" "${commit_sha}"; then
 		echo "Auto squash failed."
-		echo "Please complete the squash manually."
-		pause-script
+		git rebase --abort
+		SQUASH_ID=
 
-		PS3='Squash successful?: '
-	  select opt in "Yes" "No"
-	  do
-	    if [[ -z "$opt" ]]; then
-	      echo "Invalid option $opt. Try another one."
-	      continue
-	    fi
-	    break
-	  done
-
-	  if [[ $opt == "No" ]]; then
-	    exit
-	  fi
+		git checkout -q "$head_sha"
+		return 1
 	fi
 
 	local msg
@@ -423,7 +409,9 @@ declare -A COMMIT_REVERTED_MAP
 # If there are duplicate titles, the latest commit is always used.
 # This makes sense if there is a cherry-pick, revert and cherry-pick of a new
 # version with the same name.
-declare -A COMMITS_BY_SUBJECT
+# The subject is stripped of any tags and trailing . because a lot of the
+# commits don't use the same title as the original commit.
+declare -A COMMITS_BY_CLEAN_SUBJECT
 
 # Map of Src SHA => Dest SHA
 declare -A SQUASH_INTO_MAP
@@ -592,23 +580,15 @@ for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 
 	COMMIT_SUBJECT="$(head -n 1 <<< "$COMMIT_MSG")"
 
-	if [[ -z "${COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]}" ]]; then
-		COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]="$COMMIT_SHA"
-	else
-		# echo "Duplicate title found: $COMMIT_SUBJECT"
-		# echo "Replacing ${COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]} with $COMMIT_SHA"
+	CLEAN_COMMIT_SUBJECT="$(sanitize-subject "$COMMIT_SUBJECT")"
 
-		COMMITS_BY_SUBJECT[$COMMIT_SUBJECT]="$COMMIT_SHA"
-	fi
-
-	# TODO: Come do the fixups later
-	if [[ "1" == "0" && "$COMMIT_SUBJECT" == "FIXUP: "* ]]; then
-		CLEAN_COMMIT_SUBJECT="$(strip-fixup "$COMMIT_SUBJECT")"
+	# Link FIXUPS to their target commits
+	if [[ "$COMMIT_SUBJECT" == "FIXUP: "* ]]; then
 
 		if [[ -e "$REBASE_DIR/fixup/$COMMIT_SHA" ]]; then
 			TARGET_SHA="$(<"$REBASE_DIR/fixup/$COMMIT_SHA")"
 		else
-			TARGET_SHA="${COMMITS_BY_SUBJECT[$CLEAN_COMMIT_SUBJECT]}"
+			TARGET_SHA="${COMMITS_BY_CLEAN_SUBJECT[${CLEAN_COMMIT_SUBJECT%.}]}"
 			if [[ -z "$TARGET_SHA" ]]; then
 				echo "Processing: $COMMIT_SHA $COMMIT_SUBJECT"
 				echo "Error: Fixup unable to locate: '$CLEAN_COMMIT_SUBJECT'"
@@ -638,7 +618,10 @@ for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 				SQUASH_MAP[$TARGET_SHA]="${SQUASH_MAP[$TARGET_SHA]} $COMMIT_SHA"
 			fi
 		fi
+	else
+		COMMITS_BY_CLEAN_SUBJECT[$CLEAN_COMMIT_SUBJECT]="$COMMIT_SHA"
 	fi
+
 
 	COMMIT_TYPE=""
 	while [[ -z "$COMMIT_TYPE" ]]; do
@@ -796,6 +779,9 @@ print-csv "Local SHA" "Local Subject" > "$CHERRY_PICKED_FILE"
 CHERRY_PICKED_EMPTY_FILE="$REBASE_DIR/log/cherry-picked-empty.csv"
 print-csv "Local SHA" "Local Subject" > "$CHERRY_PICKED_EMPTY_FILE"
 
+CHERRY_PICKED_SQUASHED_FILE="$REBASE_DIR/log/cherry-picked-squashed.csv"
+print-csv "Local SHA" "Local Subject" "Squashed Commits" > "$CHERRY_PICKED_SQUASHED_FILE"
+
 PATCHED_FILE="$REBASE_DIR/log/patched.csv"
 print-csv "Local SHA" "Local Subject" > "$PATCHED_FILE"
 
@@ -858,6 +844,10 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 	if [[ -n "${SQUASH_INTO_MAP[$COMMIT_SHA]}" ]]; then
 		echo "Squashed, skipping"
 		echo "squashed $COMMIT_SHA into ${SQUASH_INTO_MAP["$COMMIT_SHA"]}" >> "$WORKLOG_FILE"
+
+		print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					"squashed into ${SQUASH_INTO_MAP[$COMMIT_SHA]}" \
+					>> "$SKIPPED_AUTOMATIC_FILE"
 		continue;
 	fi
 
@@ -903,14 +893,6 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 		continue
 	fi
 
-	IFS=' ' read -r -a SQUASH_SHAS <<< "${SQUASH_MAP[$COMMIT_SHA]}"
-	SQUASH_ID=
-	if [[ "${#SQUASH_SHAS[*]}" -gt 0 ]]; then
-		# This sets SQUASH_ID on completion
-		generate-squashed-patch "$COMMIT_SHA"
-	fi
-
-	# TODO: Should we check the squashed version first first?
 	if [[ "$COMMIT_TYPE" = "FROMLIST" || "$COMMIT_TYPE" = "FROMGIT" ]]; then
 		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
 
@@ -936,21 +918,27 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 		fi
 	fi
 
-	if [[ -e "$REBASE_DIR/patch/$COMMIT_SHA" ]]; then
-		# Verify the patch contains all the squashed commits
-		if [[ -n "$SQUASH_ID" ]]; then
-			echo "We have a patch for a squashed commit" >&2
-			if PATCH_SQUASH_ID="$(extract-squash-id "$COMMIT_SHA" < "$REBASE_DIR/patch/$COMMIT_SHA")"; then
-				echo "Patch does not contain any squashes"
-			fi
+	IFS=' ' read -r -a SQUASH_SHAS <<< "${SQUASH_MAP[$COMMIT_SHA]}"
+	SQUASH_ID=
 
-			echo "SQUASH_ID: $SQUASH_ID, PATCH_SQUASH_ID: $PATCH_SQUASH_ID"
-
-			if [[ "$SQUASH_ID" != "$PATCH_SQUASH_ID" ]]; then
-				echo "Patch does not contain all of the squashed changes"
-				echo "Moving patch to $REBASE_DIR/patch/$COMMIT_SHA.stale"
-				mv "$REBASE_DIR/patch/$COMMIT_SHA" "$REBASE_DIR/patch/$COMMIT_SHA.stale"
-				echo "Going to reapply original squashed commit."
+	# We have patches that could be squashed into this commit
+	if [[ "${#SQUASH_SHAS[@]}" -gt 0 ]]; then
+		if [[ -e "$REBASE_DIR/patch/$COMMIT_SHA" ]]; then
+			# If we found a patch, we don't want to auto squash any commits.
+			# The reason being that the conflict resolution and auditing gets a little
+			# tricky. So we only apply the squashed commit if it applies cleanly.
+			unset SQUASH_MAP["$COMMIT_SHA"]
+			for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
+				unset SQUASH_INTO_MAP["$SQUASH_SHA"]
+			done
+		else
+			# This sets SQUASH_ID on completion
+			if ! generate-squashed-patch "$COMMIT_SHA"; then
+				# If we can't auto generate the squash then skip it
+				unset SQUASH_MAP["$COMMIT_SHA"]
+				for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
+					unset SQUASH_INTO_MAP["$SQUASH_SHA"]
+				done
 			fi
 		fi
 	fi
@@ -974,30 +962,48 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			POSSIBLE_PATCHES[$COMMIT_SHA]=1
 			APPLIED=1
 		fi
-	elif [[ -n "$SQUASH_ID" ]]; then
-		GIT_ABORT_CMD=(am --abort)
-		if git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
-			APPLIED=1
-		else
-			echo "Squash patch failed to apply: $CACHE_DIR/squash/$SQUASH_ID"
-		fi
 	else
-		GIT_ABORT_CMD=(cherry-pick --abort)
-		if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
-			echo "$out"
-			NEW_SHA="$(git rev-parse HEAD)"
-			echo "cherry-pick $COMMIT_SHA as $NEW_SHA" >> "$WORKLOG_FILE"
-			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-				>> "$CHERRY_PICKED_FILE"
-			APPLIED=1
-		elif [[ $out = *"$git_empty_message"* ]]; then
-			echo "$COMMIT_SHA has already been applied"
-			echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
-			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-				>> "$CHERRY_PICKED_EMPTY_FILE"
-			APPLIED=1
-		else
-			echo "$out"
+		if [[ -n "$SQUASH_ID" ]]; then
+			GIT_ABORT_CMD=(am --abort)
+			if git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
+				echo "cherry-pick-squash $COMMIT_SHA as $(git rev-parse HEAD) squashed ${SQUASH_SHAS[*]}" >> "$WORKLOG_FILE"
+
+				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					"$(git show -s --format=oneline "${SQUASH_SHAS[@]}")" \
+					>> "$CHERRY_PICKED_SQUASHED_FILE"
+
+				APPLIED=1
+			else
+				echo "Squash patch failed to apply: $CACHE_DIR/squash/$SQUASH_ID"
+				echo "Dropping squashed patch and applying original"
+				git "${GIT_ABORT_CMD[@]}"
+
+				SQUASH_ID=
+				unset SQUASH_MAP["$COMMIT_SHA"]
+				for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
+					unset SQUASH_INTO_MAP["$SQUASH_SHA"]
+				done
+			fi
+		fi
+
+		if [[ $APPLIED -eq 0 ]]; then
+			GIT_ABORT_CMD=(cherry-pick --abort)
+			if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
+				echo "$out"
+				NEW_SHA="$(git rev-parse HEAD)"
+				echo "cherry-pick $COMMIT_SHA as $NEW_SHA" >> "$WORKLOG_FILE"
+				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					>> "$CHERRY_PICKED_FILE"
+				APPLIED=1
+			elif [[ $out = *"$git_empty_message"* ]]; then
+				echo "$COMMIT_SHA has already been applied"
+				echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
+				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					>> "$CHERRY_PICKED_EMPTY_FILE"
+				APPLIED=1
+			else
+				echo "$out"
+			fi
 		fi
 	fi
 

@@ -75,6 +75,7 @@ fc59a3298ade16fde2a425c36a29e8895a2258cc Revert "FROMLIST: cpufreq: mediatek: ad
 44396e74a20461a57610e3c6453dfcb9ce015cc0 Revert "FROMLIST: drm/mediatek: add mipi_tx driver for mt8183"
 02baaf972121c029acba56be499ea31de9743868 Revert "FROMLIST: drm/mediatek: separate mipi_tx to different file"
 5a4764b6fbdafcb47fb4d5b5e748bebdbb9c697e Revert "FROMLIST: dt-bindings: display: mediatek: update dsi supported chips"
+c12ecebde005360314e4a0eee6c70c990ebe1c3e Revert "x86/build: Move _etext to actual end of .text"
 c789a1902a1f9f8f98f04769c33690bb601b7440 Revert "FROMLIST: arm64: dts: add display nodes for mt8183"
 46cb8b000083d15675473af8c112b76a1998f7ec Revert "CHROMIUM: wilco_ec: Add exclusive lock to event node"
 f3e1259b64de0a0a9d5deeec7bba0e1195198e46 Revert "FIXUP: CHROMIUM: wilco_ec: Add event handling"
