@@ -54,6 +54,9 @@ Directory Structure:
   * <rebase_id>/fixup: If the script is unable to reliable determine which
     commit a FIXUP: commit references, it will prompt the user.
     The response is saved here.
+  * <rebase_id>/upstream: SHA of the upstream commit. This is used when
+    a commit cannot be found automatically. i.e., a FROMLIST patch that landed
+    upstream with some changes, or a different title.
   * <rebase_id>/log: All the commits that were examined
     * exists-identical.csv: Commit was found upstream using the
       `(cherry-picked from commit XXXXX)` line. The patch id of the local
@@ -62,6 +65,7 @@ Directory Structure:
       `(cherry-picked from commit XXXXX)` line. The patch id of the local
       commit differs from the upstream commit. The local commit could have been
       back ported.
+    * exists-manual.csv: Commit was manually matched to an upstream commit.
     * exits-patch-id.csv: The upstream commit was found by using the patch id
       of the local commit.
     * cherry-picked.csv: Commits that were cherry-picked without

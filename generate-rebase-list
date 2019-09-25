@@ -770,6 +770,24 @@ print-csv "Local SHA" "Local Subject" "Patch ID" "Upstream SHA" "Upstream Subjec
 EXISTS_DIFFERENT_FILE="$REBASE_DIR/log/exits-different.csv"
 print-csv "Local SHA" "Local Subject" "Local Patch ID" "Upstream SHA" "Upstream Subject" "Upstream Patch ID" > "$EXISTS_DIFFERENT_FILE"
 
+EXISTS_MANUAL_FILE="$REBASE_DIR/log/exists-manual.csv"
+print-csv "Local SHA" "Local Subject" "Local Patch ID" "Upstream SHA" "Upstream Subject" "Upstream Patch ID" > "$EXISTS_MANUAL_FILE"
+
+# $1: COMMIT_SHA
+# $2: UPSTREAM_SHA
+function log-exists-manual() {
+	local commit_sha="$1" upstream_sha="$2"
+	echo "exists-manual $commit_sha as $upstream_sha" >> "$WORKLOG_FILE"
+
+	LOCAL_PATCH_ID="$(get-patch-id "$commit_sha")"
+	UPSTREAM_PATCH_ID="$(get-patch-id "$upstream_sha")"
+
+	print-csv "$commit_sha" "$(get-subject "$commit_sha")" \
+		"$LOCAL_PATCH_ID" "$upstream_sha" \
+		"$(get-subject "$upstream_sha")" "$UPSTREAM_PATCH_ID" \
+		>> "$EXISTS_MANUAL_FILE"
+}
+
 EXISTS_PATCH_ID_FILE="$REBASE_DIR/log/exits-patch-id.csv"
 print-csv "Local SHA" "Local Subject" "Patch ID" "Commits" > "$EXISTS_PATCH_ID_FILE"
 
@@ -818,6 +836,12 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 	if [[ -n "${COMMIT_REVERTED_MAP[$COMMIT_SHA]}" ]]; then
 		echo "Skipping reverted commit"
 		echo "skip-reverted $COMMIT_SHA" >> "$WORKLOG_FILE"
+		continue
+	fi
+
+	if [[ -e "$REBASE_DIR/upstream/$COMMIT_SHA" ]]; then
+		UPSTREAM_COMMIT_SHA="$(<"$REBASE_DIR/upstream/$COMMIT_SHA")"
+		log-exists-manual "$COMMIT_SHA" "$UPSTREAM_COMMIT_SHA"
 		continue
 	fi
 
@@ -1048,9 +1072,8 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 			if [[ -n "$MATCHING_COMMIT" ]]; then
 				git "${GIT_ABORT_CMD[@]}"
-				reason="applied by $MATCHING_COMMIT"
-				echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
-				echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+				echo "$MATCHING_COMMIT" > "$REBASE_DIR/upstream/$COMMIT_SHA"
+				log-exists-manual "$COMMIT_SHA" "$MATCHING_COMMIT"
 				continue
 			elif [[ "$COMMIT_TYPE" == "FROMGIT" && "$COMMIT_SUBJECT" == *"BACKPORT:"* ]]; then
 				echo "Failed to automatically find commit upstream"
@@ -1119,9 +1142,9 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				if prompt-is-commit "$COMMIT_SHA" "$UPSTREAM_SHA"; then
 					kill-gitk
 					git "${GIT_ABORT_CMD[@]}"
-					reason="applied by $UPSTREAM_SHA"
-					echo "$reason" > "$REBASE_DIR/skip/$COMMIT_SHA"
-					echo "skip $COMMIT_SHA $reason" >> "$WORKLOG_FILE"
+
+					echo "$UPSTREAM_SHA" > "$REBASE_DIR/upstream/$COMMIT_SHA"
+					log-exists-manual "$COMMIT_SHA" "$UPSTREAM_SHA"
 					continue
 				fi
 			fi
@@ -1165,6 +1188,25 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
 						>> "$PATCHED_FILE"
+					break
+					;;
+				"Upstream")
+					echo -n "Upstream SHA: "
+					read -r UPSTREAM_SHA
+
+					if [[ -n "$UPSTREAM_SHA" ]]; then
+						if prompt-is-commit "$COMMIT_SHA" "$UPSTREAM_SHA"; then
+							kill-gitk
+							git "${GIT_ABORT_CMD[@]}"
+
+							echo "$UPSTREAM_SHA" > "$REBASE_DIR/upstream/$COMMIT_SHA"
+							log-exists-manual "$COMMIT_SHA" "$UPSTREAM_SHA"
+						else
+							continue
+						fi
+					else
+						continue
+					fi
 					break
 					;;
 				"Skip")
