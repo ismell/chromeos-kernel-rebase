@@ -26,6 +26,8 @@ SKIP_IWL7000=1
 REBASE_END_POINT_SHA="$(git rev-parse "$REBASE_END_POINT")"
 REBASE_START_POINT_SHA="$(git rev-parse "$REBASE_START_POINT")"
 TARGET_BRANCH_SHA="$(git rev-parse "$TARGET_BRANCH")"
+NEXT_BRANCH=next/master
+NEXT_BRANCH_SHA="$(git rev-parse "$NEXT_BRANCH")"
 
 WORK_DIR="$(dirname "${BASH_SOURCE[0]}")"
 mkdir -p "$WORK_DIR/change-id"
@@ -70,8 +72,13 @@ mkdir -p "$TARGET_CACHE"
 SRC_CACHE="$CACHE_DIR/${REBASE_START_POINT_SHA}..${REBASE_END_POINT_SHA}/"
 mkdir -p "$SRC_CACHE"
 
+NEXT_CACHE="$CACHE_DIR/${TARGET_BRANCH_SHA}..${NEXT_BRANCH_SHA}/"
+mkdir -p "$NEXT_CACHE"
+
 LAST_UPSTREAM_MERGE="$(git show -s --merges -n 1 --format='%P' \
 	--grep '^CHROMIUM: Merge' "$REBASE_END_POINT" | cut -d ' ' -f 2)"
+
+echo "Limit: $LAST_UPSTREAM_MERGE"
 
 sp='/-\|'
 
@@ -503,6 +510,24 @@ while IFS=" " read -r PATCH_ID COMMIT_SHA; do
 	fi
 done < "$TARGET_CACHE/ANCESTOR_PATCH_IDS"
 
+if [[ ! -e "$NEXT_CACHE/NEXT_PATCH_IDS" ]]; then
+	echo "Generating next patch-ids"
+
+	git show --no-merges "$TARGET_BRANCH".."$NEXT_BRANCH" | \
+		git patch-id --stable > "$NEXT_CACHE/NEXT_PATCH_IDS.tmp"
+
+	mv "$NEXT_CACHE/NEXT_PATCH_IDS.tmp" "$NEXT_CACHE/NEXT_PATCH_IDS"
+fi
+
+declare -A NEXT_PATCH_IDS
+while IFS=" " read -r PATCH_ID COMMIT_SHA; do
+	if [[ -n "${NEXT_PATCH_IDS[$PATCH_ID]}" ]]; then
+		NEXT_PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA ${NEXT_PATCH_IDS[$PATCH_ID]}"
+	else
+		NEXT_PATCH_IDS["$PATCH_ID"]="$COMMIT_SHA"
+	fi
+done < "$NEXT_CACHE/NEXT_PATCH_IDS"
+
 echo "Processing metadata"
 i=0
 for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
@@ -804,6 +829,9 @@ print-csv "Local SHA" "Local Subject" > "$CHERRY_PICKED_EMPTY_FILE"
 CHERRY_PICKED_SQUASHED_FILE="$REBASE_DIR/log/cherry-picked-squashed.csv"
 print-csv "Local SHA" "Local Subject" "Squashed Commits" > "$CHERRY_PICKED_SQUASHED_FILE"
 
+REPLACE_NEXT_IDENTICAL_FILE="$REBASE_DIR/log/replace-next-identical.csv"
+print-csv "Local SHA" "Local Subject" "Next Commits" > "$REPLACE_NEXT_IDENTICAL_FILE"
+
 PATCHED_FILE="$REBASE_DIR/log/patched.csv"
 print-csv "Local SHA" "Local Subject" > "$PATCHED_FILE"
 
@@ -921,6 +949,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 		continue
 	fi
 
+	NEXT_COMMIT_SHAS=
 	if [[ "$COMMIT_TYPE" = "FROMLIST" || "$COMMIT_TYPE" = "FROMGIT" ]]; then
 		PATCH_ID="$(get-patch-id "$COMMIT_SHA")"
 
@@ -934,6 +963,8 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				"$PATCH_ID" "$(git show -s --format=oneline "${PATCH_ID_SHAS[@]}")" \
 				>> "$EXISTS_PATCH_ID_FILE"
 			continue
+		elif [[ -n "${NEXT_PATCH_IDS["$PATCH_ID"]}" ]]; then
+			NEXT_COMMIT_SHAS="${NEXT_PATCH_IDS["$PATCH_ID"]}"
 		fi
 	fi
 
@@ -1016,7 +1047,33 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 		if [[ $APPLIED -eq 0 ]]; then
 			GIT_ABORT_CMD=(cherry-pick --abort)
+			if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
+				echo "$out"
+
+				if [[ -z "$NEXT_COMMIT_SHAS" ]]; then
+					echo "cherry-pick $COMMIT_SHA" >> "$WORKLOG_FILE"
+					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+						>> "$CHERRY_PICKED_FILE"
+				else
+					# Since the patch IDs are identical, this is really just for
+					# tracking what has already been accepted by the maintainers
+					echo "replace-next $COMMIT_SHA with identical $NEXT_COMMIT_SHAS" >> "$WORKLOG_FILE"
+
+					IFS=' ' read -r -a NEXT_COMMIT_SHA_LIST <<< "${NEXT_COMMIT_SHAS}"
+
+					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+						"$(git show -s --format=oneline "${NEXT_COMMIT_SHA_LIST[@]}")" \
+						>> "$REPLACE_NEXT_IDENTICAL_FILE"
+				fi
+				APPLIED=1
+			elif [[ $out = *"$git_empty_message"* ]]; then
+				echo "$COMMIT_SHA has already been applied"
+				echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
+				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					>> "$CHERRY_PICKED_EMPTY_FILE"
+				continue
 			else
+				echo "$out"
 			fi
 		fi
 	fi
