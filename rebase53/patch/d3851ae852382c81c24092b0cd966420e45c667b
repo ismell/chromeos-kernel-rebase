@@ -1,0 +1,82 @@
+From 67c231003ae446b707f23d635231c7a17596cd7f Mon Sep 17 00:00:00 2001
+From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date: Mon, 2 Sep 2019 11:53:09 +0200
+Subject: [PATCH] FROMGIT: mfd: cros_ec: Use mfd_add_hotplug_devices() helper
+
+Use mfd_add_hotplug_devices() helper to register the subdevices. The
+helper allows us to reduce the boiler plate and also registers the
+subdevices in the same way as used in other functions used in this
+files.
+
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Tested-by: Gwendal Grignou <gwendal@chromium.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+(cherry picked from commit 28e6fcc871bcff640c8960448034ea3a7c7fdfa3
+ git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git/
+ ib-mfd-extcon-hid-i2c-iio-input-media-chrome-power-pwm-rtc-sound-5.4 )
+
+Conflicts:
+ - drivers/mfd/cros_ec_dev.c: A different patch for legacy sensor was
+   already in.
+
+BUG=chromium:972644
+TEST=Compile
+
+Change-Id: Icff276567480e9aff51ddbcb9b7933f678d220cd
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1683175
+Reviewed-by: Benson Leung <bleung@google.com>
+
+[rebase53(rrangel): Cherry picked original commit 28e6fcc871bcff640c8960448034ea3a7c7fdfa3]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ drivers/mfd/cros_ec_dev.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index 449c333b3e3f1..0612198fd04c7 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -329,10 +329,8 @@ static void cros_ec_accel_legacy_register(struct cros_ec_dev *ec)
+ 	 * Register 2 accelerometers, we will fail in the IIO driver if there
+ 	 * are no sensors.
+ 	 */
+-	ret = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-			      cros_ec_accel_legacy_cells,
+-			      ARRAY_SIZE(cros_ec_accel_legacy_cells),
+-			      NULL, 0, NULL);
++	ret = mfd_add_hotplug_devices(ec->dev, cros_ec_accel_legacy_cells,
++				      ARRAY_SIZE(cros_ec_accel_legacy_cells));
+ 	if (ret)
+ 		dev_err(ec_dev->dev, "failed to add EC sensors\n");
+ }
+@@ -419,10 +417,8 @@ static int ec_device_probe(struct platform_device *pdev)
+ 	 * The following subdevices cannot be detected by sending the
+ 	 * EC_FEATURE_GET_CMD to the Embedded Controller device.
+ 	 */
+-	retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-				 cros_ec_platform_cells,
+-				 ARRAY_SIZE(cros_ec_platform_cells),
+-				 NULL, 0, NULL);
++	retval = mfd_add_hotplug_devices(ec->dev, cros_ec_platform_cells,
++					 ARRAY_SIZE(cros_ec_platform_cells));
+ 	if (retval)
+ 		dev_warn(ec->dev,
+ 			 "failed to add cros-ec platform devices: %d\n",
+@@ -431,10 +427,8 @@ static int ec_device_probe(struct platform_device *pdev)
+ 	/* Check whether this EC instance has a VBC NVRAM */
+ 	node = ec->ec_dev->dev->of_node;
+ 	if (of_property_read_bool(node, "google,has-vbc-nvram")) {
+-		retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-					 cros_ec_vbc_cells,
+-					 ARRAY_SIZE(cros_ec_vbc_cells),
+-					 NULL, 0, NULL);
++		retval = mfd_add_hotplug_devices(ec->dev, cros_ec_vbc_cells,
++						ARRAY_SIZE(cros_ec_vbc_cells));
+ 		if (retval)
+ 			dev_warn(ec->dev, "failed to add VBC devices: %d\n",
+ 				 retval);
+-- 
+2.23.0.444.g18eeb5a265-goog
+

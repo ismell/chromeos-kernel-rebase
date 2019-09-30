@@ -2476,3 +2476,15 @@ e2d9f09b0811bbd2daa3118945a4b59bf71178df BACKPORT: ASoC: audio-graph-card: fix a
 b88a9bbcc80f9244648daba296f17f72838199c1 UPSTREAM: x86/tsc: Use CPUID.0x16 to calculate missing crystal frequency
 f83e334a3823d3ead44dcf29d5fe762bba883551 UPSTREAM: Revert "Bluetooth: validate BLE connection interval updates"
 c352472d3904d7e191fb3c73ea54b8cfd5e16974 UPSTREAM: xhci: fix possible memleak on setup address fails.
+9db51ec53617bcbbe0ada3f613b4b00a7381b206 BACKPORT: media: v4l: fix uapi mpeg slice params definition
+bacfdaec437519da00f01899e6000c8c6bd652bd UPSTREAM: ASoC: mediatek: mt8183: move private structure
+299526aefa778809142d264f1cd5d89e968d1c09 UPSTREAM: ASoC: mediatek: mt8183: move headset jack to card-specific storage
+09177620d3ce3478025805b70b4c247f5bc7e26a UPSTREAM: ASoC: mediatek: mt8183: remove forward declaration of headset_init
+f0162592ac692a053c4c20ba25a4b5d9f4b7452f UPSTREAM: ASoC: mediatek: mt8183: fix space issues
+1c54ed5fe56e5b29ba5394a9cdbbdaca35d6b3d1 UPSTREAM: KVM: lapic: Explicitly cancel the hv timer if it's pre-expired
+7eb2c1c84d4579d454360ab46cf929ce6b403d18 UPSTREAM: KVM: lapic: Check for a pending timer intr prior to start_hv_timer()
+fc43b936545b9de2bd3fcd165b57fcd77a2582f7 UPSTREAM: KVM: x86: Consider LAPIC TSC-Deadline timer expired if deadline too short
+da322ed218606f6a7e1e4866818718f421716a58 UPSTREAM: mtd: mtdcore: add debugfs nodes for querying the flash name and id
+9fb562fb9495a0a3603513fe0ace2b1fb0549f0d UPSTREAM: mtd: spi-nor: enable the debugfs for the partname and partid
+4ee629b86583638838286f95cccfb27c32925274 UPSTREAM: mfd: Kconfig: Pedantic formatting
+787a03bbc57695d7c37979fa14fd3a0d676728d6 UPSTREAM: platform/chrome: cros_ec_chardev: Add a poll handler to receive MKBP events

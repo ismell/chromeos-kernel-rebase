@@ -1,0 +1,113 @@
+From 1a3bf4c08148069cdc0edf0965294f16d0cbe21f Mon Sep 17 00:00:00 2001
+From: Enrico Granata <egranata@chromium.org>
+Date: Tue, 30 Oct 2018 11:00:43 -0700
+Subject: [PATCH] CHROMIUM: cros_ec: enable tight_timestamps automatically in
+ sensor_ring
+
+This commit teaches cros_ec_sensors_ring how to read the EC feature flags
+to detect support for tight timestamps and - if support is detected -
+automatically enables tight_timestamps.
+
+BUG=b:112111610, chromium:944342
+TEST=tight_timestamps automatically enabled on Nocturne
+
+(Cherry-picked from 4.4, 4.14)
+
+Conflict:
+Unmerged paths:
+  (use "git add/rm <file>..." as appropriate to mark resolution)
+
+	deleted by us:   drivers/platform/chrome/cros_ec_dev.c
+Resolved: cros_ec_dev.c sits at drivers/mfd in kernel 4.14
+
+Conflict:
+        include/linux/mfd/cros_ec.h
+Resolved: moved cros_ec_remove comment below
+
+Reviewed-on: https://chromium-review.googlesource.com/1255904
+Reviewed-by: Alexandru M Stan <amstan@chromium.org>
+
+Change-Id: I275640a58e38fd10b71bc56567d2b22b03e93dba
+Signed-off-by: Enrico Granata <egranata@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1308064
+Commit-Ready: Jett Rink <jettrink@chromium.org>
+Reviewed-by: Aaron Durbin <adurbin@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1533346
+Commit-Ready: Alexandru M Stan <amstan@chromium.org>
+Tested-by: Alexandru M Stan <amstan@chromium.org>
+
+[rebase53(rrangel):
+Conflicts:
+	include/linux/mfd/cros_ec.h: One would think the changes should
+	go into cros_ec_proto.h, but those operate on cros_ec_device,
+	not cros_ec_dev.
+* Not sure why cros_ec_remove was exported. Removed it.
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ .../iio/common/cros_ec_sensors/cros_ec_sensors_ring.c |  3 +++
+ drivers/mfd/cros_ec_dev.c                             |  5 +++--
+ include/linux/mfd/cros_ec.h                           | 11 +++++++++++
+ 3 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+index 202a7c3839b09..00eb620c6e3ea 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+@@ -1020,6 +1020,9 @@ static int cros_ec_ring_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	state->tight_timestamps = cros_ec_check_features(ec_dev,
++		EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS);
++
+ 	/* register the notifier that will act as a top half interrupt. */
+ 	state->notifier.notifier_call = cros_ec_ring_event;
+ 	ret = blocking_notifier_chain_register(&ec_device->event_notifier,
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index 67633519b0aaf..efeee885293b9 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -112,7 +112,7 @@ static const struct mfd_cell cros_ec_vbc_cells[] = {
+ 	{ .name = "cros-ec-vbc", }
+ };
+ 
+-static int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
++int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
+ {
+ 	struct cros_ec_command *msg;
+ 	int ret;
+@@ -141,8 +141,9 @@ static int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
+ 		kfree(msg);
+ 	}
+ 
+-	return ec->features[feature / 32] & EC_FEATURE_MASK_0(feature);
++	return !!(ec->features[feature / 32] & EC_FEATURE_MASK_0(feature));
+ }
++EXPORT_SYMBOL_GPL(cros_ec_check_features);
+ 
+ static void cros_ec_class_release(struct device *dev)
+ {
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index 61c2875c2a407..7d3d58f4e3587 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -32,4 +32,15 @@ struct cros_ec_dev {
+ 
+ #define to_cros_ec_dev(dev)  container_of(dev, struct cros_ec_dev, class_dev)
+ 
++/**
++ * cros_ec_check_features - Test for the presence of EC features
++ *
++ * Call this function to test whether the ChromeOS EC supports a feature.
++ *
++ * @ec_dev: EC device
++ * @msg: One of ec_feature_code values
++ * @return: 1 if supported, 0 if not
++ */
++int cros_ec_check_features(struct cros_ec_dev *ec, int feature);
++
+ #endif /* __LINUX_MFD_CROS_EC_H */
+-- 
+2.23.0.444.g18eeb5a265-goog
+

@@ -1,0 +1,204 @@
+From b9303c4fadb3c2976880d54af85db75020e64ab4 Mon Sep 17 00:00:00 2001
+From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date: Thu, 27 Jun 2019 12:40:37 +0200
+Subject: [PATCH] BACKPORT: FROMGIT: mfd: cros_ec: Add convenience struct to
+ define autodetectable CrOS EC subdevices
+
+The CrOS EC is gaining lots of subdevices that are autodetectable by
+sending the EC_FEATURE_GET_CMD, it takes fair amount of boiler plate
+code to add those devices. So, add a struct that can be used to quickly
+add new subdevices without having to duplicate code.
+
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Tested-by: Gwendal Grignou <gwendal@chromium.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+(cherry picked from commit 832a636f6afe16aa95cb7281c4eb2194b402515d
+ git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git/
+ ib-mfd-extcon-hid-i2c-iio-input-media-chrome-power-pwm-rtc-sound-5.4 )
+
+Conflicts:
+ - drivers/mfd/cros_ec_dev.c: cros-ec-pd-sysfs is already added.
+
+BUG=chromium:972644
+TEST=Compile
+
+Change-Id: I87e658c8ba5db46bee6ed81991a7ae43958a5f44
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1683174
+Reviewed-by: Benson Leung <bleung@google.com>
+---
+ drivers/mfd/cros_ec_dev.c | 133 +++++++++++++++++++++-----------------
+ 1 file changed, 74 insertions(+), 59 deletions(-)
+
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index da20b6ede2b6d..ce6d979e337f1 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -46,6 +46,18 @@ struct cros_feature_to_name {
+ 	const char *desc;
+ };
+ 
++/**
++ * cros_feature_to_cells - CrOS feature id to mfd cells association.
++ * @id: The feature identifier.
++ * @mfd_cells: Pointer to the array of mfd cells that needs to be added.
++ * @num_cells: Number of mfd cells into the array.
++ */
++struct cros_feature_to_cells {
++	unsigned int id;
++	const struct mfd_cell *mfd_cells;
++	unsigned int num_cells;
++};
++
+ static const struct cros_feature_to_name cros_mcu_devices[] = {
+ 	{
+ 		.id	= EC_FEATURE_FINGERPRINT,
+@@ -69,6 +81,49 @@ static const struct cros_feature_to_name cros_mcu_devices[] = {
+ 	},
+ };
+ 
++static const struct mfd_cell cros_ec_cec_cells[] = {
++	{ .name = "cros-ec-cec", },
++};
++
++static const struct mfd_cell cros_ec_rtc_cells[] = {
++	{ .name = "cros-ec-rtc", },
++};
++
++static const struct mfd_cell cros_usbpd_charger_cells[] = {
++	{ .name = "cros-usbpd-charger", },
++	{ .name = "cros-usbpd-logger", },
++};
++
++static const struct cros_feature_to_cells cros_subdevices[] = {
++	{
++		.id		= EC_FEATURE_CEC,
++		.mfd_cells	= cros_ec_cec_cells,
++		.num_cells	= ARRAY_SIZE(cros_ec_cec_cells),
++	},
++	{
++		.id		= EC_FEATURE_RTC,
++		.mfd_cells	= cros_ec_rtc_cells,
++		.num_cells	= ARRAY_SIZE(cros_ec_rtc_cells),
++	},
++	{
++		.id		= EC_FEATURE_USB_PD,
++		.mfd_cells	= cros_usbpd_charger_cells,
++		.num_cells	= ARRAY_SIZE(cros_usbpd_charger_cells),
++	},
++};
++
++static const struct mfd_cell cros_ec_platform_cells[] = {
++	{ .name = "cros-ec-chardev", },
++	{ .name = "cros-ec-debugfs", },
++	{ .name = "cros-ec-lightbar", },
++	{ .name = "cros-ec-pd-sysfs" },
++	{ .name = "cros-ec-sysfs", },
++};
++
++static const struct mfd_cell cros_ec_vbc_cells[] = {
++	{ .name = "cros-ec-vbc", }
++};
++
+ int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
+ {
+ 	struct cros_ec_command *msg;
+@@ -347,31 +402,6 @@ static void cros_ec_accel_legacy_register(struct cros_ec_dev *ec)
+ 		dev_err(ec_dev->dev, "failed to add EC sensors\n");
+ }
+ 
+-static const struct mfd_cell cros_ec_cec_cells[] = {
+-	{ .name = "cros-ec-cec" }
+-};
+-
+-static const struct mfd_cell cros_ec_rtc_cells[] = {
+-	{ .name = "cros-ec-rtc" }
+-};
+-
+-static const struct mfd_cell cros_usbpd_charger_cells[] = {
+-	{ .name = "cros-usbpd-charger" },
+-	{ .name = "cros-usbpd-logger" },
+-};
+-
+-static const struct mfd_cell cros_ec_platform_cells[] = {
+-	{ .name = "cros-ec-chardev" },
+-	{ .name = "cros-ec-debugfs" },
+-	{ .name = "cros-ec-lightbar" },
+-	{ .name = "cros-ec-pd-sysfs" },
+-	{ .name = "cros-ec-sysfs" },
+-};
+-
+-static const struct mfd_cell cros_ec_vbc_cells[] = {
+-	{ .name = "cros-ec-vbc" }
+-};
+-
+ static int ec_device_probe(struct platform_device *pdev)
+ {
+ 	int retval = -ENOMEM;
+@@ -433,42 +463,27 @@ static int ec_device_probe(struct platform_device *pdev)
+ 		/* Workaroud for older EC firmware */
+ 		cros_ec_accel_legacy_register(ec);
+ 
+-	/* Check whether this EC instance has CEC host command support */
+-	if (cros_ec_check_features(ec, EC_FEATURE_CEC)) {
+-		retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-					 cros_ec_cec_cells,
+-					 ARRAY_SIZE(cros_ec_cec_cells),
+-					 NULL, 0, NULL);
+-		if (retval)
+-			dev_err(ec->dev,
+-				"failed to add cros-ec-cec device: %d\n",
+-				retval);
+-	}
+-
+-	/* Check whether this EC instance has RTC host command support */
+-	if (cros_ec_check_features(ec, EC_FEATURE_RTC)) {
+-		retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-					 cros_ec_rtc_cells,
+-					 ARRAY_SIZE(cros_ec_rtc_cells),
+-					 NULL, 0, NULL);
+-		if (retval)
+-			dev_err(ec->dev,
+-				"failed to add cros-ec-rtc device: %d\n",
+-				retval);
+-	}
+-
+-	/* Check whether this EC instance has the PD charge manager */
+-	if (cros_ec_check_features(ec, EC_FEATURE_USB_PD)) {
+-		retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+-					 cros_usbpd_charger_cells,
+-					 ARRAY_SIZE(cros_usbpd_charger_cells),
+-					 NULL, 0, NULL);
+-		if (retval)
+-			dev_err(ec->dev,
+-				"failed to add cros-usbpd-charger device: %d\n",
+-				retval);
++	/*
++	 * The following subdevices can be detected by sending the
++	 * EC_FEATURE_GET_CMD Embedded Controller device.
++	 */
++	for (i = 0; i < ARRAY_SIZE(cros_subdevices); i++) {
++		if (cros_ec_check_features(ec, cros_subdevices[i].id)) {
++			retval = mfd_add_hotplug_devices(ec->dev,
++						cros_subdevices[i].mfd_cells,
++						cros_subdevices[i].num_cells);
++			if (retval)
++				dev_err(ec->dev,
++					"failed to add %s subdevice: %d\n",
++					cros_subdevices[i].mfd_cells->name,
++					retval);
++		}
+ 	}
+ 
++	/*
++	 * The following subdevices cannot be detected by sending the
++	 * EC_FEATURE_GET_CMD to the Embedded Controller device.
++	 */
+ 	retval = mfd_add_devices(ec->dev, PLATFORM_DEVID_AUTO,
+ 				 cros_ec_platform_cells,
+ 				 ARRAY_SIZE(cros_ec_platform_cells),
+-- 
+2.23.0.444.g18eeb5a265-goog
+

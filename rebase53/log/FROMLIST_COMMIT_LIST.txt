@@ -881,3 +881,12 @@ f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-m
 ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
 fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine
 2670397aad54ecf2b6dbd236af12d4d0c92a6644 FROMLIST: KVM: coalesced_mmio: add bounds checking
+38dc590e51bb09c378eb2b19096b6d62b0cd036e FROMLIST: ARM: dts: rockchip: Add cpu id to rk3288 efuse node
+b4c4471b8bb7f2e26fc5121ee2018b0f24524c03 FROMLIST: ASoC: Intel: cht_bsw_rt5645: Add quirk for boards using pmc_plt_clk_0
+cc2a2f996a9011c75fb33b1c423748d8d619e374 FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine (take 2)
+adfa44d33d6412344a43e122a151b4bea9cf54ca FIXUP: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+77ca5f6a4c0094dfe08467aa27146a6ba4ed5cd7 FROMLIST: pinctrl: cherryview: restore Strago DMI workaround for all versions
+f722bfe88d837849082b46b1a43649dea50df88b FROMLIST: rtc: wilco-ec: Handle reading invalid times
+74d98acd1722c1a7b7a16f7e93de0f170203fdc0 FIXUP: FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+fdcc6ddd33314695812d591b1eab9db0408c5fa5 FROMLIST: drm/mediatek: add dphy reset after setting lanes number
+5ff96fc2e68cc9431258cf4a8ffdd7f8d0299c86 BACKPORT: FROMLIST: arm/arm64: defconfig: Update configs to use the new CROS_EC options

@@ -1823,6 +1823,13 @@ cd591e6ddaea7c77cd2686f3e4b3552e4574eec6 CHROMIUM: iwl7000: mvm: enable Atlas pl
 5a4de0d9ac4bc240999584010ecb3d5f902bf165 FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take three)
 e8c394111eb6fd99f4cc7655bc8dd6743c4e6d2d CHROMIUM: remove VIRTIO_GPU_CMD_GET_RESOURCE_PLANE_INFO
 48ea501949573a1e5df1c75f7cbe4da9563fd102 FIXUP: CHROMIUM: [media] hantro: add VP8 encoding support (take 2)
+c76dfa6403e81656954ea73db7856dce524b00bd CHROMIUM: Revert "drm/atomic_helper: Allow DPMS On<->Off changes for unregistered connectors"
+c6f91fa8e842988734bcf9416f2e90ccc01123ea CHROMIUM: Revert "ALSA: hda - Fix intermittent CORB/RIRB stall on Intel chips"
+bbb8a498fc3fb6760d2b3450f868cbead1c6b8ba CHROMIUM: Revert "drm/i915: Sanity check mmap length against object size"
+2d0e28e0d48a69f03bbea1cc4b7a4a8f29a8b76e CHROMIUM: Revert "drm/i915: Handle vm_mmap error during I915_GEM_MMAP ioctl with WC set"
+441211bfc69c5386d73b2c278e70e68b48315853 CHROMIUM: Revert "drm/i915: Cleanup gt powerstate from gem"
+fd8c067ebb6d6ff783864b87971411896ec25c38 CHROMIUM: Revert "drm/i915: Restore sane defaults for KMS on GEM error load"
+b923dc8dfa264b177e674b265307b2e87d27af37 CHROMIUM: Revert "drm/atomic_helper: Disallow new modesets on unregistered connectors"
 3bfd7663b760d3bf67c4e079b2027580583cb825 CHROMIUM: Bluetooth: btmrvl: Detect hangs and force a replug of the SDIO card
 6eeabb0898473600d301f7a4367f04c24e47bdf9 CHROMIUM: arm64: dts: mt8183: kodama: Add panel driver
 d356758bc94be521f8bd1a57fa1da24267ab4438 CHROMIUM: config: enable Mediatek MT8183 MDP3 config
@@ -1838,3 +1845,29 @@ b37426d5170a648b12c8e311ccca33912e78834c CHROMIUM: ARM64: dts: mt8183: Add port 
 ed3adf28d4bb2fbfc1353f2cbfc52228059f52af CHROMIUM: config: Turn on ROCKCHIP_EFUSE for arm32
 d145cca29f845e55e353cbb86fa9391a71f71dbb CHROMIUM: ARM64: dts: mt8183-jacuzzi: Add i2c2 and i2c4 attribute
 99b6cc1efda7eff87fa910c1ccfe9f3dbce0b4dc CHROMIUM: config: Re-enable CONFIG_I2C_DESIGNWARE_PLATFORM
+3e0b620a47e1670e4a3029ebc7f54da59d852799 CHROMIUM: drm/bridge: dw-hdmi: Add HDCP support
+2671db800d9fa98c8cb027e2a23f5b4ecf4f2857 CHROMIUM: dt-bindings: drm/rockchip: dw_hdmi: Add nvmem entry for cpu ID
+c4c4416837b33967f8d1f049980ce977e1d03f85 CHROMIUM: ARM: dts: rockchip: Add nvmem entry for cpu ID to HDMI on rk3288
+cee874e7210deeed6d7190486d07b53010d82986 CHROMIUM: drm/rockchip: dw_hdmi: Support Chromebook-style HDCP key from userspace
+bf21c203f25279f5c693000c3426fc871dfb5b3a CHROMIUM: virtio-gpu api: VIRTIO_GPU_F_MEMORY
+30dcc075764cd935b024a04cacffcabaa15eabcd CHROMIUM: drm/virtgpu: make memory and resource creation opaque
+521baf4b3a12ba9e45f455b95b03d330b0053e72 CHROMIUM: drm/virtgpu: don't create resources by default
+f8ace88642f2e48adcab40e330dcbe29d3e22ae5 CHROMIUM: drm/virtgpu: add memory type to virtio_gpu_object_params
+a9fb460da92ea72d572d1cb76193f40c68831866 CHROMIUM: drm/virtgpu: check for revelant capabilites
+566a17535f8a4924bdc63db2f2c3e6c9259ccfae CHROMIUM: drm/virtgpu: expose new ioctls to userspace
+43d036316fd09a862b93855383118b1d381b02bc CHROMIUM: drm/virtgpu: add stub ioctl implementation
+1d30d7b627da9391559fea54ed26ff27f86a3393 CHROMIUM: drm/virtgpu: implement DRM_VIRTGPU_RESOURCE_CREATE_V2
+03a606e4623fa9fc0124cf9babcddc44d3480abc CHROMIUM: drm/virtgpu: introduce request IDRs
+9f47e678be8b9a52b05aea6dc2ac6635f7b93aa8 CHROMIUM: drm/virtgpu: implement metadata allocation ioctl
+9b30b4dd29c7f6b53f53076d7339e112c308f05e CHROMIUM: bluetooth: enable turn on/off debug logs at runtime
+f9d76406b160cac5bc23fc942a7b154df4f56527 CHROMIUM: MALI: mediatek: use autosuspend in pm_callback_power_off
+3fd03d12c92147d048646c26f864a8684d8165e8 CHROMIUM: MALI: mediatek: Implement power_runtime_on_callback
+79ae0a226d9d5d951483340fce762c1459246554 CHROMIUM: config: normalize config
+4a8a6b83caafa0d57ab093cc4b0f768bbee5cc31 CHROMIUM: config: set Mediatek Video Codec driver as module
+6e2e4a8d7923a3272b2fa574a2002fce4a53c2be CHROMIUM: drm/virtgpu: fix various warnings
+44ad1365425184715c4ada171d409803134ea17a CHROMIUM: media: mtk-mdp3: accept MM21 input format
+3852babc72b5039e4008aa4bdfdf6d4eacedfa07 CHROMIUM: ARM64: dts: add vdec/venc h264 dtsi
+c4e9284cff225c480d618bcfe733e0f5e7105b27 CHROMIUM: esdfs: Fix deadlock when updating the file size on 32-bit SMP systems
+845491f08e055c66ced866febf787dd5daf9f843 CHROMIUM: config: Replace MFD_CROS_EC with CROS_EC
+90a320aaf3deee8276ce32529d658fb9cc18c30d CHROMIUM: config: Remove MFD_CROS_EC_CHARDEV
+724e2f028cf2f50dcd0bbf1e10488da46b049ae2 FIXUP: CHROMIUM: ARM64: dts: mt8183-kukui: Remove DIP reserved memory

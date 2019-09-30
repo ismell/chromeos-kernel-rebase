@@ -1,4 +1,4 @@
-From 0237318832c3339365bb0ee65f014b9f3d990012 Mon Sep 17 00:00:00 2001
+From 3237892c9814917150a3f1a9e7b653cf8f2dd3ef Mon Sep 17 00:00:00 2001
 From: Gwendal Grignou <gwendal@chromium.org>
 Date: Fri, 3 May 2019 10:35:02 -0700
 Subject: [PATCH] CHROMIUM: iio: cros_ec_light: Add support for RGB sensor
@@ -45,14 +45,14 @@ Signed-off-by: Raul E Rangel <rrangel@chromium.org>
  drivers/iio/light/cros_ec_light_prox.c        | 360 ++++++++++++++----
  drivers/mfd/cros_ec_dev.c                     |   3 +
  .../linux/iio/common/cros_ec_sensors_core.h   |   1 -
- include/linux/mfd/cros_ec_commands.h          |   2 +
+ .../linux/platform_data/cros_ec_commands.h    |   2 +
  4 files changed, 291 insertions(+), 75 deletions(-)
 
 diff --git a/drivers/iio/light/cros_ec_light_prox.c b/drivers/iio/light/cros_ec_light_prox.c
-index c4a75ddc1ea51..38093bb264559 100644
+index 76594d16d5a21..8cf2bf949a375 100644
 --- a/drivers/iio/light/cros_ec_light_prox.c
 +++ b/drivers/iio/light/cros_ec_light_prox.c
-@@ -21,77 +21,186 @@
+@@ -22,77 +22,186 @@
  #include <linux/slab.h>
  
  /*
@@ -281,7 +281,7 @@ index c4a75ddc1ea51..38093bb264559 100644
  		/*
  		 * RANGE is used for calibration
  		 * scale is a number x.y, where x is coded on 16 bits,
-@@ -125,24 +234,63 @@ static int cros_ec_light_prox_write(struct iio_dev *indio_dev,
+@@ -126,24 +235,63 @@ static int cros_ec_light_prox_write(struct iio_dev *indio_dev,
  			       int val, int val2, long mask)
  {
  	struct cros_ec_light_prox_state *st = iio_priv(indio_dev);
@@ -350,7 +350,7 @@ index c4a75ddc1ea51..38093bb264559 100644
  		st->core.param.cmd = MOTIONSENSE_CMD_SENSOR_RANGE;
  		st->core.param.sensor_range.data = (val << 16) | (val2 / 100);
  		ret = cros_ec_motion_send_host_cmd(&st->core, 0);
-@@ -158,6 +306,54 @@ static int cros_ec_light_prox_write(struct iio_dev *indio_dev,
+@@ -159,6 +307,54 @@ static int cros_ec_light_prox_write(struct iio_dev *indio_dev,
  	return ret;
  }
  
@@ -405,7 +405,7 @@ index c4a75ddc1ea51..38093bb264559 100644
  static const struct iio_info cros_ec_light_prox_info = {
  	.read_raw = &cros_ec_light_prox_read,
  	.write_raw = &cros_ec_light_prox_write,
-@@ -170,7 +366,7 @@ static int cros_ec_light_prox_probe(struct platform_device *pdev)
+@@ -171,7 +367,7 @@ static int cros_ec_light_prox_probe(struct platform_device *pdev)
  	struct iio_dev *indio_dev;
  	struct cros_ec_light_prox_state *state;
  	struct iio_chan_spec *channel;
@@ -414,7 +414,7 @@ index c4a75ddc1ea51..38093bb264559 100644
  
  	if (!ec_dev || !ec_dev->ec_dev) {
  		dev_warn(dev, "No CROS EC device found.\n");
-@@ -189,57 +385,73 @@ static int cros_ec_light_prox_probe(struct platform_device *pdev)
+@@ -190,57 +386,73 @@ static int cros_ec_light_prox_probe(struct platform_device *pdev)
  	state = iio_priv(indio_dev);
  	state->core.type = state->core.resp->info.type;
  	state->core.loc = state->core.resp->info.location;
@@ -515,10 +515,10 @@ index c4a75ddc1ea51..38093bb264559 100644
  		return ret;
  
 diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
-index e62feeca0a323..333b0b5e6fe67 100644
+index faa0e7d73cebf..54acf09ef6316 100644
 --- a/drivers/mfd/cros_ec_dev.c
 +++ b/drivers/mfd/cros_ec_dev.c
-@@ -526,6 +526,9 @@ static void cros_ec_sensors_register(struct cros_ec_dev *ec)
+@@ -271,6 +271,9 @@ static void cros_ec_sensors_register(struct cros_ec_dev *ec)
  		case MOTIONSENSE_TYPE_LIGHT:
  			sensor_cells[id].name = "cros-ec-light";
  			break;
@@ -529,10 +529,10 @@ index e62feeca0a323..333b0b5e6fe67 100644
  			sensor_cells[id].name = "cros-ec-activity";
  			break;
 diff --git a/include/linux/iio/common/cros_ec_sensors_core.h b/include/linux/iio/common/cros_ec_sensors_core.h
-index ffbaed6a38d03..215fbaaab3a3f 100644
+index 2728815c482b5..c05d0a84463de 100644
 --- a/include/linux/iio/common/cros_ec_sensors_core.h
 +++ b/include/linux/iio/common/cros_ec_sensors_core.h
-@@ -24,7 +24,6 @@ enum {
+@@ -25,7 +25,6 @@ enum {
  
  /*
   * 4 16 bit channels are allowed.
@@ -540,10 +540,10 @@ index ffbaed6a38d03..215fbaaab3a3f 100644
   */
  #define CROS_EC_SAMPLE_SIZE  (sizeof(s64) * 2)
  
-diff --git a/include/linux/mfd/cros_ec_commands.h b/include/linux/mfd/cros_ec_commands.h
+diff --git a/include/linux/platform_data/cros_ec_commands.h b/include/linux/platform_data/cros_ec_commands.h
 index f772591807af4..8cae223c8555b 100644
---- a/include/linux/mfd/cros_ec_commands.h
-+++ b/include/linux/mfd/cros_ec_commands.h
+--- a/include/linux/platform_data/cros_ec_commands.h
++++ b/include/linux/platform_data/cros_ec_commands.h
 @@ -2341,6 +2341,7 @@ enum motionsensor_type {
  	MOTIONSENSE_TYPE_ACTIVITY = 5,
  	MOTIONSENSE_TYPE_BARO = 6,
@@ -561,5 +561,5 @@ index f772591807af4..8cae223c8555b 100644
  };
  
 -- 
-2.23.0.351.gc4317032e6-goog
+2.23.0.444.g18eeb5a265-goog
 

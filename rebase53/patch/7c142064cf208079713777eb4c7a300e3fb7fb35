@@ -1,4 +1,4 @@
-From 5cf365d304a63282c898017158d8fae389345e63 Mon Sep 17 00:00:00 2001
+From 1b6b57010a0815d911d33b643c0f1932cd4d2c00 Mon Sep 17 00:00:00 2001
 From: Jett Rink <jettrink@chromium.org>
 Date: Fri, 5 Apr 2019 13:45:14 -0600
 Subject: [PATCH] CHROMIUM: cros_ec_istp loops until events are gone
@@ -20,19 +20,23 @@ Reviewed-on: https://chromium-review.googlesource.com/1555219
 Reviewed-by: Enrico Granata <egranata@chromium.org>
 Reviewed-by: Mathew King <mathewk@chromium.org>
 
-[rebase53(rrangel): Context conflict]
+[rebase53(rrangel):
+Conflicts:
+	drivers/mfd/cros_ec.c -> drivers/platform/chrome/cros_ec.c
+	linux/mfs/cros_ec.h -> cros_ec_proto.h
+]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
- drivers/mfd/cros_ec.c                   |  5 +++--
- drivers/platform/chrome/cros_ec_ishtp.c | 25 +++++++++++++++++++------
- include/linux/mfd/cros_ec.h             | 12 ++++++++++++
- 3 files changed, 34 insertions(+), 8 deletions(-)
+ drivers/platform/chrome/cros_ec.c           |  5 +++--
+ drivers/platform/chrome/cros_ec_ishtp.c     | 25 ++++++++++++++++-----
+ include/linux/platform_data/cros_ec_proto.h | 11 +++++++++
+ 3 files changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/mfd/cros_ec.c b/drivers/mfd/cros_ec.c
-index cc7a20c94fe0..b2b7f61d27e3 100644
---- a/drivers/mfd/cros_ec.c
-+++ b/drivers/mfd/cros_ec.c
-@@ -57,7 +57,7 @@ static irqreturn_t ec_irq_handler(int irq, void *data) {
+diff --git a/drivers/platform/chrome/cros_ec.c b/drivers/platform/chrome/cros_ec.c
+index fde2819e9b428..18e552b8faa46 100644
+--- a/drivers/platform/chrome/cros_ec.c
++++ b/drivers/platform/chrome/cros_ec.c
+@@ -45,7 +45,7 @@ static irqreturn_t ec_irq_handler(int irq, void *data) {
  	return IRQ_WAKE_THREAD;
  }
  
@@ -41,7 +45,7 @@ index cc7a20c94fe0..b2b7f61d27e3 100644
  {
  	bool wake_event = true;
  	bool ec_has_more_events = false;
-@@ -79,6 +79,7 @@ static bool ec_handle_event(struct cros_ec_device *ec_dev)
+@@ -67,6 +67,7 @@ static bool ec_handle_event(struct cros_ec_device *ec_dev)
  	return ec_has_more_events;
  
  }
@@ -49,7 +53,7 @@ index cc7a20c94fe0..b2b7f61d27e3 100644
  
  static irqreturn_t ec_irq_thread(int irq, void *data)
  {
-@@ -86,7 +87,7 @@ static irqreturn_t ec_irq_thread(int irq, void *data)
+@@ -74,7 +75,7 @@ static irqreturn_t ec_irq_thread(int irq, void *data)
  	bool ec_has_more_events;
  
  	do {
@@ -59,10 +63,10 @@ index cc7a20c94fe0..b2b7f61d27e3 100644
  
  	return IRQ_HANDLED;
 diff --git a/drivers/platform/chrome/cros_ec_ishtp.c b/drivers/platform/chrome/cros_ec_ishtp.c
-index 430731cdf827..d287cece6e94 100644
+index 25ca2c894b4de..19c38448ff061 100644
 --- a/drivers/platform/chrome/cros_ec_ishtp.c
 +++ b/drivers/platform/chrome/cros_ec_ishtp.c
-@@ -137,11 +137,11 @@ static void ish_evt_handler(struct work_struct *work)
+@@ -136,11 +136,11 @@ static void ish_evt_handler(struct work_struct *work)
  	struct ishtp_cl_data *client_data =
  		container_of(work, struct ishtp_cl_data, work_ec_evt);
  	struct cros_ec_device *ec_dev = client_data->ec_dev;
@@ -78,7 +82,7 @@ index 430731cdf827..d287cece6e94 100644
  }
  
  /**
-@@ -201,13 +201,14 @@ static int ish_send(struct ishtp_cl_data *client_data,
+@@ -200,13 +200,14 @@ static int ish_send(struct ishtp_cl_data *client_data,
   * process_recv() - Received and parse incoming packet
   * @cros_ish_cl: Client instance to get stats
   * @rb_in_proc: Host interface message buffer
@@ -94,7 +98,7 @@ index 430731cdf827..d287cece6e94 100644
  {
  	size_t data_len = rb_in_proc->buf_idx;
  	struct ishtp_cl_data *client_data =
-@@ -296,6 +297,11 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
+@@ -295,6 +296,11 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
  		break;
  
  	case CROS_MKBP_EVENT:
@@ -106,7 +110,7 @@ index 430731cdf827..d287cece6e94 100644
  		/* The event system doesn't send any data in buffer */
  		schedule_work(&client_data->work_ec_evt);
  
-@@ -323,10 +329,17 @@ static void ish_event_cb(struct ishtp_cl_device *cl_device)
+@@ -322,10 +328,17 @@ static void ish_event_cb(struct ishtp_cl_device *cl_device)
  {
  	struct ishtp_cl_rb *rb_in_proc;
  	struct ishtp_cl	*cros_ish_cl = ishtp_get_drvdata(cl_device);
@@ -125,15 +129,14 @@ index 430731cdf827..d287cece6e94 100644
  	}
  }
  
-diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
-index 37139000d30d..e38439dcc4bd 100644
---- a/include/linux/mfd/cros_ec.h
-+++ b/include/linux/mfd/cros_ec.h
-@@ -364,4 +364,16 @@ u32 cros_ec_get_host_event(struct cros_ec_device *ec_dev);
+diff --git a/include/linux/platform_data/cros_ec_proto.h b/include/linux/platform_data/cros_ec_proto.h
+index 35659f23e5eb4..143a4470b7d6d 100644
+--- a/include/linux/platform_data/cros_ec_proto.h
++++ b/include/linux/platform_data/cros_ec_proto.h
+@@ -338,4 +338,15 @@ u32 cros_ec_get_host_event(struct cros_ec_device *ec_dev);
   */
  s64 cros_ec_get_time_ns(void);
  
-+
 +/**
 + * cros_ec_handle_event - process and forward pending events on EC
 + *
@@ -145,7 +148,7 @@ index 37139000d30d..e38439dcc4bd 100644
 + */
 +bool cros_ec_handle_event(struct cros_ec_device *ec_dev);
 +
- #endif /* __LINUX_MFD_CROS_EC_H */
+ #endif /* __LINUX_CROS_EC_PROTO_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.444.g18eeb5a265-goog
 

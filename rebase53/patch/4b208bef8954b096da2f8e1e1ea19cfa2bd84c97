@@ -1,4 +1,4 @@
-From c5c6ec4bf042139badb567c3c963ed04ff6d8b12 Mon Sep 17 00:00:00 2001
+From dbcd0c6332d3f6e0e0d478cb2bde2eaf69c0c4de Mon Sep 17 00:00:00 2001
 From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
 Date: Mon, 19 Jun 2017 17:33:31 +0200
 Subject: [PATCH] CHROMIUM: iio: cros_ec: add support for single sensor hub
@@ -27,19 +27,21 @@ Change-Id: I4b208bef8954b096da2f8e1e1ea19cfa2bd84c97
 [rebase53(rrangel):
 	* Context conflict
 	* Drop cros_ec_commands.h changes. They are applied already.
+	* Apply header change from 19824c7b9e
+	* get_monotonic_boottime was replaced with ktime_get_boottime
 ]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/iio/common/cros_ec_sensors/Kconfig    |   9 +
  drivers/iio/common/cros_ec_sensors/Makefile   |   1 +
  .../cros_ec_sensors/cros_ec_sensors_core.c    |  30 +
- .../cros_ec_sensors/cros_ec_sensors_ring.c    | 537 ++++++++++++++++++
+ .../cros_ec_sensors/cros_ec_sensors_ring.c    | 535 ++++++++++++++++++
  .../linux/iio/common/cros_ec_sensors_core.h   |   1 +
- 5 files changed, 578 insertions(+)
+ 5 files changed, 576 insertions(+)
  create mode 100644 drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
 
 diff --git a/drivers/iio/common/cros_ec_sensors/Kconfig b/drivers/iio/common/cros_ec_sensors/Kconfig
-index bcb58fb76b9f..87ab2e53ce8a 100644
+index cdbb29cfb9076..54c23b2a807e6 100644
 --- a/drivers/iio/common/cros_ec_sensors/Kconfig
 +++ b/drivers/iio/common/cros_ec_sensors/Kconfig
 @@ -30,3 +30,12 @@ config IIO_CROS_EC_SENSORS_LID_ANGLE
@@ -56,7 +58,7 @@ index bcb58fb76b9f..87ab2e53ce8a 100644
 +	  A single device with a buffer will collect all samples produced
 +	  by the sensors managed by the CroEC sensor hub.
 diff --git a/drivers/iio/common/cros_ec_sensors/Makefile b/drivers/iio/common/cros_ec_sensors/Makefile
-index e0a33ab66d21..59ba12dcc3c9 100644
+index e0a33ab66d21a..59ba12dcc3c99 100644
 --- a/drivers/iio/common/cros_ec_sensors/Makefile
 +++ b/drivers/iio/common/cros_ec_sensors/Makefile
 @@ -6,3 +6,4 @@
@@ -65,10 +67,10 @@ index e0a33ab66d21..59ba12dcc3c9 100644
  obj-$(CONFIG_IIO_CROS_EC_SENSORS_LID_ANGLE) += cros_ec_lid_angle.o
 +obj-$(CONFIG_IIO_CROS_EC_SENSORS_RING) += cros_ec_sensors_ring.o
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-index 69ec1e232982..d13f1726e604 100644
+index 820daadab7e7d..312f20704751e 100644
 --- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-@@ -99,6 +99,29 @@ int cros_ec_motion_send_host_cmd(struct cros_ec_sensors_core_state *state,
+@@ -105,6 +105,29 @@ int cros_ec_motion_send_host_cmd(struct cros_ec_sensors_core_state *state,
  }
  EXPORT_SYMBOL_GPL(cros_ec_motion_send_host_cmd);
  
@@ -98,7 +100,7 @@ index 69ec1e232982..d13f1726e604 100644
  static ssize_t cros_ec_sensors_calibrate(struct iio_dev *indio_dev,
  		uintptr_t private, const struct iio_chan_spec *chan,
  		const char *buf, size_t len)
-@@ -147,6 +170,13 @@ static ssize_t cros_ec_sensors_loc(struct iio_dev *indio_dev,
+@@ -153,6 +176,13 @@ static ssize_t cros_ec_sensors_loc(struct iio_dev *indio_dev,
  }
  
  const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
@@ -114,10 +116,10 @@ index 69ec1e232982..d13f1726e604 100644
  		.shared = IIO_SHARED_BY_ALL,
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
 new file mode 100644
-index 000000000000..a3c8766ce797
+index 0000000000000..4e7b9879aad86
 --- /dev/null
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
-@@ -0,0 +1,537 @@
+@@ -0,0 +1,535 @@
 +/*
 + * cros_ec_sensors_ring - Driver for Chrome OS EC Sensor hub FIFO.
 + *
@@ -148,9 +150,10 @@ index 000000000000..a3c8766ce797
 +#include <linux/iio/trigger_consumer.h>
 +#include <linux/kernel.h>
 +#include <linux/mfd/cros_ec.h>
-+#include <linux/mfd/cros_ec_commands.h>
 +#include <linux/module.h>
 +#include <linux/slab.h>
++#include <linux/platform_data/cros_ec_commands.h>
++#include <linux/platform_data/cros_ec_proto.h>
 +#include <linux/platform_device.h>
 +
 +#define DRV_NAME "cros-ec-ring"
@@ -213,10 +216,7 @@ index 000000000000..a3c8766ce797
 +
 +static s64 cros_ec_get_time_ns(void)
 +{
-+	struct timespec ts;
-+
-+	get_monotonic_boottime(&ts);
-+	return timespec_to_ns(&ts);
++	return ktime_get_boottime();
 +}
 +
 +/*
@@ -656,10 +656,10 @@ index 000000000000..a3c8766ce797
 +MODULE_ALIAS("platform:" DRV_NAME);
 +MODULE_LICENSE("GPL v2");
 diff --git a/include/linux/iio/common/cros_ec_sensors_core.h b/include/linux/iio/common/cros_ec_sensors_core.h
-index 98cdd69635b8..b91020307436 100644
+index 17cc8d4170348..3c3fa61e34d9d 100644
 --- a/include/linux/iio/common/cros_ec_sensors_core.h
 +++ b/include/linux/iio/common/cros_ec_sensors_core.h
-@@ -54,6 +54,7 @@ enum {
+@@ -55,6 +55,7 @@ enum {
  struct cros_ec_sensors_core_state {
  	struct cros_ec_device *ec;
  	struct mutex cmd_lock;
@@ -668,5 +668,5 @@ index 98cdd69635b8..b91020307436 100644
  	struct cros_ec_command *msg;
  	struct ec_params_motion_sense param;
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.444.g18eeb5a265-goog
 

@@ -38,7 +38,8 @@ a3f7d76d0a1bd6dad3c4f28b07487cd3ea257b0c FIXUP: FROMLIST: drm/mediatek: Support 
 "92b7f61350ade17688b38ef225aa6efeddcafce4","FROMLIST: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet","d1853a9b3da14b1d18a3fa67bcf20c4abda36ba0 FIXUP: FROMGIT: ath10k: adjust skb length in ath10k_sdio_mbox_rx_packet",
 "ac02f2cebc96f1c4a2da440776428b2ecc8f560c","FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel","5bcdd900a5509775b18bbf2edc696bc7176b29d4 FIXUP: FROMLIST: drm/panel: support for boe, tv101wum-n53 wuxga dsi video mode panel",
 "3aaa1dfd6a57ae1da76bd19706ac896e398fced0","FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver","f6d41524263f225c0723bfc63b8899a47a3e526f FIXUP: FROMLIST: media: platform: mtk-mdp3: Add Mediatek MDP3 driver",
-"9b1bdc4568cfee6bc7eb8959873ce461b84a761b","FROMLIST: PM / AVS: SVS: Introduce SVS engine","fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine",
+"9b1bdc4568cfee6bc7eb8959873ce461b84a761b","FROMLIST: PM / AVS: SVS: Introduce SVS engine","fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine
+cc2a2f996a9011c75fb33b1c423748d8d619e374 FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine (take 2)",
 "ab922f68712a5768ffb8eca32d37b654738e3ecf","FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)","c917e05508d50264a3f83c1b38d2860f9f0d1337 FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)
 ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add Mediatek DIP driver (RFC V3)",
 "61e12ddf8197612c314860cdc6efacf0c37424b6","BACKPORT: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver","c23c9eae7e3f06bc29cfb3493a3d6c85ceb9ecca FIXUP: FROMLIST: media: platform: mtk-isp: Add Mediatek sensor interface driver
@@ -51,10 +52,10 @@ b055f6b00d16a4cf0c76695773d2e59a04a073c7 FIXUP: FROMLIST: media: i2c: Add more s
 "d12dc1a835648e06925c9d8f4b4e14017104fe76","CHROMIUM: MALI: Add Mali platform specific source","f2bcb17c654efaf8f5ecb9128c6282911e2ba99d FIXUP: CHROMIUM: MALI: Add Mali platform specific source
 f738c609efda4ecb7b2ebe87c3ec9b97faeabc06 FIXUP: CHROMIUM: MALI: Add Mali platform specific source",
 "04fdb1751c20b807c81be7b43e2de7389e2b25ca","CHROMIUM: Device driver for TPM over virtio","743c29e99ecad9998c07d78fa246e138aff738df FIXUP: CHROMIUM: Device driver for TPM over virtio",
-"f9b2926124b8ed2cba2ca8282dc4858dff3d9a7a","CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring","1d76113a8dc73d70b9d89c70e3e8e8da5f5f4d15 FIXUP: CHROMIUM: cros_ec: enable tight_timestamps automatically in sensor_ring",
 "05213e598eb035557b73f72f21c7a759615e93ff","CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend","2a03de2e808fb3d9128af026c300df7714c0a4d8 FIXUP: CHROMIUM: platform/chrome: wilco_ec: Add charge scheduling backend",
 "c257fa8632bb98df1fbc4e2ac46c91c938428be2","CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus","ce823a5a51832fa94a7c7e2573489e570462a611 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus
 7c966453ee85056944208a7f73c800b608c06b15 FIXUP: CHROMIUM: hardlockup: detect hard lockups without NMIs using secondary cpus",
 "e0eb312f6c333f61ddf1ef639516f3e2fd823536","CHROMIUM: net: phy: Add support for generic LED configuration through the DT","b19c830319d3b6c71ab25b57adf9b803708fe0bd FIXUP: CHROMIUM: net: phy: Add support for generic LED configuration through the DT",
 "f445c72f5d8277569bf2d5e20df38153c9141b7d","CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)","33f060daafea7097bb910fe0cbcb56f3ca30fa2f FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take two)
 5a4de0d9ac4bc240999584010ecb3d5f902bf165 FIXUP: CHROMIUM: drm/vgem: fix cache synchronization on arm/arm64 (take three)",
+"90d558344b1533ddfa18bdcbfb77e343dd3bc66a","CHROMIUM: ARM64: dts: mt8183-kukui: Remove DIP reserved memory","724e2f028cf2f50dcd0bbf1e10488da46b049ae2 FIXUP: CHROMIUM: ARM64: dts: mt8183-kukui: Remove DIP reserved memory",

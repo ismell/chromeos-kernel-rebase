@@ -4673,3 +4673,34 @@ ca294d21a889eef57112ab2494cf7fae3901f1fc FIXUP: FROMLIST: platform: mtk-isp: Add
 fa4b51a790dc8b817599a95c24ab5140021ff87e FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine
 c352472d3904d7e191fb3c73ea54b8cfd5e16974 UPSTREAM: xhci: fix possible memleak on setup address fails.
 2670397aad54ecf2b6dbd236af12d4d0c92a6644 FROMLIST: KVM: coalesced_mmio: add bounds checking
+38dc590e51bb09c378eb2b19096b6d62b0cd036e FROMLIST: ARM: dts: rockchip: Add cpu id to rk3288 efuse node
+9db51ec53617bcbbe0ada3f613b4b00a7381b206 BACKPORT: media: v4l: fix uapi mpeg slice params definition
+b4c4471b8bb7f2e26fc5121ee2018b0f24524c03 FROMLIST: ASoC: Intel: cht_bsw_rt5645: Add quirk for boards using pmc_plt_clk_0
+bacfdaec437519da00f01899e6000c8c6bd652bd UPSTREAM: ASoC: mediatek: mt8183: move private structure
+299526aefa778809142d264f1cd5d89e968d1c09 UPSTREAM: ASoC: mediatek: mt8183: move headset jack to card-specific storage
+09177620d3ce3478025805b70b4c247f5bc7e26a UPSTREAM: ASoC: mediatek: mt8183: remove forward declaration of headset_init
+f0162592ac692a053c4c20ba25a4b5d9f4b7452f UPSTREAM: ASoC: mediatek: mt8183: fix space issues
+cc2a2f996a9011c75fb33b1c423748d8d619e374 FIXUP: FROMLIST: PM / AVS: SVS: Introduce SVS engine (take 2)
+adfa44d33d6412344a43e122a151b4bea9cf54ca FIXUP: FROMLIST: media: platform: Add Mediatek ISP P1 V4L2 device driver
+77ca5f6a4c0094dfe08467aa27146a6ba4ed5cd7 FROMLIST: pinctrl: cherryview: restore Strago DMI workaround for all versions
+1c54ed5fe56e5b29ba5394a9cdbbdaca35d6b3d1 UPSTREAM: KVM: lapic: Explicitly cancel the hv timer if it's pre-expired
+7eb2c1c84d4579d454360ab46cf929ce6b403d18 UPSTREAM: KVM: lapic: Check for a pending timer intr prior to start_hv_timer()
+fc43b936545b9de2bd3fcd165b57fcd77a2582f7 UPSTREAM: KVM: x86: Consider LAPIC TSC-Deadline timer expired if deadline too short
+f722bfe88d837849082b46b1a43649dea50df88b FROMLIST: rtc: wilco-ec: Handle reading invalid times
+74d98acd1722c1a7b7a16f7e93de0f170203fdc0 FIXUP: FROMLIST: drm/mediatek: change the dsi phytiming calculate method
+fdcc6ddd33314695812d591b1eab9db0408c5fa5 FROMLIST: drm/mediatek: add dphy reset after setting lanes number
+da322ed218606f6a7e1e4866818718f421716a58 UPSTREAM: mtd: mtdcore: add debugfs nodes for querying the flash name and id
+9fb562fb9495a0a3603513fe0ace2b1fb0549f0d UPSTREAM: mtd: spi-nor: enable the debugfs for the partname and partid
+4ee629b86583638838286f95cccfb27c32925274 UPSTREAM: mfd: Kconfig: Pedantic formatting
+3038c5ac26322055938c1503a67e55800dde7b90 BACKPORT: FROMGIT: mfd / platform: cros_ec: Handle chained ECs as platform devices
+4d8c391b0256e7a16269b4096d0ec31fe66e4ac8 BACKPORT: FROMGIT: mfd / platform: cros_ec: Move cros-ec core driver out from MFD
+a8b75ac5c072cb04e63e8b3ce1345cf6e54e5faf BACKPORT: FROMGIT: mfd / platform: cros_ec: Miscellaneous character device to talk with the EC
+e1515853ab8e41bfdb1647b74387d8bf69f8d838 BACKPORT: FROMGIT: mfd: cros_ec: Switch to use the new cros-ec-chardev driver
+04231394e41892a18b678d15b80d2f74681f94b2 FROMGIT: mfd / platform: cros_ec: Rename config to a better name
+19824c7b9e337b7d387d6fb4fb4cd6ebc7e6cef9 BACKPORT: FROMGIT: mfd / platform: cros_ec: Reorganize platform and mfd includes
+d28145df1afe7b262194736cfe89895c21369817 BACKPORT: FROMGIT: mfd: cros_ec: Use kzalloc and cros_ec_cmd_xfer_status helper
+8207bd80095e94d17a878e12d5e00b2e0a2962b1 BACKPORT: FROMGIT: mfd: cros_ec: Add convenience struct to define dedicated CrOS EC MCUs
+b9303c4fadb3c2976880d54af85db75020e64ab4 BACKPORT: FROMGIT: mfd: cros_ec: Add convenience struct to define autodetectable CrOS EC subdevices
+d3851ae852382c81c24092b0cd966420e45c667b BACKPORT: FROMGIT: mfd: cros_ec: Use mfd_add_hotplug_devices() helper
+5ff96fc2e68cc9431258cf4a8ffdd7f8d0299c86 BACKPORT: FROMLIST: arm/arm64: defconfig: Update configs to use the new CROS_EC options
+787a03bbc57695d7c37979fa14fd3a0d676728d6 UPSTREAM: platform/chrome: cros_ec_chardev: Add a poll handler to receive MKBP events

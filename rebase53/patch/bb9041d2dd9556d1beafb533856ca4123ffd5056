@@ -1,0 +1,78 @@
+From 7973c80974feac4f1252b6a09893194a69b32df9 Mon Sep 17 00:00:00 2001
+From: Gwendal Grignou <gwendal@chromium.org>
+Date: Mon, 15 Jul 2019 10:38:56 -0700
+Subject: [PATCH] CHROMIUM: iio: cros_ec: Allow enabling/disabling calibration
+ mode
+
+calibration was a one-shot event sent to the sensor to calibrate itself.
+It is used on Bosch sensors (BMI160, BMA254).
+For TCS3400 light sensor, we need to stay in calibration mode to run
+tests.
+Accept boolean true and false (not just true) to enter/exit calibration.
+
+BUG=b:124512628
+TEST=Check "echo 0 > calibrate" is supported.
+
+Cq-Depend: chromium:1702543
+Change-Id: I63e55d83fe0313e0cdbd88434ec50ed67ce82e53
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1702623
+Reviewed-by: Nick Vaccaro <nvaccaro@google.com>
+
+[rebase53(rrangel):
+Conflicts:
+	include/linux/mfd/cros_ec_commands.h -> include/linux/platform_data/cros_ec_commands.h
+]
+Signed-off-by: Raul E Rangel <rrangel@chromium.org>
+---
+ .../common/cros_ec_sensors/cros_ec_sensors_core.c    |  3 +--
+ include/linux/platform_data/cros_ec_commands.h       | 12 +++++++++---
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+index 6b5a95f536ad6..b0358b82808fd 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
+@@ -245,11 +245,10 @@ static ssize_t cros_ec_sensors_calibrate(struct iio_dev *indio_dev,
+ 	ret = strtobool(buf, &calibrate);
+ 	if (ret < 0)
+ 		return ret;
+-	if (!calibrate)
+-		return -EINVAL;
+ 
+ 	mutex_lock(&st->cmd_lock);
+ 	st->param.cmd = MOTIONSENSE_CMD_PERFORM_CALIB;
++	st->param.perform_calib.enable = calibrate;
+ 	ret = cros_ec_motion_send_host_cmd(st, 0);
+ 	if (ret != 0) {
+ 		dev_warn(&indio_dev->dev, "Unable to calibrate sensor: %d\n",
+diff --git a/include/linux/platform_data/cros_ec_commands.h b/include/linux/platform_data/cros_ec_commands.h
+index 7ccb8757b79da..f772591807af4 100644
+--- a/include/linux/platform_data/cros_ec_commands.h
++++ b/include/linux/platform_data/cros_ec_commands.h
+@@ -2516,13 +2516,19 @@ struct ec_params_motion_sense {
+ 
+ 		/*
+ 		 * Used for MOTIONSENSE_CMD_INFO, MOTIONSENSE_CMD_DATA
+-		 * and MOTIONSENSE_CMD_PERFORM_CALIB.
+ 		 */
+ 		struct __ec_todo_unpacked {
+ 			uint8_t sensor_num;
+-		} info, info_3, data, fifo_flush, perform_calib,
+-				list_activities;
++		} info, info_3, data, fifo_flush, list_activities;
+ 
++		/*
++		 * Used for MOTIONSENSE_CMD_PERFORM_CALIB:
++		 * Allow entering/exiting the calibration mode.
++		 */
++		struct __ec_todo_unpacked {
++			uint8_t sensor_num;
++			uint8_t enable;
++		} perform_calib;
+ 		/*
+ 		 * Used for MOTIONSENSE_CMD_EC_RATE, MOTIONSENSE_CMD_SENSOR_ODR
+ 		 * and MOTIONSENSE_CMD_SENSOR_RANGE.
+-- 
+2.23.0.444.g18eeb5a265-goog
+

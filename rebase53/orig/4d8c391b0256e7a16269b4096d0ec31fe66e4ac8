@@ -1,0 +1,349 @@
+From 4d8c391b0256e7a16269b4096d0ec31fe66e4ac8 Mon Sep 17 00:00:00 2001
+From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Date: Thu, 27 Jun 2019 12:40:30 +0200
+Subject: [PATCH] BACKPORT: FROMGIT: mfd / platform: cros_ec: Move cros-ec core
+ driver out from MFD
+
+Now, the ChromeOS EC core driver has nothing related to an MFD device, so
+move that driver from the MFD subsystem to the platform/chrome subsystem.
+
+Conflicts:
+ - line offsets
+ - drivers/platform/chrome/Kconfig,
+   drivers/iio/common/cros_ec_sensors/Kconfig: extend MFD_CROS_EC replacement to
+   yet to be upstreamed driver.
+
+(cherry picked from commit 47f11e0b40e97f373da4efbacee0a9526c816ed5
+ git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd.git/
+ ib-mfd-extcon-hid-i2c-iio-input-media-chrome-power-pwm-rtc-sound-5.4 )
+
+BUG=chromium:972644
+TEST=Compile
+
+Signed-off-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Acked-by: Thierry Reding <thierry.reding@gmail.com>
+Acked-by: Mark Brown <broonie@kernel.org>
+Acked-by: Wolfram Sang <wsa@the-dreams.de>
+Acked-by: Neil Armstrong <narmstrong@baylibre.com>
+Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Acked-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+Reviewed-by: Gwendal Grignou <gwendal@chromium.org>
+Tested-by: Gwendal Grignou <gwendal@chromium.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+
+Change-Id: I1bbf3527a721f51af5b1a67b533d4b19662c9fa5
+Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1682344
+Reviewed-by: Benson Leung <bleung@google.com>
+---
+ drivers/extcon/Kconfig                     |  2 +-
+ drivers/hid/Kconfig                        |  2 +-
+ drivers/i2c/busses/Kconfig                 |  2 +-
+ drivers/iio/common/cros_ec_sensors/Kconfig |  3 +--
+ drivers/input/keyboard/Kconfig             |  2 +-
+ drivers/media/platform/Kconfig             |  3 +--
+ drivers/mfd/Kconfig                        | 15 ++------------
+ drivers/mfd/Makefile                       |  2 --
+ drivers/platform/chrome/Kconfig            | 23 +++++++++++++++++-----
+ drivers/platform/chrome/Makefile           |  1 +
+ drivers/{mfd => platform/chrome}/cros_ec.c |  0
+ drivers/power/supply/Kconfig               |  2 +-
+ drivers/pwm/Kconfig                        |  2 +-
+ drivers/rtc/Kconfig                        |  2 +-
+ sound/soc/codecs/Kconfig                   |  4 ++--
+ sound/soc/qcom/Kconfig                     |  2 +-
+ 16 files changed, 33 insertions(+), 34 deletions(-)
+ rename drivers/{mfd => platform/chrome}/cros_ec.c (100%)
+
+diff --git a/drivers/extcon/Kconfig b/drivers/extcon/Kconfig
+index de15bf55895bd..2d2d42805f617 100644
+--- a/drivers/extcon/Kconfig
++++ b/drivers/extcon/Kconfig
+@@ -153,7 +153,7 @@ config EXTCON_USB_GPIO
+ 
+ config EXTCON_USBC_CROS_EC
+ 	tristate "ChromeOS Embedded Controller EXTCON support"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  Say Y here to enable USB Type C cable detection extcon support when
+ 	  using Chrome OS EC based USB Type-C ports.
+diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
+index 66f6d1d71b851..748f49a53a144 100644
+--- a/drivers/hid/Kconfig
++++ b/drivers/hid/Kconfig
+@@ -351,7 +351,7 @@ config HOLTEK_FF
+ 
+ config HID_GOOGLE_HAMMER
+ 	tristate "Google Hammer Keyboard"
+-	depends on USB_HID && LEDS_CLASS && MFD_CROS_EC
++	depends on USB_HID && LEDS_CLASS && CROS_EC
+ 	---help---
+ 	Say Y here if you have a Google Hammer device.
+ 
+diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
+index 8f803812ea244..aad56b9074f3d 100644
+--- a/drivers/i2c/busses/Kconfig
++++ b/drivers/i2c/busses/Kconfig
+@@ -1300,7 +1300,7 @@ config I2C_SIBYTE
+ 
+ config I2C_CROS_EC_TUNNEL
+ 	tristate "ChromeOS EC tunnel I2C bus"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  If you say yes here you get an I2C bus that will tunnel i2c commands
+ 	  through to the other side of the ChromeOS EC to the i2c bus
+diff --git a/drivers/iio/common/cros_ec_sensors/Kconfig b/drivers/iio/common/cros_ec_sensors/Kconfig
+index edc55ea0699b4..019467490892a 100644
+--- a/drivers/iio/common/cros_ec_sensors/Kconfig
++++ b/drivers/iio/common/cros_ec_sensors/Kconfig
+@@ -3,7 +3,7 @@
+ #
+ config IIO_CROS_EC_SENSORS_CORE
+ 	tristate "ChromeOS EC Sensors Core"
+-	depends on SYSFS && MFD_CROS_EC
++	depends on SYSFS && CROS_EC
+ 	select IIO_BUFFER
+ 	select IIO_TRIGGERED_BUFFER
+ 	help
+@@ -43,7 +43,6 @@ config IIO_CROS_EC_SENSORS_LID_ANGLE
+ config IIO_CROS_EC_SENSORS_RING
+ 	tristate "ChromeOS EC Sensors Ring"
+ 	depends on IIO_CROS_EC_SENSORS || IIO_CROS_EC_LIGHT_PROX
+-	depends on MFD_CROS_EC_CHARDEV
+ 	help
+ 	  Add support for handling sensor events FIFO produced by
+ 	  the sensor hub.
+diff --git a/drivers/input/keyboard/Kconfig b/drivers/input/keyboard/Kconfig
+index 4713957b0cbba..33cd6bbadcfab 100644
+--- a/drivers/input/keyboard/Kconfig
++++ b/drivers/input/keyboard/Kconfig
+@@ -717,7 +717,7 @@ config KEYBOARD_W90P910
+ config KEYBOARD_CROS_EC
+ 	tristate "ChromeOS EC keyboard"
+ 	select INPUT_MATRIXKMAP
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  Say Y here to enable the matrix keyboard used by ChromeOS devices
+ 	  and implemented on the ChromeOS EC. You must enable one bus option
+diff --git a/drivers/media/platform/Kconfig b/drivers/media/platform/Kconfig
+index 5b2d31fd62245..6b01b438b45df 100644
+--- a/drivers/media/platform/Kconfig
++++ b/drivers/media/platform/Kconfig
+@@ -562,10 +562,9 @@ if CEC_PLATFORM_DRIVERS
+ 
+ config VIDEO_CROS_EC_CEC
+ 	tristate "ChromeOS EC CEC driver"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	select CEC_CORE
+ 	select CEC_NOTIFIER
+-	select CHROME_PLATFORMS
+ 	select CROS_EC_PROTO
+ 	---help---
+ 	  If you say yes here you will get support for the
+diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+index 37ca09689d1df..7c97406206bf8 100644
+--- a/drivers/mfd/Kconfig
++++ b/drivers/mfd/Kconfig
+@@ -190,21 +190,10 @@ config MFD_AXP20X_RSB
+ 	  components like regulators or the PEK (Power Enable Key) under the
+ 	  corresponding menus.
+ 
+-config MFD_CROS_EC
+-	tristate "ChromeOS Embedded Controller"
+-	select MFD_CORE
+-	select CHROME_PLATFORMS
+-	select CROS_EC_PROTO
+-	depends on X86 || ARM || ARM64 || COMPILE_TEST
+-	help
+-	  If you say Y here you get support for the ChromeOS Embedded
+-	  Controller (EC) providing keyboard, battery and power services.
+-	  You also need to enable the driver for the bus you are using. The
+-	  protocol for talking to the EC is defined by the bus driver.
+-
+ config MFD_CROS_EC_CHARDEV
+ 	tristate "Chrome OS Embedded Controller userspace device interface"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
++	select MFD_CORE
+ 	---help---
+ 	  This driver adds support to talk with the ChromeOS EC from userspace.
+ 
+diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+index 3bef131593c3d..2e63e1642ac3c 100644
+--- a/drivers/mfd/Makefile
++++ b/drivers/mfd/Makefile
+@@ -12,8 +12,6 @@ obj-$(CONFIG_MFD_SM501)		+= sm501.o
+ obj-$(CONFIG_MFD_ASIC3)		+= asic3.o tmio_core.o
+ obj-$(CONFIG_MFD_BCM590XX)	+= bcm590xx.o
+ obj-$(CONFIG_MFD_BD9571MWV)	+= bd9571mwv.o
+-cros_ec_core-objs		:= cros_ec.o
+-obj-$(CONFIG_MFD_CROS_EC)	+= cros_ec_core.o
+ obj-$(CONFIG_MFD_CROS_EC_CHARDEV) += cros_ec_dev.o
+ obj-$(CONFIG_MFD_EXYNOS_LPASS)	+= exynos-lpass.o
+ 
+diff --git a/drivers/platform/chrome/Kconfig b/drivers/platform/chrome/Kconfig
+index 24ee566445fc5..a67442000e4fb 100644
+--- a/drivers/platform/chrome/Kconfig
++++ b/drivers/platform/chrome/Kconfig
+@@ -58,9 +58,22 @@ config CHROMEOS_TBMC
+ 
+ source "drivers/platform/chrome/wilco_ec/Kconfig"
+ 
++config CROS_EC
++	tristate "ChromeOS Embedded Controller"
++	select CROS_EC_PROTO
++	depends on X86 || ARM || ARM64 || COMPILE_TEST
++	help
++	  If you say Y here you get support for the ChromeOS Embedded
++	  Controller (EC) providing keyboard, battery and power services.
++	  You also need to enable the driver for the bus you are using. The
++	  protocol for talking to the EC is defined by the bus driver.
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called cros_ec.
++
+ config CROS_EC_I2C
+ 	tristate "ChromeOS Embedded Controller (I2C)"
+-	depends on MFD_CROS_EC && I2C
++	depends on CROS_EC && I2C
+ 
+ 	help
+ 	  If you say Y here, you get support for talking to the ChromeOS
+@@ -83,7 +96,7 @@ config CROS_EC_ISHTP
+ 
+ config CROS_EC_RPMSG
+ 	tristate "ChromeOS Embedded Controller (rpmsg)"
+-	depends on MFD_CROS_EC && RPMSG && OF
++	depends on CROS_EC && RPMSG && OF
+ 	help
+ 	  If you say Y here, you get support for talking to the ChromeOS EC
+ 	  through rpmsg. This uses a simple byte-level protocol with a
+@@ -95,7 +108,7 @@ config CROS_EC_RPMSG
+ 
+ config CROS_EC_SPI
+ 	tristate "ChromeOS Embedded Controller (SPI)"
+-	depends on MFD_CROS_EC && SPI
++	depends on CROS_EC && SPI
+ 
+ 	---help---
+ 	  If you say Y here, you get support for talking to the ChromeOS EC
+@@ -105,7 +118,7 @@ config CROS_EC_SPI
+ 
+ config CROS_EC_LPC
+ 	tristate "ChromeOS Embedded Controller (LPC)"
+-	depends on MFD_CROS_EC && ACPI && (X86 || COMPILE_TEST)
++	depends on CROS_EC && ACPI && (X86 || COMPILE_TEST)
+ 	help
+ 	  If you say Y here, you get support for talking to the ChromeOS EC
+ 	  over an LPC bus, including the LPC Microchip EC (MEC) variant.
+@@ -166,7 +179,7 @@ config CROS_EC_DEBUGFS
+ 
+ config CROS_EC_PD_UPDATE
+ 	tristate "ChromeOS Embedded Controller PD device update driver"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 
+ 	help
+ 	  If you say Y here, you get support for updating ChromeOS
+diff --git a/drivers/platform/chrome/Makefile b/drivers/platform/chrome/Makefile
+index 5532d846d8151..39f4d2c301b77 100644
+--- a/drivers/platform/chrome/Makefile
++++ b/drivers/platform/chrome/Makefile
+@@ -7,6 +7,7 @@ obj-$(CONFIG_CHROMEOS)			+= chromeos.o
+ obj-$(CONFIG_CHROMEOS_LAPTOP)		+= chromeos_laptop.o
+ obj-$(CONFIG_CHROMEOS_PSTORE)		+= chromeos_pstore.o
+ obj-$(CONFIG_CHROMEOS_TBMC)		+= chromeos_tbmc.o
++obj-$(CONFIG_CROS_EC)			+= cros_ec.o
+ obj-$(CONFIG_CROS_EC_I2C)		+= cros_ec_i2c.o
+ obj-$(CONFIG_CROS_EC_ISHTP)		+= cros_ec_ishtp.o
+ obj-$(CONFIG_CROS_EC_RPMSG)		+= cros_ec_rpmsg.o
+diff --git a/drivers/mfd/cros_ec.c b/drivers/platform/chrome/cros_ec.c
+similarity index 100%
+rename from drivers/mfd/cros_ec.c
+rename to drivers/platform/chrome/cros_ec.c
+diff --git a/drivers/power/supply/Kconfig b/drivers/power/supply/Kconfig
+index c9c50b5f6b770..d2c7a3d1d6d5b 100644
+--- a/drivers/power/supply/Kconfig
++++ b/drivers/power/supply/Kconfig
+@@ -637,7 +637,7 @@ config CHARGER_RT9455
+ 
+ config CHARGER_CROS_USBPD
+ 	tristate "ChromeOS EC based USBPD charger"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	default n
+ 	help
+ 	  Say Y here to enable ChromeOS EC based USBPD charger
+diff --git a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+index 504d252716f2e..6790f763770be 100644
+--- a/drivers/pwm/Kconfig
++++ b/drivers/pwm/Kconfig
+@@ -142,7 +142,7 @@ config PWM_CRC
+ 
+ config PWM_CROS_EC
+ 	tristate "ChromeOS EC PWM driver"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  PWM driver for exposing a PWM attached to the ChromeOS Embedded
+ 	  Controller.
+diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
+index a13bafa5c4980..d8acd21776a87 100644
+--- a/drivers/rtc/Kconfig
++++ b/drivers/rtc/Kconfig
+@@ -1246,7 +1246,7 @@ config RTC_DRV_ZYNQMP
+ 
+ config RTC_DRV_CROS_EC
+ 	tristate "Chrome OS EC RTC driver"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  If you say yes here you will get support for the
+ 	  Chrome OS Embedded Controller's RTC.
+diff --git a/sound/soc/codecs/Kconfig b/sound/soc/codecs/Kconfig
+index b155563452e92..f1473188f10ff 100644
+--- a/sound/soc/codecs/Kconfig
++++ b/sound/soc/codecs/Kconfig
+@@ -49,7 +49,7 @@ config SND_SOC_ALL_CODECS
+ 	select SND_SOC_BT_SCO
+ 	select SND_SOC_BD28623
+ 	select SND_SOC_CQ0093VC
+-	select SND_SOC_CROS_EC_CODEC if MFD_CROS_EC
++	select SND_SOC_CROS_EC_CODEC if CROS_EC
+ 	select SND_SOC_CS35L32 if I2C
+ 	select SND_SOC_CS35L33 if I2C
+ 	select SND_SOC_CS35L34 if I2C
+@@ -451,7 +451,7 @@ config SND_SOC_CQ0093VC
+ 
+ config SND_SOC_CROS_EC_CODEC
+ 	tristate "codec driver for ChromeOS EC"
+-	depends on MFD_CROS_EC
++	depends on CROS_EC
+ 	help
+ 	  If you say yes here you will get support for the
+ 	  ChromeOS Embedded Controller's Audio Codec.
+diff --git a/sound/soc/qcom/Kconfig b/sound/soc/qcom/Kconfig
+index 369d58f545e88..c16b1172175c9 100644
+--- a/sound/soc/qcom/Kconfig
++++ b/sound/soc/qcom/Kconfig
+@@ -97,7 +97,7 @@ config SND_SOC_MSM8996
+ 
+ config SND_SOC_SDM845
+ 	tristate "SoC Machine driver for SDM845 boards"
+-	depends on QCOM_APR && MFD_CROS_EC && I2C
++	depends on QCOM_APR && CROS_EC && I2C
+ 	select SND_SOC_QDSP6
+ 	select SND_SOC_QCOM_COMMON
+ 	select SND_SOC_RT5663
+-- 
+2.23.0.444.g18eeb5a265-goog
+

@@ -222,3 +222,7 @@ c2187b65efe3ad44b2815eef1151ee13fba9e67d Revert "FIXUP: FROMLIST: drm/mediatek: 
 eb1b71f97cdf14b1a81ed1367eb1b231b6550445 Revert "FROMLIST: dt-bindings: display: mediatek: update dsi supported chips"
 407e96ba86218c43941d39d0421798f12bd3c3eb Revert "FROMLIST: drm/i915: Fix corruption lines on the screen on Gen9 chromebooks"
 ab69eb49666b3a0662cadff27e33301ab3f119c7 Revert "CHROMIUM: platform: mtk-isp: meta cache"
+02ebfd9a8a9c7442c7748abb92c029e65dd97c7f Revert "CHROMIUM: arm64: dts: mt8183: set opp-suspend for gpu opp table"
+32b7e2f0e2528fc33be3f6944ca5f379ad1cd4ac Revert "FROMLIST: mtd: spi-nor: enable the debugfs for the partname and partid"
+f4061ff1cf6b97b3c90d94fc4330a1040872690b Revert "FROMLIST: mtd: mtdcore: add debugfs nodes for querying the flash name and id"
+7771dc6919f50f1364c4f553970515338b587151 Revert "CHROMIUM: cros_ec: add a poll handler"

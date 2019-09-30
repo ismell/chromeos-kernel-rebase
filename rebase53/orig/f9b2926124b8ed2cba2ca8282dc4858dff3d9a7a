@@ -1,0 +1,115 @@
+From f9b2926124b8ed2cba2ca8282dc4858dff3d9a7a Mon Sep 17 00:00:00 2001
+From: Enrico Granata <egranata@chromium.org>
+Date: Tue, 30 Oct 2018 11:00:43 -0700
+Subject: [PATCH] CHROMIUM: cros_ec: enable tight_timestamps automatically in
+ sensor_ring
+
+This commit teaches cros_ec_sensors_ring how to read the EC feature flags
+to detect support for tight timestamps and - if support is detected -
+automatically enables tight_timestamps.
+
+BUG=b:112111610, chromium:944342
+TEST=tight_timestamps automatically enabled on Nocturne
+
+(Cherry-picked from 4.4, 4.14)
+
+Conflict:
+Unmerged paths:
+  (use "git add/rm <file>..." as appropriate to mark resolution)
+
+	deleted by us:   drivers/platform/chrome/cros_ec_dev.c
+Resolved: cros_ec_dev.c sits at drivers/mfd in kernel 4.14
+
+Conflict:
+        include/linux/mfd/cros_ec.h
+Resolved: moved cros_ec_remove comment below
+
+Reviewed-on: https://chromium-review.googlesource.com/1255904
+Reviewed-by: Alexandru M Stan <amstan@chromium.org>
+
+Change-Id: I275640a58e38fd10b71bc56567d2b22b03e93dba
+Signed-off-by: Enrico Granata <egranata@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1308064
+Commit-Ready: Jett Rink <jettrink@chromium.org>
+Reviewed-by: Aaron Durbin <adurbin@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/1533346
+Commit-Ready: Alexandru M Stan <amstan@chromium.org>
+Tested-by: Alexandru M Stan <amstan@chromium.org>
+---
+ .../cros_ec_sensors/cros_ec_sensors_ring.c    |  3 +++
+ drivers/mfd/cros_ec_dev.c                     |  5 +++--
+ include/linux/mfd/cros_ec.h                   | 20 +++++++++++++++++++
+ 3 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+index ef23f01febc1a..a5899c7f8bf2c 100644
+--- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
++++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_ring.c
+@@ -1019,6 +1019,9 @@ static int cros_ec_ring_probe(struct platform_device *pdev)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	state->tight_timestamps = cros_ec_check_features(ec_dev,
++		EC_FEATURE_MOTION_SENSE_TIGHT_TIMESTAMPS);
++
+ 	/* register the notifier that will act as a top half interrupt. */
+ 	state->notifier.notifier_call = cros_ec_ring_event;
+ 	ret = blocking_notifier_chain_register(&ec_device->event_notifier,
+diff --git a/drivers/mfd/cros_ec_dev.c b/drivers/mfd/cros_ec_dev.c
+index 64a605ef0c417..fef424efd65d2 100644
+--- a/drivers/mfd/cros_ec_dev.c
++++ b/drivers/mfd/cros_ec_dev.c
+@@ -97,7 +97,7 @@ static int ec_get_version(struct cros_ec_dev *ec, char *str, int maxlen)
+ 	return ret;
+ }
+ 
+-static int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
++int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
+ {
+ 	struct cros_ec_command *msg;
+ 	int ret;
+@@ -129,8 +129,9 @@ static int cros_ec_check_features(struct cros_ec_dev *ec, int feature)
+ 		kfree(msg);
+ 	}
+ 
+-	return ec->features[feature / 32] & EC_FEATURE_MASK_0(feature);
++	return !!(ec->features[feature / 32] & EC_FEATURE_MASK_0(feature));
+ }
++EXPORT_SYMBOL_GPL(cros_ec_check_features);
+ 
+ struct cros_ec_priv {
+ 	struct cros_ec_dev *ec;
+diff --git a/include/linux/mfd/cros_ec.h b/include/linux/mfd/cros_ec.h
+index ac2b79f1cfb53..c0920348441bf 100644
+--- a/include/linux/mfd/cros_ec.h
++++ b/include/linux/mfd/cros_ec.h
+@@ -289,6 +289,26 @@ int cros_ec_cmd_xfer(struct cros_ec_device *ec_dev,
+ int cros_ec_cmd_xfer_status(struct cros_ec_device *ec_dev,
+ 			    struct cros_ec_command *msg);
+ 
++/**
++ * cros_ec_check_features - Test for the presence of EC features
++ *
++ * Call this function to test whether the ChromeOS EC supports a feature.
++ *
++ * @ec_dev: EC device
++ * @msg: One of ec_feature_code values
++ * @return: 1 if supported, 0 if not
++ */
++int cros_ec_check_features(struct cros_ec_dev *ec, int feature);
++
++/**
++ * cros_ec_remove - Remove a ChromeOS EC
++ *
++ * Call this to deregister a ChromeOS EC, then clean up any private data.
++ *
++ * Return: 0 on success or negative error code.
++ */
++int cros_ec_remove(struct cros_ec_device *ec_dev);
++
+ /**
+  * cros_ec_register() - Register a new ChromeOS EC, using the provided info.
+  * @ec_dev: Device to register.
+-- 
+2.23.0.444.g18eeb5a265-goog
+

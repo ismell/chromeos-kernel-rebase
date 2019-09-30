@@ -1312,3 +1312,13 @@ d6128e660d8a13a8c6daf45a50033debeef3a4b0 FROMGIT: drm/bridge: dw-hdmi-i2s: enabl
 8913bb87f18b4c923095781cd30a4ee0d8f68a63 FROMGIT: drm/bridge: dw-hdmi-i2s: add .get_eld support
 81a9cfa8e3c469a03c7ec4f451b5ced058c98115 FROMGIT: drm: bridge/dw_hdmi: add audio sample channel status setting
 b5811c5300a5c82d0f92455050920b5071fa195f BACKPORT/FROMGIT: drm/i915/vbt: Fix VBT parsing for the PSR section
+3038c5ac26322055938c1503a67e55800dde7b90 BACKPORT: FROMGIT: mfd / platform: cros_ec: Handle chained ECs as platform devices
+4d8c391b0256e7a16269b4096d0ec31fe66e4ac8 BACKPORT: FROMGIT: mfd / platform: cros_ec: Move cros-ec core driver out from MFD
+a8b75ac5c072cb04e63e8b3ce1345cf6e54e5faf BACKPORT: FROMGIT: mfd / platform: cros_ec: Miscellaneous character device to talk with the EC
+e1515853ab8e41bfdb1647b74387d8bf69f8d838 BACKPORT: FROMGIT: mfd: cros_ec: Switch to use the new cros-ec-chardev driver
+04231394e41892a18b678d15b80d2f74681f94b2 FROMGIT: mfd / platform: cros_ec: Rename config to a better name
+19824c7b9e337b7d387d6fb4fb4cd6ebc7e6cef9 BACKPORT: FROMGIT: mfd / platform: cros_ec: Reorganize platform and mfd includes
+d28145df1afe7b262194736cfe89895c21369817 BACKPORT: FROMGIT: mfd: cros_ec: Use kzalloc and cros_ec_cmd_xfer_status helper
+8207bd80095e94d17a878e12d5e00b2e0a2962b1 BACKPORT: FROMGIT: mfd: cros_ec: Add convenience struct to define dedicated CrOS EC MCUs
+b9303c4fadb3c2976880d54af85db75020e64ab4 BACKPORT: FROMGIT: mfd: cros_ec: Add convenience struct to define autodetectable CrOS EC subdevices
+d3851ae852382c81c24092b0cd966420e45c667b BACKPORT: FROMGIT: mfd: cros_ec: Use mfd_add_hotplug_devices() helper

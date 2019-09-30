@@ -1,4 +1,4 @@
-From a5207ca5caff8c22ed541b0bb310cef59fa8a8c9 Mon Sep 17 00:00:00 2001
+From 7dffe7d0fa36589032937db85c560f923e2a511e Mon Sep 17 00:00:00 2001
 From: Enric Balletbo i Serra <enric.balletbo@collabora.com>
 Date: Mon, 19 Jun 2017 18:24:50 +0200
 Subject: [PATCH] CHROMIUM: iio: cros_ec_activity: add activity sensor driver
@@ -24,19 +24,20 @@ Change-Id: I72e1ef357ae8a9ef9181c43d5a553ee6d8716537
 [rebase53(rrangel):
 	* Context conflicts
 	* cros_ec_sensors_id already exists
+	* Apply header change from 19824c7b9e
 ]
 Signed-off-by: Raul E Rangel <rrangel@chromium.org>
 ---
  drivers/iio/common/cros_ec_sensors/Kconfig    |  10 +
  drivers/iio/common/cros_ec_sensors/Makefile   |   1 +
- .../common/cros_ec_sensors/cros_ec_activity.c | 284 ++++++++++++++++++
+ .../common/cros_ec_sensors/cros_ec_activity.c | 285 ++++++++++++++++++
  .../cros_ec_sensors/cros_ec_sensors_core.c    |  15 +
  .../linux/iio/common/cros_ec_sensors_core.h   |   1 +
- 5 files changed, 311 insertions(+)
+ 5 files changed, 312 insertions(+)
  create mode 100644 drivers/iio/common/cros_ec_sensors/cros_ec_activity.c
 
 diff --git a/drivers/iio/common/cros_ec_sensors/Kconfig b/drivers/iio/common/cros_ec_sensors/Kconfig
-index 87ab2e53ce8a..aeb5a78c0005 100644
+index 54c23b2a807e6..2f3db093e1fc4 100644
 --- a/drivers/iio/common/cros_ec_sensors/Kconfig
 +++ b/drivers/iio/common/cros_ec_sensors/Kconfig
 @@ -22,6 +22,16 @@ config IIO_CROS_EC_SENSORS
@@ -57,7 +58,7 @@ index 87ab2e53ce8a..aeb5a78c0005 100644
  	tristate "ChromeOS EC Sensor for lid angle"
  	depends on IIO_CROS_EC_SENSORS_CORE
 diff --git a/drivers/iio/common/cros_ec_sensors/Makefile b/drivers/iio/common/cros_ec_sensors/Makefile
-index 59ba12dcc3c9..125e124df728 100644
+index 59ba12dcc3c99..125e124df7288 100644
 --- a/drivers/iio/common/cros_ec_sensors/Makefile
 +++ b/drivers/iio/common/cros_ec_sensors/Makefile
 @@ -5,5 +5,6 @@
@@ -69,10 +70,10 @@ index 59ba12dcc3c9..125e124df728 100644
  obj-$(CONFIG_IIO_CROS_EC_SENSORS_RING) += cros_ec_sensors_ring.o
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_activity.c b/drivers/iio/common/cros_ec_sensors/cros_ec_activity.c
 new file mode 100644
-index 000000000000..a9c89de1569f
+index 0000000000000..ace6485bb6a68
 --- /dev/null
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_activity.c
-@@ -0,0 +1,284 @@
+@@ -0,0 +1,285 @@
 +/*
 + * cros_ec_sensors_activity - Driver for activities/gesture recognition.
 + *
@@ -98,9 +99,10 @@ index 000000000000..a9c89de1569f
 +#include <linux/iio/iio.h>
 +#include <linux/kernel.h>
 +#include <linux/mfd/cros_ec.h>
-+#include <linux/mfd/cros_ec_commands.h>
 +#include <linux/module.h>
 +#include <linux/slab.h>
++#include <linux/platform_data/cros_ec_commands.h>
++#include <linux/platform_data/cros_ec_proto.h>
 +#include <linux/platform_device.h>
 +
 +#define DRV_NAME "cros-ec-activity"
@@ -358,10 +360,10 @@ index 000000000000..a9c89de1569f
 +MODULE_ALIAS("platform:" DRV_NAME);
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-index d13f1726e604..627f43e573c0 100644
+index 312f20704751e..15e8b9341a2d9 100644
 --- a/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
 +++ b/drivers/iio/common/cros_ec_sensors/cros_ec_sensors_core.c
-@@ -196,6 +196,21 @@ const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
+@@ -202,6 +202,21 @@ const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[] = {
  };
  EXPORT_SYMBOL_GPL(cros_ec_sensors_ext_info);
  
@@ -384,10 +386,10 @@ index d13f1726e604..627f43e573c0 100644
   * cros_ec_sensors_idx_to_reg - convert index into offset in shared memory
   * @st:		pointer to state information for device
 diff --git a/include/linux/iio/common/cros_ec_sensors_core.h b/include/linux/iio/common/cros_ec_sensors_core.h
-index b91020307436..c97287d784fc 100644
+index 3c3fa61e34d9d..b7c543abc1855 100644
 --- a/include/linux/iio/common/cros_ec_sensors_core.h
 +++ b/include/linux/iio/common/cros_ec_sensors_core.h
-@@ -170,5 +170,6 @@ extern const struct dev_pm_ops cros_ec_sensors_pm_ops;
+@@ -174,5 +174,6 @@ extern const struct dev_pm_ops cros_ec_sensors_pm_ops;
  
  /* List of extended channel specification for all sensors */
  extern const struct iio_chan_spec_ext_info cros_ec_sensors_ext_info[];
@@ -395,5 +397,5 @@ index b91020307436..c97287d784fc 100644
  
  #endif  /* __CROS_EC_SENSORS_CORE_H */
 -- 
-2.23.0.187.g17f5b7556c-goog
+2.23.0.444.g18eeb5a265-goog
 

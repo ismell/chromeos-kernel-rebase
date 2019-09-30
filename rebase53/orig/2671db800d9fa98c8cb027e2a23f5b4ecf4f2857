@@ -1,0 +1,46 @@
+From 2671db800d9fa98c8cb027e2a23f5b4ecf4f2857 Mon Sep 17 00:00:00 2001
+From: Douglas Anderson <dianders@chromium.org>
+Date: Wed, 18 Sep 2019 15:55:41 -0700
+Subject: [PATCH] CHROMIUM: dt-bindings: drm/rockchip: dw_hdmi: Add nvmem entry
+ for cpu ID
+
+In order to decode the HDCP key that userspace provides the Rockchip
+HDMI driver needs to be able to read the CPU ID out of nvmem.  Add for
+this in the bindings.
+
+This is a CHROMIUM patch because, as far as I can tell from looking at
+Rockchip's github tree, only Chrome OS devices use the CPU ID like
+this.  Other devices using Rockchip SoCs get the HDCP seed from their
+downstream "vendor storage".  A more upstream friendly solution might
+be to have userspace read the nvmem and provide it at the same time it
+provides the key.
+
+BUG=chromium:971474
+TEST=None
+
+Change-Id: I664c486185562819104d8f8a40ca34c7f5fdd429
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Reviewed-on: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1814422
+Reviewed-by: Sean Paul <seanpaul@chromium.org>
+---
+ .../devicetree/bindings/display/rockchip/dw_hdmi-rockchip.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/rockchip/dw_hdmi-rockchip.txt b/Documentation/devicetree/bindings/display/rockchip/dw_hdmi-rockchip.txt
+index 2f6dbb02cf72b..59f18a60b74d4 100644
+--- a/Documentation/devicetree/bindings/display/rockchip/dw_hdmi-rockchip.txt
++++ b/Documentation/devicetree/bindings/display/rockchip/dw_hdmi-rockchip.txt
+@@ -34,6 +34,10 @@ Optional properties
+ - clock-names: May contain "cec" as defined in dw_hdmi.txt.
+ - clock-names: May contain "grf", power for grf io.
+ - clock-names: May contain "vpll", external clock for some hdmi phy.
++- nvmem-cells: May have the phandle for the nvmem cell containing the CPU ID.
++  This is used in HDCP.
++- nvmem-cell-names: If nvmem-cells has the phandle CPU ID, this should be the
++  string "cpu-id".
+ 
+ Optional pinctrl entry:
+ - If you have both a "unwedge" and "default" pinctrl entry, dw_hdmi
+-- 
+2.23.0.444.g18eeb5a265-goog
+
