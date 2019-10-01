@@ -20,6 +20,8 @@ REBASE_ID=rebase53
 
 SKIP_ANDROID=1
 SKIP_IWL7000=1
+ENABLE_BUILD_TEST=0
+IGNORE_BUILD_FAILURES=1
 
 ## END CONFIG
 
@@ -48,7 +50,7 @@ mkdir -p "$CACHE_DIR/msg"
 mkdir -p "$CACHE_DIR/patch-id"
 mkdir -p "$CACHE_DIR/commit"
 mkdir -p "$CACHE_DIR/squash"
-
+mkdir -p "$CACHE_DIR/build"
 
 if ! git diff-index --quiet HEAD; then
   echo "Working directory is dirty."
@@ -94,6 +96,18 @@ function kill-gitk() {
 	GITK_PIDS=()
 }
 
+BUILD_PIDS=()
+
+function kill-build() {
+	for pid in "${BUILD_PIDS[@]}"
+	do
+		kill "$pid" >/dev/null || true
+
+		wait "$pid" >/dev/null || true
+	done
+	BUILD_PIDS=()
+}
+
 function finish {
 	kill-gitk
 }
@@ -111,6 +125,100 @@ function ctrl_c() {
 
 trap ctrl_c INT
 
+# $1: COMMIT_SHA
+function build-test() {
+	local commit_sha="$1"
+	local tree_id
+	tree_id="$(git rev-parse "HEAD^{tree}")"
+	local arch arches=(x86_64 x86 arm64 arm)
+	local -i success_count=0
+	local result_str
+
+	if [[ "$ENABLE_BUILD_TEST" -ne 1 ]]; then
+		return 0
+	fi
+
+	echo "Building $commit_sha with tree id $tree_id"
+
+	mkdir -p "$CACHE_DIR/build/$tree_id"
+
+	if [[ -e "$CACHE_DIR/build/$tree_id/complete" ]]; then
+		for arch in "${arches[@]}"; do
+			if [[ -e "$CACHE_DIR/build/$tree_id/${arch}-success.log" ]]; then
+				success_count+=1
+				result_str+=" ${arch}:success"
+			else
+				result_str+=" ${arch}:failed"
+			fi
+		done
+		echo "$commit_sha ${tree_id}${result_str}" >> "$BUILD_LOG"
+		echo "$result_str (cached)"
+
+		if [[ "${#arches[@]}" -eq "$success_count" ]]; then
+			return 0
+		elif [[ $"IGNORE_BUILD_FAILURES" -eq 1 ]]; then
+			return 0
+		else
+			return 1
+		fi
+	fi
+
+	local -A compiler=([arm64]="aarch64-linux-gnu-" [arm]="arm-linux-gnueabi-")
+
+	local -A arch_pids
+
+	local pid
+	for arch in "${arches[@]}"; do
+		(
+			set -x
+			# Clear this out so we don't build a stale config
+			rm -fv /tmp/kernel/"${arch}"/.config
+			make ARCH="${arch}" CROSS_COMPILE="${compiler[$arch]}" O=/tmp/kernel/"${arch}" allmodconfig && \
+			make ARCH="${arch}" CROSS_COMPILE="${compiler[$arch]}" O=/tmp/kernel/"${arch}" -j 30
+		) &> "$CACHE_DIR/build/$tree_id/${arch}.log" &
+		pid="$!"
+		BUILD_PIDS+=("$pid")
+		arch_pids[$arch]="$pid"
+		echo "Building $arch with pid $pid"
+	done
+
+	local -i rc
+	local -i success_count=0
+	for arch in "${arches[@]}"; do
+		pid="${arch_pids[$arch]}"
+		rc=0
+		wait "$pid" || rc="$?"
+		if [[ "$rc" -ne 0 ]]; then
+			echo "$arch (pid $pid) failed with $rc"
+			result_str+=" ${arch}:failed"
+		else
+			echo "$arch (pid $pid) completed"
+			success_count+=1
+			result_str+=" ${arch}:success"
+			mv "$CACHE_DIR/build/$tree_id/${arch}.log" \
+				"$CACHE_DIR/build/$tree_id/${arch}-success.log"
+		fi
+	done
+
+	BUILD_PIDS=()
+
+	echo "$commit_sha ${tree_id}${result_str}" >> "$BUILD_LOG"
+	echo "$result_str"
+	touch "$CACHE_DIR/build/$tree_id/complete"
+
+	if [[ "${#arches[@]}" -eq "$success_count" ]]; then
+		echo "success"
+
+		return 0
+	elif [[ $"IGNORE_BUILD_FAILURES" -eq 1 ]]; then
+		echo "failed (ignored)"
+		return 0
+	else
+		echo "failed"
+
+		return 1
+	fi
+}
 
 # Returns 0 if $1 is an ancestor of HEAD
 function is-ancestor() {
@@ -182,7 +290,7 @@ function try-cherry-pick-original() {
 			echo "Cherry pick was successful"
 			local msg
 			msg="$(get-msg "$1" | sed -E -e '1 s/\s*BACKPORT:\s*//' \
-				-e '$a['"$REBASE_ID"'('"$USER"'): Cherry picked original commit'"$CHERRY_PICKED_COMMIT"']' \
+				-e '$a['"$REBASE_ID"'('"$USER"'): Cherry picked original commit '"$CHERRY_PICKED_COMMIT"']' \
 				-e '$aSigned-off-by: '"$(git config user.name)"' <'"$(git config user.email)"'>'
 			)"
 			git commit --amend --message "$msg"
@@ -711,6 +819,8 @@ for COMMIT_SHA in "${ALL_COMMITS[@]}"; do
 			if [[ -z "$REVERTS_COMMIT" ]]; then
 				echo "Failed to extract reverted commit: "
 				COMMIT_TYPE=
+			elif ! REVERTS_COMMIT="$(git rev-parse "$REVERTS_COMMIT")"; then
+				echo "Failed to locate reverted commit"
 			else
 				REVERT_COMMIT_MAP["$COMMIT_SHA"]="$REVERTS_COMMIT"
 				COMMIT_REVERTED_MAP["$REVERTS_COMMIT"]="$COMMIT_SHA"
@@ -789,6 +899,9 @@ rm -f "$WORKLOG_FILE"
 echo "# Source: ${REBASE_START_POINT}..${REBASE_END_POINT} ($(git rev-parse "${REBASE_START_POINT}")..$(git rev-parse "${REBASE_END_POINT}"))" >> "$WORKLOG_FILE"
 echo "# Dest: $TARGET_BRANCH ($(git rev-parse "${TARGET_BRANCH}")" >> "$WORKLOG_FILE"
 
+BUILD_LOG="$REBASE_DIR/build.log"
+rm -f "$BUILD_LOG"
+
 # src sha -> new sha
 COMMIT_MAP_FILE="$REBASE_DIR/commit-map.log"
 rm -f "$COMMIT_MAP_FILE"
@@ -840,6 +953,12 @@ print-csv "Local SHA" "Local Subject" "Reason" > "$SKIPPED_AUTOMATIC_FILE"
 
 SKIPPED_FILE="$REBASE_DIR/log/skipped.csv"
 print-csv "Local SHA" "Local Subject" "Reason" > "$SKIPPED_FILE"
+
+echo "Checking to make sure HEAD builds"
+if ! build-test "$TARGET_BRANCH_SHA"; then
+	echo "HEAD failed to build..."
+	exit 1
+fi
 
 i=0
 
@@ -986,6 +1105,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			# If we found a patch, we don't want to auto squash any commits.
 			# The reason being that the conflict resolution and auditing gets a little
 			# tricky. So we only apply the squashed commit if it applies cleanly.
+			echo "Not auto squashing the following commits ${SQUASH_SHAS[*]}"
 			unset SQUASH_MAP["$COMMIT_SHA"]
 			for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
 				unset SQUASH_INTO_MAP["$SQUASH_SHA"]
@@ -994,6 +1114,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			# This sets SQUASH_ID on completion
 			if ! generate-squashed-patch "$COMMIT_SHA"; then
 				# If we can't auto generate the squash then skip it
+				echo "Not auto squashing the following commits ${SQUASH_SHAS[*]}"
 				unset SQUASH_MAP["$COMMIT_SHA"]
 				for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
 					unset SQUASH_INTO_MAP["$SQUASH_SHA"]
@@ -1003,6 +1124,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 	fi
 
 	APPLIED=0
+	BUILD_SUCCESS=0
 
 	GIT_ABORT_CMD=()
 
@@ -1012,7 +1134,7 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 			echo "Patch failed to apply: $REBASE_DIR/patch/$COMMIT_SHA"
 			echo "Moving patch to $REBASE_DIR/patch/$COMMIT_SHA.bad"
 			mv "$REBASE_DIR/patch/$COMMIT_SHA" "$REBASE_DIR/patch/$COMMIT_SHA.bad"
-		else
+		elif build-test "$COMMIT_SHA"; then
 			echo "am $COMMIT_SHA using ./$REBASE_ID/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
 
 			print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
@@ -1020,19 +1142,14 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 			POSSIBLE_PATCHES[$COMMIT_SHA]=1
 			APPLIED=1
+			BUILD_SUCCESS=1
+		else
+			APPLIED=1
 		fi
 	else
 		if [[ -n "$SQUASH_ID" ]]; then
 			GIT_ABORT_CMD=(am --abort)
-			if git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
-				echo "cherry-pick-squash $COMMIT_SHA squashed ${SQUASH_SHAS[*]}" >> "$WORKLOG_FILE"
-
-				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-					"$(git show -s --format=oneline "${SQUASH_SHAS[@]}")" \
-					>> "$CHERRY_PICKED_SQUASHED_FILE"
-
-				APPLIED=1
-			else
+			if ! git am -3 "$CACHE_DIR/squash/$SQUASH_ID"; then
 				echo "Squash patch failed to apply: $CACHE_DIR/squash/$SQUASH_ID"
 				echo "Dropping squashed patch and applying original"
 				git "${GIT_ABORT_CMD[@]}"
@@ -1042,12 +1159,32 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				for SQUASH_SHA in "${SQUASH_SHAS[@]}"; do
 					unset SQUASH_INTO_MAP["$SQUASH_SHA"]
 				done
+			elif build-test "$COMMIT_SHA"; then
+				echo "cherry-pick-squash $COMMIT_SHA squashed ${SQUASH_SHAS[*]}" >> "$WORKLOG_FILE"
+
+				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+					"$(git show -s --format=oneline "${SQUASH_SHAS[@]}")" \
+					>> "$CHERRY_PICKED_SQUASHED_FILE"
+
+				APPLIED=1
+				BUILD_SUCCESS=1
+			else
+				APPLIED=1
 			fi
 		fi
 
 		if [[ $APPLIED -eq 0 ]]; then
 			GIT_ABORT_CMD=(cherry-pick --abort)
-			if out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
+			if ! out="$(git cherry-pick "$COMMIT_SHA" 2>&1)"; then
+				if [[ $out = *"$git_empty_message"* ]]; then
+					echo "$COMMIT_SHA has already been applied"
+					echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
+					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+						>> "$CHERRY_PICKED_EMPTY_FILE"
+					continue
+				fi
+				echo "$out"
+			elif build-test "$COMMIT_SHA"; then
 				echo "$out"
 
 				if [[ -z "$NEXT_COMMIT_SHAS" ]]; then
@@ -1066,14 +1203,9 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 						>> "$REPLACE_NEXT_IDENTICAL_FILE"
 				fi
 				APPLIED=1
-			elif [[ $out = *"$git_empty_message"* ]]; then
-				echo "$COMMIT_SHA has already been applied"
-				echo "skip-empty $COMMIT_SHA" >> "$WORKLOG_FILE"
-				print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-					>> "$CHERRY_PICKED_EMPTY_FILE"
-				continue
+				BUILD_SUCCESS=1
 			else
-				echo "$out"
+				APPLIED=1
 			fi
 		fi
 	fi
@@ -1127,14 +1259,17 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 				git "${GIT_ABORT_CMD[@]}"
 
 				if try-cherry-pick-original "$COMMIT_SHA"; then
-					reason="replace $COMMIT_SHA with $MATCHING_COMMIT"
-					echo "$reason"
-					echo "reason" >> "$WORKLOG_FILE"
+					if build-test "$COMMIT_SHA"; then
+						reason="replace $COMMIT_SHA with $MATCHING_COMMIT"
+						echo "$reason"
+						echo "$reason" >> "$WORKLOG_FILE"
 
-					git format-patch -1 HEAD --stdout > "$REBASE_DIR/patch/$COMMIT_SHA"
-					git format-patch -1 "$COMMIT_SHA" --stdout > "$REBASE_DIR/orig/$COMMIT_SHA"
+						APPLIED=1
+						BUILD_SUCCESS=1
+					else
+						APPLIED=1
+					fi
 
-					APPLIED=1
 				else
 					echo "Failed to cherry-pick original"
 					echo "Going to cherry-pick the BACKPORT commit so you can fix it"
@@ -1183,24 +1318,31 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 					echo "$UPSTREAM_SHA" > "$REBASE_DIR/upstream/$COMMIT_SHA"
 					log-exists-manual "$COMMIT_SHA" "$UPSTREAM_SHA"
 
-					APPLIED=1
+					continue
 				fi
 			fi
 		fi
 	fi
 
 	# Manually handle the conflict
-	if [[ $APPLIED -eq 0 ]]; then
+	if [[ $APPLIED -eq 0 || $BUILD_SUCCESS -eq 0 ]]; then
 		MERGE_MSG="$(git rev-parse --git-path MERGE_MSG)"
 		if [[ -z "$MERGE_MSG" ]]; then
 			echo "Failed to modify MERGE_MSG, please do it manually"
 		else
-			cat <<-EOF >> "$MERGE_MSG"
-				[${REBASE_ID}($USER):
-				* Conflicts:
-				$(printf "  * %s\\n" "${CONFLICTING_FILES[@]}")
-				]
-			EOF
+			echo "[${REBASE_ID}($USER):" >> "$MERGE_MSG"
+			if [[ "${#CONFLICTING_FILES[@]}" -gt 0 ]]; then
+				cat <<-EOF >> "$MERGE_MSG"
+					Conflicts:
+					$(printf "  * %s\\n" "${CONFLICTING_FILES[@]}")
+				EOF
+			fi
+
+			if [[ $BUILD_SUCCESS -eq 0 ]]; then
+				echo "* Fixed Build failure" >> "$MERGE_MSG"
+			fi
+
+			echo ']' >> "$MERGE_MSG"
 			if ! grep -q '^Change-Id:' "$MERGE_MSG"; then
 				echo -e "Change-Id: $CHANGE_ID" >> "$MERGE_MSG"
 			fi
@@ -1239,13 +1381,21 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 						continue
 					fi
 
-					echo "backport $COMMIT_SHA from $REBASE_DIR/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
-					POSSIBLE_PATCHES[$COMMIT_SHA]=1
+					if build-test "$COMMIT_SHA"; then
+						BUILD_SUCCESS=1
 
-					print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
-						>> "$PATCHED_FILE"
+						echo "backport $COMMIT_SHA from $REBASE_DIR/patch/$COMMIT_SHA" >> "$WORKLOG_FILE"
+						POSSIBLE_PATCHES[$COMMIT_SHA]=1
 
-					APPLIED=1
+						print-csv "$COMMIT_SHA" "$(get-subject "$COMMIT_SHA")" \
+							>> "$PATCHED_FILE"
+
+						APPLIED=1
+					else
+						pause-script
+						continue
+					fi
+
 					break
 					;;
 				"Upstream")
@@ -1297,8 +1447,6 @@ for COMMIT_SHA in "${NON_CHROMIUM_COMMIT_LIST[@]}" "${CHROMIUM_COMMIT_LIST[@]}";
 
 	if [[ $APPLIED -eq 1 ]]; then
 		echo "$COMMIT_SHA $(git rev-parse HEAD)" >> "$COMMIT_MAP_FILE"
-
-		# TODO(rrangel): We can add a build test here
 	fi
 done
 
